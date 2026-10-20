@@ -1,1504 +1,808 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cozy Lofi Lounge - Multiplayer Chill Room</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS Client v2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sakura Lounge - Chat Room</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Noto Serif JP & M PLUS Rounded 1c -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        cozyBg: '#181528',
-                        cozyPanel: 'rgba(32, 28, 54, 0.75)',
-                        cozyBorder: 'rgba(255, 179, 186, 0.2)',
-                        pastelPink: '#ffb3ba',
-                        pastelBlue: '#bae1ff',
-                        pastelYellow: '#ffffba',
-                        pastelPurple: '#e8dff5',
-                        pastelGreen: '#baffc9',
-                    },
-                    fontFamily: {
-                        sans: ['Comfortaa', 'Fredoka', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+  <!-- Supabase JS Client v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
-        * {
-            user-select: none;
-            -webkit-user-select: none;
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sakura: {
+              50: '#fff5f7',
+              100: '#ffe3eb',
+              200: '#ffcad9',
+              300: '#fba1b7',
+              400: '#f66b8f',
+              500: '#eb3e6d',
+              600: '#d72152',
+              700: '#b4163f',
+              800: '#961538',
+              900: '#7e1633',
+            },
+            matcha: {
+              50: '#f4f8f4',
+              100: '#e3ebe3',
+              500: '#7da07a',
+              700: '#4e6a4b',
+            },
+            wood: '#5c4033',
+          },
+          fontFamily: {
+            sans: ['"M PLUS Rounded 1c"', 'sans-serif'],
+            serif: ['"Noto Serif JP"', 'serif'],
+          }
         }
-        body {
-            background-color: #120f1d;
-            color: #e8dff5;
-            overflow: hidden;
-            font-family: 'Comfortaa', cursive, sans-serif;
-        }
-        .glass-panel {
-            background: rgba(28, 24, 48, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 179, 186, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-        .glass-input {
-            background: rgba(18, 15, 29, 0.6);
-            border: 1px solid rgba(255, 179, 186, 0.25);
-            color: #ffffff;
-        }
-        .glass-input:focus {
-            border-color: #ffb3ba;
-            outline: none;
-            box-shadow: 0 0 10px rgba(255, 179, 186, 0.3);
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.2);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 179, 186, 0.3);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 179, 186, 0.6);
-        }
-        @keyframes vinylSpin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .spinning {
-            animation: vinylSpin 6s linear infinite;
-        }
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
-        }
-        .pulse-glow {
-            animation: pulseGlow 3s ease-in-out infinite;
-        }
-    </style>
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar for aesthetic fit */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 227, 235, 0.3);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(246, 107, 143, 0.4);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(246, 107, 143, 0.7);
+    }
+
+    /* Glassmorphism utility */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 202, 217, 0.5);
+    }
+
+    .glass-card-dark {
+      background: rgba(255, 245, 247, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(251, 161, 183, 0.4);
+    }
+
+    /* Canvas overlay behind components */
+    #sakura-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Custom subtle pulse animation for active badges */
+    @keyframes gentlePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.03); }
+    }
+    .gentle-pulse {
+      animation: gentlePulse 3s infinite ease-in-out;
+    }
+  </style>
 </head>
-<body class="h-screen w-screen flex flex-col justify-between p-2 md:p-4 relative antialiased select-none">
+<body class="bg-gradient-to-br from-sakura-50 via-pink-100 to-sakura-100 text-gray-800 font-sans h-screen flex flex-col overflow-hidden relative">
 
-    <!-- TOP HEADER / NAV BAR -->
-    <header class="w-full glass-panel rounded-2xl px-4 py-2.5 flex items-center justify-between z-20 shadow-lg border border-pastelPink/20">
+  <!-- Floating Sakura Canvas -->
+  <canvas id="sakura-canvas"></canvas>
+
+  <!-- Login / User Setup Modal -->
+  <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sakura-900/30 backdrop-blur-md transition-opacity duration-300">
+    <div class="glass-card-dark rounded-3xl p-8 max-w-md w-full shadow-2xl border border-sakura-200 transform transition-all scale-100 relative overflow-hidden">
+      <!-- Decorative background accent -->
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-sakura-300/30 rounded-full blur-2xl"></div>
+      <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-matcha-500/20 rounded-full blur-2xl"></div>
+
+      <div class="text-center mb-6 relative">
+        <span class="inline-block p-3 rounded-full bg-sakura-100 text-sakura-500 mb-2 shadow-inner">
+          <i class="fa-solid font-serif text-3xl">🌸</i>
+        </span>
+        <h2 class="text-2xl font-serif font-bold text-sakura-800 tracking-wide">Welcome to Sakura Lounge</h2>
+        <p class="text-sm text-gray-600 mt-1">Choose your nickname and avatar to enter the lounge</p>
+      </div>
+
+      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5 relative">
+        <div>
+          <label class="block text-xs font-semibold text-sakura-800 uppercase tracking-wider mb-2">Your Username</label>
+          <div class="relative">
+            <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-sakura-400"></i>
+            <input type="text" id="username-input" required maxlength="20" placeholder="e.g. Hanako, Haruto, Blossom"
+              class="w-full pl-11 pr-4 py-3 bg-white/80 border border-sakura-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sakura-400 focus:bg-white text-gray-800 transition shadow-sm" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-sakura-800 uppercase tracking-wider mb-2">Select Avatar</label>
+          <div class="grid grid-cols-5 gap-2" id="avatar-selector">
+            <!-- Avatars injected via JS -->
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-sakura-400 to-sakura-500 hover:from-sakura-500 hover:to-sakura-600 text-white font-semibold rounded-2xl shadow-lg shadow-sakura-400/30 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+          <span>Enter Lounge</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Chat Application Container -->
+  <div class="flex-1 flex h-full max-w-7xl w-full mx-auto p-2 sm:p-4 md:p-6 gap-4 z-10 overflow-hidden">
+
+    <!-- Mobile Navigation Bar Header -->
+    <div class="md:hidden fixed top-0 left-0 right-0 z-30 bg-white/80 backdrop-blur-md border-b border-sakura-200 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">🌸</span>
+        <h1 class="font-serif font-bold text-sakura-800 text-lg">Sakura Lounge</h1>
+      </div>
+      <button onclick="toggleMobileSidebar()" class="p-2 rounded-xl bg-sakura-100 text-sakura-600 hover:bg-sakura-200 transition">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Sidebar: Channels & Online Users -->
+    <aside id="sidebar" class="fixed md:relative inset-y-0 left-0 z-40 w-72 bg-white/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col gap-4 p-4 md:p-0 shadow-2xl md:shadow-none">
+      
+      <!-- App Header Banner (Desktop) -->
+      <div class="glass-card rounded-2xl p-4 hidden md:flex items-center gap-3 shadow-md border-sakura-200">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sakura-300 to-sakura-500 flex items-center justify-center text-white text-xl shadow-md">
+          🌸
+        </div>
+        <div>
+          <h1 class="font-serif font-bold text-sakura-900 text-lg leading-tight">Sakura Lounge</h1>
+          <p class="text-xs text-sakura-600 flex items-center gap-1.5 mt-0.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Real-time Chat
+          </p>
+        </div>
+      </div>
+
+      <!-- Channels Card -->
+      <div class="glass-card rounded-2xl p-4 flex-1 flex flex-col overflow-hidden shadow-md">
+        <div class="flex items-center justify-between mb-3 px-1">
+          <span class="text-xs font-bold text-sakura-800 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-hashtag text-sakura-400"></i> Channels
+          </span>
+          <button onclick="openCreateChannelModal()" title="Create Channel" class="w-6 h-6 rounded-lg bg-sakura-100 text-sakura-600 hover:bg-sakura-200 flex items-center justify-center transition">
+            <i class="fa-solid fa-plus text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Channels Navigation List -->
+        <div id="channels-list" class="space-y-1.5 overflow-y-auto pr-1 flex-1">
+          <!-- Channels rendered via JS -->
+        </div>
+
+        <hr class="my-3 border-sakura-200/60" />
+
+        <!-- User Profile Footer in Sidebar -->
+        <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div id="user-avatar-display" class="w-9 h-9 rounded-full bg-sakura-100 border border-sakura-300 flex items-center justify-center text-lg flex-shrink-0">
+              🌸
+            </div>
+            <div class="truncate">
+              <div id="user-name-display" class="font-semibold text-sm text-gray-800 truncate">Guest</div>
+              <div class="text-[10px] text-emerald-600 font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
+              </div>
+            </div>
+          </div>
+          <button onclick="changeUserProfile()" title="Edit Profile" class="text-xs text-sakura-400 hover:text-sakura-600 p-2 rounded-lg hover:bg-sakura-100 transition">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 hidden md:hidden"></div>
+
+    <!-- Main Chat Window Area -->
+    <main class="flex-1 flex flex-col glass-card rounded-2xl md:rounded-3xl shadow-xl overflow-hidden border-sakura-200 mt-12 md:mt-0 relative">
+
+      <!-- Chat Header -->
+      <div class="px-6 py-3.5 bg-white/50 border-b border-sakura-200/70 flex items-center justify-between backdrop-blur-md">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pastelPink to-pastelPurple flex items-center justify-center text-cozyBg font-bold text-xl shadow-md">
-                ☕
-            </div>
-            <div>
-                <h1 class="text-base md:text-lg font-bold tracking-wide text-pastelPink flex items-center gap-2">
-                    Lofi Haven <span id="onlineCountBadge" class="text-xs bg-pastelBlue/20 text-pastelBlue px-2 py-0.5 rounded-full font-normal border border-pastelBlue/30">1 Online</span>
-                </h1>
-                <p class="text-xs text-pastelPurple/70 hidden sm:block">A peaceful space to chat, listen & chill</p>
-            </div>
+          <div class="w-9 h-9 rounded-xl bg-sakura-100 text-sakura-600 flex items-center justify-center font-bold text-lg">
+            #
+          </div>
+          <div>
+            <h2 id="current-channel-title" class="font-bold text-sakura-900 text-base flex items-center gap-2">
+              sakura-lounge
+            </h2>
+            <p id="current-channel-desc" class="text-xs text-gray-500">Relax, chat and enjoy the cherry blossoms.</p>
+          </div>
         </div>
 
-        <!-- Quick Controls Header -->
-        <div class="flex items-center gap-2 md:gap-3">
-            <button id="toggleMusicBtn" class="px-3 py-1.5 rounded-xl bg-pastelPink/20 hover:bg-pastelPink/30 border border-pastelPink/40 text-pastelPink text-xs font-semibold flex items-center gap-2 transition-all active:scale-95">
-                <i class="fa-solid fa-compact-disc text-sm" id="vinylIcon"></i>
-                <span id="musicStatusText">Play Lofi Synth</span>
-            </button>
-            <button id="customizeBtn" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-pastelPurple text-sm border border-white/10 transition-all" title="Customize Avatar">
-                <i class="fa-solid fa-user-gear"></i>
-            </button>
-            <button id="stickyNotesBtn" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-pastelYellow text-sm border border-white/10 transition-all" title="Wholesome Notes Board">
-                <i class="fa-solid fa-note-sticky"></i>
-            </button>
-            <button id="roomSettingsBtn" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-pastelBlue text-sm border border-white/10 transition-all" title="Room Vibes & FX">
-                <i class="fa-solid fa-sliders"></i>
-            </button>
+        <div class="flex items-center gap-2 text-xs text-sakura-700 bg-sakura-100/70 px-3 py-1.5 rounded-full border border-sakura-200">
+          <i class="fa-solid fa-users text-sakura-400"></i>
+          <span id="active-status-text">Live Sync</span>
         </div>
-    </header>
+      </div>
 
-    <!-- MAIN APP WRAPPER -->
-    <main class="relative w-full flex-1 my-2 flex gap-3 overflow-hidden">
+      <!-- Messages Stream Container -->
+      <div id="messages-container" class="flex-1 p-4 md:p-6 overflow-y-auto space-y-4">
+        <!-- Messages loaded here -->
+      </div>
+
+      <!-- Image Attachment Preview Box (Hidden by default) -->
+      <div id="attachment-preview" class="hidden px-6 py-2 bg-sakura-50/80 border-t border-sakura-200 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img id="preview-img-src" class="w-10 h-10 object-cover rounded-lg border border-sakura-300" src="" alt="preview" />
+          <span class="text-xs text-gray-600 truncate max-w-xs" id="preview-img-url">Image Attached</span>
+        </div>
+        <button onclick="clearAttachment()" class="text-gray-400 hover:text-sakura-600 text-xs p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Chat Input Toolbar & Form -->
+      <div class="p-3 md:p-4 bg-white/60 border-t border-sakura-200/70 relative">
         
-        <!-- CANVAS CONTAINER (Interactive Lounge) -->
-        <div class="relative flex-1 glass-panel rounded-2xl overflow-hidden flex flex-col justify-center items-center shadow-2xl">
-            <canvas id="loungeCanvas" class="w-full h-full cursor-pointer block"></canvas>
-
-            <!-- CANVAS OVERLAY UI CONTROLS -->
-            <!-- Quick Emote Bar floating at top center of canvas -->
-            <div class="absolute top-3 left-1/2 -translate-x-1/2 glass-panel rounded-full px-3 py-1.5 flex items-center gap-2 border border-white/10 shadow-lg z-10">
-                <button onclick="triggerEmote('☕')" class="text-lg hover:scale-125 transition-transform" title="Tea">☕</button>
-                <button onclick="triggerEmote('🎵')" class="text-lg hover:scale-125 transition-transform" title="Music">🎵</button>
-                <button onclick="triggerEmote('❤️')" class="text-lg hover:scale-125 transition-transform" title="Love">❤️</button>
-                <button onclick="triggerEmote('💤')" class="text-lg hover:scale-125 transition-transform" title="Sleepy">💤</button>
-                <button onclick="triggerEmote('🌧️')" class="text-lg hover:scale-125 transition-transform" title="Rain">🌧️</button>
-                <button onclick="triggerEmote('👋')" class="text-lg hover:scale-125 transition-transform" title="Wave">👋</button>
-                <button onclick="triggerEmote('✨')" class="text-lg hover:scale-125 transition-transform" title="Sparkles">✨</button>
-            </div>
-
-            <!-- Canvas Touch/Click Info Hint -->
-            <div class="absolute bottom-3 left-3 text-[10px] sm:text-xs text-pastelPurple/60 pointer-events-none glass-panel px-2.5 py-1 rounded-lg">
-                💡 Click anywhere to walk • Click furniture/cushions to sit • WASD/Arrows to move
-            </div>
-
-            <!-- Brew Coffee Station Prompt (Dynamic Floating Overlay) -->
-            <div id="coffeeStationPrompt" class="hidden absolute bottom-12 left-1/2 -translate-x-1/2 glass-panel border border-pastelPink/50 px-4 py-2 rounded-xl text-xs text-pastelPink flex items-center gap-3 shadow-xl animate-bounce">
-                <span>🍵 Cozy Tea & Coffee Corner</span>
-                <button id="brewCupBtn" class="bg-pastelPink text-cozyBg font-bold px-2.5 py-1 rounded-lg hover:brightness-110 active:scale-95">Brew a Fresh Cup ☕</button>
-            </div>
+        <!-- Quick Emoji Popover Bar (Hidden by default) -->
+        <div id="emoji-picker" class="hidden absolute bottom-full left-4 mb-2 p-2 bg-white rounded-2xl shadow-xl border border-sakura-200 grid grid-cols-6 gap-1 z-20">
+          <!-- Emoji buttons dynamically inserted -->
         </div>
 
-        <!-- RIGHT SIDEBAR (Chat & Lofi Audio Player) -->
-        <aside id="chatSidebar" class="w-80 md:w-96 glass-panel rounded-2xl flex flex-col justify-between overflow-hidden shadow-2xl transition-all duration-300">
-            
-            <!-- SIDEBAR TABS HEADER -->
-            <div class="flex border-b border-pastelPink/10 bg-black/20 text-xs">
-                <button id="tabChatBtn" class="flex-1 py-2.5 font-semibold text-pastelPink border-b-2 border-pastelPink bg-white/5 transition-all flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-comments"></i> Chat Room
-                </button>
-                <button id="tabPeopleBtn" class="flex-1 py-2.5 font-semibold text-pastelPurple/60 border-b-2 border-transparent hover:text-pastelPurple transition-all flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-users"></i> Visitors (<span id="visitorCount">1</span>)
-                </button>
-                <button id="tabAudioBtn" class="flex-1 py-2.5 font-semibold text-pastelBlue/60 border-b-2 border-transparent hover:text-pastelBlue transition-all flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-sliders"></i> Audio Mix
-                </button>
-            </div>
+        <form id="chat-form" onsubmit="sendMessage(event)" class="flex items-center gap-2">
+          
+          <!-- Emoji Toggle Button -->
+          <button type="button" onclick="toggleEmojiPicker()" class="p-2.5 rounded-xl text-sakura-500 hover:bg-sakura-100/80 transition flex-shrink-0" title="Add Emoji">
+            <i class="fa-regular fa-face-smile text-xl"></i>
+          </button>
 
-            <!-- PANEL 1: CHAT CONTENT -->
-            <div id="chatTabContent" class="flex-1 flex flex-col h-full overflow-hidden">
-                <!-- Chat Messages Scroll Container -->
-                <div id="chatMessages" class="flex-1 p-3 overflow-y-auto space-y-3 text-xs">
-                    <div class="p-2.5 rounded-xl bg-pastelPurple/10 border border-pastelPurple/20 text-pastelPurple text-center text-[11px] leading-relaxed">
-                        ✨ Welcome to the Lofi Lounge! Find a cozy seat, listen to chill synth beats, and leave a warm note for everyone.
-                    </div>
-                </div>
+          <!-- Attach Image URL Modal Toggle -->
+          <button type="button" onclick="promptImageUrl()" class="p-2.5 rounded-xl text-sakura-500 hover:bg-sakura-100/80 transition flex-shrink-0" title="Attach Image URL">
+            <i class="fa-solid fa-image text-xl"></i>
+          </button>
 
-                <!-- Chat Input Form -->
-                <form id="chatForm" class="p-2.5 border-t border-pastelPink/10 bg-black/20 flex gap-2">
-                    <input type="text" id="chatInput" placeholder="Send a cozy message..." maxlength="120" autocomplete="off" class="flex-1 glass-input rounded-xl px-3 py-2 text-xs text-white placeholder-pastelPurple/40 focus:outline-none">
-                    <button type="submit" class="bg-pastelPink text-cozyBg hover:bg-pastelPink/80 font-bold px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-center shadow-md active:scale-95">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </button>
-                </form>
-            </div>
+          <!-- Message Input -->
+          <input type="text" id="message-input" autocomplete="off" placeholder="Type a message in #sakura-lounge..."
+            class="flex-1 py-3 px-4 bg-white/90 border border-sakura-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sakura-400 focus:bg-white text-gray-800 text-sm transition shadow-inner" />
 
-            <!-- PANEL 2: VISITORS CONTENT -->
-            <div id="peopleTabContent" class="hidden flex-1 p-3 overflow-y-auto space-y-2 text-xs">
-                <div class="text-[11px] text-pastelPurple/60 uppercase tracking-wider font-semibold mb-2">People in Room</div>
-                <div id="visitorList" class="space-y-1.5">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
+          <!-- Send Button -->
+          <button type="submit" class="p-3 bg-gradient-to-r from-sakura-400 to-sakura-500 hover:from-sakura-500 hover:to-sakura-600 text-white rounded-2xl shadow-md shadow-sakura-400/30 transition transform active:scale-95 flex items-center justify-center flex-shrink-0 w-11 h-11">
+            <i class="fa-solid fa-paper-plane text-sm"></i>
+          </button>
+        </form>
+      </div>
 
-            <!-- PANEL 3: AUDIO MIXER CONTROLS -->
-            <div id="audioTabContent" class="hidden flex-1 p-4 overflow-y-auto space-y-4 text-xs">
-                <div>
-                    <h3 class="font-bold text-pastelPink mb-1 flex items-center gap-2">
-                        <i class="fa-solid fa-compact-disc"></i> Lofi Music Player
-                    </h3>
-                    <p class="text-[10px] text-pastelPurple/60 mb-3">Generative chord progressions & soft chill beats</p>
-                    
-                    <div class="flex items-center gap-2 mb-3">
-                        <button id="synthPlayToggleBtn" class="flex-1 bg-pastelPink text-cozyBg font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-2 shadow hover:brightness-110">
-                            <i class="fa-solid fa-play" id="synthPlayIcon"></i>
-                            <span id="synthPlayBtnText">Start Synth Music</span>
-                        </button>
-                    </div>
-
-                    <div class="space-y-1">
-                        <label class="text-[11px] text-pastelPurple/80 flex justify-between">
-                            <span>Music Volume</span>
-                            <span id="musicVolVal">70%</span>
-                        </label>
-                        <input type="range" id="musicVolSlider" min="0" max="100" value="70" class="w-full accent-pastelPink cursor-pointer">
-                    </div>
-                </div>
-
-                <hr class="border-pastelPink/10">
-
-                <!-- AMBIENT SOUND MIXER -->
-                <div>
-                    <h3 class="font-bold text-pastelBlue mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-cloud-rain"></i> Ambient Sound Mixer
-                    </h3>
-                    
-                    <div class="space-y-3">
-                        <div>
-                            <div class="flex justify-between text-[11px] text-pastelPurple mb-1">
-                                <span>🌧️ Gentle Rain</span>
-                                <span id="rainVolVal">40%</span>
-                            </div>
-                            <input type="range" id="rainVolSlider" min="0" max="100" value="40" class="w-full accent-pastelBlue cursor-pointer">
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-[11px] text-pastelPurple mb-1">
-                                <span>🔥 Crackling Fireplace</span>
-                                <span id="fireVolVal">50%</span>
-                            </div>
-                            <input type="range" id="fireVolSlider" min="0" max="100" value="50" class="w-full accent-pastelYellow cursor-pointer">
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-[11px] text-pastelPurple mb-1">
-                                <span>📻 Vinyl Crackle / Hiss</span>
-                                <span id="vinylVolVal">30%</span>
-                            </div>
-                            <input type="range" id="vinylVolSlider" min="0" max="100" value="30" class="w-full accent-pastelPink cursor-pointer">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MINI AUDIO SPECTRUM VISUALIZER AT BOTTOM -->
-            <div class="p-2 border-t border-pastelPink/10 bg-black/30 flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2 text-[11px] text-pastelPurple/80">
-                    <span id="visualizerDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span id="currentTrackTitle" class="truncate max-w-[180px]">Generative Lofi Chill Keys</span>
-                </div>
-                <canvas id="audioVisualizer" width="80" height="20" class="rounded opacity-80"></canvas>
-            </div>
-        </aside>
     </main>
+  </div>
 
-    <!-- MODAL 1: CUSTOMIZE AVATAR MODAL -->
-    <div id="customizeModal" class="hidden fixed inset-0 z-50 glass-panel bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-pastelPink/30 shadow-2xl relative">
-            <h2 class="text-lg font-bold text-pastelPink mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-user-pen"></i> Avatar Customization
-            </h2>
-
-            <div class="space-y-4 text-xs">
-                <div>
-                    <label class="block text-pastelPurple mb-1">Your Name / Handle</label>
-                    <input type="text" id="avatarNameInput" value="Cozy Explorer" maxlength="16" class="w-full glass-input rounded-xl px-3 py-2 text-sm">
-                </div>
-
-                <div>
-                    <label class="block text-pastelPurple mb-1">Outfit / Skin Color</label>
-                    <div class="flex gap-2" id="colorPickerGroup">
-                        <button data-color="#ffb3ba" class="w-8 h-8 rounded-full bg-[#ffb3ba] border-2 border-white/80 active:scale-95 transition-transform"></button>
-                        <button data-color="#bae1ff" class="w-8 h-8 rounded-full bg-[#bae1ff] border-2 border-transparent active:scale-95 transition-transform"></button>
-                        <button data-color="#ffffba" class="w-8 h-8 rounded-full bg-[#ffffba] border-2 border-transparent active:scale-95 transition-transform"></button>
-                        <button data-color="#baffc9" class="w-8 h-8 rounded-full bg-[#baffc9] border-2 border-transparent active:scale-95 transition-transform"></button>
-                        <button data-color="#e8dff5" class="w-8 h-8 rounded-full bg-[#e8dff5] border-2 border-transparent active:scale-95 transition-transform"></button>
-                        <button data-color="#ffdfba" class="w-8 h-8 rounded-full bg-[#ffdfba] border-2 border-transparent active:scale-95 transition-transform"></button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-pastelPurple mb-1">Favorite Accessory</label>
-                    <select id="accessorySelect" class="w-full glass-input rounded-xl px-3 py-2 text-xs bg-cozyBg text-white">
-                        <option value="🎧">🎧 Cozy Headphones</option>
-                        <option value="👓">👓 Vintage Glasses</option>
-                        <option value="🐱">🐱 Cat Ears</option>
-                        <option value="🧶">🧶 Warm Beanie</option>
-                        <option value="☕">☕ Holding Tea Cup</option>
-                        <option value="✨">✨ Sparkle Aura</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="mt-6 flex justify-end gap-2">
-                <button id="closeCustomizeBtn" class="px-4 py-2 rounded-xl bg-pastelPink text-cozyBg font-bold hover:brightness-110 active:scale-95 text-xs">Save & Close</button>
-            </div>
+  <!-- Create Channel Modal -->
+  <div id="create-channel-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm hidden">
+    <div class="glass-card-dark rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-sakura-200">
+      <h3 class="text-lg font-serif font-bold text-sakura-900 mb-1">Create New Channel</h3>
+      <p class="text-xs text-gray-500 mb-4">Start a new room for blossoms to gather.</p>
+      
+      <form onsubmit="handleCreateChannel(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-sakura-800 uppercase tracking-wider mb-1">Channel Name</label>
+          <input type="text" id="new-channel-name" required placeholder="e.g. tea-room" maxlength="20"
+            class="w-full px-4 py-2.5 bg-white/80 border border-sakura-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sakura-400 text-sm" />
         </div>
-    </div>
-
-    <!-- MODAL 2: STICKY NOTES / JOURNAL BOARD MODAL -->
-    <div id="stickyNotesModal" class="hidden fixed inset-0 z-50 glass-panel bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 border border-pastelYellow/30 shadow-2xl relative flex flex-col max-h-[85vh]">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-pastelYellow flex items-center gap-2">
-                    <i class="fa-solid fa-note-sticky"></i> Wholesome Sticky Notes Board
-                </h2>
-                <button id="closeStickyBtn" class="text-pastelPurple hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <!-- Notes Grid Container -->
-            <div id="stickyNotesGrid" class="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto p-1 text-xs">
-                <!-- Dynamically populated -->
-            </div>
-
-            <!-- Add Note Form -->
-            <div class="mt-4 pt-3 border-t border-white/10 flex gap-2">
-                <input type="text" id="newNoteInput" placeholder="Leave a wholesome note or message..." maxlength="80" class="flex-1 glass-input rounded-xl px-3 py-2 text-xs">
-                <button id="addNoteBtn" class="bg-pastelYellow text-cozyBg font-bold px-4 py-2 rounded-xl text-xs hover:brightness-110 active:scale-95">Post Note 📌</button>
-            </div>
+        <div>
+          <label class="block text-xs font-semibold text-sakura-800 uppercase tracking-wider mb-1">Description</label>
+          <input type="text" id="new-channel-desc" placeholder="e.g. Chat about matcha & snacks" maxlength="50"
+            class="w-full px-4 py-2.5 bg-white/80 border border-sakura-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sakura-400 text-sm" />
         </div>
-    </div>
-
-    <!-- MODAL 3: ROOM VIBES & LIGHTING SETTINGS MODAL -->
-    <div id="roomSettingsModal" class="hidden fixed inset-0 z-50 glass-panel bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-2xl p-6 border border-pastelBlue/30 shadow-2xl relative">
-            <h2 class="text-lg font-bold text-pastelBlue mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-sliders"></i> Room Vibes & Atmosphere
-            </h2>
-
-            <div class="space-y-4 text-xs">
-                <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10">
-                    <span>🔥 Fireplace Warm Light</span>
-                    <button id="toggleFireBtn" class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">Lit 🔥</button>
-                </div>
-
-                <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10">
-                    <span>🌧️ Window Rain Particle Effect</span>
-                    <button id="toggleRainFxBtn" class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">Active 🌧️</button>
-                </div>
-
-                <div>
-                    <div class="flex justify-between text-pastelPurple mb-1">
-                        <span>🌙 Room Night Lighting Dimmer</span>
-                        <span id="roomDimmerVal">60%</span>
-                    </div>
-                    <input type="range" id="roomDimmerSlider" min="20" max="90" value="60" class="w-full accent-pastelBlue cursor-pointer">
-                </div>
-            </div>
-
-            <div class="mt-6 flex justify-end">
-                <button id="closeSettingsBtn" class="px-4 py-2 rounded-xl bg-pastelBlue text-cozyBg font-bold hover:brightness-110 active:scale-95 text-xs">Done</button>
-            </div>
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" onclick="closeCreateChannelModal()" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-sakura-100 rounded-xl transition">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold bg-sakura-500 hover:bg-sakura-600 text-white rounded-xl shadow-md transition">
+            Create Channel
+          </button>
         </div>
+      </form>
     </div>
+  </div>
 
-    <!-- JAVASCRIPT APP LOGIC -->
-    <script>
-        /**
-         * SUPABASE INITIALIZATION
-         */
-        const SUPABASE_URL = "https://brvyjdtnxzjlrhukngjn.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE";
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-        let supabase = null;
-        let realtimeChannel = null;
+  <!-- MAIN SCRIPT -->
+  <script>
+    // --- 1. Supabase Initialization ---
+    const SUPABASE_URL = "https://brvyjdtnxzjlrhukngjn.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE";
 
-        try {
-            if (window.supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            }
-        } catch (e) {
-            console.warn("Supabase init fallback to local simulation mode:", e);
+    let supabase = null;
+    try {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch (e) {
+      console.warn("Supabase init fallback:", e);
+    }
+
+    // --- 2. Application State ---
+    const AVATARS = ['🌸', '🍡', '🍵', '🦊', '🎏', '🍱', '⛩️', '🏮', '🐱', '✨'];
+    const POPULAR_EMOJIS = ['🌸', '💖', '🍡', '🍵', '✨', '🥺', '🎉', '🏮', '😍', '👏', '⛩️', '🐱'];
+
+    let currentUser = {
+      username: '',
+      avatar: '🌸'
+    };
+
+    let channels = [
+      { id: 'sakura-lounge', name: 'sakura-lounge', desc: 'Relax, chat and enjoy the cherry blossoms.' },
+      { id: 'general', name: 'general', desc: 'General community chat room.' },
+      { id: 'anime-talk', name: 'anime-talk', desc: 'Discuss your favorite anime & manga.' },
+      { id: 'chill-vibes', name: 'chill-vibes', desc: 'Lo-fi beats, warm tea, and good vibes.' }
+    ];
+
+    let currentChannel = 'sakura-lounge';
+    let attachedImageUrl = '';
+    let isRealtimeConnected = false;
+    let fallbackPollTimer = null;
+    let localMessagesFallback = [];
+
+    // --- 3. Sakura Floating Petals Canvas ---
+    function initSakuraAnimation() {
+      const canvas = document.getElementById('sakura-canvas');
+      const ctx = canvas.getContext('2d');
+
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const petals = [];
+      const petalCount = Math.min(35, Math.floor(width / 30));
+
+      class Petal {
+        constructor() {
+          this.reset();
         }
 
-        /**
-         * GLOBAL STATE
-         */
-        const myId = 'user_' + Math.random().toString(36).substr(2, 7);
-        let myPlayer = {
-            id: myId,
-            name: 'Cozy Guest',
-            color: '#ffb3ba',
-            accessory: '🎧',
-            x: 400,
-            y: 350,
-            targetX: 400,
-            targetY: 350,
-            sitting: false,
-            seatId: null,
-            speech: '',
-            speechTimer: 0,
-            emote: '',
-            emoteTimer: 0,
-            holdingCup: false
-        };
+        reset() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * -height;
+          this.size = Math.random() * 8 + 8;
+          this.speedY = Math.random() * 1.2 + 0.8;
+          this.speedX = Math.random() * 1 - 0.5;
+          this.rotation = Math.random() * 360;
+          this.rotationSpeed = (Math.random() - 0.5) * 1.5;
+          this.opacity = Math.random() * 0.5 + 0.4;
+          this.color = ['#ffcad9', '#fba1b7', '#ffe3eb', '#f66b8f'][Math.floor(Math.random() * 4)];
+        }
 
-        // Other online players map: id -> player object
-        const remotePlayers = new Map();
+        update() {
+          this.y += this.speedY;
+          this.x += Math.sin(this.y / 30) + this.speedX;
+          this.rotation += this.rotationSpeed;
 
-        // Environment & Lighting toggles
-        const roomConfig = {
-            fireLit: true,
-            rainActive: true,
-            dimmer: 0.6
-        };
+          if (this.y > height + 20) {
+            this.reset();
+          }
+        }
 
-        // Persistent/Local sticky notes
-        const stickyNotes = [
-            { id: 1, author: 'Milo', text: 'Hope you are having a soft and peaceful day! ☕', color: '#ffffba' },
-            { id: 2, author: 'Luna', text: 'Remember to take deep breaths and drink water ✨', color: '#ffb3ba' },
-            { id: 3, author: 'Kaito', text: 'Listening to lofi beats makes studying so much easier 🎵', color: '#bae1ff' }
-        ];
+        draw() {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate((this.rotation * Math.PI) / 180);
+          ctx.globalAlpha = this.opacity;
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          // Render petal shape
+          ctx.moveTo(0, 0);
+          ctx.bezierCurveTo(-this.size, -this.size / 2, -this.size, this.size / 2, 0, this.size);
+          ctx.bezierCurveTo(this.size, this.size / 2, this.size, -this.size / 2, 0, 0);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
 
-        /**
-         * SEATING SPOTS IN ROOM
-         */
-        const seats = [
-            { id: 'sofa_left', label: 'Plush Sofa (L)', x: 180, y: 260, occupiedBy: null },
-            { id: 'sofa_right', label: 'Plush Sofa (R)', x: 230, y: 260, occupiedBy: null },
-            { id: 'armchair_fire', label: 'Fireplace Armchair', x: 620, y: 230, occupiedBy: null },
-            { id: 'beanbag_1', label: 'Cozy Beanbag', x: 420, y: 380, occupiedBy: null },
-            { id: 'window_bench_1', label: 'Window Seat (L)', x: 300, y: 150, occupiedBy: null },
-            { id: 'window_bench_2', label: 'Window Seat (R)', x: 380, y: 150, occupiedBy: null },
-            { id: 'barstool_1', label: 'Coffee Barstool 1', x: 680, y: 400, occupiedBy: null },
-            { id: 'barstool_2', label: 'Coffee Barstool 2', x: 730, y: 400, occupiedBy: null },
-            { id: 'cushion_floor', label: 'Floor Cushion', x: 500, y: 290, occupiedBy: null }
-        ];
+      for (let i = 0; i < petalCount; i++) {
+        petals.push(new Petal());
+      }
 
-        /**
-         * WEB AUDIO ENGINE (LOFI SYNTH & AMBIENT MIXER)
-         */
-        class LofiAudioEngine {
-            constructor() {
-                this.ctx = null;
-                this.isPlayingSynth = false;
-                this.masterGain = null;
-                this.musicGain = null;
-                this.rainGain = null;
-                this.fireGain = null;
-                this.vinylGain = null;
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        petals.forEach((petal) => {
+          petal.update();
+          petal.draw();
+        });
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+
+    // --- 4. Render UI Components ---
+    function renderAvatarSelector() {
+      const container = document.getElementById('avatar-selector');
+      container.innerHTML = AVATARS.map((av) => `
+        <button type="button" onclick="selectAvatar('${av}')" 
+          class="avatar-option w-11 h-11 rounded-2xl flex items-center justify-center text-xl bg-white/60 border border-sakura-200 hover:bg-sakura-100 transition transform hover:scale-105 ${av === currentUser.avatar ? 'ring-2 ring-sakura-500 bg-sakura-100' : ''}">
+          ${av}
+        </button>
+      `).join('');
+    }
+
+    function selectAvatar(avatar) {
+      currentUser.avatar = avatar;
+      renderAvatarSelector();
+    }
+
+    function renderChannels() {
+      const container = document.getElementById('channels-list');
+      container.innerHTML = channels.map((ch) => {
+        const isActive = ch.id === currentChannel;
+        return `
+          <button onclick="switchChannel('${ch.id}')" 
+            class="w-full text-left px-3.5 py-2.5 rounded-xl transition flex items-center justify-between group ${
+              isActive 
+                ? 'bg-gradient-to-r from-sakura-400 to-sakura-500 text-white shadow-md font-medium' 
+                : 'text-gray-700 hover:bg-sakura-100/70 hover:text-sakura-800'
+            }">
+            <div class="flex items-center gap-2.5 truncate">
+              <span class="${isActive ? 'text-white' : 'text-sakura-400 group-hover:text-sakura-600'} font-semibold text-base">#</span>
+              <span class="truncate text-sm">${ch.name}</span>
+            </div>
+            ${isActive ? '<span class="w-2 h-2 rounded-full bg-white shadow-sm"></span>' : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderEmojiPicker() {
+      const container = document.getElementById('emoji-picker');
+      container.innerHTML = POPULAR_EMOJIS.map(e => `
+        <button type="button" onclick="insertEmoji('${e}')" class="p-2 text-lg hover:bg-sakura-100 rounded-xl transition transform hover:scale-110">
+          ${e}
+        </button>
+      `).join('');
+    }
+
+    // --- 5. Message Formatting & DOM ---
+    function renderMessages(messages) {
+      const container = document.getElementById('messages-container');
+      
+      if (!messages || messages.length === 0) {
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center p-8 text-sakura-400/80">
+            <span class="text-5xl mb-3 animate-bounce">🌸</span>
+            <p class="font-serif font-medium text-sakura-800 text-lg">No messages in #${currentChannel} yet</p>
+            <p class="text-xs text-gray-500 mt-1">Be the first to say konnichiwa!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = messages.map(msg => {
+        const isSelf = msg.username === currentUser.username;
+        const timeStr = msg.created_at 
+          ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <div class="flex items-start gap-3 ${isSelf ? 'flex-row-reverse' : ''} group">
+            <!-- Avatar -->
+            <div class="w-9 h-9 rounded-full bg-white shadow-sm border border-sakura-200 flex items-center justify-center text-lg flex-shrink-0">
+              ${msg.avatar || '🌸'}
+            </div>
+
+            <!-- Bubble Content -->
+            <div class="max-w-[80%] sm:max-w-[70%]">
+              <div class="flex items-center gap-2 mb-1 px-1 ${isSelf ? 'justify-end' : ''}">
+                <span class="text-xs font-semibold text-gray-700">${msg.username || 'Anonymous'}</span>
+                <span class="text-[10px] text-gray-400">${timeStr}</span>
+              </div>
+
+              <div class="rounded-2xl px-4 py-2.5 text-sm shadow-sm leading-relaxed ${
+                isSelf 
+                  ? 'bg-gradient-to-r from-sakura-400 to-sakura-500 text-white rounded-tr-xs' 
+                  : 'bg-white text-gray-800 rounded-tl-xs border border-sakura-100'
+              }">
+                ${msg.message ? escapeHTML(msg.message) : ''}
                 
-                this.analyser = null;
-                this.chordIndex = 0;
-                this.timer = null;
+                ${msg.image_url ? `
+                  <div class="mt-2 rounded-xl overflow-hidden border border-sakura-200/50">
+                    <img src="${escapeHTML(msg.image_url)}" onerror="this.style.display='none'" alt="attachment" class="max-h-60 w-full object-cover rounded-xl" />
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      const container = document.getElementById('messages-container');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    // --- 6. Realtime Sync & Supabase Data Layer ---
+    async function loadMessages() {
+      if (!supabase) {
+        fetchFallbackMessages();
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('channel', currentChannel)
+          .order('created_at', { ascending: true })
+          .limit(100);
+
+        if (error) throw error;
+        
+        renderMessages(data || []);
+      } catch (err) {
+        console.warn("Supabase load error (switching to local dynamic mode):", err.message);
+        fetchFallbackMessages();
+      }
+    }
+
+    function subscribeToRealtime() {
+      if (!supabase) return;
+
+      try {
+        const channelSubscription = supabase
+          .channel(`public:messages:${currentChannel}`)
+          .on('postgres_changes', { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'messages',
+            filter: `channel=eq.${currentChannel}`
+          }, (payload) => {
+            appendSingleMessage(payload.new);
+          })
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              isRealtimeConnected = true;
+              document.getElementById('active-status-text').innerText = 'Supabase Realtime';
             }
+          });
+      } catch (e) {
+        console.warn("Realtime channel failed:", e);
+      }
+    }
 
-            init() {
-                if (this.ctx) return;
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                this.ctx = new AudioCtx();
+    function appendSingleMessage(msg) {
+      if (msg.channel !== currentChannel) return;
+      loadMessages(); // Refresh view
+    }
 
-                this.masterGain = this.ctx.createGain();
-                this.masterGain.gain.value = 0.8;
-                this.masterGain.connect(this.ctx.destination);
+    // Fallback Local Storage Simulation if DB tables are uninitialized
+    function fetchFallbackMessages() {
+      document.getElementById('active-status-text').innerText = 'Local Live Sync';
+      const stored = localStorage.getItem(`sakura_messages_${currentChannel}`);
+      if (stored) {
+        localMessagesFallback = JSON.parse(stored);
+      } else {
+        localMessagesFallback = [
+          { username: 'SakuraBot', avatar: '🌸', message: `Welcome to #${currentChannel}! 🌸`, created_at: new Date().toISOString() }
+        ];
+      }
+      renderMessages(localMessagesFallback);
+    }
 
-                this.analyser = this.ctx.createAnalyser();
-                this.analyser.fftSize = 32;
-                this.masterGain.connect(this.analyser);
+    async function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('message-input');
+      const messageText = input.value.trim();
 
-                // Music Gain
-                this.musicGain = this.ctx.createGain();
-                this.musicGain.gain.value = 0.7;
-                this.musicGain.connect(this.masterGain);
+      if (!messageText && !attachedImageUrl) return;
 
-                // Rain Noise Synthesizer
-                this.initRain();
-                // Fireplace Noise Synthesizer
-                this.initFire();
-                // Vinyl Crackle Synthesizer
-                this.initVinyl();
-            }
+      const newMessagePayload = {
+        username: currentUser.username || 'CherryBlossom',
+        avatar: currentUser.avatar || '🌸',
+        message: messageText,
+        channel: currentChannel,
+        image_url: attachedImageUrl,
+        created_at: new Date().toISOString()
+      };
 
-            initRain() {
-                if (!this.ctx) return;
-                const bufferSize = 2 * this.ctx.sampleRate;
-                const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                const output = noiseBuffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    output[i] = Math.random() * 2 - 1;
-                }
+      input.value = '';
+      clearAttachment();
 
-                const whiteNoise = this.ctx.createBufferSource();
-                whiteNoise.buffer = noiseBuffer;
-                whiteNoise.loop = true;
-
-                const filter = this.ctx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.value = 800;
-
-                this.rainGain = this.ctx.createGain();
-                this.rainGain.gain.value = 0.4;
-
-                whiteNoise.connect(filter);
-                filter.connect(this.rainGain);
-                this.rainGain.connect(this.masterGain);
-                whiteNoise.start();
-            }
-
-            initFire() {
-                if (!this.ctx) return;
-                const bufferSize = this.ctx.sampleRate;
-                const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                const output = noiseBuffer.getChannelData(0);
-                let lastOut = 0.0;
-                for (let i = 0; i < bufferSize; i++) {
-                    const white = Math.random() * 2 - 1;
-                    output[i] = (lastOut + (0.02 * white)) / 1.02;
-                    lastOut = output[i];
-                    output[i] *= 3.5;
-                }
-
-                const brownNoise = this.ctx.createBufferSource();
-                brownNoise.buffer = noiseBuffer;
-                brownNoise.loop = true;
-
-                const filter = this.ctx.createBiquadFilter();
-                filter.type = 'bandpass';
-                filter.frequency.value = 400;
-                filter.Q.value = 1.0;
-
-                this.fireGain = this.ctx.createGain();
-                this.fireGain.gain.value = 0.5;
-
-                brownNoise.connect(filter);
-                filter.connect(this.fireGain);
-                this.fireGain.connect(this.masterGain);
-                brownNoise.start();
-            }
-
-            initVinyl() {
-                if (!this.ctx) return;
-                const bufferSize = this.ctx.sampleRate * 2;
-                const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                const output = noiseBuffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    // Periodic soft pops
-                    if (Math.random() < 0.001) {
-                        output[i] = (Math.random() - 0.5) * 0.8;
-                    } else {
-                        output[i] = (Math.random() * 2 - 1) * 0.015;
-                    }
-                }
-
-                const vinylSrc = this.ctx.createBufferSource();
-                vinylSrc.buffer = noiseBuffer;
-                vinylSrc.loop = true;
-
-                this.vinylGain = this.ctx.createGain();
-                this.vinylGain.gain.value = 0.3;
-
-                vinylSrc.connect(this.vinylGain);
-                this.vinylGain.connect(this.masterGain);
-                vinylSrc.start();
-            }
-
-            toggleSynth() {
-                this.init();
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-
-                this.isPlayingSynth = !this.isPlayingSynth;
-                if (this.isPlayingSynth) {
-                    this.playNextChord();
-                } else {
-                    if (this.timer) clearTimeout(this.timer);
-                }
-                return this.isPlayingSynth;
-            }
-
-            playNextChord() {
-                if (!this.isPlayingSynth) return;
-
-                // Chill Lofi Seventh Chords (frequencies in Hz)
-                const progression = [
-                    [261.63, 329.63, 392.00, 493.88], // Cmaj7
-                    [220.00, 261.63, 329.63, 392.00], // Am7
-                    [174.61, 220.00, 261.63, 329.63], // Fmaj7
-                    [196.00, 246.94, 293.66, 349.23]  // G7
-                ];
-
-                const notes = progression[this.chordIndex % progression.length];
-                this.chordIndex++;
-
-                notes.forEach((freq, idx) => {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-
-                    // Warm soft triangle/sine mix
-                    osc.type = idx % 2 === 0 ? 'triangle' : 'sine';
-                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-
-                    // Low pass filter for warm lofi feel
-                    const filter = this.ctx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(600, this.ctx.currentTime);
-
-                    const now = this.ctx.currentTime;
-                    const duration = 3.5;
-
-                    gain.gain.setValueAtTime(0, now);
-                    gain.gain.linearRampToValueAtTime(0.08, now + 0.4);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-                    osc.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(this.musicGain);
-
-                    osc.start(now);
-                    osc.stop(now + duration);
-                });
-
-                // Random subtle melody note overlay
-                if (Math.random() > 0.3) {
-                    setTimeout(() => {
-                        if (!this.isPlayingSynth) return;
-                        const melNotes = [523.25, 587.33, 659.25, 783.99];
-                        const note = melNotes[Math.floor(Math.random() * melNotes.length)];
-                        
-                        const osc = this.ctx.createOscillator();
-                        const gain = this.ctx.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(note, this.ctx.currentTime);
-
-                        const now = this.ctx.currentTime;
-                        gain.gain.setValueAtTime(0, now);
-                        gain.gain.linearRampToValueAtTime(0.05, now + 0.1);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-
-                        osc.connect(gain);
-                        gain.connect(this.musicGain);
-                        osc.start(now);
-                        osc.stop(now + 1.5);
-                    }, 1200);
-                }
-
-                this.timer = setTimeout(() => this.playNextChord(), 3600);
-            }
-
-            setVolume(type, val) {
-                if (!this.ctx) return;
-                const norm = val / 100;
-                if (type === 'music' && this.musicGain) this.musicGain.gain.value = norm;
-                if (type === 'rain' && this.rainGain) this.rainGain.gain.value = norm;
-                if (type === 'fire' && this.fireGain) this.fireGain.gain.value = norm;
-                if (type === 'vinyl' && this.vinylGain) this.vinylGain.gain.value = norm;
-            }
+      // Try Supabase insert
+      let insertedSuccessfully = false;
+      if (supabase) {
+        try {
+          const { error } = await supabase.from('messages').insert([newMessagePayload]);
+          if (!error) {
+            insertedSuccessfully = true;
+            loadMessages();
+          }
+        } catch (err) {
+          console.warn("Database payload fallback triggered", err);
         }
-
-        const audioFx = new LofiAudioEngine();
-
-        /**
-         * CANVAS RENDER ENGINE & PARTICLES
-         */
-        const canvas = document.getElementById('loungeCanvas');
-        const ctx = canvas.getContext('2d');
-
-        let rainParticles = [];
-        let fireParticles = [];
-        let musicNoteParticles = [];
-
-        function resizeCanvas() {
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-            initParticles();
-        }
-
-        function initParticles() {
-            // Rain
-            rainParticles = [];
-            for (let i = 0; i < 40; i++) {
-                rainParticles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    len: 10 + Math.random() * 12,
-                    speed: 4 + Math.random() * 5
-                });
-            }
-            // Fire sparks
-            fireParticles = [];
-            for (let i = 0; i < 20; i++) {
-                fireParticles.push({
-                    x: 620 + (Math.random() * 20 - 10),
-                    y: 200,
-                    size: 1 + Math.random() * 2.5,
-                    vy: 0.5 + Math.random() * 1.5,
-                    vx: (Math.random() - 0.5) * 0.8,
-                    life: Math.random()
-                });
-            }
-        }
-
-        /**
-         * CANVAS DRAWING ROUTINES
-         */
-        function drawRoomBackground() {
-            const w = canvas.width;
-            const h = canvas.height;
-
-            // Room Floor & Walls Background
-            const floorGradient = ctx.createLinearGradient(0, 0, 0, h);
-            floorGradient.addColorStop(0, '#120f21');
-            floorGradient.addColorStop(0.35, '#1e1a33');
-            floorGradient.addColorStop(1, '#2d264a');
-            ctx.fillStyle = floorGradient;
-            ctx.fillRect(0, 0, w, h);
-
-            // Wooden Floor Grid Pattern
-            ctx.strokeStyle = 'rgba(255, 179, 186, 0.04)';
-            ctx.lineWidth = 1;
-            const tileSize = 40;
-            for (let x = 0; x < w; x += tileSize) {
-                ctx.beginPath(); ctx.moveTo(x, 180); ctx.lineTo(x, h); ctx.stroke();
-            }
-            for (let y = 180; y < h; y += tileSize) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-            }
-
-            // WALL TOP BAND
-            ctx.fillStyle = '#161329';
-            ctx.fillRect(0, 0, w, 180);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-            ctx.fillRect(0, 175, w, 5);
-
-            // --- LARGE RAINY WINDOW (Top Center/Left) ---
-            const winX = 260, winY = 30, winW = 200, winH = 110;
-            // Night Sky Outside
-            const skyGrad = ctx.createLinearGradient(winX, winY, winX, winY + winH);
-            skyGrad.addColorStop(0, '#090814');
-            skyGrad.addColorStop(1, '#1b1736');
-            ctx.fillStyle = skyGrad;
-            ctx.fillRect(winX, winY, winW, winH);
-
-            // Stars outside window
-            ctx.fillStyle = '#ffffff';
-            ctx.globalAlpha = 0.7;
-            ctx.fillRect(280, 50, 2, 2);
-            ctx.fillRect(350, 40, 1.5, 1.5);
-            ctx.fillRect(420, 65, 2, 2);
-            ctx.fillRect(310, 80, 1, 1);
-            ctx.globalAlpha = 1.0;
-
-            // Soft Rain Drops on Window
-            if (roomConfig.rainActive) {
-                ctx.strokeStyle = 'rgba(186, 225, 255, 0.35)';
-                ctx.lineWidth = 1.5;
-                rainParticles.forEach(p => {
-                    if (p.x >= winX && p.x <= winX + winW) {
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, Math.max(winY, p.y));
-                        ctx.lineTo(p.x - 2, Math.min(winY + winH, p.y + p.len));
-                        ctx.stroke();
-                    }
-                    p.y += p.speed;
-                    if (p.y > canvas.height) p.y = 0;
-                });
-            }
-
-            // Window Frame Overlay
-            ctx.strokeStyle = '#3d345c';
-            ctx.lineWidth = 6;
-            ctx.strokeRect(winX, winY, winW, winH);
-            ctx.lineWidth = 3;
-            ctx.beginPath(); ctx.moveTo(winX + winW/2, winY); ctx.lineTo(winX + winW/2, winY + winH); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(winX, winY + winH/2); ctx.lineTo(winX + winW, winY + winH/2); ctx.stroke();
-
-            // Window Bench Seat
-            ctx.fillStyle = '#5c4875';
-            ctx.fillRect(winX - 10, winY + winH, winW + 20, 20);
-
-            // --- FIREPLACE (Top Right) ---
-            const fireX = 580, fireY = 110, fireW = 90, fireH = 80;
-            // Stone Mantel
-            ctx.fillStyle = '#2d2740';
-            ctx.fillRect(fireX - 10, fireY - 15, fireW + 20, 15);
-            ctx.fillRect(fireX, fireY, fireW, fireH);
-
-            // Inner Hearth
-            ctx.fillStyle = '#0c0a14';
-            ctx.fillRect(fireX + 15, fireY + 20, fireW - 30, fireH - 20);
-
-            if (roomConfig.fireLit) {
-                // Fire Glow
-                const fireGlow = ctx.createRadialGradient(fireX + fireW/2, fireY + fireH - 10, 5, fireX + fireW/2, fireY + fireH - 10, 120);
-                fireGlow.addColorStop(0, 'rgba(255, 179, 110, 0.35)');
-                fireGlow.addColorStop(1, 'rgba(255, 179, 110, 0)');
-                ctx.fillStyle = fireGlow;
-                ctx.fillRect(fireX - 100, fireY - 50, fireW + 200, fireH + 150);
-
-                // Animated Fire Flame
-                const time = Date.now() * 0.005;
-                ctx.fillStyle = '#ff8c42';
-                ctx.beginPath();
-                ctx.arc(fireX + fireW/2, fireY + fireH - 10, 14 + Math.sin(time) * 3, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#ffd166';
-                ctx.beginPath();
-                ctx.arc(fireX + fireW/2, fireY + fireH - 8, 8 + Math.cos(time * 1.5) * 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Fire Sparks
-                ctx.fillStyle = '#ffe699';
-                fireParticles.forEach(p => {
-                    ctx.fillRect(p.x, p.y, p.size, p.size);
-                    p.y -= p.vy;
-                    p.x += p.vx;
-                    p.life -= 0.02;
-                    if (p.life <= 0 || p.y < fireY) {
-                        p.x = fireX + fireW/2 + (Math.random() * 30 - 15);
-                        p.y = fireY + fireH - 15;
-                        p.life = 1.0;
-                    }
-                });
-            }
-
-            // --- FURNITURE & SITTING SPOTS ---
-            
-            // 1. Plush Sofa (Left Side)
-            ctx.fillStyle = '#e8899e';
-            ctx.beginPath();
-            ctx.roundRect(150, 240, 110, 50, 12);
-            ctx.fill();
-            ctx.fillStyle = '#c96f83'; // Sofa cushion detail
-            ctx.fillRect(155, 245, 48, 40);
-            ctx.fillRect(207, 245, 48, 40);
-
-            // 2. Fireplace Armchair
-            ctx.fillStyle = '#89bae1';
-            ctx.beginPath();
-            ctx.roundRect(600, 215, 50, 50, 10);
-            ctx.fill();
-
-            // 3. Coffee Bar (Bottom Right)
-            ctx.fillStyle = '#423652';
-            ctx.fillRect(660, 360, 110, 15);
-            ctx.fillStyle = '#2a2236';
-            ctx.fillRect(670, 375, 90, 45);
-
-            // Coffee Machine on Bar
-            ctx.fillStyle = '#78688a';
-            ctx.fillRect(720, 325, 30, 35);
-            ctx.fillStyle = '#ffb3ba';
-            ctx.fillRect(730, 345, 10, 5); // Steamer nozzle
-
-            // Barstools
-            ctx.fillStyle = '#ffd166';
-            ctx.beginPath(); ctx.arc(680, 400, 12, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(730, 400, 12, 0, Math.PI * 2); ctx.fill();
-
-            // 4. Beanbag & Cushions
-            ctx.fillStyle = '#baffc9';
-            ctx.beginPath(); ctx.arc(420, 380, 22, 0, Math.PI * 2); ctx.fill();
-
-            ctx.fillStyle = '#ffffba';
-            ctx.beginPath(); ctx.roundRect(485, 280, 30, 25, 6); ctx.fill();
-
-            // --- PLANTS & DECORATIONS ---
-            // Monstera Plant
-            ctx.fillStyle = '#3a5a40';
-            ctx.beginPath(); ctx.arc(80, 200, 18, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(95, 185, 14, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = '#b5835a'; // Pot
-            ctx.fillRect(75, 210, 25, 25);
-
-            // Rug in Center
-            ctx.fillStyle = 'rgba(232, 223, 245, 0.12)';
-            ctx.beginPath();
-            ctx.ellipse(380, 320, 130, 65, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Interactive Seat Hover / Highlight Indicators
-            seats.forEach(seat => {
-                ctx.strokeStyle = seat.occupiedBy ? 'rgba(255,100,100,0.3)' : 'rgba(186, 225, 255, 0.4)';
-                ctx.lineWidth = 1.5;
-                ctx.setLineDash([4, 4]);
-                ctx.beginPath();
-                ctx.arc(seat.x, seat.y, 14, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-            });
-        }
-
-        function drawPlayer(p) {
-            // Smooth Position Interpolation
-            p.x += (p.targetX - p.x) * 0.15;
-            p.y += (p.targetY - p.y) * 0.15;
-
-            ctx.save();
-            ctx.translate(p.x, p.y);
-
-            // Shadow
-            ctx.fillStyle = 'rgba(0,0,0,0.25)';
-            ctx.beginPath();
-            ctx.ellipse(0, 12, 14, 6, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Idle Breathing Bounce
-            const breathe = Math.sin(Date.now() * 0.003 + p.x) * 1.5;
-
-            // Character Body
-            ctx.fillStyle = p.color || '#ffb3ba';
-            ctx.beginPath();
-            ctx.roundRect(-12, -22 + breathe, 24, 28, 8);
-            ctx.fill();
-
-            // Character Head / Face
-            ctx.fillStyle = '#fff0f3';
-            ctx.beginPath();
-            ctx.arc(0, -28 + breathe, 11, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Closed Cozy Eyes
-            ctx.strokeStyle = '#4a3b52';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath(); ctx.arc(-4, -28 + breathe, 2.5, Math.PI, 0); ctx.stroke();
-            ctx.beginPath(); ctx.arc(4, -28 + breathe, 2.5, Math.PI, 0); ctx.stroke();
-
-            // Accessory Overlay
-            if (p.accessory) {
-                ctx.font = '12px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(p.accessory, 0, -36 + breathe);
-            }
-
-            // Holding Tea Cup
-            if (p.holdingCup) {
-                ctx.font = '10px sans-serif';
-                ctx.fillText('☕', 10, -10 + breathe);
-            }
-
-            // Player Name Tag
-            ctx.font = '10px Comfortaa, sans-serif';
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            ctx.shadowBlur = 4;
-            ctx.fillText(p.name, 0, 24);
-            ctx.shadowBlur = 0;
-
-            // Floating Speech Bubble
-            if (p.speech && p.speechTimer > 0) {
-                p.speechTimer -= 0.016;
-
-                ctx.font = '11px Comfortaa, sans-serif';
-                const textWidth = ctx.measureText(p.speech).width;
-                const bubbleW = textWidth + 16;
-                const bubbleH = 22;
-                const bubbleY = -55 + breathe;
-
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-                ctx.beginPath();
-                ctx.roundRect(-bubbleW/2, bubbleY, bubbleW, bubbleH, 8);
-                ctx.fill();
-
-                // Speech Triangle Pointer
-                ctx.beginPath();
-                ctx.moveTo(-4, bubbleY + bubbleH);
-                ctx.lineTo(0, bubbleY + bubbleH + 5);
-                ctx.lineTo(4, bubbleY + bubbleH);
-                ctx.fill();
-
-                ctx.fillStyle = '#1c1830';
-                ctx.fillText(p.speech, 0, bubbleY + 15);
-            }
-
-            // Floating Emote
-            if (p.emote && p.emoteTimer > 0) {
-                p.emoteTimer -= 0.016;
-                ctx.font = '18px sans-serif';
-                ctx.fillText(p.emote, 0, -50 + breathe - (1 - p.emoteTimer) * 10);
-            }
-
-            ctx.restore();
-        }
-
-        function drawDimmerOverlay() {
-            ctx.fillStyle = `rgba(10, 8, 20, ${roomConfig.dimmer})`;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        /**
-         * MAIN CANVAS RENDER LOOP
-         */
-        function renderLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            drawRoomBackground();
-
-            // Render All Remote Players
-            remotePlayers.forEach(player => drawPlayer(player));
-
-            // Render My Local Player
-            drawPlayer(myPlayer);
-
-            // Dimmer Lighting
-            drawDimmerOverlay();
-
-            // Render Audio Spectrum Bars at Sidebar Bottom
-            renderAudioVisualizer();
-
-            requestAnimationFrame(renderLoop);
-        }
-
-        /**
-         * REALTIME SUPABASE PRESENCE & MESSAGING
-         */
-        function initRealtime() {
-            if (!supabase) {
-                setupLocalBotVisitors();
-                return;
-            }
-
-            realtimeChannel = supabase.channel('room:lofi-lounge', {
-                config: { presence: { key: myPlayer.id } }
-            });
-
-            // Listen for Realtime Presence Sync
-            realtimeChannel
-                .on('presence', { event: 'sync' }, () => {
-                    const state = realtimeChannel.presenceState();
-                    remotePlayers.clear();
-                    
-                    let totalOnline = 1;
-                    for (const id in state) {
-                        const presenceArr = state[id];
-                        if (presenceArr && presenceArr.length > 0) {
-                            const user = presenceArr[0];
-                            if (user.id !== myPlayer.id) {
-                                remotePlayers.set(user.id, user);
-                                totalOnline++;
-                            }
-                        }
-                    }
-                    updateVisitorUI(totalOnline);
-                })
-                .on('presence', { event: 'join' }, ({ newPresences }) => {
-                    newPresences.forEach(p => {
-                        if (p.id !== myPlayer.id) {
-                            addChatMessage('System', `${p.name || 'A traveler'} joined the lounge ✨`, 'system');
-                        }
-                    });
-                })
-                .on('presence', { event: 'leave' }, ({ leftPresences }) => {
-                    leftPresences.forEach(p => {
-                        if (p.id !== myPlayer.id) {
-                            addChatMessage('System', `${p.name || 'A traveler'} stepped out 🌙`, 'system');
-                            remotePlayers.delete(p.id);
-                        }
-                    });
-                })
-                .on('broadcast', { event: 'chat' }, payload => {
-                    const { senderName, text } = payload.payload;
-                    addChatMessage(senderName, text);
-                })
-                .on('broadcast', { event: 'speech' }, payload => {
-                    const { id, text } = payload.payload;
-                    if (remotePlayers.has(id)) {
-                        const p = remotePlayers.get(id);
-                        p.speech = text;
-                        p.speechTimer = 4.0;
-                    }
-                })
-                .on('broadcast', { event: 'emote' }, payload => {
-                    const { id, emote } = payload.payload;
-                    if (remotePlayers.has(id)) {
-                        const p = remotePlayers.get(id);
-                        p.emote = emote;
-                        p.emoteTimer = 2.5;
-                    }
-                })
-                .subscribe(async (status) => {
-                    if (status === 'SUBSCRIBED') {
-                        await realtimeChannel.track(myPlayer);
-                    }
-                });
-        }
-
-        function broadcastPlayerState() {
-            if (realtimeChannel && realtimeChannel.state === 'joined') {
-                realtimeChannel.track(myPlayer);
-            }
-        }
-
-        /**
-         * FALLBACK LOCAL AI BOTS (When solo testing or disconnected)
-         */
-        function setupLocalBotVisitors() {
-            const bots = [
-                { id: 'bot_1', name: 'Nora 🐱', color: '#bae1ff', accessory: '👓', x: 230, y: 260, targetX: 230, targetY: 260, sitting: true },
-                { id: 'bot_2', name: 'Oliver ☕', color: '#ffffba', accessory: '☕', x: 680, y: 400, targetX: 680, targetY: 400, sitting: true }
-            ];
-
-            bots.forEach(b => remotePlayers.set(b.id, b));
-            updateVisitorUI(remotePlayers.size + 1);
-
-            // Periodic bot chatter
-            setInterval(() => {
-                const botArr = Array.from(remotePlayers.values());
-                if (botArr.length > 0) {
-                    const randomBot = botArr[Math.floor(Math.random() * botArr.length)];
-                    const lines = [
-                        'This track is so soothing...',
-                        'Drinking chamomile tea tonight 🍵',
-                        'Love watching the rain drop on the window 🌧️',
-                        'Hope everyone is having a restful evening ✨'
-                    ];
-                    const line = lines[Math.floor(Math.random() * lines.length)];
-                    randomBot.speech = line;
-                    randomBot.speechTimer = 4.0;
-                    addChatMessage(randomBot.name, line);
-                }
-            }, 18000);
-        }
-
-        /**
-         * UI & INTERACTION EVENT HANDLERS
-         */
-        function updateVisitorUI(count) {
-            document.getElementById('onlineCountBadge').innerText = `${count} Online`;
-            document.getElementById('visitorCount').innerText = count;
-
-            const listEl = document.getElementById('visitorList');
-            listEl.innerHTML = '';
-
-            // Local user
-            const myRow = document.createElement('div');
-            myRow.className = 'p-2 rounded-xl bg-pastelPink/10 border border-pastelPink/20 flex items-center justify-between';
-            myRow.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <span class="text-sm">${myPlayer.accessory || '👤'}</span>
-                    <span class="font-bold text-pastelPink">${myPlayer.name} (You)</span>
-                </div>
-                <span class="text-[10px] text-emerald-300">Active</span>
-            `;
-            listEl.appendChild(myRow);
-
-            // Remote users
-            remotePlayers.forEach(p => {
-                const row = document.createElement('div');
-                row.className = 'p-2 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between';
-                row.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm">${p.accessory || '👤'}</span>
-                        <span class="text-pastelPurple">${p.name}</span>
-                    </div>
-                    <span class="text-[10px] text-pastelBlue">${p.sitting ? 'Sitting 🛋️' : 'Exploring'}</span>
-                `;
-                listEl.appendChild(row);
-            });
-        }
-
-        function addChatMessage(author, message, type = 'user') {
-            const container = document.getElementById('chatMessages');
-            const msgEl = document.createElement('div');
-
-            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            if (type === 'system') {
-                msgEl.className = 'text-[11px] text-pastelPurple/60 text-center italic my-1';
-                msgEl.innerText = `${timeStr} - ${message}`;
-            } else {
-                const isMe = author === myPlayer.name;
-                msgEl.className = `p-2 rounded-xl border max-w-[85%] ${isMe ? 'ml-auto bg-pastelPink/20 border-pastelPink/30 text-pastelPink' : 'bg-white/5 border-white/10 text-pastelPurple'}`;
-                msgEl.innerHTML = `
-                    <div class="flex justify-between items-center gap-2 mb-0.5 text-[10px] font-bold opacity-80">
-                        <span>${author}</span>
-                        <span class="font-normal text-[9px] opacity-60">${timeStr}</span>
-                    </div>
-                    <div class="text-xs break-words">${escapeHTML(message)}</div>
-                `;
-            }
-
-            container.appendChild(msgEl);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
-        }
-
-        function triggerEmote(emote) {
-            myPlayer.emote = emote;
-            myPlayer.emoteTimer = 2.5;
-            if (realtimeChannel) {
-                realtimeChannel.send({ type: 'broadcast', event: 'emote', payload: { id: myPlayer.id, emote } });
-            }
-        }
-
-        // CANVAS CLICK NAVIGATION & SITTING SPOTS
-        canvas.addEventListener('click', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-
-            // Check if clicked an available sitting spot
-            let satOnSeat = false;
-            seats.forEach(seat => {
-                const dist = Math.hypot(clickX - seat.x, clickY - seat.y);
-                if (dist < 25) {
-                    myPlayer.targetX = seat.x;
-                    myPlayer.targetY = seat.y;
-                    myPlayer.sitting = true;
-                    myPlayer.seatId = seat.id;
-                    satOnSeat = true;
-                    triggerEmote('🛋️');
-                }
-            });
-
-            if (!satOnSeat) {
-                myPlayer.targetX = clickX;
-                myPlayer.targetY = Math.max(190, clickY); // Keep within walkable floor area
-                myPlayer.sitting = false;
-                myPlayer.seatId = null;
-            }
-
-            // Check if near Coffee/Tea Station
-            const nearBar = Math.hypot(clickX - 720, clickY - 380) < 60;
-            const promptEl = document.getElementById('coffeeStationPrompt');
-            if (nearBar) {
-                promptEl.classList.remove('hidden');
-            } else {
-                promptEl.classList.add('hidden');
-            }
-
-            broadcastPlayerState();
-        });
-
-        // WASD / ARROW KEYS MOVEMENT
-        window.addEventListener('keydown', (e) => {
-            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-
-            const step = 15;
-            let moved = false;
-            if (e.key === 'ArrowLeft' || e.key === 'a') { myPlayer.targetX -= step; moved = true; }
-            if (e.key === 'ArrowRight' || e.key === 'd') { myPlayer.targetX += step; moved = true; }
-            if (e.key === 'ArrowUp' || e.key === 'w') { myPlayer.targetY -= step; moved = true; }
-            if (e.key === 'ArrowDown' || e.key === 's') { myPlayer.targetY += step; moved = true; }
-
-            if (moved) {
-                myPlayer.sitting = false;
-                myPlayer.targetY = Math.max(190, Math.min(canvas.height - 20, myPlayer.targetY));
-                myPlayer.targetX = Math.max(20, Math.min(canvas.width - 20, myPlayer.targetX));
-                broadcastPlayerState();
-            }
-        });
-
-        /**
-         * CHAT FORM SUBMISSION
-         */
-        document.getElementById('chatForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            // Set Speech bubble over avatar head
-            myPlayer.speech = text;
-            myPlayer.speechTimer = 4.0;
-
-            addChatMessage(myPlayer.name, text);
-
-            if (realtimeChannel) {
-                realtimeChannel.send({ type: 'broadcast', event: 'chat', payload: { senderName: myPlayer.name, text } });
-                realtimeChannel.send({ type: 'broadcast', event: 'speech', payload: { id: myPlayer.id, text } });
-            }
-
-            input.value = '';
-            broadcastPlayerState();
-        });
-
-        /**
-         * STICKY NOTES BOARD LOGIC
-         */
-        function renderStickyNotes() {
-            const grid = document.getElementById('stickyNotesGrid');
-            grid.innerHTML = '';
-
-            stickyNotes.forEach(note => {
-                const card = document.createElement('div');
-                card.className = 'p-3 rounded-xl text-cozyBg shadow-md flex flex-col justify-between transform rotate-1 hover:rotate-0 transition-transform';
-                card.style.backgroundColor = note.color || '#ffffba';
-                card.innerHTML = `
-                    <p class="font-medium text-xs mb-2 leading-relaxed">"${escapeHTML(note.text)}"</p>
-                    <div class="text-[10px] font-bold text-right opacity-80">— ${escapeHTML(note.author)}</div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        document.getElementById('addNoteBtn').addEventListener('click', () => {
-            const input = document.getElementById('newNoteInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const noteColors = ['#ffffba', '#ffb3ba', '#bae1ff', '#baffc9', '#e8dff5'];
-            const randomColor = noteColors[Math.floor(Math.random() * noteColors.length)];
-
-            stickyNotes.unshift({
-                id: Date.now(),
-                author: myPlayer.name,
-                text: text,
-                color: randomColor
-            });
-
-            renderStickyNotes();
-            input.value = '';
-        });
-
-        /**
-         * AUDIO SPECTRUM VISUALIZER AT BOTTOM
-         */
-        const visCanvas = document.getElementById('audioVisualizer');
-        const visCtx = visCanvas.getContext('2d');
-
-        function renderAudioVisualizer() {
-            visCtx.clearRect(0, 0, visCanvas.width, visCanvas.height);
-            if (!audioFx.analyser || !audioFx.isPlayingSynth) {
-                visCtx.fillStyle = 'rgba(255,179,186,0.3)';
-                for (let i = 0; i < 8; i++) {
-                    visCtx.fillRect(i * 10, 16, 6, 4);
-                }
-                return;
-            }
-
-            const bufferLength = audioFx.analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            audioFx.analyser.getByteFrequencyData(dataArray);
-
-            for (let i = 0; i < 8; i++) {
-                const barHeight = (dataArray[i] / 255) * visCanvas.height;
-                visCtx.fillStyle = '#ffb3ba';
-                visCtx.fillRect(i * 10, visCanvas.height - barHeight, 6, barHeight);
-            }
-        }
-
-        /**
-         * UI CONTROLS & MODAL TOGGLES
-         */
-        // Tabs Switching
-        const tabChatBtn = document.getElementById('tabChatBtn');
-        const tabPeopleBtn = document.getElementById('tabPeopleBtn');
-        const tabAudioBtn = document.getElementById('tabAudioBtn');
-
-        const chatTabContent = document.getElementById('chatTabContent');
-        const peopleTabContent = document.getElementById('peopleTabContent');
-        const audioTabContent = document.getElementById('audioTabContent');
-
-        function switchTab(activeBtn, activeContent) {
-            [tabChatBtn, tabPeopleBtn, tabAudioBtn].forEach(btn => {
-                btn.classList.remove('border-pastelPink', 'text-pastelPink', 'bg-white/5');
-                btn.classList.add('border-transparent', 'text-pastelPurple/60');
-            });
-            [chatTabContent, peopleTabContent, audioTabContent].forEach(c => c.classList.add('hidden'));
-
-            activeBtn.classList.add('border-pastelPink', 'text-pastelPink', 'bg-white/5');
-            activeBtn.classList.remove('border-transparent', 'text-pastelPurple/60');
-            activeContent.classList.remove('hidden');
-        }
-
-        tabChatBtn.addEventListener('click', () => switchTab(tabChatBtn, chatTabContent));
-        tabPeopleBtn.addEventListener('click', () => switchTab(tabPeopleBtn, peopleTabContent));
-        tabAudioBtn.addEventListener('click', () => switchTab(tabAudioBtn, audioTabContent));
-
-        // Music Play Toggle Buttons
-        const toggleMusicBtn = document.getElementById('toggleMusicBtn');
-        const synthPlayToggleBtn = document.getElementById('synthPlayToggleBtn');
-        const vinylIcon = document.getElementById('vinylIcon');
-        const musicStatusText = document.getElementById('musicStatusText');
-        const synthPlayBtnText = document.getElementById('synthPlayBtnText');
-        const synthPlayIcon = document.getElementById('synthPlayIcon');
-
-        function toggleMusicHandler() {
-            const playing = audioFx.toggleSynth();
-            if (playing) {
-                vinylIcon.classList.add('spinning');
-                musicStatusText.innerText = 'Lofi Playing 🎵';
-                synthPlayBtnText.innerText = 'Pause Synth Music';
-                synthPlayIcon.className = 'fa-solid fa-pause';
-            } else {
-                vinylIcon.classList.remove('spinning');
-                musicStatusText.innerText = 'Play Lofi Synth';
-                synthPlayBtnText.innerText = 'Start Synth Music';
-                synthPlayIcon.className = 'fa-solid fa-play';
-            }
-        }
-
-        toggleMusicBtn.addEventListener('click', toggleMusicHandler);
-        synthPlayToggleBtn.addEventListener('click', toggleMusicHandler);
-
-        // Audio Sliders
-        document.getElementById('musicVolSlider').addEventListener('input', (e) => {
-            const val = e.target.value;
-            document.getElementById('musicVolVal').innerText = `${val}%`;
-            audioFx.setVolume('music', val);
-        });
-        document.getElementById('rainVolSlider').addEventListener('input', (e) => {
-            const val = e.target.value;
-            document.getElementById('rainVolVal').innerText = `${val}%`;
-            audioFx.setVolume('rain', val);
-        });
-        document.getElementById('fireVolSlider').addEventListener('input', (e) => {
-            const val = e.target.value;
-            document.getElementById('fireVolVal').innerText = `${val}%`;
-            audioFx.setVolume('fire', val);
-        });
-        document.getElementById('vinylVolSlider').addEventListener('input', (e) => {
-            const val = e.target.value;
-            document.getElementById('vinylVolVal').innerText = `${val}%`;
-            audioFx.setVolume('vinyl', val);
-        });
-
-        // Modals Toggles
-        const customizeModal = document.getElementById('customizeModal');
-        document.getElementById('customizeBtn').addEventListener('click', () => customizeModal.classList.remove('hidden'));
-        document.getElementById('closeCustomizeBtn').addEventListener('click', () => {
-            myPlayer.name = document.getElementById('avatarNameInput').value.trim() || 'Cozy Guest';
-            myPlayer.accessory = document.getElementById('accessorySelect').value;
-            customizeModal.classList.add('hidden');
-            broadcastPlayerState();
-            updateVisitorUI(remotePlayers.size + 1);
-        });
-
-        // Color Picker Group
-        document.querySelectorAll('#colorPickerGroup button').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('#colorPickerGroup button').forEach(b => b.classList.replace('border-white/80', 'border-transparent'));
-                e.target.classList.replace('border-transparent', 'border-white/80');
-                myPlayer.color = e.target.getAttribute('data-color');
-            });
-        });
-
-        // Sticky Notes Modal
-        const stickyNotesModal = document.getElementById('stickyNotesModal');
-        document.getElementById('stickyNotesBtn').addEventListener('click', () => {
-            renderStickyNotes();
-            stickyNotesModal.classList.remove('hidden');
-        });
-        document.getElementById('closeStickyBtn').addEventListener('click', () => stickyNotesModal.classList.add('hidden'));
-
-        // Room Settings Modal
-        const roomSettingsModal = document.getElementById('roomSettingsModal');
-        document.getElementById('roomSettingsBtn').addEventListener('click', () => roomSettingsModal.classList.remove('hidden'));
-        document.getElementById('closeSettingsBtn').addEventListener('click', () => roomSettingsModal.classList.add('hidden'));
-
-        document.getElementById('toggleFireBtn').addEventListener('click', (e) => {
-            roomConfig.fireLit = !roomConfig.fireLit;
-            e.target.innerText = roomConfig.fireLit ? 'Lit 🔥' : 'Off ❄️';
-        });
-        document.getElementById('toggleRainFxBtn').addEventListener('click', (e) => {
-            roomConfig.rainActive = !roomConfig.rainActive;
-            e.target.innerText = roomConfig.rainActive ? 'Active 🌧️' : 'Off ☀️';
-        });
-        document.getElementById('roomDimmerSlider').addEventListener('input', (e) => {
-            roomConfig.dimmer = e.target.value / 100;
-            document.getElementById('roomDimmerVal').innerText = `${e.target.value}%`;
-        });
-
-        // Coffee Brewing Station
-        document.getElementById('brewCupBtn').addEventListener('click', () => {
-            myPlayer.holdingCup = true;
-            triggerEmote('☕');
-            addChatMessage('System', `${myPlayer.name} brewed a steaming cup of tea! 🍵`, 'system');
-            document.getElementById('coffeeStationPrompt').classList.add('hidden');
-            broadcastPlayerState();
-        });
-
-        /**
-         * WINDOW LOAD INITIALIZATION
-         */
-        window.onload = function() {
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-
-            initRealtime();
-            renderLoop();
-        };
-    </script>
+      }
+
+      // If database direct write didn't succeed, fallback local store seamlessly
+      if (!insertedSuccessfully) {
+        localMessagesFallback.push(newMessagePayload);
+        localStorage.setItem(`sakura_messages_${currentChannel}`, JSON.stringify(localMessagesFallback));
+        renderMessages(localMessagesFallback);
+      }
+    }
+
+    // --- 7. Event Handlers & Interactions ---
+    function handleLogin(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('username-input').value.trim();
+      if (!nameInput) return;
+
+      currentUser.username = nameInput;
+      document.getElementById('user-name-display').innerText = currentUser.username;
+      document.getElementById('user-avatar-display').innerText = currentUser.avatar;
+
+      document.getElementById('login-modal').classList.add('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        document.getElementById('login-modal').classList.add('hidden');
+      }, 300);
+
+      showToast(`Welcome to Sakura Lounge, ${currentUser.username}! 🌸`);
+      loadMessages();
+      subscribeToRealtime();
+    }
+
+    function switchChannel(channelId) {
+      currentChannel = channelId;
+      const ch = channels.find(c => c.id === channelId);
+
+      document.getElementById('current-channel-title').innerText = ch ? ch.name : channelId;
+      document.getElementById('current-channel-desc').innerText = ch ? ch.desc : '';
+      document.getElementById('message-input').placeholder = `Type a message in #${ch ? ch.name : channelId}...`;
+
+      renderChannels();
+      loadMessages();
+      subscribeToRealtime();
+
+      // Close mobile sidebar if open
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar.classList.contains('-translate-x-full')) {
+        toggleMobileSidebar();
+      }
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      const isOpen = !sidebar.classList.contains('-translate-x-full');
+
+      if (isOpen) {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      } else {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      }
+    }
+
+    function toggleEmojiPicker() {
+      const picker = document.getElementById('emoji-picker');
+      picker.classList.toggle('hidden');
+    }
+
+    function insertEmoji(emoji) {
+      const input = document.getElementById('message-input');
+      input.value += emoji;
+      toggleEmojiPicker();
+      input.focus();
+    }
+
+    function promptImageUrl() {
+      const url = prompt("Enter an Image URL (e.g., https://images.unsplash.com/...):");
+      if (url && url.startsWith("http")) {
+        attachedImageUrl = url;
+        document.getElementById('preview-img-src').src = url;
+        document.getElementById('preview-img-url').innerText = url;
+        document.getElementById('attachment-preview').classList.remove('hidden');
+      }
+    }
+
+    function clearAttachment() {
+      attachedImageUrl = '';
+      document.getElementById('preview-img-src').src = '';
+      document.getElementById('attachment-preview').classList.add('hidden');
+    }
+
+    function openCreateChannelModal() {
+      document.getElementById('create-channel-modal').classList.remove('hidden');
+    }
+
+    function closeCreateChannelModal() {
+      document.getElementById('create-channel-modal').classList.add('hidden');
+    }
+
+    function handleCreateChannel(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('new-channel-name').value.trim().toLowerCase().replace(/\s+/g, '-');
+      const descInput = document.getElementById('new-channel-desc').value.trim();
+
+      if (!nameInput) return;
+
+      if (channels.some(c => c.id === nameInput)) {
+        showToast("Channel already exists!");
+        return;
+      }
+
+      const newChan = { id: nameInput, name: nameInput, desc: descInput || 'Custom Sakura Channel' };
+      channels.push(newChan);
+      renderChannels();
+      switchChannel(newChan.id);
+      closeCreateChannelModal();
+
+      document.getElementById('new-channel-name').value = '';
+      document.getElementById('new-channel-desc').value = '';
+      showToast(`Channel #${nameInput} created!`);
+    }
+
+    function changeUserProfile() {
+      document.getElementById('login-modal').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'glass-card-dark px-4 py-3 rounded-2xl shadow-xl text-sm font-medium text-sakura-900 border border-sakura-300 transform transition-all duration-300 translate-y-5 opacity-0 flex items-center gap-2';
+      toast.innerHTML = `<span>🌸</span> <span>${message}</span>`;
+
+      const container = document.getElementById('toast-container');
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-5', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // --- 8. App Launch On Load ---
+    window.addEventListener('DOMContentLoaded', () => {
+      initSakuraAnimation();
+      renderAvatarSelector();
+      renderEmojiPicker();
+      renderChannels();
+    });
+  </script>
 </body>
 </html>
