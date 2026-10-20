@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Sakura World 🌸 - 2D Virtual Realtime Chatroom</title>
-
-  <!-- Tailwind CSS CDN -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sakura Virtual Lounge 🌸</title>
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Yuji+Mai&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Yuji+Mai&display=swap" rel="stylesheet">
 
   <style>
     body {
@@ -20,922 +20,505 @@
       background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 50%, #f472b6 100%);
       min-height: 100vh;
       overflow: hidden;
-      touch-action: manipulation;
     }
-
-    .font-sakura {
-      font-family: 'Yuji Mai', serif;
-    }
-
-    /* Glassmorphism Styles */
+    .font-sakura { font-family: 'Yuji Mai', serif; }
     .glass {
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.9);
     }
-
-    .glass-dark {
-      background: rgba(255, 241, 248, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(244, 114, 182, 0.3);
+    /* Falling Petals */
+    .petal {
+      position: fixed;
+      background-color: #fbcfe8;
+      border-radius: 150% 0 150% 0;
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: 0;
+      animation: fall linear infinite;
     }
-
-    .glass-input {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(244, 114, 182, 0.4);
+    @keyframes fall {
+      0% { opacity: 0.8; top: -10%; transform: translateX(0) rotate(0deg); }
+      100% { opacity: 0.2; top: 110%; transform: translateX(80px) rotate(360deg); }
     }
-
-    .glass-input:focus {
-      background: rgba(255, 255, 255, 0.98);
-      border-color: #ec4899;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2);
-    }
-
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(244, 114, 182, 0.5);
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(236, 72, 153, 0.8);
-    }
-
-    /* D-pad Touch Buttons */
-    .dpad-btn {
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(244, 114, 182, 0.4);
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .dpad-btn:active {
-      background: rgba(236, 72, 153, 0.8);
-      color: white;
-      transform: scale(0.92);
+    canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
     }
   </style>
 </head>
-<body class="flex flex-col h-screen w-screen overflow-hidden select-none">
+<body class="flex items-center justify-center h-screen p-2 sm:p-4 relative">
 
-  <!-- Top Navigation Header -->
-  <header class="h-14 glass px-4 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
-    <div class="flex items-center gap-3">
-      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-2 rounded-xl shadow-md shadow-pink-300">
-        <i data-lucide="flower-2" class="w-5 h-5 animate-spin" style="animation-duration: 12s;"></i>
-      </div>
+  <!-- Petals background container -->
+  <div id="petals-container"></div>
+
+  <!-- Main Container -->
+  <div class="glass w-full max-w-6xl h-[95vh] rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden z-10 relative">
+    
+    <!-- Sidebar: Chat & Room Info -->
+    <aside class="w-full md:w-80 bg-white/50 border-b md:border-b-0 md:border-r border-pink-200/60 flex flex-col justify-between p-4 z-20">
       <div>
-        <h1 class="font-sakura text-lg text-pink-950 font-bold tracking-wide leading-none">Sakura World 🌸</h1>
-        <p class="text-[10px] text-pink-600 font-semibold tracking-wider uppercase mt-0.5" id="room-indicator">#sakura-lounge</p>
-      </div>
-    </div>
+        <!-- Title -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-pink-200/60">
+          <div class="bg-pink-500 text-white p-2.5 rounded-2xl shadow-md shadow-pink-300">
+            <i data-lucide="flower-2" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="font-sakura text-lg text-pink-900 font-bold">Sakura Lounge</h1>
+            <p class="text-[11px] text-pink-600">Virtual 2D Room</p>
+          </div>
+        </div>
 
-    <!-- Right Header Tools -->
-    <div class="flex items-center gap-2">
-      <!-- Active Players Counter -->
-      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-100/80 border border-pink-200/80 text-pink-800 text-xs font-semibold">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span id="player-count">1 Online</span>
-      </div>
+        <!-- Rooms -->
+        <h2 class="text-xs font-bold text-pink-700 uppercase tracking-wider mb-2 px-1">Rooms</h2>
+        <div class="space-y-1 mb-4">
+          <button onclick="switchRoom('sakura-lounge')" id="room-sakura-lounge" class="room-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-semibold text-xs transition bg-pink-500 text-white shadow-sm">
+            <i data-lucide="cherry" class="w-4 h-4"></i> Sakura Shrine
+          </button>
+          <button onclick="switchRoom('gaming-room')" id="room-gaming-room" class="room-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium text-xs text-pink-800 hover:bg-pink-100/80 transition">
+            <i data-lucide="gamepad-2" class="w-4 h-4"></i> Arcade Room
+          </button>
+        </div>
 
-      <!-- Settings / Customization Modal Button -->
-      <button onclick="toggleSettingsModal()" class="p-2 rounded-xl bg-white/70 hover:bg-pink-100 text-pink-800 transition border border-pink-200/60 shadow-sm active:scale-95" title="Customize Avatar">
-        <i data-lucide="user-cog" class="w-5 h-5"></i>
-      </button>
-
-      <!-- Toggle Chat Drawer Button -->
-      <button onclick="toggleChatSidebar()" class="p-2 rounded-xl bg-pink-500 hover:bg-pink-600 text-white transition shadow-md shadow-pink-300 active:scale-95 md:hidden" title="Toggle Chat">
-        <i data-lucide="message-square" class="w-5 h-5"></i>
-      </button>
-    </div>
-  </header>
-
-  <!-- Main View Area (Canvas + Sidebar) -->
-  <div class="flex-1 flex relative overflow-hidden">
-
-    <!-- Game World Canvas Container -->
-    <div class="flex-1 relative bg-pink-900/10 flex items-center justify-center overflow-hidden" id="canvas-container">
-      <canvas id="gameCanvas" class="block w-full h-full cursor-pointer touch-none"></canvas>
-
-      <!-- On-Screen Controls Hint Overlay (Fades out) -->
-      <div id="controls-hint" class="absolute top-4 left-4 pointer-events-none glass px-3.5 py-2 rounded-2xl border border-pink-200/80 shadow-md text-xs text-pink-950 flex items-center gap-2 transition-opacity duration-500">
-        <i data-lucide="gamepad-2" class="w-4 h-4 text-pink-600"></i>
-        <span>Move: <strong class="text-pink-700">WASD / Arrow Keys / Click floor</strong></span>
+        <!-- Chat Feed Box -->
+        <div class="flex flex-col h-48 md:h-64 bg-white/60 rounded-2xl border border-pink-200/60 p-3 overflow-hidden shadow-inner">
+          <h3 class="text-xs font-bold text-pink-800 mb-2 flex items-center gap-1.5">
+            <i data-lucide="message-square" class="w-3.5 h-3.5 text-pink-500"></i> Live Room Chat
+          </h3>
+          <div id="chat-messages" class="flex-1 overflow-y-auto space-y-2 text-xs pr-1">
+            <p class="text-pink-400 italic text-center mt-6">Welcome! Say hello in the room.</p>
+          </div>
+        </div>
       </div>
 
-      <!-- On-Screen Virtual Touch D-Pad (Visible on Mobile) -->
-      <div class="absolute bottom-6 left-6 z-20 grid grid-cols-3 gap-1.5 w-36 h-36 md:hidden pointer-events-auto">
-        <div></div>
-        <button ontouchstart="startMove('up')" ontouchend="stopMove('up')" onmousedown="startMove('up')" onmouseup="stopMove('up')" class="dpad-btn rounded-t-2xl flex items-center justify-center font-bold text-pink-800 text-xl shadow">▲</button>
-        <div></div>
-        <button ontouchstart="startMove('left')" ontouchend="stopMove('left')" onmousedown="startMove('left')" onmouseup="stopMove('left')" class="dpad-btn rounded-l-2xl flex items-center justify-center font-bold text-pink-800 text-xl shadow">◀</button>
-        <div class="dpad-btn rounded-lg bg-pink-200/50 flex items-center justify-center text-[10px] text-pink-700 font-bold">MOVE</div>
-        <button ontouchstart="startMove('right')" ontouchend="stopMove('right')" onmousedown="startMove('right')" onmouseup="stopMove('right')" class="dpad-btn rounded-r-2xl flex items-center justify-center font-bold text-pink-800 text-xl shadow">▶</button>
-        <div></div>
-        <button ontouchstart="startMove('down')" ontouchend="stopMove('down')" onmousedown="startMove('down')" onmouseup="stopMove('down')" class="dpad-btn rounded-b-2xl flex items-center justify-center font-bold text-pink-800 text-xl shadow">▼</button>
-        <div></div>
-      </div>
-    </div>
+      <!-- Controls Info & User Profile -->
+      <div class="space-y-3 mt-3">
+        <div class="bg-pink-100/60 p-2.5 rounded-xl border border-pink-200/50 text-[11px] text-pink-800 space-y-1">
+          <p class="font-bold flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i> Controls:</p>
+          <p>• Use <b>WASD</b> or <b>Arrow Keys</b> to walk</p>
+          <p>• Click anywhere on canvas to walk there</p>
+        </div>
 
-    <!-- Sidebar Chat Box -->
-    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-20 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none">
+        <div class="flex items-center justify-between pt-2 border-t border-pink-200/60">
+          <div class="flex items-center gap-2.5">
+            <div id="my-avatar-icon" class="w-9 h-9 rounded-full bg-pink-500 text-white font-bold flex items-center justify-center text-sm shadow-sm">🌸</div>
+            <div class="overflow-hidden">
+              <p id="my-name-display" class="text-xs font-semibold text-pink-900 truncate">Player</p>
+              <p class="text-[10px] text-emerald-600 font-medium">Online</p>
+            </div>
+          </div>
+          <button onclick="changeName()" class="text-pink-600 hover:text-pink-800 p-1.5 rounded-lg hover:bg-pink-100 transition" title="Change Name">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Game Canvas Area -->
+    <main class="flex-1 flex flex-col h-full bg-pink-50/40 relative overflow-hidden">
       
-      <!-- Sidebar Channels Header -->
-      <div class="p-3.5 border-b border-pink-200/80 bg-white/50 flex flex-col gap-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-pink-800 uppercase tracking-wider flex items-center gap-1.5">
-            <i data-lucide="compass" class="w-3.5 h-3.5"></i> Rooms & Channels
+      <!-- Top Bar -->
+      <div class="px-4 py-3 border-b border-pink-200/60 flex items-center justify-between bg-white/40 z-10">
+        <div class="flex items-center gap-2">
+          <span id="current-room-badge" class="font-bold text-pink-900 text-sm">🌸 Sakura Shrine</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs px-2.5 py-1 bg-pink-100 text-pink-700 rounded-full font-medium border border-pink-200 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="online-count">1</span> Users Here
           </span>
-          <button onclick="toggleChatSidebar()" class="md:hidden text-pink-700 hover:text-pink-900 p-1">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
-        </div>
-        
-        <!-- Channels Selector Buttons -->
-        <div class="grid grid-cols-3 gap-1.5">
-          <button onclick="switchChannel('sakura-lounge')" id="chan-btn-sakura-lounge" class="chan-btn px-2 py-1.5 rounded-xl text-xs font-semibold bg-pink-500 text-white shadow-sm transition">
-            #lounge
-          </button>
-          <button onclick="switchChannel('gaming-shrine')" id="chan-btn-gaming-shrine" class="chan-btn px-2 py-1.5 rounded-xl text-xs font-medium text-pink-800 hover:bg-pink-200/60 transition">
-            #shrine
-          </button>
-          <button onclick="switchChannel('chill-garden')" id="chan-btn-chill-garden" class="chan-btn px-2 py-1.5 rounded-xl text-xs font-medium text-pink-800 hover:bg-pink-200/60 transition">
-            #garden
-          </button>
         </div>
       </div>
 
-      <!-- Chat Log Stream -->
-      <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3">
-        <div class="text-center text-xs text-pink-500 my-4 italic">Welcome to the Sakura Zen Room! Walk around & chat in real time. 🌸</div>
+      <!-- Canvas Viewport -->
+      <div id="canvas-container" class="flex-1 relative flex items-center justify-center overflow-hidden cursor-crosshair">
+        <canvas id="gameCanvas" class="shadow-lg rounded-2xl bg-gradient-to-br from-pink-100 to-rose-200 border border-pink-300/50"></canvas>
       </div>
 
-      <!-- Input Bar -->
-      <div class="p-3 bg-white/60 border-t border-pink-200/80">
+      <!-- Chat Input Bar -->
+      <footer class="p-3 bg-white/50 border-t border-pink-200/60 z-10">
         <form id="chat-form" class="flex items-center gap-2">
           <input 
             type="text" 
             id="chat-input" 
-            placeholder="Type a message & press Enter..." 
-            maxlength="120"
+            placeholder="Type a message to chat & talk..." 
             autocomplete="off"
-            class="glass-input flex-1 px-3.5 py-2.5 rounded-xl text-sm text-pink-950 placeholder-pink-400 font-medium"
+            maxlength="100"
+            class="flex-1 px-4 py-2.5 rounded-xl text-xs bg-white/80 border border-pink-300/50 text-pink-950 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-400 shadow-inner"
           />
           <button 
             type="submit" 
-            class="bg-pink-500 hover:bg-pink-600 text-white p-2.5 rounded-xl shadow-md shadow-pink-300 transition shrink-0 active:scale-95"
+            class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-pink-300 transition flex items-center gap-1"
           >
-            <i data-lucide="send" class="w-4 h-4"></i>
+            <i data-lucide="send" class="w-3.5 h-3.5"></i> Send
           </button>
         </form>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Customization Settings Modal -->
-  <div id="settings-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass w-full max-w-md rounded-3xl p-6 shadow-2xl border border-white space-y-5 animate-in fade-in zoom-in-95 duration-200">
-      <div class="flex items-center justify-between border-b border-pink-200/80 pb-3">
-        <div class="flex items-center gap-2">
-          <i data-lucide="user" class="w-5 h-5 text-pink-600"></i>
-          <h3 class="font-bold text-pink-950 text-lg">Avatar Customization</h3>
-        </div>
-        <button onclick="toggleSettingsModal()" class="text-pink-700 hover:text-pink-900 p-1">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <!-- Username Customization -->
-      <div class="space-y-1.5">
-        <label class="text-xs font-bold text-pink-800 uppercase tracking-wider">Display Username</label>
-        <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" placeholder="Your Avatar Name..." />
-      </div>
-
-      <!-- Avatar Class / Sprite Selection -->
-      <div class="space-y-2">
-        <label class="text-xs font-bold text-pink-800 uppercase tracking-wider">Select Avatar Style</label>
-        <div class="grid grid-cols-2 gap-3" id="avatar-picker">
-          <!-- Options rendered dynamically -->
-        </div>
-      </div>
-
-      <!-- Save Button -->
-      <button onclick="saveAvatarSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2">
-        <i data-lucide="check" class="w-5 h-5"></i> Save & Play
-      </button>
-    </div>
+      </footer>
+    </main>
   </div>
 
   <script>
-    // --- SUPABASE CONFIGURATION ---
+    // Supabase Credentials
     const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- GAME & PLAYER STATE ---
-    const AVATAR_TYPES = {
-      sakura: { name: 'Sakura Blossom', bodyColor: '#ec4899', hatColor: '#fbcfe8', detail: '#be185d' },
-      spirit: { name: 'Cyan Spirit', bodyColor: '#06b6d4', hatColor: '#a5f3fc', detail: '#0e7490' },
-      fox:    { name: 'Gold Fox', bodyColor: '#f59e0b', hatColor: '#fef3c7', detail: '#b45309' },
-      ninja:  { name: 'Purple Ninja', bodyColor: '#8b5cf6', hatColor: '#ddd6fe', detail: '#6d28d9' }
-    };
+    // User State
+    let myId = 'user_' + Math.random().toString(36).substr(2, 9);
+    let myName = localStorage.getItem('sakura_name') || ('Visitor_' + Math.floor(100 + Math.random() * 900));
+    let currentRoom = 'sakura-lounge';
+    let myColor = localStorage.getItem('sakura_color') || ['#f472b6', '#ec4899', '#fb7185', '#e879f9', '#c084fc'][Math.floor(Math.random() * 5)];
 
-    let localPlayer = {
-      id: 'usr_' + Math.random().toString(36).substring(2, 9),
-      name: localStorage.getItem('sakura_avatar_name') || 'Wanderer_' + Math.floor(100 + Math.random() * 900),
-      avatarType: localStorage.getItem('sakura_avatar_type') || 'sakura',
-      x: 400,
-      y: 300,
-      targetX: 400,
-      targetY: 300,
-      speed: 3.5,
-      direction: 'down', // 'up', 'down', 'left', 'right'
-      isMoving: false,
-      speechBubble: null // { text: '', expiresAt: 0 }
-    };
+    // Player position & movement
+    let myX = 400, myY = 250;
+    let targetX = 400, targetY = 250;
+    const speed = 3.5;
+    const keys = {};
 
-    let remotePlayers = {}; // Keyed by player ID
-    let currentChannel = 'sakura-lounge';
-    let realtimeChannel = null;
-    let petals = [];
+    // Other players dictionary & chat bubbles
+    let players = {};
+    let chatBubbles = {}; // { userId: { text, timer } }
 
-    // Keyboard Movement State
-    const keys = { up: false, down: false, left: false, right: false };
+    // Supabase Realtime Channel
+    let roomChannel = null;
 
-    // --- CANVAS SETUP ---
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initUserProfile();
+      initCanvasSize();
+      setupCanvasEvents();
+      setupKeyboardControls();
+      connectRealtimeRoom();
+      createPetals();
+      requestAnimationFrame(gameLoop);
+    });
 
-    function resizeCanvas() {
-      const container = document.getElementById('canvas-container');
-      canvas.width = container.clientWidth;
-      canvas.height = container.clientHeight;
-      
-      // Keep player inside bounds on resize
-      localPlayer.x = Math.max(40, Math.min(canvas.width - 40, localPlayer.x));
-      localPlayer.y = Math.max(40, Math.min(canvas.height - 40, localPlayer.y));
+    function initUserProfile() {
+      localStorage.setItem('sakura_name', myName);
+      localStorage.setItem('sakura_color', myColor);
+      document.getElementById('my-name-display').textContent = myName;
+      document.getElementById('my-avatar-icon').style.backgroundColor = myColor;
+      document.getElementById('my-avatar-icon').textContent = myName.charAt(0).toUpperCase();
     }
 
-    // --- PETAL PARTICLES ---
-    function initPetals() {
-      petals = [];
-      const count = 35;
-      for (let i = 0; i < count; i++) {
-        petals.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight,
-          size: Math.random() * 6 + 4,
-          speedY: Math.random() * 1.2 + 0.8,
-          speedX: Math.random() * 0.8 - 0.4,
-          rotation: Math.random() * Math.PI * 2,
-          rotSpeed: (Math.random() - 0.5) * 0.02
-        });
+    function changeName() {
+      const newName = prompt('Enter your visitor name:', myName);
+      if (newName && newName.trim()) {
+        myName = newName.trim();
+        initUserProfile();
+        broadcastPosition();
       }
     }
 
-    function updateAndDrawPetals() {
-      ctx.fillStyle = 'rgba(251, 207, 232, 0.75)';
-      petals.forEach(p => {
-        p.y += p.speedY;
-        p.x += p.speedX + Math.sin(p.y * 0.01) * 0.3;
-        p.rotation += p.rotSpeed;
-
-        if (p.y > canvas.height + 10) {
-          p.y = -10;
-          p.x = Math.random() * canvas.width;
-        }
-
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rotation);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
+    function initCanvasSize() {
+      const canvas = document.getElementById('gameCanvas');
+      canvas.width = 750;
+      canvas.height = 420;
     }
 
-    // --- RENDERING ENVIRONMENT (BACKGROUND & DECORATIONS) ---
-    function drawEnvironment() {
-      const w = canvas.width;
-      const h = canvas.height;
-
-      // 1. Tatami Floor Grid Pattern
-      ctx.fillStyle = '#fce7f3';
-      ctx.fillRect(0, 0, w, h);
-
-      const tileSize = 80;
-      ctx.strokeStyle = 'rgba(244, 114, 182, 0.2)';
-      ctx.lineWidth = 1.5;
-
-      for (let x = 0; x < w; x += tileSize) {
-        for (let y = 0; y < h; y += tileSize) {
-          ctx.strokeRect(x, y, tileSize, tileSize);
-          // Subtle inner weave details
-          ctx.fillStyle = 'rgba(253, 226, 243, 0.3)';
-          ctx.fillRect(x + 4, y + 4, tileSize - 8, tileSize - 8);
-        }
+    // Connect to Supabase Realtime (Broadcast + Presence - NO database required!)
+    function connectRealtimeRoom() {
+      if (roomChannel) {
+        supabaseClient.removeChannel(roomChannel);
       }
 
-      // 2. Room Borders / Walls Effect
-      ctx.lineWidth = 12;
-      ctx.strokeStyle = 'rgba(236, 72, 153, 0.3)';
-      ctx.strokeRect(0, 0, w, h);
-
-      // 3. Center Zen Shrine Platform (Decor)
-      const cx = w / 2;
-      const cy = h / 2;
-      
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, 140, 90, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(244, 114, 182, 0.4)';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      // 4. Cherry Blossom Bonsai Tree in Top Center
-      drawBonsaiTree(cx, cy - 30);
-
-      // 5. Cozy Corner Lanterns
-      drawLantern(80, 80);
-      drawLantern(w - 80, 80);
-      drawLantern(80, h - 80);
-      drawLantern(w - 80, h - 80);
-    }
-
-    function drawBonsaiTree(x, y) {
-      // Pot
-      ctx.fillStyle = '#be185d';
-      ctx.beginPath();
-      ctx.ellipse(x, y + 25, 30, 12, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Trunk
-      ctx.strokeStyle = '#831843';
-      ctx.lineWidth = 8;
-      ctx.beginPath();
-      ctx.moveTo(x, y + 20);
-      ctx.quadraticCurveTo(x - 10, y, x - 5, y - 20);
-      ctx.quadraticCurveTo(x, y - 35, x + 10, y - 45);
-      ctx.stroke();
-
-      // Foliage / Sakura Canopy
-      ctx.fillStyle = '#f472b6';
-      ctx.beginPath();
-      ctx.arc(x + 10, y - 50, 28, 0, Math.PI * 2);
-      ctx.arc(x - 15, y - 40, 22, 0, Math.PI * 2);
-      ctx.arc(x + 25, y - 35, 20, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#fbcfe8';
-      ctx.beginPath();
-      ctx.arc(x + 8, y - 54, 18, 0, Math.PI * 2);
-      ctx.arc(x - 12, y - 44, 14, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function drawLantern(x, y) {
-      // Glow
-      const glow = ctx.createRadialGradient(x, y, 5, x, y, 35);
-      glow.addColorStop(0, 'rgba(251, 146, 60, 0.4)');
-      glow.addColorStop(1, 'rgba(251, 146, 60, 0)');
-      ctx.fillStyle = glow;
-      ctx.beginPath();
-      ctx.arc(x, y, 35, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Lamp Frame
-      ctx.fillStyle = '#f97316';
-      ctx.fillRect(x - 10, y - 14, 20, 28);
-      ctx.strokeStyle = '#7c2d12';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(x - 10, y - 14, 20, 28);
-
-      // Wooden Top/Bottom
-      ctx.fillStyle = '#451a03';
-      ctx.fillRect(x - 13, y - 18, 26, 5);
-      ctx.fillRect(x - 13, y + 14, 26, 5);
-    }
-
-    // --- DRAW AVATAR & SPEECH BUBBLES ---
-    function drawAvatar(player, isSelf = false) {
-      const { x, y, name, avatarType, direction, speechBubble } = player;
-      const type = AVATAR_TYPES[avatarType] || AVATAR_TYPES.sakura;
-
-      ctx.save();
-      ctx.translate(x, y);
-
-      // Shadow
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-      ctx.beginPath();
-      ctx.ellipse(0, 18, 16, 7, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Walking bounce animation tick
-      const bounce = player.isMoving ? Math.sin(Date.now() * 0.015) * 3 : 0;
-
-      // Character Body (Cute rounded capsule sprite)
-      ctx.fillStyle = type.bodyColor;
-      ctx.beginPath();
-      ctx.arc(0, -10 + bounce, 16, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Hat / Cap Detail
-      ctx.fillStyle = type.hatColor;
-      ctx.beginPath();
-      ctx.arc(0, -18 + bounce, 12, Math.PI, Math.PI * 2);
-      ctx.fill();
-
-      // Face & Eyes direction offset
-      let eyeX = 0;
-      let eyeY = -12 + bounce;
-      if (direction === 'left') eyeX = -5;
-      if (direction === 'right') eyeX = 5;
-      if (direction === 'up') eyeY = -16 + bounce; // Looking away
-
-      if (direction !== 'up') {
-        ctx.fillStyle = '#1e1b4b';
-        ctx.beginPath();
-        ctx.arc(eyeX - 4, eyeY, 2.5, 0, Math.PI * 2);
-        ctx.arc(eyeX + 4, eyeY, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Cute Blush
-        ctx.fillStyle = 'rgba(244, 114, 182, 0.6)';
-        ctx.beginPath();
-        ctx.arc(eyeX - 7, eyeY + 3, 3, 0, Math.PI * 2);
-        ctx.arc(eyeX + 7, eyeY + 3, 3, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Nameplate Hovering
-      ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
-      ctx.textAlign = 'center';
-
-      // Self Indicator Ring / Highlight
-      if (isSelf) {
-        ctx.strokeStyle = '#ec4899';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.ellipse(0, 18, 20, 9, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-      // Nameplate Tag
-      const nameWidth = ctx.measureText(name).width + 12;
-      ctx.fillStyle = isSelf ? 'rgba(236, 72, 153, 0.9)' : 'rgba(255, 255, 255, 0.85)';
-      ctx.beginPath();
-      ctx.roundRect(-nameWidth / 2, 24, nameWidth, 18, 9);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(244, 114, 182, 0.5)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      ctx.fillStyle = isSelf ? '#ffffff' : '#831843';
-      ctx.fillText(name, 0, 37);
-
-      // Floating Speech Bubble
-      if (speechBubble && speechBubble.expiresAt > Date.now()) {
-        drawSpeechBubble(speechBubble.text);
-      }
-
-      ctx.restore();
-    }
-
-    function drawSpeechBubble(text) {
-      ctx.font = '500 12px "Plus Jakarta Sans", sans-serif';
-      const textMetrics = ctx.measureText(text);
-      const bubbleWidth = Math.min(180, Math.max(60, textMetrics.width + 20));
-      const bubbleHeight = 30;
-      const bubbleX = -bubbleWidth / 2;
-      const bubbleY = -65;
-
-      // Bubble background
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.beginPath();
-      ctx.roundRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight, 12);
-      ctx.fill();
-
-      ctx.strokeStyle = 'rgba(244, 114, 182, 0.6)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // Bubble Tail Pointer
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.beginPath();
-      ctx.moveTo(-5, bubbleY + bubbleHeight);
-      ctx.lineTo(0, bubbleY + bubbleHeight + 6);
-      ctx.lineTo(5, bubbleY + bubbleHeight);
-      ctx.fill();
-
-      // Text inside bubble
-      ctx.fillStyle = '#831843';
-      ctx.textAlign = 'center';
-
-      // Truncate text if too long for simple bubble
-      let displayText = text;
-      if (textMetrics.width > 160) {
-        displayText = text.substring(0, 22) + '...';
-      }
-      ctx.fillText(displayText, 0, bubbleY + 19);
-    }
-
-    // --- GAME LOOP & MOVEMENT LOGIC ---
-    function updatePlayerMovement() {
-      let dx = 0;
-      let dy = 0;
-
-      if (keys.up) { dy -= 1; localPlayer.direction = 'up'; }
-      if (keys.down) { dy += 1; localPlayer.direction = 'down'; }
-      if (keys.left) { dx -= 1; localPlayer.direction = 'left'; }
-      if (keys.right) { dx += 1; localPlayer.direction = 'right'; }
-
-      // Keyboard movement override
-      if (dx !== 0 || dy !== 0) {
-        // Normalize diagonal speed
-        const length = Math.hypot(dx, dy);
-        localPlayer.x += (dx / length) * localPlayer.speed;
-        localPlayer.y += (dy / length) * localPlayer.speed;
-
-        localPlayer.targetX = localPlayer.x;
-        localPlayer.targetY = localPlayer.y;
-        localPlayer.isMoving = true;
-      } else {
-        // Smooth interpolated click-to-move interpolation
-        const distX = localPlayer.targetX - localPlayer.x;
-        const distY = localPlayer.targetY - localPlayer.y;
-        const distance = Math.hypot(distX, distY);
-
-        if (distance > 3) {
-          localPlayer.x += (distX / distance) * localPlayer.speed;
-          localPlayer.y += (distY / distance) * localPlayer.speed;
-          localPlayer.isMoving = true;
-
-          if (Math.abs(distX) > Math.abs(distY)) {
-            localPlayer.direction = distX > 0 ? 'right' : 'left';
-          } else {
-            localPlayer.direction = distY > 0 ? 'down' : 'up';
-          }
-        } else {
-          localPlayer.isMoving = false;
-        }
-      }
-
-      // Keep local player inside screen boundaries
-      localPlayer.x = Math.max(30, Math.min(canvas.width - 30, localPlayer.x));
-      localPlayer.y = Math.max(40, Math.min(canvas.height - 40, localPlayer.y));
-
-      // Broadcast position to Realtime channel if moving
-      if (localPlayer.isMoving && realtimeChannel) {
-        broadcastState();
-      }
-    }
-
-    function render() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // 1. Render World Environment
-      drawEnvironment();
-
-      // 2. Render Petals Particles
-      updateAndDrawPetals();
-
-      // 3. Update & Draw Remote Players
-      Object.values(remotePlayers).forEach(player => {
-        drawAvatar(player, false);
+      roomChannel = supabaseClient.channel(`room:${currentRoom}`, {
+        config: { presence: { key: myId } }
       });
 
-      // 4. Update & Draw Local Player
-      updatePlayerMovement();
-      drawAvatar(localPlayer, true);
-
-      requestAnimationFrame(render);
-    }
-
-    // --- SUPABASE REALTIME & CHAT LOGIC ---
-    async function initSupabaseChannel(channelName) {
-      if (realtimeChannel) {
-        supabaseClient.removeChannel(realtimeChannel);
-      }
-
-      currentChannel = channelName;
-      document.getElementById('room-indicator').textContent = '#' + channelName;
-
-      realtimeChannel = supabaseClient.channel(`room_${channelName}`, {
-        config: { presence: { key: localPlayer.id } }
-      });
-
-      // Presence Sync (Track online users in room)
-      realtimeChannel
-        .on('presence', { event: 'sync' }, () => {
-          const state = realtimeChannel.presenceState();
-          remotePlayers = {};
-          let count = 1; // local player
-
-          Object.keys(state).forEach(key => {
-            if (key !== localPlayer.id) {
-              const presences = state[key];
-              if (presences && presences.length > 0) {
-                remotePlayers[key] = presences[0];
-                count++;
-              }
-            }
-          });
-
-          document.getElementById('player-count').textContent = `${count} Online`;
-        })
-        .on('presence', { event: 'leave' }, ({ key }) => {
-          delete remotePlayers[key];
-        })
-        // Realtime position & chat broadcast stream
-        .on('broadcast', { event: 'player-move' }, payload => {
-          const p = payload.payload;
-          if (p.id !== localPlayer.id) {
-            remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
+      // Listen for broadcasts (Movement & Chat)
+      roomChannel
+        .on('broadcast', { event: 'move' }, payload => {
+          if (payload.payload.id !== myId) {
+            players[payload.payload.id] = payload.payload;
           }
         })
-        .on('broadcast', { event: 'chat-message' }, payload => {
-          const msg = payload.payload;
-          displayChatMessage(msg);
-
-          // Trigger speech bubble on corresponding player
-          if (msg.playerId === localPlayer.id) {
-            localPlayer.speechBubble = { text: msg.content, expiresAt: Date.now() + 4500 };
-          } else if (remotePlayers[msg.playerId]) {
-            remotePlayers[msg.playerId].speechBubble = { text: msg.content, expiresAt: Date.now() + 4500 };
-          }
+        .on('broadcast', { event: 'chat' }, payload => {
+          triggerChatBubble(payload.payload.id, payload.payload.text);
+          appendChatLog(payload.payload.name, payload.payload.text);
         })
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
-            await realtimeChannel.track({
-              id: localPlayer.id,
-              name: localPlayer.name,
-              avatarType: localPlayer.avatarType,
-              x: localPlayer.x,
-              y: localPlayer.y,
-              direction: localPlayer.direction
+            await roomChannel.track({
+              id: myId,
+              name: myName,
+              x: myX,
+              y: myY,
+              color: myColor,
+              room: currentRoom
             });
+            broadcastPosition();
           }
         });
 
-      // Load Recent Chat Messages History
-      fetchChatHistory();
-    }
-
-    function broadcastState() {
-      if (!realtimeChannel) return;
-      
-      realtimeChannel.send({
-        type: 'broadcast',
-        event: 'player-move',
-        payload: {
-          id: localPlayer.id,
-          name: localPlayer.name,
-          avatarType: localPlayer.avatarType,
-          x: localPlayer.x,
-          y: localPlayer.y,
-          direction: localPlayer.direction,
-          isMoving: localPlayer.isMoving
-        }
+      // Track online count via Presence
+      roomChannel.on('presence', { event: 'sync' }, () => {
+        const state = roomChannel.presenceState();
+        let total = 0;
+        Object.values(state).forEach(presences => {
+          total += presences.length;
+        });
+        document.getElementById('online-count').textContent = total;
       });
     }
 
-    async function fetchChatHistory() {
-      const { data, error } = await supabaseClient
-        .from('messages')
-        .select('*')
-        .eq('channel', currentChannel)
-        .order('created_at', { ascending: true })
-        .limit(30);
+    function switchRoom(roomName) {
+      currentRoom = roomName;
+      document.getElementById('current-room-badge').textContent = roomName === 'sakura-lounge' ? '🌸 Sakura Shrine' : '🕹️ Arcade Room';
+      
+      document.querySelectorAll('.room-btn').forEach(btn => {
+        btn.classList.remove('bg-pink-500', 'text-white', 'shadow-sm', 'font-semibold');
+        btn.classList.add('text-pink-800', 'font-medium');
+      });
+      document.getElementById(`room-${roomName}`).classList.add('bg-pink-500', 'text-white', 'shadow-sm', 'font-semibold');
+      document.getElementById(`room-${roomName}`).classList.remove('text-pink-800', 'font-medium');
 
-      const chatContainer = document.getElementById('chat-messages');
-      chatContainer.innerHTML = '';
-
-      if (data && data.length > 0) {
-        data.forEach(msg => {
-          displayChatMessage({
-            sender: msg.username,
-            content: msg.content,
-            time: new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isSelf: msg.username === localPlayer.name
-          });
-        });
-      } else {
-        chatContainer.innerHTML = `<div class="text-center text-xs text-pink-500 my-4 italic">No messages in #${currentChannel} yet. Be the first to say hi!</div>`;
-      }
+      players = {};
+      document.getElementById('chat-messages').innerHTML = `<p class="text-pink-400 italic text-center mt-6">Joined #${roomName}. Say hello!</p>`;
+      
+      connectRealtimeRoom();
     }
 
-    // Send Message Handler
-    document.getElementById('chat-form').addEventListener('submit', async (e) => {
+    // Broadcast Position
+    function broadcastPosition() {
+      if (!roomChannel) return;
+      roomChannel.send({
+        type: 'broadcast',
+        event: 'move',
+        payload: { id: myId, name: myName, x: myX, y: myY, color: myColor }
+      });
+    }
+
+    // Chat handling
+    document.getElementById('chat-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
-
       if (!text) return;
       input.value = '';
 
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      // Show locally immediately
+      triggerChatBubble(myId, text);
+      appendChatLog(myName, text);
 
-      // Local Speech Bubble
-      localPlayer.speechBubble = { text: text, expiresAt: Date.now() + 4500 };
-
-      // Broadcast Realtime Event
-      if (realtimeChannel) {
-        realtimeChannel.send({
+      // Broadcast to others
+      if (roomChannel) {
+        roomChannel.send({
           type: 'broadcast',
-          event: 'chat-message',
-          payload: {
-            playerId: localPlayer.id,
-            sender: localPlayer.name,
-            content: text,
-            time: timeStr
-          }
+          event: 'chat',
+          payload: { id: myId, name: myName, text: text }
         });
       }
-
-      // Persist Message to Supabase DB
-      await supabaseClient.from('messages').insert([{
-        username: localPlayer.name,
-        content: text,
-        channel: currentChannel,
-        avatar_color: AVATAR_TYPES[localPlayer.avatarType].bodyColor
-      }]);
     });
 
-    function displayChatMessage(msg) {
+    function triggerChatBubble(id, text) {
+      chatBubbles[id] = { text: text, timer: 180 }; // displays for ~3 seconds
+    }
+
+    function appendChatLog(name, text) {
       const container = document.getElementById('chat-messages');
-      const isSelf = msg.sender === localPlayer.name;
-
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `flex flex-col ${isSelf ? 'items-end' : 'items-start'} space-y-1 animate-in fade-in slide-in-from-bottom-2 duration-150`;
-
-      msgDiv.innerHTML = `
-        <div class="flex items-center gap-1.5 px-1">
-          <span class="text-[11px] font-bold text-pink-900">${escapeHtml(msg.sender)}</span>
-          <span class="text-[9px] text-pink-400">${msg.time || ''}</span>
-        </div>
-        <div class="px-3 py-2 rounded-2xl text-xs max-w-[85%] shadow-sm ${
-          isSelf 
-            ? 'bg-pink-500 text-white rounded-tr-none' 
-            : 'bg-white/90 text-pink-950 border border-pink-100 rounded-tl-none font-medium'
-        }">
-          ${escapeHtml(msg.content)}
-        </div>
-      `;
-
-      container.appendChild(msgDiv);
+      const div = document.createElement('div');
+      div.className = "bg-white/80 p-2 rounded-xl border border-pink-200/50 shadow-xs";
+      div.innerHTML = `<span class="font-bold text-pink-900">${escapeHtml(name)}:</span> <span class="text-pink-950">${escapeHtml(text)}</span>`;
+      container.appendChild(div);
       container.scrollTop = container.scrollHeight;
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.innerText = text;
-      return div.innerHTML;
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.innerText = str;
+      return d.innerHTML;
     }
 
-    // --- CONTROLS & EVENT LISTENERS ---
-    window.addEventListener('keydown', e => {
-      // Don't capture controls when typing in inputs
-      if (document.activeElement.tagName === 'INPUT') return;
+    // Input & Movement setup
+    function setupKeyboardControls() {
+      window.addEventListener('keydown', (e) => {
+        if (document.activeElement.tagName === 'INPUT') return;
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+          e.preventDefault();
+        }
+        keys[e.code] = true;
+      });
+      window.addEventListener('keyup', (e) => {
+        keys[e.code] = false;
+      });
+    }
 
-      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.up = true;
-      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.down = true;
-      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
-      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
-    });
+    function setupCanvasEvents() {
+      const canvas = document.getElementById('gameCanvas');
+      canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        targetX = e.clientX - rect.left;
+        targetY = e.clientY - rect.top;
+      });
+    }
 
-    window.addEventListener('keyup', e => {
-      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.up = false;
-      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.down = false;
-      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
-      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
-    });
+    // Game Loop
+    let lastBroadcast = 0;
+    function gameLoop(timestamp) {
+      updatePlayer();
+      renderGame();
 
-    // Click to Move on Canvas
-    canvas.addEventListener('click', e => {
-      const rect = canvas.getBoundingClientRect();
-      localPlayer.targetX = e.clientX - rect.left;
-      localPlayer.targetY = e.clientY - rect.top;
-    });
+      // Throttle position broadcast
+      if (timestamp - lastBroadcast > 80) {
+        broadcastPosition();
+        lastBroadcast = timestamp;
+      }
 
-    // Touch D-Pad Helper
-    function startMove(dir) { keys[dir] = true; }
-    function stopMove(dir) { keys[dir] = false; }
+      requestAnimationFrame(gameLoop);
+    }
 
-    // Channel Switching
-    function switchChannel(channelName) {
-      document.querySelectorAll('.chan-btn').forEach(btn => {
-        btn.classList.remove('bg-pink-500', 'text-white', 'shadow-sm');
-        btn.classList.add('text-pink-800');
+    function updatePlayer() {
+      let dx = 0, dy = 0;
+      if (keys['KeyW'] || keys['ArrowUp']) dy -= 1;
+      if (keys['KeyS'] || keys['ArrowDown']) dy += 1;
+      if (keys['KeyA'] || keys['ArrowLeft']) dx -= 1;
+      if (keys['KeyD'] || keys['ArrowRight']) dx += 1;
+
+      if (dx !== 0 || dy !== 0) {
+        const len = Math.hypot(dx, dy);
+        myX += (dx / len) * speed;
+        myY += (dy / len) * speed;
+        targetX = myX;
+        targetY = myY;
+      } else {
+        // Move towards click target
+        const distX = targetX - myX;
+        const distY = targetY - myY;
+        const dist = Math.hypot(distX, distY);
+        if (dist > 2) {
+          myX += (distX / dist) * speed;
+          myY += (distY / dist) * speed;
+        }
+      }
+
+      // Boundaries
+      const canvas = document.getElementById('gameCanvas');
+      myX = Math.max(30, Math.min(canvas.width - 30, myX));
+      myY = Math.max(40, Math.min(canvas.height - 30, myY));
+    }
+
+    function renderGame() {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Room Background Decorations
+      drawRoomDecor(ctx, canvas);
+
+      // Draw Other Players
+      Object.values(players).forEach(p => {
+        drawAvatar(ctx, p.x, p.y, p.name, p.color, false);
       });
 
-      const activeBtn = document.getElementById(`chan-btn-${channelName}`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-pink-500', 'text-white', 'shadow-sm');
-        activeBtn.classList.remove('text-pink-800');
-      }
-
-      initSupabaseChannel(channelName);
+      // Draw My Avatar
+      drawAvatar(ctx, myX, myY, myName + ' (You)', myColor, true);
     }
 
-    // --- CUSTOMIZATION MODAL LOGIC ---
-    function renderAvatarPicker() {
-      const picker = document.getElementById('avatar-picker');
-      picker.innerHTML = Object.keys(AVATAR_TYPES).map(key => {
-        const type = AVATAR_TYPES[key];
-        const isSelected = localPlayer.avatarType === key;
+    function drawRoomDecor(ctx, canvas) {
+      if (currentRoom === 'sakura-lounge') {
+        // Tatami floor grid lines
+        ctx.strokeStyle = 'rgba(244, 114, 182, 0.15)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < canvas.width; x += 50) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += 50) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
 
-        return `
-          <div 
-            onclick="selectAvatarType('${key}')"
-            class="p-3 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
-              isSelected 
-                ? 'border-pink-500 bg-pink-100/60 shadow-sm' 
-                : 'border-pink-200/60 hover:bg-white/50'
-            }"
-            id="avatar-opt-${key}"
-          >
-            <div class="w-7 h-7 rounded-full shadow-sm flex-shrink-0" style="background-color: ${type.bodyColor}"></div>
-            <span class="text-xs font-bold text-pink-900">${type.name}</span>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function selectAvatarType(key) {
-      localPlayer.avatarType = key;
-      renderAvatarPicker();
-    }
-
-    function toggleSettingsModal() {
-      const modal = document.getElementById('settings-modal');
-      modal.classList.toggle('hidden');
-      if (!modal.classList.contains('hidden')) {
-        document.getElementById('setting-username').value = localPlayer.name;
-        renderAvatarPicker();
+        // Shrine Tree in corner
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath(); ctx.arc(100, 90, 45, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#db2777';
+        ctx.beginPath(); ctx.arc(80, 75, 30, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#854d0e'; // trunk
+        ctx.fillRect(92, 110, 16, 60);
+      } else {
+        // Arcade Floor pattern
+        ctx.fillStyle = 'rgba(219, 39, 119, 0.1)';
+        ctx.fillRect(50, 50, 150, 100);
+        ctx.fillRect(550, 250, 150, 100);
       }
     }
 
-    function saveAvatarSettings() {
-      const newName = document.getElementById('setting-username').value.trim();
-      if (newName) {
-        localPlayer.name = newName;
-        localStorage.setItem('sakura_avatar_name', localPlayer.name);
-      }
-      localStorage.setItem('sakura_avatar_type', localPlayer.avatarType);
+    function drawAvatar(ctx, x, y, name, color, isMe) {
+      // Shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+      ctx.beginPath();
+      ctx.ellipse(x, y + 16, 14, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-      // Update Presence
-      if (realtimeChannel) {
-        realtimeChannel.track({
-          id: localPlayer.id,
-          name: localPlayer.name,
-          avatarType: localPlayer.avatarType,
-          x: localPlayer.x,
-          y: localPlayer.y
-        });
-      }
+      // Avatar Body (Cute Blob / Sprite representation)
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x, y - 4, 18, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Highlight rim
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
 
-      toggleSettingsModal();
+      // Face Emoji / Eyes
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(x - 5, y - 6, 3, 0, Math.PI * 2);
+      ctx.arc(x + 5, y - 6, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Name Tag
+      ctx.fillStyle = isMe ? '#831843' : '#500724';
+      ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(name, x, y - 26);
+
+      // Chat Bubble if active
+      const userId = isMe ? myId : Object.keys(players).find(k => players[k].name === name.replace(' (You)', ''));
+      if (userId && chatBubbles[userId] && chatBubbles[userId].timer > 0) {
+        const bubble = chatBubbles[userId];
+        bubble.timer--;
+
+        ctx.font = '11px "Plus Jakarta Sans", sans-serif';
+        const textWidth = ctx.measureText(bubble.text).width;
+        const bWidth = Math.max(textWidth + 16, 30);
+        const bHeight = 24;
+        const bx = x - bWidth / 2;
+        const by = y - 62;
+
+        // Bubble background
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.strokeStyle = '#f472b6';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(bx, by, bWidth, bHeight, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        // Bubble text
+        ctx.fillStyle = '#831843';
+        ctx.textAlign = 'center';
+        ctx.fillText(bubble.text, x, by + 16);
+      }
     }
 
-    function toggleChatSidebar() {
-      const sidebar = document.getElementById('chat-sidebar');
-      sidebar.classList.toggle('translate-x-full');
+    // Falling Petals Animation
+    function createPetals() {
+      const container = document.getElementById('petals-container');
+      for (let i = 0; i < 15; i++) {
+        const p = document.createElement('div');
+        p.className = 'petal';
+        const size = Math.random() * 10 + 6;
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.left = `${Math.random() * 100}vw`;
+        p.style.animationDuration = `${Math.random() * 7 + 5}s`;
+        p.style.animationDelay = `${Math.random() * 5}s`;
+        container.appendChild(p);
+      }
     }
-
-    // Fade out controls hint after 6 seconds
-    setTimeout(() => {
-      const hint = document.getElementById('controls-hint');
-      if (hint) hint.style.opacity = '0.3';
-    }, 6000);
-
-    // --- INITIALIZATION ---
-    window.addEventListener('resize', resizeCanvas);
-
-    window.addEventListener('load', () => {
-      lucide.createIcons();
-      resizeCanvas();
-      initPetals();
-
-      // Initial Spawn in Center Canvas
-      localPlayer.x = canvas.width / 2;
-      localPlayer.y = canvas.height / 2 + 60;
-      localPlayer.targetX = localPlayer.x;
-      localPlayer.targetY = localPlayer.y;
-
-      initSupabaseChannel('sakura-lounge');
-      requestAnimationFrame(render);
-    });
   </script>
 </body>
 </html>
