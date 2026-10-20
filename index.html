@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Sakura Slime World 🌸 - Virtual Lounge & Bonfire Park</title>
+  <title>Sakura Slime World 🌸 - Virtual Lounge, Fair & Neon Arcade</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -124,7 +124,7 @@
           <i data-lucide="sparkles" class="w-6 h-6"></i>
         </div>
         <h2 class="font-sakura text-2xl font-bold text-pink-950">Sakura Slime World</h2>
-        <p class="text-xs text-pink-600 font-medium">Zen Parks, Slime Shop, Games & Live Chat!</p>
+        <p class="text-xs text-pink-600 font-medium">Zen Parks, Fair, Arcade & Live Chat!</p>
       </div>
 
       <div class="grid grid-cols-2 gap-1 p-1 bg-pink-100/80 rounded-2xl text-xs font-bold text-pink-800">
@@ -372,20 +372,20 @@
         </div>
       </div>
 
-      <!-- Mini-Games Launcher Panel -->
+      <!-- Mini-Games Launcher Panel (User Selectable Games) -->
       <div class="px-3 py-2 bg-pink-950/40 border-b border-pink-200/20 space-y-1 shrink-0">
-        <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider">Play Lounge Mini-Games:</span>
-        <div class="grid grid-cols-4 gap-1">
-          <button onclick="startMiniGame('petal-catch')" class="px-1.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-[10px] font-bold shadow-sm flex items-center justify-center transition">
-            🌸 Petals
+        <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider">Select & Play Mini-Game:</span>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button onclick="startMiniGame('petal-catch')" class="px-2.5 py-2 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
+            🌸 Petal Catch
           </button>
-          <button onclick="startMiniGame('balloon-pop')" class="px-1.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-[10px] font-bold shadow-sm flex items-center justify-center transition">
-            🎈 Balloons
+          <button onclick="startMiniGame('balloon-pop')" class="px-2.5 py-2 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
+            🎈 Balloon Pop
           </button>
-          <button onclick="startMiniGame('shrine-dash')" class="px-1.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-[10px] font-bold shadow-sm flex items-center justify-center transition">
-            ⛩️ Dash
+          <button onclick="startMiniGame('shrine-dash')" class="px-2.5 py-2 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
+            ⛩️ Shrine Dash
           </button>
-          <button onclick="startMiniGame('sparkle-collector')" class="px-1.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-[10px] font-bold shadow-sm flex items-center justify-center transition">
+          <button onclick="startMiniGame('sparkle-collector')" class="px-2.5 py-2 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
             ✨ Sparkles
           </button>
         </div>
@@ -501,7 +501,7 @@
           </div>
           <div>
             <h3 class="font-bold text-pink-950 text-base">Slime Shop & Boutique</h3>
-            <p class="text-[10px] text-pink-600 font-semibold">Unlock new colors, accessories & clothing!</p>
+            <p class="text-[10px] text-pink-600 font-semibold">Unlock skins, clothes, makeup & titles (Prices scale up!)</p>
           </div>
         </div>
         <button onclick="toggleShopModal()" class="text-pink-700 hover:text-pink-900 p-1">
@@ -509,10 +509,11 @@
         </button>
       </div>
 
-      <div class="grid grid-cols-4 gap-1 bg-pink-100 p-1 rounded-2xl text-[11px] font-bold text-pink-800">
+      <div class="grid grid-cols-5 gap-1 bg-pink-100 p-1 rounded-2xl text-[10px] font-bold text-pink-800">
         <button onclick="switchShopTab('skins')" id="shoptab-skins" class="py-1.5 rounded-xl transition tab-active">Skins</button>
         <button onclick="switchShopTab('clothing')" id="shoptab-clothing" class="py-1.5 rounded-xl transition">Clothes</button>
         <button onclick="switchShopTab('makeup')" id="shoptab-makeup" class="py-1.5 rounded-xl transition">Makeup</button>
+        <button onclick="switchShopTab('titles')" id="shoptab-titles" class="py-1.5 rounded-xl transition">Titles</button>
         <button onclick="switchShopTab('accessories')" id="shoptab-accessories" class="py-1.5 rounded-xl transition">Hats</button>
       </div>
 
@@ -531,12 +532,6 @@
         <button onclick="toggleCustomStudioModal()" class="text-pink-700 hover:text-pink-900 p-1">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
-      </div>
-
-      <!-- Live Interactive Preview Canvas -->
-      <div class="flex flex-col items-center justify-center bg-gradient-to-b from-pink-100 to-rose-50 rounded-2xl p-4 border border-pink-200 shadow-inner">
-        <canvas id="previewCanvas" width="160" height="120" class="block drop-shadow-md"></canvas>
-        <span class="text-[10px] font-bold text-pink-600 uppercase tracking-widest mt-1">Live Interactive Preview</span>
       </div>
 
       <div class="space-y-1">
@@ -684,58 +679,56 @@
       if (musicMasterGain) musicMasterGain.gain.value = parseFloat(val);
     }
 
-    // --- AVATAR TYPES & CUSTOMIZATIONS ---
+    // --- AVATAR TYPES & 5X SCALING PRICES ---
     const AVATAR_TYPES = {
       sakura: { name: 'Sakura Pin', bodyColor: '#f472b6', accessory: '🌸', price: 0 },
       spirit: { name: 'Cat Ears', bodyColor: '#38bdf8', accessory: '🐱', price: 0 },
       admin_black: { name: 'Admin Black', bodyColor: '#18181b', accessory: '👑', price: 0 },
       dev_white: { name: 'Dev Pure White', bodyColor: '#ffffff', accessory: '⚡', price: 0 },
-      fox:    { name: 'Kitsune Mask', bodyColor: '#fb923c', accessory: '🦊', price: 50 },
-      matcha: { name: 'Matcha Boba', bodyColor: '#4ade80', accessory: '🍵', price: 75 },
-      crown:  { name: 'Gold Crown', bodyColor: '#a855f7', accessory: '👑', price: 100 },
-      galaxy: { name: 'Galaxy Star', bodyColor: '#6366f1', accessory: '⭐', price: 150 },
-      lava:   { name: 'Lava Flame', bodyColor: '#ef4444', accessory: '🔥', price: 200 },
-      ice:    { name: 'Ice Crystal', bodyColor: '#06b6d4', accessory: '❄️', price: 250 }
+      fox:    { name: 'Kitsune Mask', bodyColor: '#fb923c', accessory: '🦊', price: 250 },     // 50 * 5
+      matcha: { name: 'Matcha Boba', bodyColor: '#4ade80', accessory: '🍵', price: 375 },     // 75 * 5
+      crown:  { name: 'Royal Purple', bodyColor: '#a855f7', accessory: '👑', price: 500 },    // 100 * 5
+      galaxy: { name: 'Galaxy Indigo', bodyColor: '#6366f1', accessory: '⭐', price: 750 }    // 150 * 5
     };
 
     const EXPRESSIONS = {
-      happy: 'Happy',
-      cute:  'Cute',
-      wink:  'Wink',
-      chill: 'Chill',
-      gamer: 'Gamer',
-      derp:  'Derp'
+      happy: 'Happy', cute: 'Cute', wink: 'Wink', chill: 'Chill', gamer: 'Gamer', derp: 'Derp'
     };
 
+    // Each sequential item in category gets more expensive than the last
     const SHOP_CATALOG = {
       skins: [
-        { id: 'fox', name: 'Kitsune Orange', price: 50, type: 'skin' },
-        { id: 'matcha', name: 'Matcha Green', price: 75, type: 'skin' },
-        { id: 'crown', name: 'Royal Purple', price: 100, type: 'skin' },
-        { id: 'galaxy', name: 'Galaxy Indigo', price: 150, type: 'skin' }
+        { id: 'fox', name: 'Kitsune Orange', price: 250, type: 'skin' },
+        { id: 'matcha', name: 'Matcha Green', price: 400, type: 'skin' },
+        { id: 'crown', name: 'Royal Purple', price: 650, type: 'skin' },
+        { id: 'galaxy', name: 'Galaxy Indigo', price: 1000, type: 'skin' }
       ],
       clothing: [
-        { id: 'scarf_red', name: 'Cozy Scarf', price: 40, type: 'clothing', icon: '🧣' },
-        { id: 'ribbon_blue', name: 'Cute Ribbon', price: 60, type: 'clothing', icon: '🎀' },
-        { id: 'vest_gold', name: 'Gold Vest', price: 90, type: 'clothing', icon: '🎽' }
+        { id: 'scarf_red', name: 'Cozy Scarf', price: 200, type: 'clothing', icon: '🧣' },
+        { id: 'ribbon_blue', name: 'Cute Ribbon', price: 350, type: 'clothing', icon: '🎀' },
+        { id: 'vest_gold', name: 'Gold Vest', price: 600, type: 'clothing', icon: '🎽' }
       ],
       makeup: [
-        { id: 'blush_star', name: 'Star Blush', price: 35, type: 'makeup', icon: '✨' },
-        { id: 'blush_heart', name: 'Heart Blush', price: 45, type: 'makeup', icon: '💖' },
-        { id: 'face_sparkle', name: 'Glitter Face', price: 70, type: 'makeup', icon: '💎' }
+        { id: 'blush_star', name: 'Star Blush', price: 175, type: 'makeup', icon: '✨' },
+        { id: 'blush_heart', name: 'Heart Blush', price: 300, type: 'makeup', icon: '💖' },
+        { id: 'face_sparkle', name: 'Glitter Face', price: 550, type: 'makeup', icon: '💎' }
+      ],
+      titles: [
+        { id: 'title_vip', name: '⭐ VIP Title', price: 250, type: 'title', icon: '⭐' },
+        { id: 'title_cool', name: '🔥 Cool Title', price: 500, type: 'title', icon: '🔥' },
+        { id: 'title_legend', name: '👑 Legend Title', price: 900, type: 'title', icon: '👑' }
       ],
       accessories: [
-        { id: '🎩', name: 'Top Hat', price: 60, type: 'acc' },
-        { id: '👓', name: 'Cool Glasses', price: 80, type: 'acc' },
-        { id: '👑', name: 'Emperor Crown', price: 120, type: 'acc' }
+        { id: '🎩', name: 'Top Hat', price: 300, type: 'acc' },
+        { id: '👓', name: 'Cool Glasses', price: 500, type: 'acc' },
+        { id: '👑', name: 'Emperor Crown', price: 850, type: 'acc' }
       ]
     };
 
     // --- GAME STATE ---
     let sakuraCoins = parseInt(localStorage.getItem('sakura_coins') || '150');
-    let unlockedItems = JSON.parse(localStorage.getItem('sakura_unlocked_items') || '["sakura","spirit","scarf_red","blush_star"]');
+    let unlockedItems = JSON.parse(localStorage.getItem('sakura_unlocked_items') || '["sakura","spirit","scarf_red","blush_star","title_vip"]');
 
-    // Admin & Moderation Stores
     let bannedUsers = JSON.parse(localStorage.getItem('sakura_banned_users') || '[]');
     let adminUsers = JSON.parse(localStorage.getItem('sakura_admin_users') || '[]');
     let userBanEndTimes = {};
@@ -755,6 +748,7 @@
       equippedClothing: localStorage.getItem('sakura_equipped_clothing') || 'scarf_red',
       equippedMakeup: localStorage.getItem('sakura_equipped_makeup') || 'blush_star',
       equippedTrail: localStorage.getItem('sakura_equipped_trail') || 'sakura_petals',
+      equippedTitle: localStorage.getItem('sakura_equipped_title') || '',
       title: '',
       x: 400,
       y: 300,
@@ -782,10 +776,14 @@
     let koiFish = [];
     let bonfireFlames = [];
 
-    // Selected Target Player for Moderation Menu
+    // Animation & Disco Lighting variables
+    let ferrisWheelAngle = 0;
+    let coasterPos = 0;
+    let discoHue = 0;
+
     let selectedPlayerForContext = null;
 
-    // Mini-Game Active State Variables
+    // Mini-Game Active State
     let activeMiniGame = null;
     let miniGameScore = 0;
     let miniGameTimeLeft = 0;
@@ -800,19 +798,16 @@
       'arcade-lounge': JSON.parse(localStorage.getItem('chat_arcade-lounge') || '[]')
     };
 
-    // Registered Players Mock Directory for Dev Search
     let registeredUsers = JSON.parse(localStorage.getItem('sakura_registered_users') || '[]');
     if (registeredUsers.length === 0) {
       registeredUsers = [
         { id: localPlayer.id, name: localPlayer.name },
         { id: 'usr_mika', name: 'MikaSlime' },
-        { id: 'usr_taro', name: 'TaroBoba' },
-        { id: 'usr_hana', name: 'HanaBloom' }
+        { id: 'usr_taro', name: 'TaroBoba' }
       ];
       localStorage.setItem('sakura_registered_users', JSON.stringify(registeredUsers));
     }
 
-    // Input States
     const keys = { up: false, down: false, left: false, right: false };
     const joystick = { active: false, dx: 0, dy: 0 };
 
@@ -831,7 +826,7 @@
       document.getElementById('coin-counter').textContent = sakuraCoins;
     }
 
-    // --- DEVELOPER MODE & PASSCODE SYSTEM ---
+    // --- DEV MODE ---
     function promptDevMode() {
       if (isDevMode) {
         toggleDevModal();
@@ -856,7 +851,7 @@
 
     function disableDevMode() {
       isDevMode = false;
-      localPlayer.title = isAdminRole && showAdminTitle ? 'Admin' : '';
+      localPlayer.title = isAdminRole && showAdminTitle ? 'Admin' : (localPlayer.equippedTitle || '');
       localPlayer.avatarType = isAdminRole ? 'admin_black' : 'sakura';
       toggleDevModal();
       alert("Developer Mode Deactivated.");
@@ -880,13 +875,13 @@
         localPlayer.title = 'Admin';
         btn.classList.add('ring-2', 'ring-white');
       } else {
-        localPlayer.title = isDevMode ? 'Dev' : '';
+        localPlayer.title = isDevMode ? 'Dev' : (localPlayer.equippedTitle || '');
         btn.classList.remove('ring-2', 'ring-white');
       }
       if (realtimeChannel) broadcastState();
     }
 
-    // --- MODERATION LOGIC ---
+    // --- MODERATION ---
     function openUserContextMenu(player, clickX, clickY) {
       selectedPlayerForContext = player;
       const menu = document.getElementById('user-context-menu');
@@ -923,17 +918,14 @@
 
     function adminTempBan() {
       if (!selectedPlayerForContext) return;
-      const targetId = selectedPlayerForContext.id;
-      userBanEndTimes[targetId] = Date.now() + 10 * 60 * 1000;
+      userBanEndTimes[selectedPlayerForContext.id] = Date.now() + 10 * 60 * 1000;
       alert(`${selectedPlayerForContext.name} has been temporarily chat banned for 10 minutes.`);
       closeUserMenu();
     }
 
     function adminKickUser() {
       if (!selectedPlayerForContext) return;
-      const targetId = selectedPlayerForContext.id;
-      // Set red dots indicator for 3 days
-      kickedPlayers[targetId] = Date.now() + 3 * 24 * 60 * 60 * 1000;
+      kickedPlayers[selectedPlayerForContext.id] = Date.now() + 3 * 24 * 60 * 60 * 1000;
       localStorage.setItem('sakura_kicked_players', JSON.stringify(kickedPlayers));
       alert(`${selectedPlayerForContext.name} was kicked! Red dots badge assigned for 3 days.`);
       closeUserMenu();
@@ -1051,11 +1043,9 @@
       });
     }
 
-    function filterDevUserList() {
-      renderDevUserList();
-    }
+    function filterDevUserList() { renderDevUserList(); }
 
-    // --- AUTHENTICATION ---
+    // --- AUTH ---
     let authMode = 'signin';
 
     function switchAuthTab(mode) {
@@ -1131,7 +1121,7 @@
       initSupabaseChannel(currentChannel);
     }
 
-    // --- ENVIRONMENT PARTICLES ---
+    // --- ENVIRONMENT ---
     function initEnvironmentElements() {
       petals = [];
       for (let i = 0; i < 60; i++) {
@@ -1248,13 +1238,13 @@
       }
     }
 
-    // --- ENVIRONMENT RENDERERS ---
+    // --- ENVIRONMENT RENDERING WITH IMPROVED SAKURA FAIR & NEON ARCADE ---
     function drawEnvironment() {
       const w = canvas.width;
       const h = canvas.height;
 
       if (currentChannel === 'sakura-lounge') {
-        // Room 1: 🌸 Sakura Zen Garden
+        // Room 1: 🌸 Zen Garden (Increased Pink Trees, Removed Green Things)
         ctx.fillStyle = '#fce7f3';
         ctx.fillRect(0, 0, w, h);
 
@@ -1276,80 +1266,78 @@
         drawWoodenBridge(w * 0.75, h * 0.65, 80, 30);
         drawToriiGate(w * 0.5, h * 0.22);
 
-        // INCREASED PINK TREES
-        drawSakuraTree(w * 0.1, h * 0.2, 55);
-        drawSakuraTree(w * 0.28, h * 0.15, 48);
-        drawSakuraTree(w * 0.72, h * 0.15, 48);
-        drawSakuraTree(w * 0.9, h * 0.2, 55);
-        drawSakuraTree(w * 0.08, h * 0.65, 50);
-        drawSakuraTree(w * 0.92, h * 0.65, 50);
+        // MANY PINK TREES (No green bushes/willows)
+        drawSakuraTree(w * 0.08, h * 0.18, 60);
+        drawSakuraTree(w * 0.25, h * 0.12, 50);
+        drawSakuraTree(w * 0.5, h * 0.1, 55);
+        drawSakuraTree(w * 0.75, h * 0.12, 50);
+        drawSakuraTree(w * 0.92, h * 0.18, 60);
+        drawSakuraTree(w * 0.1, h * 0.7, 55);
+        drawSakuraTree(w * 0.9, h * 0.7, 55);
 
         drawLantern(w * 0.35, h * 0.25);
         drawLantern(w * 0.65, h * 0.25);
 
       } else if (currentChannel === 'bonfire-park') {
-        // Room 2: 🔥 Separate Bonfire Night Camp
+        // Room 2: 🔥 Bonfire Camp (Separate Area)
         ctx.fillStyle = '#0f172a';
         ctx.fillRect(0, 0, w, h);
 
-        // Night Grass Path
         ctx.fillStyle = '#1e293b';
         ctx.beginPath(); ctx.arc(w / 2, h / 2, 180, 0, Math.PI * 2); ctx.fill();
 
-        // Tents & Logs Around Fire
         drawCampTent(w * 0.25, h * 0.35, '#f43f5e');
         drawCampTent(w * 0.75, h * 0.35, '#38bdf8');
         drawWoodenLog(w * 0.35, h * 0.55);
         drawWoodenLog(w * 0.65, h * 0.55);
 
-        // Bonfire with Particle Effects
         drawBonfireWithParticles(w * 0.5, h * 0.5);
 
-        // Night Trees & Stars
-        drawNightTree(w * 0.1, h * 0.2);
-        drawNightTree(w * 0.9, h * 0.2);
-
       } else if (currentChannel === 'amusement-park') {
-        // Room 3: 🎡 Sakura Fair
-        ctx.fillStyle = '#fdf2f8';
+        // Room 3: 🎡 Enhanced Sakura Fair with Park Theme Decorations
+        ctx.fillStyle = '#fce7f3';
         ctx.fillRect(0, 0, w, h);
 
-        ctx.strokeStyle = 'rgba(236, 72, 153, 0.15)';
-        for (let x = 0; x < w; x += 50) {
-          for (let y = 0; y < h; y += 50) {
-            ctx.strokeRect(x, y, 50, 50);
-          }
-        }
+        // Park Flag Bunting across top
+        ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, 40); ctx.quadraticCurveTo(w/2, 80, w, 40); ctx.stroke();
+        ['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#10b981', '#ec4899'].forEach((col, idx, arr) => {
+          ctx.fillStyle = col;
+          const px = (w / (arr.length + 1)) * (idx + 1);
+          const py = 50 + Math.sin((idx + 1) * 0.5) * 15;
+          ctx.beginPath(); ctx.moveTo(px - 10, py); ctx.lineTo(px + 10, py); ctx.lineTo(px, py + 18); ctx.fill();
+        });
 
-        drawFerrisWheel(w * 0.22, h * 0.35, 75);
-        drawFestivalBooth(w * 0.15, h * 0.75, '🎪 POP BALLOONS', '#f43f5e');
-        drawFestivalBooth(w * 0.45, h * 0.75, '🍿 COTTON CANDY', '#ec4899');
-        drawFestivalBooth(w * 0.82, h * 0.75, '🎯 RING TOSS', '#8b5cf6');
+        drawFerrisWheel(w * 0.25, h * 0.38, 85);
+        drawCarouselRide(w * 0.75, h * 0.38, 70);
 
-        drawSakuraTree(w * 0.05, h * 0.2, 45);
-        drawSakuraTree(w * 0.5, h * 0.2, 40);
-        drawSakuraTree(w * 0.95, h * 0.2, 45);
+        drawFestivalBooth(w * 0.15, h * 0.75, '🎪 BALLOON POP', '#f43f5e');
+        drawFestivalBooth(w * 0.42, h * 0.75, '🍿 COTTON CANDY', '#ec4899');
+        drawFestivalBooth(w * 0.78, h * 0.75, '🎯 RING TOSS', '#8b5cf6');
+
+        drawSakuraTree(w * 0.1, h * 0.2, 50);
+        drawSakuraTree(w * 0.9, h * 0.2, 50);
 
       } else if (currentChannel === 'arcade-lounge') {
-        // Room 4: 🕹️ Cyberpunk Neon Arcade
-        ctx.fillStyle = '#1e0a24';
+        // Room 4: 🕹️ Enhanced Neon Arcade with Disco Floor & Arcade Machines
+        ctx.fillStyle = '#090514';
         ctx.fillRect(0, 0, w, h);
 
-        ctx.lineWidth = 1;
-        for (let x = 0; x < w; x += 45) {
-          for (let y = 0; y < h; y += 45) {
-            ctx.strokeStyle = ((x + y) % 90 === 0) ? 'rgba(236, 72, 153, 0.3)' : 'rgba(139, 92, 246, 0.15)';
-            ctx.strokeRect(x, y, 45, 45);
-          }
-        }
+        discoHue = (discoHue + 2) % 360;
+        const discoColor = `hsl(${discoHue}, 100%, 60%)`;
 
-        drawDanceFloor(w * 0.5, h * 0.7, 160, 80);
-        drawArcadeCabinet(w * 0.15, h * 0.25, '#ec4899', 'SLIME MATCH');
-        drawArcadeCabinet(w * 0.32, h * 0.25, '#8b5cf6', 'NEON DASH');
-        drawArcadeCabinet(w * 0.68, h * 0.25, '#06b6d4', 'BOBA HERO');
-        drawArcadeCabinet(w * 0.85, h * 0.25, '#f59e0b', 'CHIBI KOI');
+        // Disco Floor Grid with pulsing neon colors
+        drawDiscoFloor(w * 0.5, h * 0.65, 220, 110, discoColor);
 
-        drawNeonSign(w * 0.5, h * 0.12, 'SAKURA ARCADE');
+        // Arcade Machines Lineup
+        drawArcadeCabinet(w * 0.15, h * 0.28, '#ec4899', 'SLIME MATCH');
+        drawArcadeCabinet(w * 0.35, h * 0.28, '#8b5cf6', 'NEON DASH');
+        drawArcadeCabinet(w * 0.65, h * 0.28, '#06b6d4', 'BOBA HERO');
+        drawArcadeCabinet(w * 0.85, h * 0.28, '#f59e0b', 'CHIBI KOI');
+
+        // DJ Booth & Neon Sign
+        drawDJBooth(w * 0.5, h * 0.22);
+        drawNeonSign(w * 0.5, h * 0.09, 'DISCO ARCADE LOUNGE');
       }
 
       ctx.lineWidth = 6;
@@ -1378,20 +1366,15 @@
     }
 
     function drawBonfireWithParticles(x, y) {
-      // Base Logs
-      ctx.strokeStyle = '#78350f';
-      ctx.lineWidth = 8;
+      ctx.strokeStyle = '#78350f'; ctx.lineWidth = 8;
       ctx.beginPath(); ctx.moveTo(x - 25, y + 15); ctx.lineTo(x + 25, y - 5); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(x - 25, y - 5); ctx.lineTo(x + 25, y + 15); ctx.stroke();
 
-      // Glow Gradient
       const glow = ctx.createRadialGradient(x, y, 5, x, y, 70);
       glow.addColorStop(0, 'rgba(249, 115, 22, 0.8)');
       glow.addColorStop(1, 'rgba(249, 115, 22, 0)');
-      ctx.fillStyle = glow;
-      ctx.beginPath(); ctx.arc(x, y, 70, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 70, 0, Math.PI * 2); ctx.fill();
 
-      // Fire Particles Simulation
       bonfireFlames.forEach(p => {
         p.x += p.vx; p.y += p.vy; p.life -= 0.03;
         if (p.life <= 0) {
@@ -1401,7 +1384,6 @@
           p.vy = -Math.random() * 2.5 - 1.5;
           p.life = 1.0;
         }
-
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.life;
         ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill();
@@ -1412,29 +1394,33 @@
     function drawCampTent(x, y, color) {
       ctx.fillStyle = color;
       ctx.beginPath(); ctx.moveTo(x, y - 30); ctx.lineTo(x - 30, y + 20); ctx.lineTo(x + 30, y + 20); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath(); ctx.moveTo(x, y - 30); ctx.lineTo(x - 10, y + 20); ctx.lineTo(x + 10, y + 20); ctx.closePath(); ctx.fill();
     }
 
     function drawWoodenLog(x, y) {
-      ctx.fillStyle = '#78350f';
-      ctx.beginPath(); ctx.roundRect(x - 25, y - 8, 50, 16, 6); ctx.fill();
-    }
-
-    function drawNightTree(x, y) {
-      ctx.fillStyle = '#1e3a8a';
-      ctx.beginPath(); ctx.arc(x, y - 20, 35, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#451a03';
-      ctx.fillRect(x - 5, y + 10, 10, 25);
+      ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.roundRect(x - 25, y - 8, 50, 16, 6); ctx.fill();
     }
 
     function drawFerrisWheel(x, y, radius) {
+      ferrisWheelAngle += 0.01;
       ctx.strokeStyle = '#9d174d'; ctx.lineWidth = 5;
       ctx.beginPath(); ctx.moveTo(x, y + radius + 20); ctx.lineTo(x - 30, y + radius + 40); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(x, y + radius + 20); ctx.lineTo(x + 30, y + radius + 40); ctx.stroke();
 
       ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 4;
       ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.stroke();
+
+      for (let i = 0; i < 6; i++) {
+        const a = ferrisWheelAngle + (i * Math.PI * 2) / 6;
+        const cx = x + Math.cos(a) * radius;
+        const cy = y + Math.sin(a) * radius;
+        ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    function drawCarouselRide(x, y, radius) {
+      ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath(); ctx.moveTo(x, y - radius - 25); ctx.lineTo(x - radius - 10, y); ctx.lineTo(x + radius + 10, y); ctx.closePath(); ctx.fill();
     }
 
     function drawFestivalBooth(x, y, title, color) {
@@ -1468,28 +1454,46 @@
     }
 
     function drawLantern(x, y) {
-      ctx.fillStyle = '#f97316';
-      ctx.beginPath(); ctx.roundRect(x - 8, y - 10, 16, 20, 4); ctx.fill();
+      ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.roundRect(x - 8, y - 10, 16, 20, 4); ctx.fill();
     }
 
     function drawArcadeCabinet(x, y, color, title) {
-      ctx.fillStyle = '#0f172a'; ctx.fillRect(x - 20, y - 35, 40, 60);
-      ctx.fillStyle = color; ctx.fillRect(x - 18, y - 33, 36, 12);
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(x - 22, y - 38, 44, 65);
+      ctx.fillStyle = color; ctx.fillRect(x - 19, y - 35, 38, 14);
+      ctx.fillStyle = '#38bdf8'; ctx.fillRect(x - 17, y - 18, 34, 24);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 6px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(title, x, y - 5);
     }
 
-    function drawDanceFloor(x, y, w, h) {
-      ctx.fillStyle = 'rgba(236, 72, 153, 0.3)'; ctx.fillRect(x - w / 2, y - h / 2, w, h);
+    function drawDiscoFloor(x, y, w, h, activeColor) {
+      ctx.fillStyle = activeColor;
+      ctx.shadowColor = activeColor;
+      ctx.shadowBlur = 15;
+      ctx.fillRect(x - w / 2, y - h / 2, w, h);
+      ctx.shadowBlur = 0;
+
+      ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
+      for (let dx = x - w / 2; dx < x + w / 2; dx += 25) {
+        ctx.beginPath(); ctx.moveTo(dx, y - h / 2); ctx.lineTo(dx, y + h / 2); ctx.stroke();
+      }
+      for (let dy = y - h / 2; dy < y + h / 2; dy += 25) {
+        ctx.beginPath(); ctx.moveTo(x - w / 2, dy); ctx.lineTo(x + w / 2, dy); ctx.stroke();
+      }
+    }
+
+    function drawDJBooth(x, y) {
+      ctx.fillStyle = '#334155'; ctx.fillRect(x - 30, y - 12, 60, 24);
+      ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(x - 14, y, 8, 0, Math.PI * 2); ctx.arc(x + 14, y, 8, 0, Math.PI * 2); ctx.fill();
     }
 
     function drawNeonSign(x, y, text) {
-      ctx.font = 'bold 14px "Yuji Mai", serif'; ctx.fillStyle = '#f472b6'; ctx.textAlign = 'center'; ctx.fillText(text, x, y);
+      ctx.font = 'bold 15px "Yuji Mai", serif'; ctx.fillStyle = '#f472b6'; ctx.textAlign = 'center';
+      ctx.shadowColor = '#ec4899'; ctx.shadowBlur = 12; ctx.fillText(text, x, y); ctx.shadowBlur = 0;
     }
 
     // --- BOUNCY SLIME RENDERING ---
     function drawSlime(player, isSelf = false) {
-      let { id, x, y, name, avatarType, expression, equippedAcc, equippedClothing, equippedMakeup, equippedTrail, title, isMoving, isJumping, isDancing, jumpOffset, speechBubble, activeEmote } = player;
+      let { id, x, y, name, avatarType, expression, equippedAcc, equippedClothing, equippedMakeup, equippedTrail, equippedTitle, title, isMoving, isJumping, isDancing, jumpOffset, speechBubble, activeEmote } = player;
 
-      // Dynamic Overrides for Admin / Dev Status
       const isTargetAdmin = adminUsers.includes(id);
       if (isDevMode && isSelf) {
         avatarType = 'dev_white';
@@ -1497,6 +1501,10 @@
       } else if (isTargetAdmin) {
         avatarType = 'admin_black';
         title = 'Admin';
+      } else if (!title && equippedTitle) {
+        if (equippedTitle === 'title_vip') title = 'VIP';
+        if (equippedTitle === 'title_cool') title = 'Cool';
+        if (equippedTitle === 'title_legend') title = 'Legend';
       }
 
       const type = AVATAR_TYPES[avatarType] || AVATAR_TYPES.sakura;
@@ -1524,7 +1532,6 @@
 
       ctx.translate(drawX, drawY);
 
-      // Shadow
       ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
       ctx.beginPath();
       const shadowSize = Math.max(5, 16 - (jumpOffset || 0) * 0.2);
@@ -1533,39 +1540,28 @@
 
       ctx.scale(scaleX, scaleY);
 
-      // Slime Jelly Body
       ctx.fillStyle = type.bodyColor;
       ctx.beginPath();
       ctx.arc(0, 0, 18, Math.PI * 0.82, Math.PI * 2.18);
       ctx.quadraticCurveTo(0, 20, -18, 0);
       ctx.fill();
 
-      // Shiny Top Highlight
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.beginPath();
-      ctx.ellipse(-5, -8, 6, 3, -Math.PI / 4, 0, Math.PI * 2);
-      ctx.fill();
-
+      ctx.beginPath(); ctx.ellipse(-5, -8, 6, 3, -Math.PI / 4, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; ctx.lineWidth = 2; ctx.stroke();
 
-      // Clothing Layer
       if (equippedClothing === 'scarf_red') {
-        ctx.fillStyle = '#ef4444';
-        ctx.beginPath(); ctx.roundRect(-12, 6, 24, 6, 3); ctx.fill();
+        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.roundRect(-12, 6, 24, 6, 3); ctx.fill();
       } else if (equippedClothing === 'ribbon_blue') {
-        ctx.fillStyle = '#38bdf8';
-        ctx.beginPath(); ctx.arc(0, 8, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(0, 8, 4, 0, Math.PI * 2); ctx.fill();
       }
 
-      // Eye Expressions & Makeup
       drawSlimeExpression(expression || 'happy', 0);
 
       if (equippedMakeup === 'blush_star') {
-        ctx.fillStyle = '#fbcfe8';
         ctx.font = '8px sans-serif'; ctx.fillText('✨', -12, 4); ctx.fillText('✨', 6, 4);
       }
 
-      // Slime Accessories & Hats
       const accToDraw = equippedAcc || type.accessory;
       if (accToDraw) {
         ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(accToDraw, 0, -18);
@@ -1573,7 +1569,6 @@
 
       ctx.restore();
 
-      // Red Dots Badge for Kicked Players
       if (kickedPlayers[id] && kickedPlayers[id] > Date.now()) {
         ctx.fillStyle = '#ef4444';
         ctx.beginPath(); ctx.arc(drawX - 8, drawY - 32, 3, 0, Math.PI * 2); ctx.fill();
@@ -1581,15 +1576,14 @@
         ctx.beginPath(); ctx.arc(drawX + 8, drawY - 32, 3, 0, Math.PI * 2); ctx.fill();
       }
 
-      // Prominent Header Title (Admin / Dev)
+      // Prominent Title on Head
       if (title) {
-        ctx.font = 'black 11px "Plus Jakarta Sans", sans-serif';
-        ctx.fillStyle = title === 'Dev' ? '#a855f7' : '#f59e0b';
+        ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = title === 'Dev' ? '#a855f7' : (title === 'Admin' ? '#f59e0b' : '#38bdf8');
         ctx.textAlign = 'center';
         ctx.fillText(`[ ${title.toUpperCase()} ]`, drawX, drawY - 26);
       }
 
-      // Name Badge
       ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
       const nameWidth = ctx.measureText(name).width + 12;
       ctx.fillStyle = isSelf ? '#ec4899' : 'rgba(255, 255, 255, 0.95)';
@@ -1598,10 +1592,8 @@
       ctx.fillStyle = isSelf ? '#ffffff' : '#831843'; ctx.textAlign = 'center';
       ctx.fillText(name, drawX, drawY + 31);
 
-      // Bubbles
       if (activeEmote && activeEmote.expiresAt > Date.now()) {
-        ctx.font = '20px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(activeEmote.emoji, drawX, drawY - 42);
+        ctx.font = '20px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(activeEmote.emoji, drawX, drawY - 42);
       }
 
       if (speechBubble && speechBubble.expiresAt > Date.now()) {
@@ -1643,6 +1635,7 @@
       localPlayer.isDancing = !localPlayer.isDancing;
       playSound('emote');
       if (localPlayer.isDancing) triggerEmote('💃');
+      if (realtimeChannel) broadcastState();
     }
 
     function updatePlayerMovement() {
@@ -1686,10 +1679,10 @@
       localPlayer.y = Math.max(20, Math.min(canvas.height - 20, localPlayer.y));
 
       if (activeMiniGame) checkMiniGameCollisions();
-      if (localPlayer.isMoving && realtimeChannel) broadcastState();
+      if ((localPlayer.isMoving || localPlayer.isJumping) && realtimeChannel) broadcastState();
     }
 
-    // --- MINI-GAME SYSTEM ---
+    // --- MINI-GAMES ---
     function startMiniGame(type) {
       activeMiniGame = type;
       miniGameScore = 0;
@@ -1767,7 +1760,6 @@
       gameCollectibles = [];
     }
 
-    // Arcade Game
     function openArcadeMemoryGame() {
       const grid = document.getElementById('memory-grid');
       grid.innerHTML = '';
@@ -1830,7 +1822,7 @@
       requestAnimationFrame(render);
     }
 
-    // --- REALTIME SUPABASE ---
+    // --- REALTIME SUPABASE (FIXED DESKTOP / MOBILE VISIBILITY SYNC) ---
     async function initSupabaseChannel(channelName) {
       if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
 
@@ -1856,7 +1848,9 @@
         })
         .on('broadcast', { event: 'player-move' }, payload => {
           const p = payload.payload;
-          if (p.id !== localPlayer.id) remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
+          if (p.id !== localPlayer.id) {
+            remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
+          }
         })
         .on('broadcast', { event: 'chat-message' }, payload => {
           const msg = payload.payload;
@@ -1889,9 +1883,11 @@
               equippedClothing: localPlayer.equippedClothing,
               equippedMakeup: localPlayer.equippedMakeup,
               equippedTrail: localPlayer.equippedTrail,
+              equippedTitle: localPlayer.equippedTitle,
               title: localPlayer.title,
               x: localPlayer.x, y: localPlayer.y
             });
+            broadcastState();
           }
         });
 
@@ -1930,6 +1926,7 @@
           equippedClothing: localPlayer.equippedClothing,
           equippedMakeup: localPlayer.equippedMakeup,
           equippedTrail: localPlayer.equippedTrail,
+          equippedTitle: localPlayer.equippedTitle,
           title: localPlayer.title,
           x: localPlayer.x, y: localPlayer.y,
           isMoving: localPlayer.isMoving,
@@ -1952,7 +1949,6 @@
     document.getElementById('chat-form').addEventListener('submit', (e) => {
       e.preventDefault();
 
-      // Check Ban Restrictions
       if (bannedUsers.includes(localPlayer.id)) {
         alert("You are permanently banned from sending chat messages.");
         return;
@@ -2025,7 +2021,6 @@
       if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
     });
 
-    // Mobile Joystick
     const joystickBase = document.getElementById('joystick-container');
     const joystickStick = document.getElementById('joystick-stick');
     if (joystickBase) {
@@ -2046,14 +2041,12 @@
       joystick.dx = dx / maxDist; joystick.dy = dy / maxDist;
     }
 
-    // CANVAS CLICK FOR MOVEMENT & USER MODERATION POPUP
     canvas.addEventListener('pointerdown', e => {
       if (e.target !== canvas) return;
       const rect = canvas.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       const clickY = e.clientY - rect.top;
 
-      // Check if clicked on a remote player slime
       let clickedUser = null;
       Object.values(remotePlayers).forEach(p => {
         if (Math.hypot(p.x - clickX, p.y - clickY) < 30) clickedUser = p;
@@ -2090,7 +2083,7 @@
       initSupabaseChannel(channelName);
     }
 
-    // --- SHOP & CUSTOMIZATION STUDIO CONTROLS ---
+    // --- SHOP & STUDIO ---
     let currentShopTab = 'skins';
 
     function toggleShopModal() {
@@ -2101,7 +2094,7 @@
 
     function switchShopTab(tab) {
       currentShopTab = tab;
-      document.querySelectorAll('#shoptab-skins, #shoptab-clothing, #shoptab-makeup, #shoptab-accessories').forEach(b => b.classList.remove('tab-active'));
+      document.querySelectorAll('#shoptab-skins, #shoptab-clothing, #shoptab-makeup, #shoptab-titles, #shoptab-accessories').forEach(b => b.classList.remove('tab-active'));
       document.getElementById(`shoptab-${tab}`).classList.add('tab-active');
       renderShopItems();
     }
@@ -2151,6 +2144,12 @@
       if (type === 'skin') localPlayer.avatarType = id;
       if (type === 'clothing') localPlayer.equippedClothing = id;
       if (type === 'makeup') localPlayer.equippedMakeup = id;
+      if (type === 'title') {
+        localPlayer.equippedTitle = id;
+        if (id === 'title_vip') localPlayer.title = 'VIP';
+        if (id === 'title_cool') localPlayer.title = 'Cool';
+        if (id === 'title_legend') localPlayer.title = 'Legend';
+      }
       if (type === 'acc') localPlayer.equippedAcc = id;
       playSound('emote');
       saveStudioSettings();
@@ -2162,7 +2161,6 @@
       if (!modal.classList.contains('hidden')) {
         document.getElementById('setting-username').value = localPlayer.name;
         renderStudioPickers();
-        updatePreviewCanvas();
       }
     }
 
@@ -2206,31 +2204,11 @@
     function selectAvatarType(key) {
       localPlayer.avatarType = key;
       renderStudioPickers();
-      updatePreviewCanvas();
     }
 
     function selectExpression(key) {
       localPlayer.expression = key;
       renderStudioPickers();
-      updatePreviewCanvas();
-    }
-
-    function updatePreviewCanvas() {
-      const pCanvas = document.getElementById('previewCanvas');
-      const pCtx = pCanvas.getContext('2d');
-      pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-
-      const mockPlayer = {
-        ...localPlayer,
-        x: pCanvas.width / 2,
-        y: pCanvas.height / 2 + 10,
-        isMoving: false, isJumping: false
-      };
-
-      const origCtx = ctx;
-      window.ctx = pCtx;
-      drawSlime(mockPlayer, false);
-      window.ctx = origCtx;
     }
 
     function saveStudioSettings() {
@@ -2243,6 +2221,7 @@
       localStorage.setItem('sakura_equipped_acc', localPlayer.equippedAcc);
       localStorage.setItem('sakura_equipped_clothing', localPlayer.equippedClothing);
       localStorage.setItem('sakura_equipped_makeup', localPlayer.equippedMakeup);
+      localStorage.setItem('sakura_equipped_title', localPlayer.equippedTitle);
 
       if (realtimeChannel) broadcastState();
       document.getElementById('custom-studio-modal').classList.add('hidden');
@@ -2272,6 +2251,8 @@
         const user = data.session.user;
         const dispName = user.user_metadata?.display_name || user.email.split('@')[0];
         completeUserLogin(user, dispName);
+      } else {
+        loginAsGuest();
       }
 
       requestAnimationFrame(render);
