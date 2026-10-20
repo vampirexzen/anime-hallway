@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full w-full overflow-hidden">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Sakura Slime World 🌸 - 2D Virtual Lounge & Mini-Games</title>
+  <title>Sakura Slime World 🌸 - 2D Virtual Lounge & Games</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,48 +15,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Yuji+Mai&display=swap" rel="stylesheet" />
 
   <style>
-    :root {
-      --app-height: 100vh;
-    }
-
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: #fbcfe8;
-      height: 100vh;
-      height: var(--app-height);
+    /* Viewport & Lock Rules */
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      width: 100%;
+      width: 100dvw;
+      margin: 0;
+      padding: 0;
       overflow: hidden;
       touch-action: none;
       -webkit-user-select: none;
       user-select: none;
+      background: #180914;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .font-sakura {
       font-family: 'Yuji Mai', serif;
     }
 
-    /* Glassmorphism Styles */
+    /* Glassmorphism Styling */
     .glass {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.9);
     }
 
     .glass-dark {
-      background: rgba(255, 241, 248, 0.96);
+      background: rgba(30, 15, 28, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(244, 114, 182, 0.35);
+      border: 1px solid rgba(244, 114, 182, 0.25);
     }
 
     .glass-input {
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(244, 114, 182, 0.4);
     }
 
     .glass-input:focus {
-      background: rgba(255, 255, 255, 0.98);
       border-color: #ec4899;
       outline: none;
       box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25);
@@ -67,40 +67,39 @@
       width: 4px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.2);
+      background: transparent;
     }
     ::-webkit-scrollbar-thumb {
       background: rgba(244, 114, 182, 0.5);
       border-radius: 10px;
     }
 
-    /* Virtual Joystick Touch Base */
+    /* Mobile Virtual Joystick Touch Base */
     .joystick-base {
-      width: 100px;
-      height: 100px;
+      width: 88px;
+      height: 88px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.25);
       border: 2px solid rgba(244, 114, 182, 0.6);
       backdrop-filter: blur(8px);
       position: relative;
       touch-action: none;
     }
     .joystick-stick {
-      width: 44px;
-      height: 44px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
-      box-shadow: 0 4px 10px rgba(236, 72, 153, 0.4);
+      box-shadow: 0 4px 10px rgba(236, 72, 153, 0.5);
       position: absolute;
-      top: 28px;
-      left: 28px;
+      top: 23px;
+      left: 23px;
       pointer-events: none;
-      transition: transform 0.05s ease-out;
+      transition: transform 0.04s ease-out;
     }
 
-    /* Action Buttons */
     .action-btn {
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(244, 114, 182, 0.5);
       backdrop-filter: blur(8px);
       box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
@@ -112,250 +111,223 @@
     }
   </style>
 </head>
-<body class="flex flex-col h-screen w-screen overflow-hidden select-none">
+<body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
 
   <!-- AUTH MODAL OVERLAY -->
-  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/40 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="glass w-full max-w-md rounded-3xl p-6 md:p-8 shadow-2xl border border-white space-y-5 animate-in fade-in zoom-in-95 duration-200">
-      
-      <!-- Auth Header -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90dvh] overflow-y-auto">
       <div class="text-center space-y-1">
         <div class="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 text-white shadow-lg shadow-pink-300 mb-1">
-          <i data-lucide="sparkles" class="w-7 h-7"></i>
+          <i data-lucide="sparkles" class="w-6 h-6"></i>
         </div>
         <h2 class="font-sakura text-2xl font-bold text-pink-950">Sakura Slime World</h2>
-        <p class="text-xs text-pink-600 font-medium">Explore virtual zen rooms, play mini-games & chat live!</p>
+        <p class="text-xs text-pink-600 font-medium">Explore virtual zen rooms, play games & chat live!</p>
       </div>
 
-      <!-- Auth Tabs -->
       <div class="grid grid-cols-2 gap-1 p-1 bg-pink-100/80 rounded-2xl text-xs font-bold text-pink-800">
-        <button id="tab-signin" onclick="switchAuthTab('signin')" class="py-2.5 rounded-xl bg-white shadow text-pink-900 transition">Sign In</button>
-        <button id="tab-signup" onclick="switchAuthTab('signup')" class="py-2.5 rounded-xl transition text-pink-600 hover:text-pink-900">Sign Up</button>
+        <button id="tab-signin" onclick="switchAuthTab('signin')" class="py-2 rounded-xl bg-white shadow text-pink-900 transition">Sign In</button>
+        <button id="tab-signup" onclick="switchAuthTab('signup')" class="py-2 rounded-xl transition text-pink-600 hover:text-pink-900">Sign Up</button>
       </div>
 
-      <!-- Auth Notification Alert -->
       <div id="auth-alert" class="hidden text-xs p-3 rounded-xl border font-medium"></div>
 
-      <!-- Auth Form -->
       <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-3">
         <div class="space-y-1">
-          <label class="text-[11px] font-bold text-pink-800 uppercase tracking-wider">Email Address</label>
-          <input type="email" id="auth-email" required placeholder="slime@sakura.com" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" />
+          <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Email Address</label>
+          <input type="email" id="auth-email" required placeholder="slime@sakura.com" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm font-semibold text-pink-950" />
         </div>
         <div class="space-y-1">
-          <label class="text-[11px] font-bold text-pink-800 uppercase tracking-wider">Password</label>
-          <input type="password" id="auth-password" required minlength="6" placeholder="••••••••" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" />
+          <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Password</label>
+          <input type="password" id="auth-password" required minlength="6" placeholder="••••••••" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm font-semibold text-pink-950" />
         </div>
         <div id="username-field" class="space-y-1 hidden">
-          <label class="text-[11px] font-bold text-pink-800 uppercase tracking-wider">Slime Display Name</label>
-          <input type="text" id="auth-username" maxlength="15" placeholder="BouncySlime" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" />
+          <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Slime Display Name</label>
+          <input type="text" id="auth-username" maxlength="15" placeholder="BouncySlime" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm font-semibold text-pink-950" />
         </div>
 
-        <button type="submit" id="auth-submit-btn" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-sm mt-2">
+        <button type="submit" id="auth-submit-btn" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs mt-2">
           <span>Sign In</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </button>
       </form>
 
-      <div class="relative flex items-center justify-center my-2">
+      <div class="relative flex items-center justify-center my-1">
         <div class="border-t border-pink-200 w-full"></div>
-        <span class="bg-white/80 px-3 text-[10px] font-bold uppercase text-pink-400 absolute">or</span>
+        <span class="bg-white/90 px-3 text-[10px] font-bold uppercase text-pink-400 absolute">or</span>
       </div>
 
-      <!-- Guest Play Option -->
-      <button onclick="loginAsGuest()" class="w-full bg-white hover:bg-pink-50 text-pink-800 font-semibold py-2.5 rounded-2xl border border-pink-200/80 transition active:scale-95 text-xs flex items-center justify-center gap-1.5 shadow-sm">
-        <i data-lucide="user" class="w-4 h-4 text-pink-500"></i> Continue as Guest Slime
+      <button onclick="loginAsGuest()" class="w-full bg-white hover:bg-pink-50 text-pink-800 font-semibold py-2 rounded-2xl border border-pink-200 transition active:scale-95 text-xs flex items-center justify-center gap-1.5 shadow-sm">
+        <i data-lucide="user" class="w-4 h-4 text-pink-500"></i> Continue as Guest
       </button>
     </div>
   </div>
 
-  <!-- TOP NAVIGATION HEADER -->
-  <header class="h-14 glass px-3 sm:px-4 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
-    <div class="flex items-center gap-2.5">
-      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-2 rounded-xl shadow-md shadow-pink-300 shrink-0">
-        <i data-lucide="flower-2" class="w-5 h-5 animate-spin" style="animation-duration: 12s;"></i>
+  <!-- TOP HEADER NAVBAR -->
+  <header class="h-12 sm:h-14 glass px-3 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
+    <div class="flex items-center gap-2">
+      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shadow-pink-300 shrink-0">
+        <i data-lucide="flower-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style="animation-duration: 12s;"></i>
       </div>
       <div>
-        <h1 class="font-sakura text-base sm:text-lg text-pink-950 font-bold tracking-wide leading-none">Sakura Slime World 🌸</h1>
-        <p class="text-[10px] text-pink-600 font-semibold tracking-wider uppercase mt-0.5" id="room-indicator">#sakura-lounge</p>
+        <h1 class="font-sakura text-xs sm:text-base text-pink-950 font-bold tracking-wide leading-none">Sakura Slime 🌸</h1>
+        <p class="text-[9px] sm:text-[10px] text-pink-600 font-semibold uppercase mt-0.5" id="room-indicator">#sakura-lounge</p>
       </div>
     </div>
 
-    <!-- Header Tools & Audio Controls -->
-    <div class="flex items-center gap-1.5 sm:gap-2">
-      <!-- Music Control Button & Synth Toggle -->
-      <div class="relative flex items-center bg-pink-100/80 rounded-xl p-1 border border-pink-200/80">
-        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1.5 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs font-semibold" title="Toggle Music">
-          <i data-lucide="music" id="music-icon" class="w-4 h-4 text-pink-600"></i>
+    <div class="flex items-center gap-1.5">
+      <!-- Audio Synth Control -->
+      <div class="flex items-center bg-pink-100/90 rounded-xl p-1 border border-pink-200">
+        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Lo-Fi Music">
+          <i data-lucide="music" id="music-icon" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-600"></i>
         </button>
-        <input type="range" id="bg-volume" min="0" max="1" step="0.05" value="0.3" oninput="updateMusicVolume(this.value)" class="w-12 sm:w-16 h-1 accent-pink-500 cursor-pointer mx-1" />
+        <input type="range" id="bg-volume" min="0" max="1" step="0.05" value="0.3" oninput="updateMusicVolume(this.value)" class="w-10 sm:w-16 h-1 accent-pink-500 cursor-pointer mx-1" />
       </div>
 
-      <!-- Active Players Counter -->
-      <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-100/80 border border-pink-200/80 text-pink-800 text-xs font-semibold">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span id="player-count">1 Online</span>
+      <!-- Player Counter Badge -->
+      <div class="flex items-center gap-1 px-2 py-1 rounded-xl bg-pink-100/90 border border-pink-200 text-pink-800 text-[10px] sm:text-xs font-semibold">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="player-count">1</span>
       </div>
 
-      <!-- User Profile Badge -->
-      <div id="user-profile-badge" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 border border-pink-200/80 text-pink-900 text-xs font-bold shadow-sm">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-500"></i>
-        <span id="user-display-name">Guest</span>
-        <button onclick="handleSignOut()" class="hover:text-rose-600 ml-1 p-0.5" title="Sign Out">
-          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-        </button>
-      </div>
-
-      <!-- Settings / Customization Modal Button -->
-      <button onclick="toggleSettingsModal()" class="p-2 rounded-xl bg-white/80 hover:bg-pink-100 text-pink-800 transition border border-pink-200/60 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-semibold" title="Customize Slime">
+      <!-- Settings Customization Modal Trigger -->
+      <button onclick="toggleSettingsModal()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Customize Slime">
         <i data-lucide="user-cog" class="w-4 h-4"></i>
-      </button>
-
-      <!-- Toggle Chat Drawer Button (Mobile/Tablet) -->
-      <button onclick="toggleChatSidebar()" class="p-2 rounded-xl bg-pink-500 hover:bg-pink-600 text-white transition shadow-md shadow-pink-300 active:scale-95 md:hidden" title="Toggle Chat">
-        <i data-lucide="message-square" class="w-4 h-4"></i>
       </button>
     </div>
   </header>
 
-  <!-- MAIN VIEW AREA (Canvas + Overlay UI + Slide-out Sidebars) -->
-  <div class="flex-1 flex relative overflow-hidden">
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <div class="flex-1 relative flex overflow-hidden w-full h-full">
 
-    <!-- Game World Canvas Container -->
-    <div class="flex-1 relative bg-pink-900/10 flex items-center justify-center overflow-hidden" id="canvas-container">
+    <!-- CANVAS VIEW (Always Fills Available Screen Space) -->
+    <div class="flex-1 relative bg-pink-950/20 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
       <canvas id="gameCanvas" class="block w-full h-full cursor-pointer touch-none"></canvas>
 
-      <!-- Top Overlay Room Switcher (Quick Pills) -->
-      <div class="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 p-1 glass rounded-2xl border border-pink-200/80 shadow-md">
-        <button onclick="switchChannel('sakura-lounge')" id="quick-btn-sakura-lounge" class="quick-chan-btn px-3 py-1 rounded-xl text-xs font-bold bg-pink-500 text-white shadow-sm transition">
-          🌸 Zen Lounge
+      <!-- Top Overlay Room Quick Pills Switcher -->
+      <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[95vw] overflow-x-auto">
+        <button onclick="switchChannel('sakura-lounge')" id="quick-btn-sakura-lounge" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap">
+          🌸 Zen Garden
         </button>
-        <button onclick="switchChannel('gaming-shrine')" id="quick-btn-gaming-shrine" class="quick-chan-btn px-3 py-1 rounded-xl text-xs font-bold text-pink-800 hover:bg-pink-100 transition">
-          ⛩️ Shrine Dash
+        <button onclick="switchChannel('arcade-lounge')" id="quick-btn-arcade-lounge" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
+          🕹️ Neon Arcade
         </button>
-        <button onclick="switchChannel('arcade-lounge')" id="quick-btn-arcade-lounge" class="quick-chan-btn px-3 py-1 rounded-xl text-xs font-bold text-pink-800 hover:bg-pink-100 transition">
-          🕹️ Arcade Room
+        <button onclick="switchChannel('onsen-hotspring')" id="quick-btn-onsen-hotspring" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
+          🎋 Onsen Spring
         </button>
       </div>
 
-      <!-- Mini-Game Live Overlay Banner (When Mini-Game Active) -->
-      <div id="minigame-banner" class="hidden absolute top-14 left-1/2 -translate-x-1/2 z-20 glass px-4 py-2 rounded-2xl border border-pink-300 shadow-xl flex items-center gap-4 animate-in fade-in slide-in-from-top-3">
-        <div class="flex items-center gap-2">
-          <span id="minigame-title" class="font-bold text-xs text-pink-950 uppercase tracking-wider">🌸 Petal Catch</span>
-          <span class="text-pink-400">|</span>
-          <span class="text-xs font-bold text-pink-700">Score: <strong id="minigame-score" class="text-pink-900 font-extrabold text-sm">0</strong></span>
-          <span class="text-pink-400">|</span>
-          <span class="text-xs font-bold text-pink-700">Time: <strong id="minigame-timer" class="text-pink-900 font-extrabold text-sm">30s</strong></span>
+      <!-- Live Mini-Game HUD Banner -->
+      <div id="minigame-banner" class="hidden absolute top-12 left-1/2 -translate-x-1/2 z-20 glass px-3 py-1.5 rounded-2xl border border-pink-300 shadow-xl flex items-center gap-3 animate-in fade-in">
+        <div class="flex items-center gap-2 text-xs">
+          <span id="minigame-title" class="font-bold text-pink-950 uppercase">🌸 Petal Catch</span>
+          <span class="text-pink-300">|</span>
+          <span class="font-bold text-pink-800">Score: <strong id="minigame-score" class="text-pink-950 font-black text-sm">0</strong></span>
+          <span class="text-pink-300">|</span>
+          <span class="font-bold text-pink-800">Time: <strong id="minigame-timer" class="text-pink-950 font-black text-sm">30s</strong></span>
         </div>
         <button onclick="endMiniGame(true)" class="px-2 py-0.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-bold">Quit</button>
       </div>
 
-      <!-- Expressive Emote Toolbar Overlay (Bottom Center) -->
-      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 glass px-3 py-1.5 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2 backdrop-blur-md">
-        <button onclick="triggerJump()" class="action-btn px-2.5 py-1 rounded-xl text-xs font-extrabold text-pink-800 flex items-center gap-1 mr-1" title="Jump / Bounce">
-          <i data-lucide="arrow-up-circle" class="w-4 h-4 text-pink-600"></i>
+      <!-- Emote Toolbar Overlay (Bottom Center on Canvas) -->
+      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2.5 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2">
+        <button onclick="triggerJump()" class="action-btn px-2 py-0.5 rounded-xl text-xs font-black text-pink-800 flex items-center gap-1" title="Jump / Bounce">
+          <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5 text-pink-600"></i>
           <span class="hidden sm:inline">Jump</span>
         </button>
         <span class="text-pink-300">|</span>
-        <button onclick="triggerEmote('🌸')" class="hover:scale-125 active:scale-90 transition text-lg p-0.5 sm:p-1" title="Sakura Blossom">🌸</button>
-        <button onclick="triggerEmote('❤️')" class="hover:scale-125 active:scale-90 transition text-lg p-0.5 sm:p-1" title="Heart">❤️</button>
-        <button onclick="triggerEmote('✨')" class="hover:scale-125 active:scale-90 transition text-lg p-0.5 sm:p-1" title="Sparkles">✨</button>
-        <button onclick="triggerEmote('🍵')" class="hover:scale-125 active:scale-90 transition text-lg p-0.5 sm:p-1" title="Matcha Tea">🍵</button>
-        <button onclick="triggerEmote('🎉')" class="hover:scale-125 active:scale-90 transition text-lg p-0.5 sm:p-1" title="Party">🎉</button>
-        <button onclick="triggerEmote('🎮')" class="hover:scale-125 active:scale-90 transition text-lg p-0.5 sm:p-1" title="Gaming">🎮</button>
+        <button onclick="triggerEmote('🌸')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg" title="Sakura Blossom">🌸</button>
+        <button onclick="triggerEmote('❤️')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg" title="Heart">❤️</button>
+        <button onclick="triggerEmote('✨')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg" title="Sparkles">✨</button>
+        <button onclick="triggerEmote('🍵')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg" title="Matcha Tea">🍵</button>
+        <button onclick="triggerEmote('🎮')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg" title="Gaming">🎮</button>
       </div>
 
-      <!-- Mobile Virtual Joystick & Jump Controls -->
-      <div class="absolute bottom-5 left-5 z-20 md:hidden pointer-events-auto">
+      <!-- Mobile D-Pad Touch Joystick -->
+      <div class="absolute bottom-3 left-3 z-20 pointer-events-auto md:hidden">
         <div id="joystick-container" class="joystick-base">
           <div id="joystick-stick" class="joystick-stick"></div>
         </div>
       </div>
 
       <!-- Mobile Right Jump Button -->
-      <div class="absolute bottom-5 right-5 z-20 md:hidden pointer-events-auto">
-        <button onclick="triggerJump()" class="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
+      <div class="absolute bottom-3 right-3 z-20 pointer-events-auto md:hidden">
+        <button onclick="triggerJump()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-xs font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
           JUMP
         </button>
       </div>
 
-      <!-- Arcade Mini-Game Card Overlay (For Memory Card Matching in Arcade Lounge) -->
-      <div id="arcade-card-modal" class="hidden absolute inset-0 z-30 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95">
-          <div class="flex items-center justify-between border-b border-pink-200/80 pb-2">
-            <h3 class="font-bold text-pink-950 text-sm flex items-center gap-1.5">
+      <!-- Arcade Mini-Game Card Overlay -->
+      <div id="arcade-card-modal" class="hidden absolute inset-0 z-30 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass w-full max-w-xs rounded-3xl p-4 shadow-2xl border border-white space-y-3 animate-in fade-in">
+          <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+            <h3 class="font-bold text-pink-950 text-xs flex items-center gap-1.5">
               <i data-lucide="gamepad-2" class="w-4 h-4 text-pink-600"></i> Arcade Slime Match
             </h3>
-            <button onclick="closeArcadeMemoryGame()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <button onclick="closeArcadeMemoryGame()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
           </div>
-          <div class="grid grid-cols-4 gap-2" id="memory-grid">
-            <!-- Grid cards inserted via JS -->
-          </div>
-          <p class="text-[11px] text-pink-600 font-semibold text-center" id="memory-status">Match all pairs to win bonus points!</p>
+          <div class="grid grid-cols-4 gap-1.5" id="memory-grid"></div>
+          <p class="text-[10px] text-pink-700 font-semibold text-center" id="memory-status">Match all pairs to win bonus points!</p>
         </div>
       </div>
     </div>
 
-    <!-- Sidebar Chat & Friends Drawer -->
-    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none">
+    <!-- SIDEBAR DRAWER (Responsive overlay on mobile, fixed panel on desktop) -->
+    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
       
-      <!-- Sidebar Channels Header -->
-      <div class="p-3.5 border-b border-pink-200/80 bg-white/70 flex flex-col gap-2">
+      <!-- Drawer Room Selector -->
+      <div class="p-3 border-b border-pink-200/30 bg-white/10 flex flex-col gap-2 shrink-0">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-pink-800 uppercase tracking-wider flex items-center gap-1.5">
-            <i data-lucide="compass" class="w-3.5 h-3.5"></i> Virtual Lounge Rooms
+          <span class="text-xs font-bold text-pink-200 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="compass" class="w-3.5 h-3.5 text-pink-400"></i> Virtual Lounge Rooms
           </span>
-          <button onclick="toggleChatSidebar()" class="md:hidden text-pink-700 hover:text-pink-900 p-1">
+          <button onclick="toggleChatSidebar()" class="md:hidden text-pink-300 hover:text-white p-1">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
         
-        <!-- Channels Selector Buttons -->
-        <div class="grid grid-cols-3 gap-1.5">
-          <button onclick="switchChannel('sakura-lounge')" id="chan-btn-sakura-lounge" class="chan-btn px-2 py-1.5 rounded-xl text-xs font-semibold bg-pink-500 text-white shadow-sm transition">
-            🌸 Lounge
+        <div class="grid grid-cols-3 gap-1">
+          <button onclick="switchChannel('sakura-lounge')" id="chan-btn-sakura-lounge" class="chan-btn px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition">
+            🌸 Zen Garden
           </button>
-          <button onclick="switchChannel('gaming-shrine')" id="chan-btn-gaming-shrine" class="chan-btn px-2 py-1.5 rounded-xl text-xs font-medium text-pink-800 hover:bg-pink-200/60 transition">
-            ⛩️ Shrine
-          </button>
-          <button onclick="switchChannel('arcade-lounge')" id="chan-btn-arcade-lounge" class="chan-btn px-2 py-1.5 rounded-xl text-xs font-medium text-pink-800 hover:bg-pink-200/60 transition">
+          <button onclick="switchChannel('arcade-lounge')" id="chan-btn-arcade-lounge" class="chan-btn px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-medium text-pink-200 hover:bg-pink-900/50 transition">
             🕹️ Arcade
+          </button>
+          <button onclick="switchChannel('onsen-hotspring')" id="chan-btn-onsen-hotspring" class="chan-btn px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-medium text-pink-200 hover:bg-pink-900/50 transition">
+            🎋 Onsen
           </button>
         </div>
       </div>
 
-      <!-- Mini-Games Launch Section -->
-      <div class="px-3.5 py-2.5 bg-pink-100/50 border-b border-pink-200/60 space-y-1.5">
-        <span class="text-[10px] font-bold text-pink-700 uppercase tracking-wider">Play Lounge Mini-Games:</span>
+      <!-- Mini-Games Launcher Panel -->
+      <div class="px-3 py-2 bg-pink-950/40 border-b border-pink-200/20 space-y-1 shrink-0">
+        <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider">Play Lounge Mini-Games:</span>
         <div class="grid grid-cols-2 gap-1.5">
-          <button onclick="startMiniGame('petal-catch')" class="px-2 py-1.5 rounded-xl bg-white hover:bg-pink-200 text-pink-900 text-xs font-bold border border-pink-200/80 shadow-sm flex items-center justify-center gap-1 transition">
+          <button onclick="startMiniGame('petal-catch')" class="px-2 py-1.5 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
             🌸 Petal Catcher
           </button>
-          <button onclick="startMiniGame('shrine-dash')" class="px-2 py-1.5 rounded-xl bg-white hover:bg-pink-200 text-pink-900 text-xs font-bold border border-pink-200/80 shadow-sm flex items-center justify-center gap-1 transition">
+          <button onclick="startMiniGame('shrine-dash')" class="px-2 py-1.5 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
             ⛩️ Shrine Dash
           </button>
         </div>
       </div>
 
       <!-- Chat Log Stream -->
-      <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3">
-        <!-- Messages rendered dynamically -->
-      </div>
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2.5"></div>
 
-      <!-- Input Bar -->
-      <div class="p-3 bg-white/80 border-t border-pink-200/80">
+      <!-- Chat Input Form -->
+      <div class="p-2.5 bg-pink-950/80 border-t border-pink-200/30 shrink-0">
         <form id="chat-form" class="flex items-center gap-2">
           <input 
             type="text" 
             id="chat-input" 
-            placeholder="Type a message & press Enter..." 
+            placeholder="Type a message..." 
             maxlength="120"
             autocomplete="off"
-            class="glass-input flex-1 px-3.5 py-2.5 rounded-xl text-sm text-pink-950 placeholder-pink-400 font-medium"
+            class="glass-input flex-1 px-3 py-2 rounded-xl text-xs text-pink-950 placeholder-pink-400 font-medium"
           />
           <button 
             type="submit" 
-            class="bg-pink-500 hover:bg-pink-600 text-white p-2.5 rounded-xl shadow-md shadow-pink-300 transition shrink-0 active:scale-95"
+            class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl shadow-md transition shrink-0 active:scale-95"
           >
             <i data-lucide="send" class="w-4 h-4"></i>
           </button>
@@ -364,55 +336,62 @@
     </aside>
   </div>
 
-  <!-- Customization Settings Modal -->
-  <div id="settings-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass w-full max-w-md rounded-3xl p-6 shadow-2xl border border-white space-y-5 animate-in fade-in zoom-in-95 duration-200">
-      <div class="flex items-center justify-between border-b border-pink-200/80 pb-3">
+  <!-- MOBILE BOTTOM FLOATING NAVIGATION BAR -->
+  <nav class="h-12 bg-pink-950/90 border-t border-pink-200/20 backdrop-blur-md flex items-center justify-around px-2 z-30 shrink-0 md:hidden">
+    <button onclick="toggleChatSidebar()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
+      <i data-lucide="message-square" class="w-4 h-4"></i>
+      <span class="text-[9px] font-bold">Chat</span>
+    </button>
+    <button onclick="startMiniGame('petal-catch')" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
+      <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+      <span class="text-[9px] font-bold">Games</span>
+    </button>
+    <button onclick="toggleSettingsModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
+      <i data-lucide="user-cog" class="w-4 h-4"></i>
+      <span class="text-[9px] font-bold">Custom</span>
+    </button>
+    <button onclick="toggleBackgroundMusic()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
+      <i data-lucide="music" class="w-4 h-4"></i>
+      <span class="text-[9px] font-bold">Lo-Fi</span>
+    </button>
+  </nav>
+
+  <!-- CUSTOMIZATION SETTINGS MODAL -->
+  <div id="settings-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 max-h-[90dvh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
         <div class="flex items-center gap-2">
           <i data-lucide="sparkles" class="w-5 h-5 text-pink-600"></i>
-          <h3 class="font-bold text-pink-950 text-lg">Customize Slime Companion</h3>
+          <h3 class="font-bold text-pink-950 text-base">Customize Slime</h3>
         </div>
         <button onclick="toggleSettingsModal()" class="text-pink-700 hover:text-pink-900 p-1">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <!-- Username Customization -->
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Display Name</label>
+        <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs font-semibold text-pink-950" placeholder="Your Slime Name..." />
+      </div>
+
       <div class="space-y-1.5">
-        <label class="text-xs font-bold text-pink-800 uppercase tracking-wider">Display Name</label>
-        <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" placeholder="Your Slime Name..." />
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Choose Slime Style & Accessory</label>
+        <div class="grid grid-cols-2 gap-2" id="avatar-picker"></div>
       </div>
 
-      <!-- Slime Preset Selection -->
-      <div class="space-y-2">
-        <label class="text-xs font-bold text-pink-800 uppercase tracking-wider">Choose Slime Style & Accessory</label>
-        <div class="grid grid-cols-2 gap-3" id="avatar-picker">
-          <!-- Rendered dynamically -->
-        </div>
-      </div>
-
-      <!-- Save Button -->
-      <button onclick="saveAvatarSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2">
-        <i data-lucide="check" class="w-5 h-5"></i> Save & Bouncing Around
+      <button onclick="saveAvatarSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs">
+        <i data-lucide="check" class="w-4 h-4"></i> Save Settings
       </button>
     </div>
   </div>
 
   <script>
-    // Fix Mobile Viewport Height issues
-    function resetAppHeight() {
-      document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
-    }
-    window.addEventListener('resize', resetAppHeight);
-    window.addEventListener('orientationchange', resetAppHeight);
-    resetAppHeight();
-
     // --- SUPABASE CONFIGURATION ---
     const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- PROCEDURAL AUDIO SYNTHESIZER (Web Audio API) ---
+    // --- PROCEDURAL AUDIO SYNTHESIZER ---
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     let musicPlaying = false;
@@ -440,95 +419,77 @@
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-
         const now = audioCtx.currentTime;
 
         if (type === 'bounce') {
           osc.type = 'sine';
           osc.frequency.setValueAtTime(220, now);
-          osc.frequency.exponentialRampToValueAtTime(440, now + 0.15);
-          gain.gain.setValueAtTime(0.25, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-          osc.start(now);
-          osc.stop(now + 0.15);
+          osc.frequency.exponentialRampToValueAtTime(440, now + 0.12);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+          osc.start(now); osc.stop(now + 0.12);
         } else if (type === 'jump') {
           osc.type = 'sine';
           osc.frequency.setValueAtTime(300, now);
-          osc.frequency.exponentialRampToValueAtTime(650, now + 0.22);
-          gain.gain.setValueAtTime(0.3, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
-          osc.start(now);
-          osc.stop(now + 0.22);
+          osc.frequency.exponentialRampToValueAtTime(650, now + 0.2);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now); osc.stop(now + 0.2);
         } else if (type === 'emote') {
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(523.25, now);
-          osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
           gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-          osc.start(now);
-          osc.stop(now + 0.2);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+          osc.start(now); osc.stop(now + 0.18);
         } else if (type === 'msg') {
           osc.type = 'sine';
           osc.frequency.setValueAtTime(400, now);
-          osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
-          gain.gain.setValueAtTime(0.18, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-          osc.start(now);
-          osc.stop(now + 0.1);
+          osc.frequency.exponentialRampToValueAtTime(600, now + 0.08);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now); osc.stop(now + 0.08);
         } else if (type === 'win') {
-          const notes = [523.25, 659.25, 783.99, 1046.50];
-          notes.forEach((freq, idx) => {
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
             const o = audioCtx.createOscillator();
             const g = audioCtx.createGain();
-            o.connect(g);
-            g.connect(audioCtx.destination);
-            o.type = 'triangle';
-            o.frequency.value = freq;
-            g.gain.setValueAtTime(0.2, now + idx * 0.08);
-            g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.25);
-            o.start(now + idx * 0.08);
-            o.stop(now + idx * 0.08 + 0.25);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.type = 'triangle'; o.frequency.value = freq;
+            g.gain.setValueAtTime(0.15, now + idx * 0.08);
+            g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.2);
+            o.start(now + idx * 0.08); o.stop(now + idx * 0.08 + 0.2);
           });
         }
-      } catch (e) {
-        // Handle audio autoplay block gracefully
-      }
+      } catch (e) {}
     }
 
-    // Procedural Ambient Lo-Fi / Japanese Pentatonic Scale Music Generator
-    const PENTATONIC_SCALE = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99];
+    const PENTATONIC_SCALE = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
 
     function playPentatonicNote() {
       if (!musicPlaying || !audioCtx) return;
-
       const now = audioCtx.currentTime;
       const freq = PENTATONIC_SCALE[Math.floor(Math.random() * PENTATONIC_SCALE.length)];
 
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-
       osc.type = Math.random() > 0.4 ? 'sine' : 'triangle';
       osc.frequency.setValueAtTime(freq, now);
 
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(0.15, now + 0.1);
+      gain.gain.linearRampToValueAtTime(0.12, now + 0.1);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
 
       osc.connect(gain);
       gain.connect(musicMasterGain);
-
       osc.start(now);
       osc.stop(now + 1.8);
 
-      // Schedule next note randomly for relaxing lo-fi cadence
-      const delay = Math.random() * 600 + 400;
-      musicTimer = setTimeout(playPentatonicNote, delay);
+      musicTimer = setTimeout(playPentatonicNote, Math.random() * 600 + 400);
     }
 
     function toggleBackgroundMusic() {
       initAudio();
       musicPlaying = !musicPlaying;
-
       const icon = document.getElementById('music-icon');
       const btn = document.getElementById('music-toggle-btn');
 
@@ -545,22 +506,20 @@
     }
 
     function updateMusicVolume(val) {
-      if (musicMasterGain) {
-        musicMasterGain.gain.value = parseFloat(val);
-      }
+      if (musicMasterGain) musicMasterGain.gain.value = parseFloat(val);
     }
 
-    // --- SLIME TYPES & ACCESSORIES PRESETS ---
+    // --- AVATAR TYPES & CUSTOMIZATION ---
     const AVATAR_TYPES = {
-      sakura: { name: 'Sakura Slime', bodyColor: '#f472b6', accentColor: '#fb7185', accessory: '🌸' },
-      spirit: { name: 'Ocean Neko', bodyColor: '#38bdf8', accentColor: '#0284c7', accessory: '🐱' },
-      fox:    { name: 'Kitsune Slime', bodyColor: '#fb923c', accentColor: '#c2410c', accessory: '🦊' },
-      matcha: { name: 'Matcha Boba', bodyColor: '#4ade80', accentColor: '#15803d', accessory: '🍵' },
-      crown:  { name: 'Royal Slime', bodyColor: '#a855f7', accentColor: '#7e22ce', accessory: '👑' },
-      bunny:  { name: 'Bunny Slime', bodyColor: '#f43f5e', accentColor: '#be123c', accessory: '🐰' }
+      sakura: { name: 'Sakura Pin', bodyColor: '#f472b6', accessory: '🌸' },
+      spirit: { name: 'Cat Ears', bodyColor: '#38bdf8', accessory: '🐱' },
+      fox:    { name: 'Kitsune Mask', bodyColor: '#fb923c', accessory: '🦊' },
+      matcha: { name: 'Matcha Boba', bodyColor: '#4ade80', accessory: '🍵' },
+      crown:  { name: 'Gold Crown', bodyColor: '#a855f7', accessory: '👑' },
+      bunny:  { name: 'Bunny Ears', bodyColor: '#f43f5e', accessory: '🐰' }
     };
 
-    // --- GAME & PLAYER STATE ---
+    // --- GAME STATE ---
     let currentUser = null;
     let localPlayer = {
       id: 'usr_' + Math.random().toString(36).substring(2, 9),
@@ -587,26 +546,27 @@
     let realtimeChannel = null;
     let petals = [];
     let koiFish = [];
+    let steamParticles = [];
 
     // Mini-Game Active Variables
-    let activeMiniGame = null; // 'petal-catch', 'shrine-dash', 'memory'
+    let activeMiniGame = null;
     let miniGameScore = 0;
     let miniGameTimeLeft = 0;
     let miniGameInterval = null;
     let gameCollectibles = [];
 
-    // --- PERSISTENT CHAT MEMORY ---
+    // Persistent Chat Log Memory
     const chatMemory = {
       'sakura-lounge': JSON.parse(localStorage.getItem('chat_sakura-lounge') || '[]'),
-      'gaming-shrine': JSON.parse(localStorage.getItem('chat_gaming-shrine') || '[]'),
-      'arcade-lounge': JSON.parse(localStorage.getItem('chat_arcade-lounge') || '[]')
+      'arcade-lounge': JSON.parse(localStorage.getItem('chat_arcade-lounge') || '[]'),
+      'onsen-hotspring': JSON.parse(localStorage.getItem('chat_onsen-hotspring') || '[]')
     };
 
-    // Keyboard & Touch Joystick state
+    // Input States
     const keys = { up: false, down: false, left: false, right: false };
     const joystick = { active: false, dx: 0, dy: 0 };
 
-    // Canvas Setup
+    // Dynamic Canvas Fit Setup
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -616,7 +576,7 @@
       canvas.height = container.clientHeight;
     }
 
-    // --- AUTHENTICATION HANDLERS ---
+    // --- AUTH HANDLERS ---
     let authMode = 'signin';
 
     function switchAuthTab(mode) {
@@ -627,13 +587,13 @@
       const submitBtn = document.getElementById('auth-submit-btn');
 
       if (mode === 'signin') {
-        tabSignIn.className = "py-2.5 rounded-xl bg-white shadow text-pink-900 transition";
-        tabSignUp.className = "py-2.5 rounded-xl transition text-pink-600 hover:text-pink-900";
+        tabSignIn.className = "py-2 rounded-xl bg-white shadow text-pink-900 transition";
+        tabSignUp.className = "py-2 rounded-xl transition text-pink-600 hover:text-pink-900";
         usernameField.classList.add('hidden');
         submitBtn.querySelector('span').textContent = 'Sign In';
       } else {
-        tabSignUp.className = "py-2.5 rounded-xl bg-white shadow text-pink-900 transition";
-        tabSignIn.className = "py-2.5 rounded-xl transition text-pink-600 hover:text-pink-900";
+        tabSignUp.className = "py-2 rounded-xl bg-white shadow text-pink-900 transition";
+        tabSignIn.className = "py-2 rounded-xl transition text-pink-600 hover:text-pink-900";
         usernameField.classList.remove('hidden');
         submitBtn.querySelector('span').textContent = 'Create Account';
       }
@@ -659,7 +619,7 @@
           });
           if (error) throw error;
           showAuthAlert('Account created! Logging in...', false);
-          setTimeout(() => completeUserLogin(data.user, username || email.split('@')[0]), 1000);
+          setTimeout(() => completeUserLogin(data.user, username || email.split('@')[0]), 800);
         } else {
           const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
           if (error) throw error;
@@ -683,27 +643,18 @@
       if (user) localPlayer.id = user.id;
 
       localStorage.setItem('sakura_avatar_name', displayName);
-
       document.getElementById('auth-modal').classList.add('hidden');
-      document.getElementById('user-profile-badge').classList.remove('hidden');
-      document.getElementById('user-display-name').textContent = displayName;
-
       initSupabaseChannel(currentChannel);
     }
 
-    async function handleSignOut() {
-      if (currentUser) await supabaseClient.auth.signOut();
-      location.reload();
-    }
-
-    // --- PETALS & KOI FISH ANIMATIONS ---
+    // --- ANIMATION PARTICLES & ENVIRONMENT DATA ---
     function initEnvironmentElements() {
       petals = [];
-      for (let i = 0; i < 45; i++) {
+      for (let i = 0; i < 40; i++) {
         petals.push({
           x: Math.random() * window.innerWidth,
           y: Math.random() * window.innerHeight,
-          size: Math.random() * 6 + 4,
+          size: Math.random() * 5 + 3,
           speedY: Math.random() * 1.2 + 0.6,
           speedX: Math.random() * 0.8 - 0.4,
           rotation: Math.random() * Math.PI * 2,
@@ -712,9 +663,20 @@
       }
 
       koiFish = [
-        { x: canvas.width / 2 - 20, y: canvas.height / 2 + 50, angle: 0, color: '#f97316' },
-        { x: canvas.width / 2 + 30, y: canvas.height / 2 + 70, angle: Math.PI / 2, color: '#ef4444' }
+        { x: 200, y: 200, angle: 0, color: '#f97316' },
+        { x: 240, y: 220, angle: Math.PI / 2, color: '#ef4444' }
       ];
+
+      steamParticles = [];
+      for (let i = 0; i < 25; i++) {
+        steamParticles.push({
+          x: Math.random() * 200 + 100,
+          y: Math.random() * 100 + 150,
+          r: Math.random() * 12 + 8,
+          alpha: Math.random() * 0.4 + 0.1,
+          speedY: Math.random() * 0.6 + 0.3
+        });
+      }
     }
 
     function updateAndDrawPetals() {
@@ -739,16 +701,15 @@
       });
     }
 
-    // Floating Emote Particles System
     function addFloatingParticle(x, y, text) {
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 3; i++) {
         floatingParticles.push({
           x: x + (Math.random() - 0.5) * 20,
           y: y - 20,
           vx: (Math.random() - 0.5) * 1.5,
-          vy: -Math.random() * 2 - 1.5,
+          vy: -Math.random() * 2 - 1.2,
           alpha: 1,
-          size: Math.random() * 8 + 14,
+          size: Math.random() * 6 + 14,
           text: text
         });
       }
@@ -774,194 +735,281 @@
       }
     }
 
-    // --- MAP & ENVIRONMENT DRAWING ---
+    // --- ENHANCED ROOM ENVIRONMENT DRAWINGS ---
     function drawEnvironment() {
       const w = canvas.width;
       const h = canvas.height;
 
       if (currentChannel === 'sakura-lounge') {
-        // Soft Tatami Floor
+        // Room 1: 🌸 Sakura Shrine & Zen Garden
         ctx.fillStyle = '#fce7f3';
         ctx.fillRect(0, 0, w, h);
 
-        ctx.strokeStyle = 'rgba(244, 114, 182, 0.25)';
+        // Tatami Tile Grid
+        ctx.strokeStyle = 'rgba(244, 114, 182, 0.2)';
         ctx.lineWidth = 2;
-        const tileSize = 80;
-        for (let x = 0; x < w; x += tileSize) {
-          for (let y = 0; y < h; y += tileSize) {
-            ctx.strokeRect(x, y, tileSize, tileSize);
+        for (let x = 0; x < w; x += 70) {
+          for (let y = 0; y < h; y += 70) {
+            ctx.strokeRect(x, y, 70, 70);
           }
         }
 
-        // Zen Koi Pond
-        drawPond(w / 2, h / 2 + 60, 130, 70);
+        // Stepping Stone Path
+        ctx.fillStyle = '#cbd5e1';
+        [ {x: w*0.2, y: h*0.3}, {x: w*0.35, y: h*0.4}, {x: w*0.5, y: h*0.45}, {x: w*0.65, y: h*0.4} ].forEach(s => {
+          ctx.beginPath(); ctx.ellipse(s.x, s.y, 18, 10, 0, 0, Math.PI * 2); ctx.fill();
+        });
+
+        // Zen Koi Pond & Wooden Bridge
+        drawPond(w * 0.75, h * 0.65, 110, 65);
+        drawWoodenBridge(w * 0.75, h * 0.65, 80, 30);
+
+        // Detailed Torii Gate
+        drawToriiGate(w * 0.5, h * 0.22);
 
         // Blooming Sakura Trees
-        drawSakuraTree(100, 100, 52);
-        drawSakuraTree(w - 100, 100, 52);
-        drawSakuraTree(110, h - 110, 48);
-        drawSakuraTree(w - 110, h - 110, 48);
+        drawSakuraTree(w * 0.12, h * 0.2, 50);
+        drawSakuraTree(w * 0.88, h * 0.2, 50);
 
-        drawLantern(200, 90);
-        drawLantern(w - 200, 90);
+        // Glowing Stone Lanterns
+        drawLantern(w * 0.35, h * 0.25);
+        drawLantern(w * 0.65, h * 0.25);
 
-      } else if (currentChannel === 'gaming-shrine') {
-        // Red Shrine Courtyard
-        ctx.fillStyle = '#fbcfe8';
-        ctx.fillRect(0, 0, w, h);
-
-        ctx.strokeStyle = 'rgba(225, 29, 72, 0.15)';
-        ctx.lineWidth = 1.5;
-        for (let x = 0; x < w; x += 60) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
-        }
-
-        drawToriiGate(w / 2, 130);
-
-        drawSakuraTree(80, 120, 42);
-        drawSakuraTree(w - 80, 120, 42);
-        drawLantern(w / 2 - 110, 160);
-        drawLantern(w / 2 + 110, 160);
+        // Zen Tea Table
+        drawTeaTable(w * 0.2, h * 0.7);
 
       } else if (currentChannel === 'arcade-lounge') {
-        // Cyber Arcade Room
-        ctx.fillStyle = '#2e1065';
+        // Room 2: 🕹️ Cyberpunk Neon Arcade & Chill Lounge
+        ctx.fillStyle = '#1e0a24';
         ctx.fillRect(0, 0, w, h);
 
-        ctx.strokeStyle = 'rgba(236, 72, 153, 0.25)';
+        // Glowing Neon Tile Floor
         ctx.lineWidth = 1;
-        for (let x = 0; x < w; x += 50) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
-        }
-        for (let y = 0; y < h; y += 50) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+        for (let x = 0; x < w; x += 45) {
+          for (let y = 0; y < h; y += 45) {
+            ctx.strokeStyle = ((x + y) % 90 === 0) ? 'rgba(236, 72, 153, 0.3)' : 'rgba(139, 92, 246, 0.15)';
+            ctx.strokeRect(x, y, 45, 45);
+          }
         }
 
-        // Neon Cabinets
-        drawArcadeCabinet(120, 110, '#ec4899', 'SLIME MATCH');
-        drawArcadeCabinet(220, 110, '#8b5cf6', 'NEON DASH');
-        drawArcadeCabinet(w - 220, 110, '#06b6d4', 'BOBA HERO');
-        drawArcadeCabinet(w - 120, 110, '#f59e0b', 'CHIBI KOI');
+        // Dance Floor Grid
+        drawDanceFloor(w * 0.5, h * 0.7, 160, 80);
+
+        // Playable Arcade Cabinets
+        drawArcadeCabinet(w * 0.15, h * 0.25, '#ec4899', 'SLIME MATCH');
+        drawArcadeCabinet(w * 0.32, h * 0.25, '#8b5cf6', 'NEON DASH');
+        drawArcadeCabinet(w * 0.68, h * 0.25, '#06b6d4', 'BOBA HERO');
+        drawArcadeCabinet(w * 0.85, h * 0.25, '#f59e0b', 'CHIBI KOI');
+
+        // Neon Signs & Sofa Lounge
+        drawNeonSign(w * 0.5, h * 0.12, 'SAKURA ARCADE');
+        drawSofaLounge(w * 0.2, h * 0.75);
+        drawVendingMachine(w * 0.82, h * 0.72);
+
+      } else if (currentChannel === 'onsen-hotspring') {
+        // Room 3: 🎋 Bamboo Forest & Steaming Hot Spring (Onsen)
+        ctx.fillStyle = '#064e3b';
+        ctx.fillRect(0, 0, w, h);
+
+        // River Stone Ground Texture
+        ctx.fillStyle = '#047857';
+        ctx.fillRect(0, 0, w, h);
+
+        // Dense Bamboo Thickets
+        for (let x = 20; x < w; x += 40) {
+          if (x < w * 0.3 || x > w * 0.7) {
+            drawBambooStalk(x, h * 0.15, h * 0.7);
+          }
+        }
+
+        // Steaming Onsen Hot Spring Pool
+        drawOnsenPool(w * 0.5, h * 0.55, 140, 80);
+
+        // Wooden Dipping Tubs & Towels
+        drawWoodenTub(w * 0.25, h * 0.75);
+        drawWoodenTub(w * 0.75, h * 0.75);
+
+        // Lanterns & Rocks
+        drawLantern(w * 0.32, h * 0.35);
+        drawLantern(w * 0.68, h * 0.35);
       }
 
       // Outer Frame
-      ctx.lineWidth = 8;
+      ctx.lineWidth = 6;
       ctx.strokeStyle = 'rgba(244, 114, 182, 0.4)';
       ctx.strokeRect(0, 0, w, h);
     }
 
+    // DRAWING HELPER FUNCTIONS
     function drawSakuraTree(x, y, radius) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
-      ctx.beginPath();
-      ctx.ellipse(x, y + radius * 0.7, radius * 0.9, radius * 0.3, 0, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,0.15)';
+      ctx.beginPath(); ctx.ellipse(x, y + radius * 0.7, radius, radius * 0.3, 0, 0, Math.PI * 2); ctx.fill();
 
-      ctx.strokeStyle = '#7c2d12';
-      ctx.lineWidth = Math.max(6, radius * 0.2);
-      ctx.beginPath();
-      ctx.moveTo(x, y + radius * 0.6);
-      ctx.quadraticCurveTo(x - 5, y + 10, x, y - radius * 0.2);
-      ctx.stroke();
+      ctx.strokeStyle = '#582f0e';
+      ctx.lineWidth = 10;
+      ctx.beginPath(); ctx.moveTo(x, y + radius * 0.6); ctx.quadraticCurveTo(x - 5, y, x, y - radius * 0.2); ctx.stroke();
 
       const clusters = [
         { dx: 0, dy: -radius * 0.4, r: radius * 0.6, color: '#f472b6' },
         { dx: -radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#ec4899' },
-        { dx: radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#f472b6' },
-        { dx: -radius * 0.2, dy: -radius * 0.6, r: radius * 0.45, color: '#fbcfe8' }
+        { dx: radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#fb7185' }
       ];
-
       clusters.forEach(c => {
         ctx.fillStyle = c.color;
-        ctx.beginPath();
-        ctx.arc(x + c.dx, y + c.dy, c.r, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(x + c.dx, y + c.dy, c.r, 0, Math.PI * 2); ctx.fill();
       });
     }
 
     function drawPond(x, y, rx, ry) {
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
-      ctx.beginPath();
-      ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.5)';
+      ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)'; ctx.lineWidth = 3; ctx.stroke();
 
-      // Swim Koi Fish
       koiFish.forEach(fish => {
         fish.angle += 0.02;
         fish.x = x + Math.cos(fish.angle) * (rx * 0.5);
         fish.y = y + Math.sin(fish.angle) * (ry * 0.5);
-
         ctx.fillStyle = fish.color;
-        ctx.beginPath();
-        ctx.ellipse(fish.x, fish.y, 8, 3, fish.angle, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.ellipse(fish.x, fish.y, 7, 3, fish.angle, 0, Math.PI * 2); ctx.fill();
       });
+    }
 
-      // Lily Pads
-      ctx.fillStyle = '#22c55e';
-      ctx.beginPath(); ctx.arc(x - 30, y - 10, 12, 0, Math.PI * 1.8); ctx.fill();
-      ctx.beginPath(); ctx.arc(x + 40, y + 10, 15, 0, Math.PI * 1.8); ctx.fill();
+    function drawWoodenBridge(x, y, w, h) {
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(x - w / 2, y - h / 2, w, h);
+      ctx.strokeStyle = '#451a03'; ctx.lineWidth = 2;
+      for (let bx = x - w / 2; bx < x + w / 2; bx += 10) {
+        ctx.strokeRect(bx, y - h / 2, 10, h);
+      }
     }
 
     function drawToriiGate(x, y) {
       ctx.fillStyle = '#dc2626';
-      ctx.fillRect(x - 60, y - 60, 12, 80);
-      ctx.fillRect(x + 48, y - 60, 12, 80);
-      ctx.fillRect(x - 80, y - 60, 160, 14);
-      ctx.fillRect(x - 70, y - 42, 140, 10);
+      ctx.fillRect(x - 50, y - 50, 10, 70);
+      ctx.fillRect(x + 40, y - 50, 10, 70);
+      ctx.fillRect(x - 65, y - 50, 130, 12);
+      ctx.fillRect(x - 55, y - 35, 110, 8);
       ctx.fillStyle = '#0f172a';
-      ctx.fillRect(x - 84, y - 66, 168, 6);
+      ctx.fillRect(x - 68, y - 55, 136, 5);
     }
 
     function drawLantern(x, y) {
-      const glow = ctx.createRadialGradient(x, y, 4, x, y, 28);
-      glow.addColorStop(0, 'rgba(253, 224, 71, 0.6)');
+      const glow = ctx.createRadialGradient(x, y, 2, x, y, 22);
+      glow.addColorStop(0, 'rgba(253, 224, 71, 0.7)');
       glow.addColorStop(1, 'rgba(253, 224, 71, 0)');
       ctx.fillStyle = glow;
-      ctx.beginPath(); ctx.arc(x, y, 28, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fill();
 
       ctx.fillStyle = '#f97316';
-      ctx.beginPath(); ctx.roundRect(x - 10, y - 12, 20, 24, 4); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(x - 8, y - 10, 16, 20, 4); ctx.fill();
       ctx.fillStyle = '#451a03';
-      ctx.fillRect(x - 12, y - 16, 24, 4);
-      ctx.fillRect(x - 12, y + 12, 24, 4);
+      ctx.fillRect(x - 10, y - 13, 20, 3); ctx.fillRect(x - 10, y + 10, 20, 3);
+    }
+
+    function drawTeaTable(x, y) {
+      ctx.fillStyle = '#92400e';
+      ctx.beginPath(); ctx.ellipse(x, y, 28, 16, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath(); ctx.arc(x - 6, y - 2, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x + 6, y + 2, 4, 0, Math.PI * 2); ctx.fill();
     }
 
     function drawArcadeCabinet(x, y, color, title) {
-      ctx.fillStyle = '#1e1b4b';
-      ctx.fillRect(x - 22, y - 40, 44, 70);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(x - 20, y - 35, 40, 60);
       ctx.fillStyle = color;
-      ctx.fillRect(x - 20, y - 38, 40, 15);
+      ctx.fillRect(x - 18, y - 33, 36, 12);
       ctx.fillStyle = '#0284c7';
-      ctx.fillRect(x - 18, y - 20, 36, 26);
+      ctx.fillRect(x - 16, y - 18, 32, 22);
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 7px "Plus Jakarta Sans"';
+      ctx.font = 'bold 6px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(title, x, y - 7);
+      ctx.fillText(title, x, y - 5);
     }
 
-    // --- REFINED BOUNCY SLIME ANIMATION & JUMP PHYSICS ---
+    function drawDanceFloor(x, y, w, h) {
+      const colors = ['#ec4899', '#8b5cf6', '#06b6d4', '#10b981'];
+      let cIdx = 0;
+      for (let dx = x - w / 2; dx < x + w / 2; dx += 20) {
+        for (let dy = y - h / 2; dy < y + h / 2; dy += 20) {
+          ctx.fillStyle = colors[(cIdx++) % colors.length];
+          ctx.globalAlpha = 0.4;
+          ctx.fillRect(dx, dy, 18, 18);
+          ctx.globalAlpha = 1.0;
+        }
+      }
+    }
+
+    function drawNeonSign(x, y, text) {
+      ctx.font = 'bold 14px "Yuji Mai", serif';
+      ctx.fillStyle = '#f472b6';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = '#ec4899';
+      ctx.shadowBlur = 12;
+      ctx.fillText(text, x, y);
+      ctx.shadowBlur = 0;
+    }
+
+    function drawSofaLounge(x, y) {
+      ctx.fillStyle = '#be185d';
+      ctx.beginPath(); ctx.roundRect(x - 30, y - 15, 60, 30, 8); ctx.fill();
+      ctx.fillStyle = '#9d174d';
+      ctx.fillRect(x - 26, y - 12, 52, 10);
+    }
+
+    function drawVendingMachine(x, y) {
+      ctx.fillStyle = '#f43f5e';
+      ctx.fillRect(x - 15, y - 30, 30, 50);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillRect(x - 12, y - 25, 24, 20);
+    }
+
+    function drawBambooStalk(x, yStart, height) {
+      ctx.fillStyle = '#15803d';
+      ctx.fillRect(x, yStart, 8, height);
+      ctx.fillStyle = '#166534';
+      for (let h = yStart; h < yStart + height; h += 25) {
+        ctx.fillRect(x - 1, h, 10, 3);
+      }
+    }
+
+    function drawOnsenPool(x, y, rx, ry) {
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 6; ctx.stroke();
+
+      // Steam Particles
+      steamParticles.forEach(p => {
+        p.y -= p.speedY;
+        if (p.y < y - ry) p.y = y + ry * 0.5;
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+        ctx.beginPath(); ctx.arc(p.x + x - 200, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+      });
+    }
+
+    function drawWoodenTub(x, y) {
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath(); ctx.ellipse(x, y, 18, 10, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fef08a';
+      ctx.fillRect(x - 6, y - 4, 12, 6);
+    }
+
+    // --- BOUNCY SLIME RENDERING ---
     function drawSlime(player, isSelf = false) {
       const { x, y, name, avatarType, direction, isMoving, isJumping, jumpOffset, speechBubble, activeEmote } = player;
       const type = AVATAR_TYPES[avatarType] || AVATAR_TYPES.sakura;
 
       ctx.save();
 
-      // Bounce & Jump Squish Calculation
       player.bouncePhase = (player.bouncePhase || 0) + (isMoving ? 0.22 : 0.05);
-      const groundBounce = isMoving ? Math.abs(Math.sin(player.bouncePhase)) * 10 : Math.sin(player.bouncePhase) * 2;
-      
+      const groundBounce = isMoving ? Math.abs(Math.sin(player.bouncePhase)) * 8 : Math.sin(player.bouncePhase) * 2;
       const drawY = y - groundBounce - (jumpOffset || 0);
 
-      // Squish & Stretch scale
       let scaleX = 1;
       let scaleY = 1;
       if (isJumping) {
-        scaleX = 0.82;
-        scaleY = 1.22;
+        scaleX = 0.82; scaleY = 1.22;
       } else if (isMoving) {
         scaleX = 1 + Math.sin(player.bouncePhase) * 0.12;
         scaleY = 1 - Math.sin(player.bouncePhase) * 0.12;
@@ -970,184 +1018,123 @@
       ctx.translate(x, drawY);
 
       // Shadow
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
       ctx.beginPath();
-      const shadowSize = Math.max(6, 18 - (jumpOffset || 0) * 0.2);
-      ctx.ellipse(0, y - drawY + 16, shadowSize, 6, 0, 0, Math.PI * 2);
+      const shadowSize = Math.max(5, 16 - (jumpOffset || 0) * 0.2);
+      ctx.ellipse(0, y - drawY + 14, shadowSize, 5, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Apply Deformation Scale
       ctx.scale(scaleX, scaleY);
 
       // Slime Jelly Body
       ctx.fillStyle = type.bodyColor;
       ctx.beginPath();
-      ctx.arc(0, 0, 20, Math.PI * 0.82, Math.PI * 2.18);
-      ctx.quadraticCurveTo(0, 22, -20, 0);
+      ctx.arc(0, 0, 18, Math.PI * 0.82, Math.PI * 2.18);
+      ctx.quadraticCurveTo(0, 20, -18, 0);
       ctx.fill();
 
       // Shiny Top Highlight
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       ctx.beginPath();
-      ctx.ellipse(-6, -10, 7, 3.5, -Math.PI / 4, 0, Math.PI * 2);
+      ctx.ellipse(-5, -8, 6, 3, -Math.PI / 4, 0, Math.PI * 2);
       ctx.fill();
 
-      // Outline
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Expressive Eyes
-      let eyeOffsetX = 0;
-      if (direction === 'left') eyeOffsetX = -5;
-      if (direction === 'right') eyeOffsetX = 5;
-
+      // Eyes & Blush
+      let eyeOffsetX = (direction === 'left') ? -4 : (direction === 'right') ? 4 : 0;
       if (direction !== 'up') {
-        const blink = Math.sin(Date.now() * 0.003) > 0.96 ? 0.2 : 1;
-
         ctx.fillStyle = '#0f172a';
         ctx.beginPath();
-        ctx.ellipse(-6 + eyeOffsetX, -2, 2.5, 3 * blink, 0, 0, Math.PI * 2);
-        ctx.ellipse(6 + eyeOffsetX, -2, 2.5, 3 * blink, 0, 0, Math.PI * 2);
+        ctx.ellipse(-5 + eyeOffsetX, -2, 2, 2.5, 0, 0, Math.PI * 2);
+        ctx.ellipse(5 + eyeOffsetX, -2, 2, 2.5, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        if (blink > 0.5) {
-          ctx.fillStyle = '#ffffff';
-          ctx.beginPath();
-          ctx.arc(-7 + eyeOffsetX, -3, 1, 0, Math.PI * 2);
-          ctx.arc(5 + eyeOffsetX, -3, 1, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Rosy Blush
         ctx.fillStyle = 'rgba(244, 114, 182, 0.7)';
         ctx.beginPath();
-        ctx.ellipse(-9 + eyeOffsetX, 3, 4, 2, 0, 0, Math.PI * 2);
-        ctx.ellipse(9 + eyeOffsetX, 3, 4, 2, 0, 0, Math.PI * 2);
+        ctx.ellipse(-8 + eyeOffsetX, 2, 3, 1.5, 0, 0, Math.PI * 2);
+        ctx.ellipse(8 + eyeOffsetX, 2, 3, 1.5, 0, 0, Math.PI * 2);
         ctx.fill();
       }
 
       // Slime Accessory
-      ctx.font = '14px sans-serif';
+      ctx.font = '12px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(type.accessory, 0 + eyeOffsetX, -20);
+      ctx.fillText(type.accessory, 0 + eyeOffsetX, -18);
 
       ctx.restore();
 
       // Self Ring Indicator
       if (isSelf) {
         ctx.strokeStyle = '#ec4899';
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.ellipse(x, y + 16, 22, 9, 0, 0, Math.PI * 2);
+        ctx.ellipse(x, y + 14, 18, 7, 0, 0, Math.PI * 2);
         ctx.stroke();
       }
 
       // Name Badge
-      ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
-      const nameWidth = ctx.measureText(name).width + 16;
-      ctx.fillStyle = isSelf ? '#ec4899' : 'rgba(255, 255, 255, 0.92)';
+      ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
+      const nameWidth = ctx.measureText(name).width + 12;
+      ctx.fillStyle = isSelf ? '#ec4899' : 'rgba(255, 255, 255, 0.95)';
       ctx.beginPath();
-      ctx.roundRect(x - nameWidth / 2, drawY + 24, nameWidth, 18, 9);
+      ctx.roundRect(x - nameWidth / 2, drawY + 20, nameWidth, 16, 8);
       ctx.fill();
-      ctx.strokeStyle = 'rgba(244, 114, 182, 0.5)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
 
       ctx.fillStyle = isSelf ? '#ffffff' : '#831843';
       ctx.textAlign = 'center';
-      ctx.fillText(name, x, drawY + 37);
+      ctx.fillText(name, x, drawY + 31);
 
-      // Active Floating Emote
+      // Emote & Speech Bubbles
       if (activeEmote && activeEmote.expiresAt > Date.now()) {
-        ctx.font = '22px sans-serif';
+        ctx.font = '20px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(activeEmote.emoji, x, drawY - 45);
+        ctx.fillText(activeEmote.emoji, x, drawY - 40);
       }
 
-      // Speech Bubble
       if (speechBubble && speechBubble.expiresAt > Date.now()) {
-        drawSpeechBubble(x, drawY - 35, speechBubble.text);
+        drawSpeechBubble(x, drawY - 30, speechBubble.text);
       }
     }
 
     function drawSpeechBubble(x, y, text) {
-      ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
-      const maxLineWidth = 150;
-      const words = text.split(' ');
-      let lines = [];
-      let currentLine = '';
-
-      words.forEach(word => {
-        const testLine = currentLine ? currentLine + ' ' + word : word;
-        if (ctx.measureText(testLine).width > maxLineWidth) {
-          lines.push(currentLine);
-          currentLine = word;
-        } else {
-          currentLine = testLine;
-        }
-      });
-      if (currentLine) lines.push(currentLine);
-
-      const lineHeight = 16;
-      const padding = 10;
-      let maxMeasuredWidth = 0;
-      lines.forEach(l => {
-        const w = ctx.measureText(l).width;
-        if (w > maxMeasuredWidth) maxMeasuredWidth = w;
-      });
-
-      const bubbleWidth = Math.max(60, maxMeasuredWidth + padding * 2);
-      const bubbleHeight = lines.length * lineHeight + padding * 1.2;
+      ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
+      const bubbleWidth = Math.min(140, ctx.measureText(text).width + 16);
+      const bubbleHeight = 22;
       const bubbleX = x - bubbleWidth / 2;
       const bubbleY = y - bubbleHeight;
 
       ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
-      ctx.beginPath();
-      ctx.roundRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight, 12);
-      ctx.fill();
+      ctx.beginPath(); ctx.roundRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight, 10); ctx.fill();
+      ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 1.5; ctx.stroke();
 
-      ctx.strokeStyle = '#ec4899';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      ctx.fillStyle = '#831843';
-      ctx.textAlign = 'center';
-      lines.forEach((line, idx) => {
-        ctx.fillText(line, x, bubbleY + padding + 11 + idx * lineHeight);
-      });
+      ctx.fillStyle = '#831843'; ctx.textAlign = 'center';
+      ctx.fillText(text, x, bubbleY + 15);
     }
 
-    // --- CONTROLS, JUMP & MOVEMENT PHYSICS ---
+    // --- CONTROLS & PHYSICS ---
     function triggerJump() {
       if (!localPlayer.isJumping) {
         localPlayer.isJumping = true;
-        localPlayer.jumpVelocity = 12;
+        localPlayer.jumpVelocity = 11;
         playSound('jump');
       }
     }
 
     function updatePlayerMovement() {
-      let dx = 0;
-      let dy = 0;
-
-      // Keyboard input
+      let dx = 0; let dy = 0;
       if (keys.up) dy -= 1;
       if (keys.down) dy += 1;
       if (keys.left) dx -= 1;
       if (keys.right) dx += 1;
 
-      // Joystick input override
-      if (joystick.active) {
-        dx = joystick.dx;
-        dy = joystick.dy;
-      }
+      if (joystick.active) { dx = joystick.dx; dy = joystick.dy; }
 
-      // Jump Vertical Gravity
       if (localPlayer.isJumping) {
         localPlayer.jumpOffset = (localPlayer.jumpOffset || 0) + localPlayer.jumpVelocity;
-        localPlayer.jumpVelocity -= 0.8; // Gravity
-
+        localPlayer.jumpVelocity -= 0.8;
         if (localPlayer.jumpOffset <= 0) {
           localPlayer.jumpOffset = 0;
           localPlayer.isJumping = false;
@@ -1161,18 +1148,11 @@
         const len = Math.hypot(dx, dy);
         localPlayer.x += (dx / len) * localPlayer.speed;
         localPlayer.y += (dy / len) * localPlayer.speed;
-
         localPlayer.targetX = localPlayer.x;
         localPlayer.targetY = localPlayer.y;
         localPlayer.isMoving = true;
-
-        if (Math.abs(dx) > Math.abs(dy)) {
-          localPlayer.direction = dx > 0 ? 'right' : 'left';
-        } else {
-          localPlayer.direction = dy > 0 ? 'down' : 'up';
-        }
+        localPlayer.direction = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
       } else {
-        // Target Move interpolation
         const distX = localPlayer.targetX - localPlayer.x;
         const distY = localPlayer.targetY - localPlayer.y;
         const distance = Math.hypot(distX, distY);
@@ -1181,45 +1161,22 @@
           localPlayer.x += (distX / distance) * localPlayer.speed;
           localPlayer.y += (distY / distance) * localPlayer.speed;
           localPlayer.isMoving = true;
-
-          if (Math.abs(distX) > Math.abs(distY)) {
-            localPlayer.direction = distX > 0 ? 'right' : 'left';
-          } else {
-            localPlayer.direction = distY > 0 ? 'down' : 'up';
-          }
+          localPlayer.direction = Math.abs(distX) > Math.abs(distY) ? (distX > 0 ? 'right' : 'left') : (distY > 0 ? 'down' : 'up');
         } else {
           localPlayer.isMoving = false;
         }
       }
 
-      if (!prevMoving && localPlayer.isMoving) {
-        playSound('bounce');
-      }
+      if (!prevMoving && localPlayer.isMoving) playSound('bounce');
 
-      // Bound player inside canvas
-      localPlayer.x = Math.max(25, Math.min(canvas.width - 25, localPlayer.x));
-      localPlayer.y = Math.max(25, Math.min(canvas.height - 25, localPlayer.y));
+      localPlayer.x = Math.max(20, Math.min(canvas.width - 20, localPlayer.x));
+      localPlayer.y = Math.max(20, Math.min(canvas.height - 20, localPlayer.y));
 
-      // Slime Collision Bounce & Hugs
-      Object.values(remotePlayers).forEach(p => {
-        const dist = Math.hypot(localPlayer.x - p.x, localPlayer.y - p.y);
-        if (dist < 32 && dist > 0) {
-          localPlayer.x += ((localPlayer.x - p.x) / dist) * 2;
-          localPlayer.y += ((localPlayer.y - p.y) / dist) * 2;
-        }
-      });
-
-      // Mini-Game Collectible Collision Checks
-      if (activeMiniGame) {
-        checkMiniGameCollisions();
-      }
-
-      if (localPlayer.isMoving && realtimeChannel) {
-        broadcastState();
-      }
+      if (activeMiniGame) checkMiniGameCollisions();
+      if (localPlayer.isMoving && realtimeChannel) broadcastState();
     }
 
-    // --- MINI-GAMES SYSTEM ---
+    // --- MINI-GAME SYSTEM ---
     function startMiniGame(type) {
       activeMiniGame = type;
       miniGameScore = 0;
@@ -1234,47 +1191,25 @@
         spawnPetalCollectibles();
       } else if (type === 'shrine-dash') {
         document.getElementById('minigame-title').textContent = '⛩️ Shrine Dash';
-        switchChannel('gaming-shrine');
-        spawnShrineDashObstacles();
+        switchChannel('sakura-lounge');
+        spawnPetalCollectibles();
       }
 
       clearInterval(miniGameInterval);
       miniGameInterval = setInterval(() => {
         miniGameTimeLeft--;
         document.getElementById('minigame-timer').textContent = miniGameTimeLeft + 's';
-
-        if (type === 'petal-catch' && gameCollectibles.length < 8) {
-          gameCollectibles.push({
-            x: Math.random() * (canvas.width - 80) + 40,
-            y: Math.random() * (canvas.height - 80) + 40,
-            type: Math.random() > 0.2 ? '🌸' : '⭐'
-          });
-        }
-
-        if (miniGameTimeLeft <= 0) {
-          endMiniGame(false);
-        }
+        if (gameCollectibles.length < 8) spawnPetalCollectibles(1);
+        if (miniGameTimeLeft <= 0) endMiniGame(false);
       }, 1000);
     }
 
-    function spawnPetalCollectibles() {
-      gameCollectibles = [];
-      for (let i = 0; i < 7; i++) {
+    function spawnPetalCollectibles(count = 6) {
+      for (let i = 0; i < count; i++) {
         gameCollectibles.push({
-          x: Math.random() * (canvas.width - 80) + 40,
-          y: Math.random() * (canvas.height - 80) + 40,
+          x: Math.random() * (canvas.width - 60) + 30,
+          y: Math.random() * (canvas.height - 60) + 30,
           type: Math.random() > 0.2 ? '🌸' : '⭐'
-        });
-      }
-    }
-
-    function spawnShrineDashObstacles() {
-      gameCollectibles = [];
-      for (let i = 0; i < 10; i++) {
-        gameCollectibles.push({
-          x: Math.random() * (canvas.width - 100) + 50,
-          y: Math.random() * (canvas.height - 100) + 50,
-          type: '⛩️'
         });
       }
     }
@@ -1282,9 +1217,7 @@
     function checkMiniGameCollisions() {
       for (let i = gameCollectibles.length - 1; i >= 0; i--) {
         const item = gameCollectibles[i];
-        const dist = Math.hypot(localPlayer.x - item.x, localPlayer.y - item.y);
-
-        if (dist < 32) {
+        if (Math.hypot(localPlayer.x - item.x, localPlayer.y - item.y) < 28) {
           playSound('win');
           addFloatingParticle(item.x, item.y, '+10');
           miniGameScore += (item.type === '⭐' ? 25 : 10);
@@ -1296,7 +1229,7 @@
 
     function drawMiniGameCollectibles() {
       gameCollectibles.forEach(item => {
-        ctx.font = '22px sans-serif';
+        ctx.font = '20px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(item.type, item.x, item.y);
       });
@@ -1305,18 +1238,15 @@
     function endMiniGame(manualQuit = false) {
       clearInterval(miniGameInterval);
       document.getElementById('minigame-banner').classList.add('hidden');
-
       if (!manualQuit) {
         playSound('win');
         triggerEmote('🎉');
-        alert(`🎉 Game Over! Final Score: ${miniGameScore}`);
       }
-
       activeMiniGame = null;
       gameCollectibles = [];
     }
 
-    // --- ARCADE MEMORY MATCHING MINI-GAME ---
+    // Arcade Matching Game Popup
     function openArcadeMemoryGame() {
       const grid = document.getElementById('memory-grid');
       grid.innerHTML = '';
@@ -1326,15 +1256,14 @@
       let firstCard = null;
       let matchedCount = 0;
 
-      icons.forEach((icon, index) => {
+      icons.forEach(icon => {
         const btn = document.createElement('button');
-        btn.className = 'h-14 rounded-2xl bg-pink-200 hover:bg-pink-300 text-transparent text-xl font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
+        btn.className = 'h-12 rounded-xl bg-pink-200 text-transparent text-lg font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
         btn.textContent = icon;
 
         btn.onclick = () => {
           if (btn.classList.contains('bg-white')) return;
-
-          btn.className = 'h-14 rounded-2xl bg-white text-xl font-bold transition flex items-center justify-center border-2 border-pink-500 shadow-sm';
+          btn.className = 'h-12 rounded-xl bg-white text-lg font-bold transition flex items-center justify-center border-2 border-pink-500 shadow-sm';
 
           if (!firstCard) {
             firstCard = { btn, icon };
@@ -1344,22 +1273,19 @@
               matchedCount += 2;
               firstCard = null;
               if (matchedCount === icons.length) {
-                document.getElementById('memory-status').textContent = '🎉 You matched all cards! Winner!';
-                playSound('win');
+                document.getElementById('memory-status').textContent = '🎉 Winner! All Matched!';
               }
             } else {
               setTimeout(() => {
-                btn.className = 'h-14 rounded-2xl bg-pink-200 text-transparent text-xl font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
-                firstCard.btn.className = 'h-14 rounded-2xl bg-pink-200 text-transparent text-xl font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
+                btn.className = 'h-12 rounded-xl bg-pink-200 text-transparent text-lg font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
+                firstCard.btn.className = 'h-12 rounded-xl bg-pink-200 text-transparent text-lg font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
                 firstCard = null;
-              }, 600);
+              }, 500);
             }
           }
         };
-
         grid.appendChild(btn);
       });
-
       document.getElementById('arcade-card-modal').classList.remove('hidden');
     }
 
@@ -1367,24 +1293,13 @@
       document.getElementById('arcade-card-modal').classList.add('hidden');
     }
 
-    // Render Main Game Loop
+    // MAIN GAME LOOP
     function render() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       drawEnvironment();
       updateAndDrawPetals();
 
-      // Click Ripple Indicator
-      const targetDist = Math.hypot(localPlayer.targetX - localPlayer.x, localPlayer.targetY - localPlayer.y);
-      if (targetDist > 8) {
-        ctx.strokeStyle = 'rgba(236, 72, 153, 0.6)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(localPlayer.targetX, localPlayer.targetY, 10, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-      // Draw Collectibles
       if (activeMiniGame) drawMiniGameCollectibles();
 
       // Remote Players
@@ -1400,7 +1315,7 @@
       requestAnimationFrame(render);
     }
 
-    // --- REALTIME SUPABASE CHANNELS ---
+    // --- REALTIME SUPABASE SYSTEM ---
     async function initSupabaseChannel(channelName) {
       if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
 
@@ -1416,46 +1331,35 @@
           const state = realtimeChannel.presenceState();
           remotePlayers = {};
           let count = 1;
-
           Object.keys(state).forEach(key => {
-            if (key !== localPlayer.id) {
-              const presences = state[key];
-              if (presences && presences.length > 0) {
-                remotePlayers[key] = presences[0];
-                count++;
-              }
+            if (key !== localPlayer.id && state[key][0]) {
+              remotePlayers[key] = state[key][0];
+              count++;
             }
           });
-          document.getElementById('player-count').textContent = `${count} Online`;
-        })
-        .on('presence', { event: 'leave' }, ({ key }) => {
-          delete remotePlayers[key];
+          document.getElementById('player-count').textContent = count;
         })
         .on('broadcast', { event: 'player-move' }, payload => {
           const p = payload.payload;
-          if (p.id !== localPlayer.id) {
-            remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
-          }
+          if (p.id !== localPlayer.id) remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
         })
         .on('broadcast', { event: 'chat-message' }, payload => {
           const msg = payload.payload;
           saveChatMessageToMemory(msg.channel || currentChannel, msg);
-          
           if ((msg.channel || currentChannel) === currentChannel) {
             displayChatMessage(msg);
             playSound('msg');
           }
-
           if (msg.playerId === localPlayer.id) {
-            localPlayer.speechBubble = { text: msg.content, expiresAt: Date.now() + 6500 };
+            localPlayer.speechBubble = { text: msg.content, expiresAt: Date.now() + 6000 };
           } else if (remotePlayers[msg.playerId]) {
-            remotePlayers[msg.playerId].speechBubble = { text: msg.content, expiresAt: Date.now() + 6500 };
+            remotePlayers[msg.playerId].speechBubble = { text: msg.content, expiresAt: Date.now() + 6000 };
           }
         })
         .on('broadcast', { event: 'player-emote' }, payload => {
           const data = payload.payload;
           if (remotePlayers[data.playerId]) {
-            remotePlayers[data.playerId].activeEmote = { emoji: data.emoji, expiresAt: Date.now() + 3500 };
+            remotePlayers[data.playerId].activeEmote = { emoji: data.emoji, expiresAt: Date.now() + 3000 };
             addFloatingParticle(remotePlayers[data.playerId].x, remotePlayers[data.playerId].y, data.emoji);
           }
         })
@@ -1478,7 +1382,7 @@
     function saveChatMessageToMemory(channel, msg) {
       if (!chatMemory[channel]) chatMemory[channel] = [];
       chatMemory[channel].push(msg);
-      if (chatMemory[channel].length > 50) chatMemory[channel].shift();
+      if (chatMemory[channel].length > 40) chatMemory[channel].shift();
       try { localStorage.setItem(`chat_${channel}`, JSON.stringify(chatMemory[channel])); } catch(e) {}
     }
 
@@ -1486,9 +1390,8 @@
       const container = document.getElementById('chat-messages');
       container.innerHTML = '';
       const messages = chatMemory[channel] || [];
-
       if (messages.length === 0) {
-        container.innerHTML = `<div class="text-center text-xs text-pink-500 my-6 italic">Welcome to #${channel}! Chat with friends 🌸</div>`;
+        container.innerHTML = `<div class="text-center text-[10px] text-pink-300 my-4 italic">Welcome to #${channel}! Chat with slimes 🌸</div>`;
         return;
       }
       messages.forEach(msg => displayChatMessage(msg));
@@ -1513,7 +1416,7 @@
 
     function triggerEmote(emoji) {
       playSound('emote');
-      localPlayer.activeEmote = { emoji: emoji, expiresAt: Date.now() + 3500 };
+      localPlayer.activeEmote = { emoji: emoji, expiresAt: Date.now() + 3000 };
       addFloatingParticle(localPlayer.x, localPlayer.y, emoji);
 
       if (realtimeChannel) {
@@ -1542,7 +1445,7 @@
       };
 
       playSound('msg');
-      localPlayer.speechBubble = { text: text, expiresAt: Date.now() + 6500 };
+      localPlayer.speechBubble = { text: text, expiresAt: Date.now() + 6000 };
 
       saveChatMessageToMemory(currentChannel, msgObj);
       displayChatMessage(msgObj);
@@ -1557,17 +1460,15 @@
       const isSelf = msg.sender === localPlayer.name;
 
       const msgDiv = document.createElement('div');
-      msgDiv.className = `flex flex-col ${isSelf ? 'items-end' : 'items-start'} space-y-1 animate-in fade-in slide-in-from-bottom-2 duration-150`;
+      msgDiv.className = `flex flex-col ${isSelf ? 'items-end' : 'items-start'} space-y-0.5 animate-in fade-in`;
 
       msgDiv.innerHTML = `
-        <div class="flex items-center gap-1.5 px-1">
-          <span class="text-[11px] font-bold text-pink-900">${escapeHtml(msg.sender)}</span>
-          <span class="text-[9px] text-pink-400">${msg.time || ''}</span>
+        <div class="flex items-center gap-1 px-1">
+          <span class="text-[10px] font-bold text-pink-200">${escapeHtml(msg.sender)}</span>
+          <span class="text-[8px] text-pink-400">${msg.time || ''}</span>
         </div>
-        <div class="px-3.5 py-2 rounded-2xl text-xs max-w-[88%] shadow-sm ${
-          isSelf 
-            ? 'bg-pink-500 text-white rounded-tr-none' 
-            : 'bg-white/95 text-pink-950 border border-pink-100 rounded-tl-none font-medium'
+        <div class="px-3 py-1.5 rounded-2xl text-xs max-w-[88%] shadow-sm ${
+          isSelf ? 'bg-pink-500 text-white rounded-tr-none' : 'bg-white/95 text-pink-950 rounded-tl-none font-medium'
         }">
           ${escapeHtml(msg.content)}
         </div>
@@ -1578,12 +1479,10 @@
     }
 
     function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.innerText = text;
-      return div.innerHTML;
+      const div = document.createElement('div'); div.innerText = text; return div.innerHTML;
     }
 
-    // --- INPUT & JOYSTICK LISTENERS ---
+    // --- CONTROLS & LISTENERS ---
     window.addEventListener('keydown', e => {
       if (document.activeElement.tagName === 'INPUT') return;
       if (e.key === ' ' || e.key === 'Spacebar') { triggerJump(); return; }
@@ -1600,64 +1499,36 @@
       if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
     });
 
-    // Touch Virtual Joystick Logic
+    // Mobile Joystick Logic
     const joystickBase = document.getElementById('joystick-container');
     const joystickStick = document.getElementById('joystick-stick');
 
     if (joystickBase) {
-      joystickBase.addEventListener('touchstart', handleJoystickStart, { passive: false });
-      joystickBase.addEventListener('touchmove', handleJoystickMove, { passive: false });
-      joystickBase.addEventListener('touchend', handleJoystickEnd, { passive: false });
-    }
-
-    function handleJoystickStart(e) {
-      e.preventDefault();
-      joystick.active = true;
-      updateJoystickPos(e.touches[0]);
-    }
-
-    function handleJoystickMove(e) {
-      e.preventDefault();
-      if (joystick.active) updateJoystickPos(e.touches[0]);
-    }
-
-    function handleJoystickEnd(e) {
-      e.preventDefault();
-      joystick.active = false;
-      joystick.dx = 0;
-      joystick.dy = 0;
-      joystickStick.style.transform = `translate(0px, 0px)`;
+      joystickBase.addEventListener('touchstart', e => { e.preventDefault(); joystick.active = true; updateJoystickPos(e.touches[0]); }, { passive: false });
+      joystickBase.addEventListener('touchmove', e => { e.preventDefault(); if (joystick.active) updateJoystickPos(e.touches[0]); }, { passive: false });
+      joystickBase.addEventListener('touchend', e => { e.preventDefault(); joystick.active = false; joystick.dx = 0; joystick.dy = 0; joystickStick.style.transform = `translate(0px, 0px)`; }, { passive: false });
     }
 
     function updateJoystickPos(touch) {
       const rect = joystickBase.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-
-      let dx = touch.clientX - centerX;
-      let dy = touch.clientY - centerY;
+      let dx = touch.clientX - (rect.left + rect.width / 2);
+      let dy = touch.clientY - (rect.top + rect.height / 2);
       const dist = Math.hypot(dx, dy);
-      const maxDist = rect.width / 2 - 10;
+      const maxDist = rect.width / 2 - 8;
 
-      if (dist > maxDist) {
-        dx = (dx / dist) * maxDist;
-        dy = (dy / dist) * maxDist;
-      }
-
+      if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
       joystickStick.style.transform = `translate(${dx}px, ${dy}px)`;
-      joystick.dx = dx / maxDist;
-      joystick.dy = dy / maxDist;
+      joystick.dx = dx / maxDist; joystick.dy = dy / maxDist;
     }
 
-    // Tap Anywhere Pointer Navigation
+    // Canvas Tap Navigation & Arcade Machine Interaction
     canvas.addEventListener('pointerdown', e => {
       if (e.target !== canvas) return;
       const rect = canvas.getBoundingClientRect();
       localPlayer.targetX = e.clientX - rect.left;
       localPlayer.targetY = e.clientY - rect.top;
 
-      // Check Arcade Lounge Cabinet interaction trigger
-      if (currentChannel === 'arcade-lounge' && localPlayer.targetY < 180) {
+      if (currentChannel === 'arcade-lounge' && localPlayer.targetY < canvas.height * 0.35) {
         openArcadeMemoryGame();
       }
     });
@@ -1667,7 +1538,7 @@
 
       document.querySelectorAll('.chan-btn, .quick-chan-btn').forEach(btn => {
         btn.classList.remove('bg-pink-500', 'text-white', 'shadow-sm');
-        btn.classList.add('text-pink-800');
+        btn.classList.add('text-pink-200', 'text-pink-800');
       });
 
       const activeBtn = document.getElementById(`chan-btn-${channelName}`);
@@ -1679,24 +1550,23 @@
       initSupabaseChannel(channelName);
     }
 
-    // --- SETTINGS MODAL ---
+    // CUSTOMIZATION SETTINGS
     function renderAvatarPicker() {
       const picker = document.getElementById('avatar-picker');
       picker.innerHTML = Object.keys(AVATAR_TYPES).map(key => {
         const type = AVATAR_TYPES[key];
         const isSelected = localPlayer.avatarType === key;
-
         return `
           <div 
             onclick="selectAvatarType('${key}')"
-            class="p-3 rounded-2xl border-2 cursor-pointer transition flex items-center gap-3 ${
-              isSelected ? 'border-pink-500 bg-pink-100/80 shadow-sm' : 'border-pink-200/60 hover:bg-white/60'
+            class="p-2.5 rounded-2xl border cursor-pointer transition flex items-center gap-2 ${
+              isSelected ? 'border-pink-500 bg-pink-100/90 shadow-sm' : 'border-pink-200 hover:bg-white/80'
             }"
           >
-            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm shrink-0" style="background-color: ${type.bodyColor}">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-sm shrink-0" style="background-color: ${type.bodyColor}">
               ${type.accessory}
             </div>
-            <span class="text-xs font-bold text-pink-900">${type.name}</span>
+            <span class="text-[11px] font-bold text-pink-900">${type.name}</span>
           </div>
         `;
       }).join('');
@@ -1721,7 +1591,6 @@
       if (newName) {
         localPlayer.name = newName;
         localStorage.setItem('sakura_avatar_name', localPlayer.name);
-        document.getElementById('user-display-name').textContent = newName;
       }
       localStorage.setItem('sakura_avatar_type', localPlayer.avatarType);
 
@@ -1741,7 +1610,7 @@
       document.getElementById('chat-sidebar').classList.toggle('translate-x-full');
     }
 
-    // --- INITIALIZATION ---
+    // INITIALIZATION
     window.addEventListener('resize', resizeCanvas);
 
     window.addEventListener('load', async () => {
@@ -1755,7 +1624,7 @@
       localPlayer.targetY = localPlayer.y;
 
       const { data } = await supabaseClient.auth.getSession();
-      if (data.session) {
+      if (data?.session?.user) {
         const user = data.session.user;
         const dispName = user.user_metadata?.display_name || user.email.split('@')[0];
         completeUserLogin(user, dispName);
