@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Anime Bonfire Sanctuary - 2.5D Edition</title>
+    <title>Anime Sanctuary - 2D Pixel Edition</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -20,8 +20,8 @@
         }
         body {
             font-family: 'Press Start 2P', monospace;
-            background-color: #030307;
-            color: #e2e8f0;
+            background-color: #030712;
+            color: #f3f4f6;
             overflow: hidden;
             margin: 0;
             padding: 0;
@@ -32,52 +32,53 @@
             display: block;
         }
         ::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
         }
         ::-webkit-scrollbar-track {
             background: rgba(0,0,0,0.5);
         }
         ::-webkit-scrollbar-thumb {
-            background: #6366f1;
-            border-radius: 3px;
+            background: #8b5cf6;
+            border-radius: 2px;
         }
         .pixel-btn {
-            background: #4f46e5;
-            box-shadow: inset -2px -2px 0px 0px #312e81, inset 2px 2px 0px 0px #818cf8;
+            background: #7c3aed;
+            box-shadow: inset -2px -2px 0px 0px #5b21b6, inset 2px 2px 0px 0px #a78bfa;
             transition: all 0.1s ease;
         }
         .pixel-btn:active {
-            box-shadow: inset 2px 2px 0px 0px #312e81, inset -2px -2px 0px 0px #818cf8;
+            box-shadow: inset 2px 2px 0px 0px #5b21b6, inset -2px -2px 0px 0px #a78bfa;
             transform: translateY(2px);
         }
     </style>
 </head>
 <body class="w-screen h-screen flex flex-col justify-between relative bg-slate-950">
 
-    <!-- CANVAS GAME CONTAINER -->
+    <!-- GAME CANVAS CONTAINER -->
     <div id="canvasContainer" class="absolute inset-0 z-0 flex items-center justify-center bg-black">
         <canvas id="gameCanvas"></canvas>
     </div>
 
-    <!-- TOP HUD BAR -->
-    <div class="relative z-10 p-3 flex justify-between items-center bg-slate-950/90 backdrop-blur-md border-b-2 border-indigo-950 text-xs shadow-2xl">
+    <!-- TOP BAR HUD -->
+    <div class="relative z-10 p-3 flex justify-between items-center bg-slate-950/85 backdrop-blur-md border-b-2 border-violet-950 text-xs shadow-xl">
         <div class="flex items-center gap-3">
-            <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-md border border-indigo-900/60 shadow">
-                <i class="fa-solid fa-user text-indigo-400"></i>
-                <span id="playerTag" class="text-indigo-300 font-bold">AnimeWalker</span>
+            <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-md border border-violet-900/50 shadow-inner">
+                <i class="fa-solid fa-user text-violet-400"></i>
+                <span id="playerTag" class="text-violet-300 font-bold">AnimeWalker</span>
             </div>
-            <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-md border border-indigo-900/60 shadow">
+            <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-md border border-violet-900/50 shadow-inner">
                 <i class="fa-solid fa-location-dot text-amber-400"></i>
-                <span id="locationTag" class="text-amber-200">Courtyard Hub</span>
+                <span id="locationTag" class="text-amber-200">Main Hallway</span>
             </div>
         </div>
 
+        <!-- System Controls -->
         <div class="flex items-center gap-2">
             <button id="btnMusicToggle" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-amber-600 shadow">
                 <i id="musicIcon" class="fa-solid fa-music"></i>
                 <span class="hidden md:inline">Music</span>
             </button>
-            <button id="btnCustomizer" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-indigo-600 shadow">
+            <button id="btnCustomizer" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-violet-600 shadow">
                 <i class="fa-solid fa-gear"></i>
                 <span class="hidden md:inline">Settings</span>
             </button>
@@ -87,34 +88,34 @@
         </div>
     </div>
 
-    <!-- PERSISTENT DATABASE CHAT OVERLAY -->
+    <!-- MAIN CHAT OVERLAY (DATABASE-BACKED) -->
     <div class="relative z-10 p-2 md:p-4 pointer-events-none flex justify-between items-end mb-16 md:mb-0">
-        <div class="pointer-events-auto w-80 max-w-[85vw] bg-slate-950/90 border-2 border-indigo-900/70 rounded-lg p-3 flex flex-col h-48 backdrop-blur-md shadow-2xl">
-            <div class="text-[10px] text-indigo-400 mb-2 border-b border-indigo-900/50 pb-1 flex justify-between items-center">
-                <span><i class="fa-solid fa-comments"></i> Cloud Chat Sanctuary</span>
+        <div class="pointer-events-auto w-80 max-w-[85vw] bg-slate-950/90 border-2 border-violet-900/60 rounded-lg p-3 flex flex-col h-48 backdrop-blur-md shadow-2xl">
+            <div class="text-[10px] text-violet-400 mb-2 border-b border-violet-900/40 pb-1 flex justify-between items-center">
+                <span><i class="fa-solid fa-comments"></i> Sanctuary Live Chat</span>
                 <span id="peerCount" class="text-slate-400">Online: 1</span>
             </div>
             <div id="chatMessages" class="flex-1 overflow-y-auto space-y-2 pr-1 text-[10px] leading-relaxed">
-                <div class="text-emerald-400"><i class="fa-solid fa-circle-info"></i> Welcome! Walk into doors to explore 2.5D rooms and sit by fires.</div>
+                <div class="text-emerald-400"><i class="fa-solid fa-circle-info"></i> Welcome! Messages are synced securely. Walk right to enter rooms.</div>
             </div>
             <form id="chatForm" class="mt-2 flex gap-1">
-                <input id="chatInput" type="text" maxlength="60" placeholder="Type a message..." class="flex-1 bg-slate-900 border border-indigo-900/50 rounded px-2 py-1 text-[10px] text-slate-200 focus:outline-none focus:border-indigo-500 shadow-inner">
-                <button type="submit" class="pixel-btn bg-indigo-600 text-white px-2 py-1 rounded text-[10px]"><i class="fa-solid fa-paper-plane"></i></button>
+                <input id="chatInput" type="text" maxlength="60" placeholder="Type a message..." class="flex-1 bg-slate-900 border border-violet-900/50 rounded px-2 py-1 text-[10px] text-slate-200 focus:outline-none focus:border-violet-500 shadow-inner">
+                <button type="submit" class="pixel-btn bg-violet-600 text-white px-2 py-1 rounded text-[10px]"><i class="fa-solid fa-paper-plane"></i></button>
             </form>
         </div>
     </div>
 
-    <!-- TOUCH CONTROLS FOR MOBILE -->
+    <!-- MOBILE TOUCH CONTROLS -->
     <div id="mobileControls" class="relative z-20 p-4 flex justify-between items-center pointer-events-none mb-2">
-        <div class="pointer-events-auto grid grid-cols-3 gap-1 w-32 h-32">
-            <div></div>
-            <button id="btnUp" class="w-10 h-10 bg-slate-900/90 active:bg-indigo-600 border border-indigo-900 rounded flex items-center justify-center text-white text-sm shadow"><i class="fa-solid fa-chevron-up"></i></button>
-            <div></div>
-            <button id="btnLeft" class="w-10 h-10 bg-slate-900/90 active:bg-indigo-600 border border-indigo-900 rounded flex items-center justify-center text-white text-sm shadow"><i class="fa-solid fa-chevron-left"></i></button>
-            <button id="btnDown" class="w-10 h-10 bg-slate-900/90 active:bg-indigo-600 border border-indigo-900 rounded flex items-center justify-center text-white text-sm shadow"><i class="fa-solid fa-chevron-down"></i></button>
-            <button id="btnRight" class="w-10 h-10 bg-slate-900/90 active:bg-indigo-600 border border-indigo-900 rounded flex items-center justify-center text-white text-sm shadow"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="pointer-events-auto flex gap-2">
+            <button id="btnLeft" class="w-14 h-14 bg-slate-900/90 active:bg-violet-600 border-2 border-violet-900 rounded-lg flex items-center justify-center text-white text-xl shadow-xl">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <button id="btnRight" class="w-14 h-14 bg-slate-900/90 active:bg-violet-600 border-2 border-violet-900 rounded-lg flex items-center justify-center text-white text-xl shadow-xl">
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
         </div>
-        <div class="pointer-events-auto flex flex-col gap-2">
+        <div class="pointer-events-auto flex gap-2">
             <button id="btnSit" class="w-14 h-14 bg-emerald-700/90 active:bg-emerald-600 border-2 border-emerald-400 rounded-full flex flex-col items-center justify-center text-white font-bold text-xs shadow-xl">
                 <i class="fa-solid fa-chair text-sm"></i>
                 <span class="text-[7px] mt-0.5">SIT</span>
@@ -128,9 +129,9 @@
 
     <!-- AUTHENTICATION MODAL -->
     <div id="modalAuth" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-slate-950 border-2 border-indigo-500/80 rounded-xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
-            <h2 class="text-sm text-indigo-400 font-bold"><i class="fa-solid fa-shield-halved"></i> Sanctuary Login</h2>
-            <p class="text-[9px] text-slate-400">Sign in with your email & password to access cloud chat and permanent avatars.</p>
+        <div class="bg-slate-950 border-2 border-violet-500/80 rounded-xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <h2 class="text-sm text-violet-400 font-bold"><i class="fa-solid fa-shield-halved"></i> Sanctuary Login</h2>
+            <p class="text-[9px] text-slate-400">Sign in with email & password to preserve your display name and custom avatar.</p>
             
             <form id="authForm" class="space-y-3 text-xs text-left">
                 <div>
@@ -143,32 +144,32 @@
                 </div>
                 <div id="displayNameGroup" class="hidden">
                     <label class="block text-[10px] text-slate-400 mb-1">Display Name:</label>
-                    <input id="authDisplayName" type="text" maxlength="12" placeholder="AnimeWalker" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-indigo-300 text-xs shadow-inner">
+                    <input id="authDisplayName" type="text" maxlength="12" placeholder="AnimeWalker" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-violet-300 text-xs shadow-inner">
                 </div>
 
                 <div id="authError" class="text-[9px] text-rose-400 text-center h-4"></div>
 
-                <button type="submit" id="btnAuthSubmit" class="pixel-btn w-full py-2.5 rounded text-white bg-indigo-600 text-xs font-bold shadow-lg">
+                <button type="submit" id="btnAuthSubmit" class="pixel-btn w-full py-2.5 rounded text-white bg-violet-600 text-xs font-bold shadow-lg">
                     Login
                 </button>
             </form>
 
             <div class="text-[9px] text-slate-400 pt-2 border-t border-slate-900">
                 <span id="authSwitchText">Don't have an account?</span> 
-                <button id="btnSwitchAuthMode" class="text-indigo-400 underline font-bold ml-1">Sign Up</button>
+                <button id="btnSwitchAuthMode" class="text-violet-400 underline font-bold ml-1">Sign Up</button>
             </div>
         </div>
     </div>
 
-    <!-- SETTINGS & CUSTOMIZER MODAL -->
+    <!-- SETTINGS & PROFILE MODAL -->
     <div id="modalCustomizer" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center hidden p-4 backdrop-blur-sm">
-        <div class="bg-slate-950 border-2 border-indigo-500 rounded-xl p-5 max-w-sm w-full text-center space-y-4 shadow-2xl">
-            <h2 class="text-sm text-indigo-400 font-bold"><i class="fa-solid fa-gear"></i> Avatar & Settings</h2>
+        <div class="bg-slate-950 border-2 border-violet-500 rounded-xl p-5 max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <h2 class="text-sm text-violet-400 font-bold"><i class="fa-solid fa-gear"></i> Avatar Settings</h2>
             
             <div class="space-y-3 text-xs text-left">
                 <div>
                     <label class="block text-slate-400 mb-1">Display Name:</label>
-                    <input id="inputPlayerName" type="text" maxlength="12" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-indigo-300 text-xs shadow-inner">
+                    <input id="inputPlayerName" type="text" maxlength="12" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-violet-300 text-xs shadow-inner">
                 </div>
                 <div>
                     <label class="block text-slate-400 mb-1">Hair Color:</label>
@@ -176,56 +177,64 @@
                 </div>
                 <div>
                     <label class="block text-slate-400 mb-1">Outfit Color:</label>
-                    <input id="colorOutfit" type="color" value="#4f46e5" class="w-full h-8 bg-transparent cursor-pointer rounded border border-slate-700">
+                    <input id="colorOutfit" type="color" value="#7c3aed" class="w-full h-8 bg-transparent cursor-pointer rounded border border-slate-700">
                 </div>
             </div>
 
-            <button id="btnCloseCustomizer" class="pixel-btn w-full py-2 rounded text-white bg-indigo-600 text-xs shadow-lg">
+            <button id="btnCloseCustomizer" class="pixel-btn w-full py-2 rounded text-white bg-violet-600 text-xs shadow-lg">
                 Save & Close
             </button>
         </div>
     </div>
 
-    <!-- 2.5D ENGINE & DATABASE CHAT SCRIPT -->
+    <!-- GAME ENGINE & SUPABASE SCRIPT -->
     <script>
         // --- SUPABASE CONFIGURATION ---
         const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const gameChannel = supabaseClient.channel('anime_sanctuary_global', {
+            config: { broadcast: { self: false } }
+        });
 
-        // --- 2.5D GAME ENGINE CONSTANTS ---
+        // --- GAME ENGINE STATE ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         ctx.imageSmoothingEnabled = false;
 
-        const VIRTUAL_WIDTH = 400;
-        const VIRTUAL_HEIGHT = 225;
+        const VIRTUAL_WIDTH = 320;
+        const VIRTUAL_HEIGHT = 180;
         let scale = 1;
 
-        const PLAYER_SPEED = 1.8;
+        const PLAYER_SPEED = 1.6;
+        const HALLWAY_GROUND_Y = 145;
+        const ROOM_GROUND_Y = 150;
+        const BONFIRE_X = VIRTUAL_WIDTH / 2;
 
         let currentUser = null;
         let localPlayer = {
             id: 'p_' + Math.random().toString(36).substr(2, 9),
             name: 'AnimeWalker',
             email: '',
-            x: 200,
-            y: 160,
+            x: 40,
+            y: HALLWAY_GROUND_Y,
             vx: 0,
-            vy: 0,
-            facing: 'down', // 'up', 'down', 'left', 'right'
-            state: 'idle', // 'idle', 'walk', 'sit'
+            facing: 'right',
+            state: 'idle',
             hairColor: '#fbbf24',
-            outfitColor: '#4f46e5',
-            currentArea: 'courtyard', // 'courtyard', 'sanctuary_1', 'sanctuary_2'
+            outfitColor: '#7c3aed',
+            currentRoom: null,
             frame: 0,
             animTimer: 0
         };
 
         let remotePlayers = new Map();
         let particles = [];
-        const keys = { up: false, down: false, left: false, right: false };
+        const keys = { left: false, right: false };
+
+        const DOOR_SPACING = 90;
+        const LEFT_WALL_X = 15;
 
         function resizeCanvas() {
             const scaleX = window.innerWidth / VIRTUAL_WIDTH;
@@ -238,7 +247,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // --- AUTHENTICATION & SESSIONS ---
+        // --- AUTHENTICATION & SESSION ---
         let isSignUpMode = false;
         const modalAuth = document.getElementById('modalAuth');
         const authForm = document.getElementById('authForm');
@@ -272,7 +281,7 @@
 
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            authError.innerText = "Connecting...";
+            authError.innerText = "Authenticating...";
             const email = authEmail.value.trim();
             const password = authPassword.value.trim();
 
@@ -285,14 +294,14 @@
                         data: { 
                             display_name: name,
                             hair_color: '#fbbf24',
-                            outfit_color: '#4f46e5'
+                            outfit_color: '#7c3aed'
                         } 
                     }
                 });
                 if (error) {
                     authError.innerText = error.message;
                 } else {
-                    alert("Account registered! You are now logged in.");
+                    alert("Account registered successfully! Logged in.");
                     initSession(data.user);
                 }
             } else {
@@ -315,15 +324,15 @@
             localPlayer.email = user.email;
             localPlayer.name = metadata.display_name || user.email.split('@')[0];
             localPlayer.hairColor = metadata.hair_color || '#fbbf24';
-            localPlayer.outfitColor = metadata.outfit_color || '#4f46e5';
+            localPlayer.outfitColor = metadata.outfit_color || '#7c3aed';
             
             document.getElementById('playerTag').innerText = localPlayer.name;
             document.getElementById('inputPlayerName').value = localPlayer.name;
             document.getElementById('colorHair').value = localPlayer.hairColor;
             document.getElementById('colorOutfit').value = localPlayer.outfitColor;
 
-            initMultiplayerSync();
-            loadCloudChatHistory();
+            initRealtimeSync();
+            loadChatHistory();
         }
 
         btnLogout.addEventListener('click', async () => {
@@ -341,13 +350,11 @@
             gameLoop();
         });
 
-        // --- BULLETPROOF DATABASE CHAT & REALTIME SYNC ---
-        const gameChannel = supabaseClient.channel('sanctuary_room_sync');
-
-        function initMultiplayerSync() {
-            // Presence & Position Sync
+        // --- REALTIME POSITION & CHAT SYNC FIX (TABLE + BROADCAST) ---
+        function initRealtimeSync() {
+            // Player position broadcast
             gameChannel
-                .on('broadcast', { event: 'player_state' }, ({ payload }) => {
+                .on('broadcast', { event: 'state' }, ({ payload }) => {
                     if (payload && payload.id && payload.id !== localPlayer.id) {
                         remotePlayers.set(payload.id, payload);
                         updatePeerCountUI();
@@ -355,31 +362,33 @@
                 })
                 .subscribe((status) => {
                     if (status === 'SUBSCRIBED') {
-                        console.log('2.5D Multiplayer Sync Online.');
+                        console.log('Sanctuary Player Sync Active.');
                     }
                 });
 
-            // Permanent Database Chat Realtime Subscription
+            // Bulletproof Chat sync using Supabase Realtime Database Subscriptions
             supabaseClient
-                .channel('db_messages')
+                .channel('public:messages')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-                    const msg = payload.new;
-                    if (msg && msg.author && msg.text) {
-                        appendChatDOM(msg.author, msg.text);
+                    const newMsg = payload.new;
+                    if (newMsg && newMsg.sender && newMsg.text) {
+                        addChatMessage(newMsg.sender, newMsg.text);
                     }
                 })
                 .subscribe();
         }
 
-        async function loadCloudChatHistory() {
+        async function loadChatHistory() {
             const { data, error } = await supabaseClient
                 .from('messages')
                 .select('*')
                 .order('created_at', { ascending: false })
-                .limit(15);
+                .limit(20);
 
             if (!error && data) {
-                data.reverse().forEach(m => appendChatDOM(m.author, m.text));
+                data.reverse().forEach(msg => {
+                    addChatMessage(msg.sender, msg.text);
+                });
             }
         }
 
@@ -387,7 +396,7 @@
             if (!currentUser) return;
             gameChannel.send({
                 type: 'broadcast',
-                event: 'player_state',
+                event: 'state',
                 payload: localPlayer
             });
         }
@@ -396,7 +405,7 @@
             document.getElementById('peerCount').innerText = `Online: ${remotePlayers.size + 1}`;
         }
 
-        // --- AMBIENT WEB AUDIO MUSIC ---
+        // --- PROCEDURAL AMBIENT MUSIC (WEB AUDIO API) ---
         let audioCtx = null;
         let isMusicPlaying = false;
         let musicInterval = null;
@@ -414,25 +423,25 @@
                 btnMusic.classList.add('bg-emerald-600');
                 musicIcon.className = 'fa-solid fa-volume-high';
 
-                const chord = [196.00, 246.94, 293.66, 349.23]; // Relaxing G major atmosphere
+                const notes = [220.00, 261.63, 329.63, 392.00, 440.00]; // A minor soothing chord
                 musicInterval = setInterval(() => {
                     if (!isMusicPlaying || !audioCtx) return;
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     
-                    osc.type = 'triangle';
-                    const freq = chord[Math.floor(Math.random() * chord.length)];
+                    osc.type = 'sine';
+                    const freq = notes[Math.floor(Math.random() * notes.length)];
                     osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
 
-                    gain.gain.setValueAtTime(0.012, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 5.0);
+                    gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3.5);
 
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
 
                     osc.start();
-                    osc.stop(audioCtx.currentTime + 5.0);
-                }, 2000);
+                    osc.stop(audioCtx.currentTime + 3.5);
+                }, 1400);
 
             } else {
                 isMusicPlaying = false;
@@ -446,157 +455,177 @@
         }
         document.getElementById('btnMusicToggle').addEventListener('click', toggleBackgroundMusic);
 
-        // --- 2.5D PIXEL ART & DEPTH RENDERING ENGINE ---
+        // --- ENHANCED 2D PIXEL ART & WALLPAPER ENGINE ---
         const PixelArt = {
-            drawCharacter(ctx, p) {
+            drawCharacter(ctx, x, y, player, isLocal = false) {
                 ctx.save();
-                ctx.translate(Math.round(p.x), Math.round(p.y));
+                ctx.translate(Math.round(x), Math.round(y));
 
-                const isSitting = p.state === 'sit';
-                const bobbing = p.state === 'walk' ? Math.sin(p.frame * 0.6) * 1.5 : 0;
+                if (player.facing === 'left') {
+                    ctx.scale(-1, 1);
+                }
 
-                // Soft Floor Shadow
+                const animOffset = player.state === 'walk' ? Math.sin(player.frame * 0.5) * 1.5 : 0;
+                const bobbing = player.state === 'idle' ? Math.sin(Date.now() * 0.005) * 0.6 : 0;
+                const isSitting = player.state === 'sit';
+
+                // Soft shadow
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
                 ctx.beginPath();
-                ctx.ellipse(0, 2, 9, 3.5, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, 8, 3, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (isSitting) {
-                    // Sitting Sprite
                     ctx.fillStyle = '#1e293b';
-                    ctx.fillRect(-4, -2, 3, 3);
-                    ctx.fillStyle = p.outfitColor || '#4f46e5';
-                    ctx.fillRect(-5, -10, 10, 7);
+                    ctx.fillRect(-3, -2, 3, 3);
+                    ctx.fillStyle = player.outfitColor || '#7c3aed';
+                    ctx.fillRect(-4, -9, 8, 6);
                     ctx.fillStyle = '#ffedd5';
-                    ctx.fillRect(-5, -18, 10, 8);
-                    ctx.fillStyle = p.hairColor || '#fbbf24';
-                    ctx.fillRect(-6, -21, 12, 5);
+                    ctx.fillRect(-4, -16, 8, 7);
+                    ctx.fillStyle = player.hairColor || '#fbbf24';
+                    ctx.fillRect(-5, -19, 10, 5);
                 } else {
-                    // Standing / Walking Sprite
                     ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(-3, -2, 2, 4);
-                    ctx.fillRect(1, -2, 2, 4);
+                    ctx.fillRect(-3, -4, 2, 4);
+                    ctx.fillRect(1, -4, 2, 4);
 
-                    // Outfit
-                    ctx.fillStyle = p.outfitColor || '#4f46e5';
-                    ctx.fillRect(-5, -13 + bobbing, 10, 9);
+                    // Outfit & Scarf
+                    ctx.fillStyle = player.outfitColor || '#7c3aed';
+                    ctx.fillRect(-4, -12 + bobbing, 8, 8);
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.fillRect(-3, -12 + bobbing, 6, 2);
 
-                    // Head & Anime Hair
+                    // Arms
+                    ctx.fillStyle = '#f87171';
+                    ctx.fillRect(-5, -11 + bobbing, 2, 6);
+                    ctx.fillRect(3, -11 + bobbing, 2, 6);
+
+                    // Head
                     ctx.fillStyle = '#ffedd5';
-                    ctx.fillRect(-4, -21 + bobbing, 8, 8);
+                    ctx.fillRect(-4, -20 + bobbing, 8, 8);
 
-                    ctx.fillStyle = p.hairColor || '#fbbf24';
+                    // Eyes
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(1, -17 + bobbing, 2, 3);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(2, -17 + bobbing, 1, 1);
+
+                    // Anime Hair
+                    ctx.fillStyle = player.hairColor || '#fbbf24';
                     ctx.fillRect(-5, -23 + bobbing, 10, 5);
-                    if (p.facing === 'left') {
-                        ctx.fillRect(-6, -20 + bobbing, 3, 6);
-                    } else {
-                        ctx.fillRect(3, -20 + bobbing, 3, 6);
-                    }
+                    ctx.fillRect(-6, -20 + bobbing, 3, 6);
+                    ctx.fillRect(3, -19 + bobbing, 3, 4);
                 }
 
                 ctx.restore();
-
-                // Name Tag & Area Tag
                 ctx.save();
                 ctx.font = '5px "Press Start 2P"';
                 ctx.textAlign = 'center';
-                ctx.fillStyle = p.id === localPlayer.id ? '#34d399' : '#93c5fd';
-                ctx.fillText(p.name, Math.round(p.x), Math.round(p.y - (isSitting ? 22 : 28)));
+                ctx.fillStyle = isLocal ? '#34d399' : '#c084fc';
+                ctx.fillText(player.name, Math.round(x), Math.round(y - (isSitting ? 20 : 26)));
                 ctx.restore();
             },
 
-            drawCourtyard(ctx) {
-                // Stone Courtyard Floor
+            drawDoor(ctx, x, y, doorNumber) {
+                ctx.save();
+                ctx.translate(Math.round(x), Math.round(y));
+                ctx.fillStyle = '#1c1917';
+                ctx.fillRect(-12, -32, 24, 32);
+                ctx.fillStyle = '#78350f';
+                ctx.fillRect(-10, -30, 20, 30);
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(-8, -27, 16, 10);
+                ctx.fillRect(-8, -14, 16, 12);
+                ctx.fillStyle = '#fbbf24';
+                ctx.fillRect(5, -15, 2, 2);
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(-6, -36, 12, 6);
+                ctx.fillStyle = '#f59e0b';
+                ctx.font = '4px "Press Start 2P"';
+                ctx.textAlign = 'center';
+                ctx.fillText(doorNumber, 0, -31);
+                ctx.restore();
+            },
+
+            drawSealedWall(ctx, x) {
+                ctx.save();
+                ctx.fillStyle = '#020617';
+                ctx.fillRect(x - 15, 0, 15, VIRTUAL_HEIGHT);
+                ctx.fillStyle = '#0f172a';
+                for (let y = 10; y < VIRTUAL_HEIGHT; y += 12) {
+                    ctx.fillRect(x - 12, y, 10, 5);
+                }
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(x - 10, 60, 8, 8);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '5px "Press Start 2P"';
+                ctx.fillText('X', x - 8, 66);
+                ctx.restore();
+            },
+
+            drawBonfireRoom(ctx) {
+                // --- 2D ANIME WALLPAPER BACKGROUND ---
                 ctx.fillStyle = '#090d16';
                 ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 
-                ctx.fillStyle = '#111827';
-                for (let x = 0; x < VIRTUAL_WIDTH; x += 40) {
-                    for (let y = 0; y < VIRTUAL_HEIGHT; y += 40) {
-                        ctx.fillRect(x + 2, y + 2, 36, 36);
-                    }
+                // Starry Night & Sakura Wallpaper Motif
+                ctx.fillStyle = '#1e1b4b';
+                for (let x = 15; x < VIRTUAL_WIDTH; x += 30) {
+                    ctx.fillRect(x, 15, 14, 115);
+                }
+                // Wallpaper Accent Pattern
+                ctx.fillStyle = '#312e81';
+                for (let x = 15; x < VIRTUAL_WIDTH; x += 30) {
+                    ctx.fillRect(x + 4, 30, 6, 6);
+                    ctx.fillRect(x + 4, 70, 6, 6);
                 }
 
-                // Central Fountain / Monument
-                ctx.fillStyle = '#1e293b';
-                ctx.fillRect(VIRTUAL_WIDTH / 2 - 30, 40, 60, 40);
-                ctx.fillStyle = '#3b82f6';
-                ctx.fillRect(VIRTUAL_WIDTH / 2 - 20, 48, 40, 24);
+                // Wall Lanterns
+                ctx.fillStyle = '#f59e0b';
+                ctx.fillRect(75, 45, 6, 8);
+                ctx.fillRect(239, 45, 6, 8);
 
-                // Sanctuary Doors (Top Wall)
-                PixelArt.drawDoor(ctx, 120, 35, 'Room 1');
-                PixelArt.drawDoor(ctx, 280, 35, 'Room 2');
-            },
-
-            drawSanctuaryRoom(ctx, roomName) {
-                // Cozy Wooden Room Floor
-                ctx.fillStyle = '#170f0c';
-                ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
-
-                ctx.fillStyle = '#291307';
-                for (let x = 0; x < VIRTUAL_WIDTH; x += 32) {
-                    ctx.fillRect(x + 1, 30, 30, VIRTUAL_HEIGHT - 30);
-                }
-
-                // Stone Walls
-                ctx.fillStyle = '#0c0a09';
-                ctx.fillRect(0, 0, VIRTUAL_WIDTH, 35);
-
-                // Exit Door at Bottom
-                PixelArt.drawDoor(ctx, VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - 10, 'Exit');
-
-                // Bonfire & Log Benches in Center
-                const centerX = VIRTUAL_WIDTH / 2;
-                const centerY = VIRTUAL_HEIGHT / 2 + 10;
-
-                // Benches
+                // Room Wooden Floor
+                ctx.fillStyle = '#291104';
+                ctx.fillRect(0, ROOM_GROUND_Y, VIRTUAL_WIDTH, VIRTUAL_HEIGHT - ROOM_GROUND_Y);
                 ctx.fillStyle = '#78350f';
-                ctx.fillRect(centerX - 50, centerY - 25, 36, 12);
-                ctx.fillRect(centerX + 14, centerY - 25, 36, 12);
+                ctx.fillRect(0, ROOM_GROUND_Y, VIRTUAL_WIDTH, 2);
 
-                // Animated Bonfire Flames
-                const frame = Math.floor(Date.now() / 100);
+                // Sitting Benches
+                ctx.fillStyle = '#78350f';
+                ctx.fillRect(BONFIRE_X - 65, ROOM_GROUND_Y - 6, 28, 6);
                 ctx.fillStyle = '#451a03';
-                ctx.fillRect(centerX - 12, centerY - 6, 24, 8);
+                ctx.fillRect(BONFIRE_X - 63, ROOM_GROUND_Y - 4, 24, 2);
 
+                ctx.fillStyle = '#78350f';
+                ctx.fillRect(BONFIRE_X + 37, ROOM_GROUND_Y - 6, 28, 6);
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(BONFIRE_X + 39, ROOM_GROUND_Y - 4, 24, 2);
+
+                // Bonfire Logs & Flame
+                const frame = Math.floor(Date.now() / 100);
+                ctx.fillStyle = '#291104';
+                ctx.fillRect(BONFIRE_X - 10, ROOM_GROUND_Y - 3, 20, 4);
+                
                 const fireColors = ['#f59e0b', '#ef4444', '#facc15', '#ffffff'];
                 for (let i = 0; i < 6; i++) {
                     const color = fireColors[(i + frame) % fireColors.length];
-                    const fx = centerX + (Math.sin(frame * 0.2 + i) * 5);
-                    const fy = centerY - 10 - (i * 4);
-                    const size = Math.max(2, 8 - i);
+                    const fx = BONFIRE_X + (Math.sin(frame * 0.2 + i) * 4);
+                    const fy = ROOM_GROUND_Y - 6 - (i * 3);
+                    const size = Math.max(1, 6 - i);
                     ctx.fillStyle = color;
                     ctx.fillRect(fx - size / 2, fy, size, size);
                 }
 
-                // Ambient Radial Lighting
-                const grad = ctx.createRadialGradient(centerX, centerY - 10, 5, centerX, centerY - 10, 110);
-                grad.addColorStop(0, 'rgba(245, 158, 11, 0.35)');
-                grad.addColorStop(0.7, 'rgba(239, 68, 68, 0.1)');
-                grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                ctx.fillStyle = grad;
+                // Cinematic Warm Bonfire Radial Lighting
+                const gradient = ctx.createRadialGradient(BONFIRE_X, ROOM_GROUND_Y - 15, 4, BONFIRE_X, ROOM_GROUND_Y - 15, 95);
+                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
+                gradient.addColorStop(0.6, 'rgba(239, 68, 68, 0.12)');
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = gradient;
                 ctx.beginPath();
-                ctx.arc(centerX, centerY - 10, 110, 0, Math.PI * 2);
+                ctx.arc(BONFIRE_X, ROOM_GROUND_Y - 15, 95, 0, Math.PI * 2);
                 ctx.fill();
-            },
-
-            drawDoor(ctx, x, y, label) {
-                ctx.save();
-                ctx.translate(Math.round(x), Math.round(y));
-                ctx.fillStyle = '#451a03';
-                ctx.fillRect(-14, -28, 28, 28);
-                ctx.fillStyle = '#78350f';
-                ctx.fillRect(-11, -25, 22, 25);
-                ctx.fillStyle = '#fbbf24';
-                ctx.fillRect(6, -12, 2, 2);
-
-                ctx.fillStyle = '#0f172a';
-                ctx.fillRect(-18, -36, 36, 8);
-                ctx.fillStyle = '#f59e0b';
-                ctx.font = '4px "Press Start 2P"';
-                ctx.textAlign = 'center';
-                ctx.fillText(label, 0, -30);
-                ctx.restore();
             }
         };
 
@@ -619,69 +648,121 @@
             }
         }
 
-        // --- 2.5D MOVEMENT & GAME LOOP ---
         function updateGame() {
             if (localPlayer.state !== 'sit') {
-                localPlayer.vx = 0;
-                localPlayer.vy = 0;
-
-                if (keys.left) { localPlayer.vx = -PLAYER_SPEED; localPlayer.facing = 'left'; }
-                if (keys.right) { localPlayer.vx = PLAYER_SPEED; localPlayer.facing = 'right'; }
-                if (keys.up) { localPlayer.vy = -PLAYER_SPEED; localPlayer.facing = 'up'; }
-                if (keys.down) { localPlayer.vy = PLAYER_SPEED; localPlayer.facing = 'down'; }
-
-                localPlayer.x += localPlayer.vx;
-                localPlayer.y += localPlayer.vy;
-
-                // Boundaries
-                if (localPlayer.currentArea === 'courtyard') {
-                    localPlayer.x = Math.max(20, Math.min(VIRTUAL_WIDTH - 20, localPlayer.x));
-                    localPlayer.y = Math.max(45, Math.min(VIRTUAL_HEIGHT - 20, localPlayer.y));
+                if (keys.left) {
+                    localPlayer.vx = -PLAYER_SPEED;
+                    localPlayer.facing = 'left';
+                    localPlayer.state = 'walk';
+                } else if (keys.right) {
+                    localPlayer.vx = PLAYER_SPEED;
+                    localPlayer.facing = 'right';
+                    localPlayer.state = 'walk';
                 } else {
-                    localPlayer.x = Math.max(25, Math.min(VIRTUAL_WIDTH - 25, localPlayer.x));
-                    localPlayer.y = Math.max(40, Math.min(VIRTUAL_HEIGHT - 20, localPlayer.y));
+                    localPlayer.vx = 0;
+                    localPlayer.state = 'idle';
                 }
 
-                if (localPlayer.vx !== 0 || localPlayer.vy !== 0) {
-                    localPlayer.state = 'walk';
+                localPlayer.x += localPlayer.vx;
+
+                if (localPlayer.currentRoom === null) {
+                    if (localPlayer.x < LEFT_WALL_X + 8) localPlayer.x = LEFT_WALL_X + 8;
+                } else {
+                    if (localPlayer.x < 20) localPlayer.x = 20;
+                    if (localPlayer.x > VIRTUAL_WIDTH - 20) localPlayer.x = VIRTUAL_WIDTH - 20;
+                }
+
+                if (localPlayer.state === 'walk') {
                     localPlayer.animTimer++;
                     if (localPlayer.animTimer % 8 === 0) {
                         localPlayer.frame++;
-                        spawnParticle(localPlayer.x, localPlayer.y + 4, 'rgba(148, 163, 184, 0.4)', (Math.random() - 0.5) * 0.3, -0.2, 10);
+                        spawnParticle(localPlayer.x, localPlayer.y, 'rgba(167, 139, 250, 0.4)', (Math.random() - 0.5) * 0.4, -0.2, 12);
                     }
-                } else {
-                    localPlayer.state = 'idle';
                 }
             }
 
             broadcastPlayerState();
         }
 
+        function drawHallway(cameraX) {
+            // Hallway Wallpaper & Architecture
+            ctx.fillStyle = '#030712';
+            ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+
+            ctx.fillStyle = '#0f172a';
+            const startCol = Math.floor(cameraX / 20) - 1;
+            for (let i = 0; i < 20; i++) {
+                ctx.fillRect((startCol + i) * 20 - cameraX, 20, 18, 100);
+            }
+
+            ctx.fillStyle = '#1e1b4b';
+            ctx.fillRect(0, HALLWAY_GROUND_Y, VIRTUAL_WIDTH, VIRTUAL_HEIGHT - HALLWAY_GROUND_Y);
+            ctx.fillStyle = '#4338ca';
+            ctx.fillRect(0, HALLWAY_GROUND_Y, VIRTUAL_WIDTH, 2);
+
+            const startDoorIndex = Math.floor((cameraX - 50) / DOOR_SPACING);
+            for (let i = 0; i < 5; i++) {
+                const doorIdx = Math.max(1, startDoorIndex + i);
+                const doorWorldX = doorIdx * DOOR_SPACING;
+                const doorScreenX = doorWorldX - cameraX;
+
+                PixelArt.drawDoor(ctx, doorScreenX, HALLWAY_GROUND_Y, `#${doorIdx}`);
+
+                if (Math.abs(localPlayer.x - doorWorldX) < 15 && localPlayer.currentRoom === null) {
+                    ctx.save();
+                    ctx.font = '5px "Press Start 2P"';
+                    ctx.fillStyle = '#facc15';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('[E] Enter', doorScreenX, HALLWAY_GROUND_Y - 42);
+                    ctx.restore();
+                }
+            }
+
+            PixelArt.drawSealedWall(ctx, LEFT_WALL_X - cameraX);
+        }
+
         function renderGame() {
-            ctx.clearRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
             ctx.save();
             ctx.scale(scale, scale);
 
-            // Draw Area
-            if (localPlayer.currentArea === 'courtyard') {
-                PixelArt.drawCourtyard(ctx);
-                document.getElementById('locationTag').innerText = 'Courtyard Hub';
+            let cameraX = 0;
+            if (localPlayer.currentRoom === null) {
+                cameraX = Math.max(0, localPlayer.x - VIRTUAL_WIDTH / 2);
+                drawHallway(cameraX);
             } else {
-                PixelArt.drawSanctuaryRoom(ctx, localPlayer.currentArea);
-                document.getElementById('locationTag').innerText = `Sanctuary Room`;
+                PixelArt.drawBonfireRoom(ctx);
+                PixelArt.drawDoor(ctx, 30, ROOM_GROUND_Y, 'Exit');
+                if (Math.abs(localPlayer.x - 30) < 15) {
+                    ctx.save();
+                    ctx.font = '5px "Press Start 2P"';
+                    ctx.fillStyle = '#facc15';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('[E] Exit', 30, ROOM_GROUND_Y - 42);
+                    ctx.restore();
+                }
+
+                // Floating glowing ember particles
+                if (Math.random() < 0.4) {
+                    spawnParticle(
+                        BONFIRE_X + (Math.random() - 0.5) * 60,
+                        ROOM_GROUND_Y - 15 - Math.random() * 40,
+                        '#fbbf24',
+                        (Math.random() - 0.5) * 0.5,
+                        -0.3 - Math.random() * 0.5,
+                        40
+                    );
+                }
             }
 
-            // Collect all characters (local + remote) and sort by Y depth for 2.5D layering
-            let allEntities = [localPlayer];
             remotePlayers.forEach(p => {
-                if (p.currentArea === localPlayer.currentArea) allEntities.push(p);
+                if (p.currentRoom === localPlayer.currentRoom) {
+                    const screenX = localPlayer.currentRoom === null ? p.x - cameraX : p.x;
+                    PixelArt.drawCharacter(ctx, screenX, p.y, p, false);
+                }
             });
-            allEntities.sort((a, b) => a.y - b.y);
 
-            // Render entities with proper depth
-            allEntities.forEach(entity => {
-                PixelArt.drawCharacter(ctx, entity);
-            });
+            const playerScreenX = localPlayer.currentRoom === null ? localPlayer.x - cameraX : localPlayer.x;
+            PixelArt.drawCharacter(ctx, playerScreenX, localPlayer.y, localPlayer, true);
 
             updateAndDrawParticles(ctx);
             ctx.restore();
@@ -693,34 +774,42 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // --- INTERACTION & DOORS ---
         function handleInteraction() {
-            if (localPlayer.currentArea === 'courtyard') {
-                if (Math.abs(localPlayer.x - 120) < 25 && localPlayer.y < 65) {
-                    localPlayer.currentArea = 'sanctuary_1';
-                    localPlayer.x = VIRTUAL_WIDTH / 2;
-                    localPlayer.y = VIRTUAL_HEIGHT - 25;
-                } else if (Math.abs(localPlayer.x - 280) < 25 && localPlayer.y < 65) {
-                    localPlayer.currentArea = 'sanctuary_2';
-                    localPlayer.x = VIRTUAL_WIDTH / 2;
-                    localPlayer.y = VIRTUAL_HEIGHT - 25;
+            if (localPlayer.currentRoom === null) {
+                const doorIdx = Math.round(localPlayer.x / DOOR_SPACING);
+                const doorX = doorIdx * DOOR_SPACING;
+                if (Math.abs(localPlayer.x - doorX) < 18 && doorIdx >= 1) {
+                    localPlayer.currentRoom = doorIdx;
+                    localPlayer.x = 45;
+                    localPlayer.y = ROOM_GROUND_Y;
+                    localPlayer.state = 'idle';
+                    document.getElementById('locationTag').innerText = `Room #${doorIdx}`;
+                    addSystemMessage(`Entered Cozy Room #${doorIdx}`);
                 }
             } else {
-                if (localPlayer.y > VIRTUAL_HEIGHT - 25) {
-                    localPlayer.currentArea = 'courtyard';
-                    localPlayer.x = 200;
-                    localPlayer.y = 75;
+                if (Math.abs(localPlayer.x - 30) < 18) {
+                    const prevRoom = localPlayer.currentRoom;
+                    localPlayer.x = prevRoom * DOOR_SPACING;
+                    localPlayer.y = HALLWAY_GROUND_Y;
+                    localPlayer.currentRoom = null;
                     localPlayer.state = 'idle';
+                    document.getElementById('locationTag').innerText = 'Main Hallway';
+                    addSystemMessage(`Exited back to Hallway`);
                 }
             }
         }
 
         function toggleSit() {
-            if (localPlayer.currentArea !== 'courtyard') {
+            if (localPlayer.currentRoom !== null) {
                 if (localPlayer.state === 'sit') {
                     localPlayer.state = 'idle';
-                    localPlayer.y += 10;
+                    localPlayer.y = ROOM_GROUND_Y;
                 } else {
+                    const leftBenchX = BONFIRE_X - 50;
+                    const rightBenchX = BONFIRE_X + 50;
+                    const targetBenchX = Math.abs(localPlayer.x - leftBenchX) < Math.abs(localPlayer.x - rightBenchX) ? leftBenchX : rightBenchX;
+                    localPlayer.x = targetBenchX;
+                    localPlayer.y = ROOM_GROUND_Y;
                     localPlayer.state = 'sit';
                 }
             }
@@ -729,45 +818,51 @@
         // --- CONTROLS ---
         window.addEventListener('keydown', (e) => {
             if (document.activeElement.tagName === 'INPUT') return;
-            if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
-            if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
-            if (e.key === 'ArrowUp' || e.key === 'w') keys.up = true;
-            if (e.key === 'ArrowDown' || e.key === 's') keys.down = true;
-            if (e.key === 'e' || e.key === 'E') handleInteraction();
-            if (e.key === ' ') toggleSit();
+            if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') keys.left = true;
+            if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') keys.right = true;
+            if (e.key === 'e' || e.key === 'E' || e.key === ' ') handleInteraction();
+            if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') toggleSit();
         });
 
         window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
-            if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
-            if (e.key === 'ArrowUp' || e.key === 'w') keys.up = false;
-            if (e.key === 'ArrowDown' || e.key === 's') keys.down = false;
+            if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') keys.left = false;
+            if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') keys.right = false;
         });
 
-        // Touch control bindings
-        const bindTouch = (elem, startFn, endFn) => {
-            elem.addEventListener('touchstart', (e) => { e.preventDefault(); startFn(); });
-            elem.addEventListener('touchend', (e) => { e.preventDefault(); endFn(); });
-            elem.addEventListener('mousedown', startFn);
-            elem.addEventListener('mouseup', endFn);
+        const btnLeft = document.getElementById('btnLeft');
+        const btnRight = document.getElementById('btnRight');
+        const btnInteract = document.getElementById('btnInteract');
+        const btnSit = document.getElementById('btnSit');
+
+        const bindTouch = (elem, onPress, onRelease) => {
+            elem.addEventListener('touchstart', (e) => { e.preventDefault(); onPress(); });
+            elem.addEventListener('touchend', (e) => { e.preventDefault(); onRelease(); });
+            elem.addEventListener('mousedown', onPress);
+            elem.addEventListener('mouseup', onRelease);
         };
 
-        bindTouch(document.getElementById('btnLeft'), () => keys.left = true, () => keys.left = false);
-        bindTouch(document.getElementById('btnRight'), () => keys.right = true, () => keys.right = false);
-        bindTouch(document.getElementById('btnUp'), () => keys.up = true, () => keys.up = false);
-        bindTouch(document.getElementById('btnDown'), () => keys.down = true, () => keys.down = false);
-        document.getElementById('btnInteract').addEventListener('click', handleInteraction);
-        document.getElementById('btnSit').addEventListener('click', toggleSit);
+        bindTouch(btnLeft, () => { keys.left = true; }, () => { keys.left = false; });
+        bindTouch(btnRight, () => { keys.right = true; }, () => { keys.right = false; });
+        btnInteract.addEventListener('click', handleInteraction);
+        btnSit.addEventListener('click', toggleSit);
 
-        // --- PERMANENT DATABASE CHAT SYSTEM ---
+        // --- BULLETPROOF DATABASE CHAT SYSTEM ---
         const chatForm = document.getElementById('chatForm');
         const chatInput = document.getElementById('chatInput');
         const chatMessages = document.getElementById('chatMessages');
 
-        function appendChatDOM(sender, msg) {
+        function addChatMessage(sender, msg, colorClass = 'text-slate-200') {
             const div = document.createElement('div');
-            div.className = 'text-slate-200 break-words';
-            div.innerHTML = `<span class="font-bold text-indigo-400">${sender}:</span> ${msg}`;
+            div.className = `${colorClass} break-words`;
+            div.innerHTML = `<span class="font-bold">${sender}:</span> ${msg}`;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addSystemMessage(msg) {
+            const div = document.createElement('div');
+            div.className = 'text-amber-400 italic';
+            div.innerHTML = `<i class="fa-solid fa-circle-info"></i> ${msg}`;
             chatMessages.appendChild(div);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
@@ -776,12 +871,13 @@
             e.preventDefault();
             const text = chatInput.value.trim();
             if (text.length > 0 && currentUser) {
-                // Insert directly into Supabase database table so all users receive it reliably
-                await supabaseClient.from('messages').insert([
-                    { author: localPlayer.name, text: text }
-                ]);
                 chatInput.value = '';
                 chatInput.blur();
+
+                // Save message directly to Supabase table (never freezes or drops)
+                await supabaseClient.from('messages').insert([
+                    { sender: localPlayer.name, text: text }
+                ]);
             }
         });
 
