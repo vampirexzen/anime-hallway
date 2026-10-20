@@ -3,466 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Endless Anime Hallway & Bonfire Sanctuary</title>
-    <!-- Supabase Client Library for Realtime Sync -->
+    <title>Endless Anime Hallway - Pixel Multiplayer</title>
+    <!-- Tailwind CSS for UI framing -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Press Start 2P for retro aesthetic -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Supabase for Multiplayer Sync -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: none;
+            touch-action: manipulation;
         }
-
-        body, html {
-            width: 100%;
-            height: 100%;
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background-color: #0b0c10;
+            color: #e0e6ed;
             overflow: hidden;
-            background-color: #07080c;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #fff;
+            margin: 0;
+            padding: 0;
         }
-
-        #game-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
         canvas {
-            display: block;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
-            background-color: #050508;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+            display: block;
         }
-
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 16px;
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-
-        .interactive {
-            pointer-events: auto;
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
         }
-
-        #top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 3px;
         }
-
-        .card {
-            background: rgba(14, 16, 26, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 10px;
-            padding: 10px 16px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        .pixel-border {
+            border: 4px solid #1f293d;
+            box-shadow: inset -4px -4px 0px 0px #0f172a, inset 4px 4px 0px 0px #384152;
         }
-
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #ff4757;
-            margin-right: 6px;
+        .pixel-btn {
+            background: #4f46e5;
+            box-shadow: inset -2px -2px 0px 0px #312e81, inset 2px 2px 0px 0px #818cf8;
+            transition: all 0.1s ease;
         }
-
-        .status-dot.online {
-            background-color: #2ed573;
-            box-shadow: 0 0 10px #2ed573;
-        }
-
-        /* --- Refined Chat Area --- */
-        #chat-container {
-            width: 340px;
-            max-width: 90vw;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            background: rgba(12, 14, 22, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 10px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-        }
-
-        #chat-messages {
-            height: 120px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding-right: 4px;
-            font-size: 12px;
-            scroll-behavior: smooth;
-        }
-
-        #chat-messages::-webkit-scrollbar {
-            width: 4px;
-        }
-        #chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-        }
-
-        .chat-msg {
-            word-wrap: break-word;
-            line-height: 1.4;
-            background: rgba(255, 255, 255, 0.04);
-            padding: 6px 10px;
-            border-radius: 6px;
-            border-left: 3px solid #70a1ff;
-        }
-
-        .chat-msg .author {
-            font-weight: bold;
-            color: #70a1ff;
-            margin-right: 4px;
-        }
-
-        .chat-msg.system {
-            border-left-color: #eccc68;
-            color: #f1f2f6;
-            font-style: italic;
-        }
-
-        #chat-input-group {
-            display: flex;
-            gap: 8px;
-        }
-
-        #chat-input {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 6px;
-            padding: 8px 12px;
-            color: white;
-            font-size: 12px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        #chat-input:focus {
-            border-color: #70a1ff;
-            box-shadow: 0 0 8px rgba(112, 161, 255, 0.3);
-        }
-
-        .btn {
-            background: #4a69bd;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .btn:hover { background: #3c559c; }
-        .btn:active { transform: scale(0.96); }
-
-        /* --- Mobile Controls --- */
-        #mobile-controls {
-            display: none;
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            width: 100%;
-            height: 160px;
-            pointer-events: none;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding: 0 20px;
-        }
-
-        .touch-pad {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            pointer-events: auto;
-            touch-action: none;
-        }
-
-        .touch-stick {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 48px;
-            height: 48px;
-            background: rgba(112, 161, 255, 0.6);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 12px rgba(112, 161, 255, 0.5);
-        }
-
-        .action-btns {
-            display: flex;
-            gap: 12px;
-            pointer-events: auto;
-        }
-
-        .action-btn {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: rgba(255, 71, 87, 0.7);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            touch-action: none;
-        }
-
-        .action-btn:active {
-            background: rgba(255, 71, 87, 1);
-            transform: scale(0.92);
-        }
-
-        #interaction-prompt {
-            position: absolute;
-            bottom: 190px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(10, 12, 20, 0.9);
-            border: 1px solid #eccc68;
-            color: #eccc68;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            display: none;
-            box-shadow: 0 4px 15px rgba(236, 204, 104, 0.3);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.8; transform: translateX(-50%) scale(0.98); }
-            50% { opacity: 1; transform: translateX(-50%) scale(1.02); }
-            100% { opacity: 0.8; transform: translateX(-50%) scale(0.98); }
-        }
-
-        @media (max-width: 768px) {
-            #mobile-controls { display: flex; }
-            #chat-container { width: 260px; }
-            #chat-messages { height: 90px; }
+        .pixel-btn:active {
+            box-shadow: inset 2px 2px 0px 0px #312e81, inset -2px -2px 0px 0px #818cf8;
+            transform: translateY(2px);
         }
     </style>
 </head>
-<body>
+<body class="w-screen h-screen flex flex-col justify-between relative bg-slate-950">
 
-    <div id="game-container">
+    <!-- GAME CANVAS CONTAINER -->
+    <div id="canvasContainer" class="absolute inset-0 z-0 flex items-center justify-center bg-black">
         <canvas id="gameCanvas"></canvas>
+    </div>
 
-        <div id="ui-layer">
-            <div id="top-bar">
-                <div class="card">
-                    <div><span id="status-dot" class="status-dot"></span><span id="status-text">Connecting...</span></div>
-                    <div style="font-size: 11px; opacity: 0.7; margin-top: 2px;">Players Online: <span id="peer-count">1</span></div>
-                </div>
+    <!-- TOP BAR HUD -->
+    <div class="relative z-10 p-3 flex justify-between items-center bg-slate-900/80 backdrop-blur-md border-b-2 border-slate-800 text-xs">
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 bg-slate-800/90 px-3 py-1.5 rounded-md border border-slate-700">
+                <i class="fa-solid fa-user text-indigo-400"></i>
+                <span id="playerTag" class="text-indigo-300 font-bold">AnimeWalker</span>
             </div>
-
-            <div id="interaction-prompt">Press [E] or Tap to Enter Door</div>
-
-            <!-- Enhanced Chat Panel -->
-            <div id="chat-container">
-                <div id="chat-messages">
-                    <div class="chat-msg system">Sanctuary initialized. Welcome to the Endless Hallway.</div>
-                </div>
-                <div id="chat-input-group" class="interactive">
-                    <input type="text" id="chat-input" placeholder="Type a message..." maxlength="100" autocomplete="off" />
-                    <button class="btn" onclick="sendChatMessage()">Send</button>
-                </div>
+            <div class="flex items-center gap-2 bg-slate-800/90 px-3 py-1.5 rounded-md border border-slate-700">
+                <i class="fa-solid fa-location-dot text-amber-400"></i>
+                <span id="locationTag" class="text-amber-200">Main Hallway</span>
             </div>
+        </div>
 
-            <div id="mobile-controls">
-                <div class="touch-pad" id="joystick-zone">
-                    <div class="touch-stick" id="joystick-knob"></div>
-                </div>
-                <div class="action-btns">
-                    <div class="action-btn" id="btn-action">INTERACT</div>
-                </div>
-            </div>
+        <!-- System Controls -->
+        <div class="flex items-center gap-2">
+            <!-- Proximity Mic Button -->
+            <button id="btnMicToggle" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-rose-600">
+                <i id="micIcon" class="fa-solid fa-microphone-slash"></i>
+                <span class="hidden md:inline">Mic Off</span>
+            </button>
+            <!-- Customizer Modal Button -->
+            <button id="btnCustomizer" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-indigo-600">
+                <i class="fa-solid fa-shirt"></i>
+                <span class="hidden md:inline">Avatar</span>
+            </button>
+            <!-- APK Instructions Button -->
+            <button id="btnApkInfo" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-emerald-600">
+                <i class="fa-solid fa-android"></i>
+                <span class="hidden md:inline">APK Guide</span>
+            </button>
         </div>
     </div>
 
+    <!-- MAIN CHAT OVERLAY -->
+    <div class="relative z-10 p-2 md:p-4 pointer-events-none flex justify-between items-end mb-16 md:mb-0">
+        <!-- Chat Box -->
+        <div class="pointer-events-auto w-80 max-w-[85vw] bg-slate-900/90 border-2 border-indigo-900/60 rounded-lg p-3 flex flex-col h-48 backdrop-blur-md shadow-2xl">
+            <div class="text-[10px] text-indigo-400 mb-2 border-b border-indigo-900/40 pb-1 flex justify-between items-center">
+                <span><i class="fa-solid fa-comments"></i> Local Proximity Chat</span>
+                <span id="peerCount" class="text-slate-400">Online: 1</span>
+            </div>
+            <div id="chatMessages" class="flex-1 overflow-y-auto space-y-2 pr-1 text-[10px] leading-relaxed">
+                <div class="text-emerald-400"><i class="fa-solid fa-circle-info"></i> Welcome to the Endless Anime Hallway! Walk right to discover cozy bonfire rooms.</div>
+            </div>
+            <form id="chatForm" class="mt-2 flex gap-1">
+                <input id="chatInput" type="text" maxlength="60" placeholder="Type a message..." class="flex-1 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-[10px] text-slate-200 focus:outline-none focus:border-indigo-500">
+                <button type="submit" class="pixel-btn bg-indigo-600 text-white px-2 py-1 rounded text-[10px]"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MOBILE TOUCH CONTROLS -->
+    <div id="mobileControls" class="relative z-20 p-4 flex justify-between items-center pointer-events-none mb-2">
+        <div class="pointer-events-auto flex gap-2">
+            <button id="btnLeft" class="w-14 h-14 bg-slate-800/80 active:bg-indigo-600 border-2 border-slate-600 rounded-lg flex items-center justify-center text-white text-xl shadow-lg">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <button id="btnRight" class="w-14 h-14 bg-slate-800/80 active:bg-indigo-600 border-2 border-slate-600 rounded-lg flex items-center justify-center text-white text-xl shadow-lg">
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+        <div class="pointer-events-auto">
+            <button id="btnInteract" class="w-16 h-16 bg-amber-600/90 active:bg-amber-500 border-2 border-amber-300 rounded-full flex flex-col items-center justify-center text-white font-bold text-xs shadow-xl">
+                <i class="fa-solid fa-door-open text-lg"></i>
+                <span class="text-[8px] mt-0.5">INTERACT</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- CHARACTER CUSTOMIZER MODAL -->
+    <div id="modalCustomizer" class="fixed inset-0 z-50 bg-black/75 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border-2 border-indigo-500 rounded-xl p-5 max-w-sm w-full text-center space-y-4">
+            <h2 class="text-sm text-indigo-400 font-bold"><i class="fa-solid fa-palette"></i> Avatar Customizer</h2>
+            
+            <div class="space-y-3 text-xs text-left">
+                <div>
+                    <label class="block text-slate-400 mb-1">Player Name:</label>
+                    <input id="inputPlayerName" type="text" maxlength="12" value="AnimeWalker" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-indigo-300">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Hair Color:</label>
+                    <input id="colorHair" type="color" value="#fbbf24" class="w-full h-8 bg-transparent cursor-pointer rounded">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Outfit Color:</label>
+                    <input id="colorOutfit" type="color" value="#4f46e5" class="w-full h-8 bg-transparent cursor-pointer rounded">
+                </div>
+            </div>
+
+            <button id="btnCloseCustomizer" class="pixel-btn w-full py-2 rounded text-white bg-indigo-600 text-xs">
+                Save & Play
+            </button>
+        </div>
+    </div>
+
+    <!-- APK GUIDE MODAL -->
+    <div id="modalApk" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border-2 border-emerald-500 rounded-xl p-5 max-w-md w-full text-left space-y-3 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h2 class="text-sm text-emerald-400 font-bold"><i class="fa-solid fa-android"></i> Convert Web Game to Android APK</h2>
+                <button id="btnCloseApk" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="text-[10px] text-slate-300 space-y-2 leading-relaxed">
+                <p class="text-amber-300 font-bold">You can easily generate a native playable Android APK from this HTML game code:</p>
+                <p class="font-bold text-white mt-2">Method 1: PWABuilder (Fastest & Free)</p>
+                <ol class="list-decimal pl-4 space-y-1 text-slate-400">
+                    <li>Host this single HTML file on GitHub Pages, Netlify, or Vercel.</li>
+                    <li>Visit <a href="https://www.pwabuilder.com" target="_blank" class="text-indigo-400 underline">PWABuilder.com</a>.</li>
+                    <li>Enter your published game URL and click <strong>Build APK</strong>.</li>
+                    <li>Download the signed APK file and install it on any Android phone!</li>
+                </ol>
+            </div>
+            <button id="btnCloseApk2" class="pixel-btn w-full py-2 rounded text-white bg-emerald-600 text-xs mt-3">
+                Got it!
+            </button>
+        </div>
+    </div>
+
+    <!-- GAME ENGINE LOGIC & MULTIPLAYER SYNC -->
     <script>
-        // --- 1. SUPABASE CLOUD CONFIGURATION ---
+        // --- SUPABASE CLOUD CONFIGURATION ---
         const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const gameChannel = supabaseClient.channel('endless_anime_sanctuary_v2');
+        const gameChannel = supabaseClient.channel('endless_anime_pixel_v3');
 
-        // --- 2. GAME RENDERING CONFIGURATION ---
-        const CANVAS_WIDTH = 480;
-        const CANVAS_HEIGHT = 270;
-        const TILE_SIZE = 16;
-
+        // --- GAME ENGINE STATE & CONSTANTS ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         ctx.imageSmoothingEnabled = false;
 
+        const VIRTUAL_WIDTH = 320;
+        const VIRTUAL_HEIGHT = 180;
+        let scale = 1;
+
+        const PLAYER_SPEED = 1.5;
+        const HALLWAY_GROUND_Y = 145;
+        const ROOM_GROUND_Y = 150;
+        const BONFIRE_X = VIRTUAL_WIDTH / 2;
+
+        let localPlayer = {
+            id: 'p_' + Math.random().toString(36).substr(2, 9),
+            name: 'AnimeWalker',
+            x: 40,
+            y: HALLWAY_GROUND_Y,
+            vx: 0,
+            facing: 'right',
+            state: 'idle',
+            hairColor: '#fbbf24',
+            outfitColor: '#4f46e5',
+            currentRoom: null,
+            frame: 0,
+            animTimer: 0
+        };
+
+        let remotePlayers = new Map();
+        let particles = [];
+        const keys = { left: false, right: false };
+
+        let isMicActive = false;
+        let localAudioStream = null;
+
+        const DOOR_SPACING = 90;
+        const LEFT_WALL_X = 15;
+
         function resizeCanvas() {
-            const scale = Math.min(window.innerWidth / CANVAS_WIDTH, window.innerHeight / CANVAS_HEIGHT);
-            canvas.width = CANVAS_WIDTH;
-            canvas.height = CANVAS_HEIGHT;
-            canvas.style.width = `${CANVAS_WIDTH * scale}px`;
-            canvas.style.height = `${CANVAS_HEIGHT * scale}px`;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const scaleX = windowWidth / VIRTUAL_WIDTH;
+            const scaleY = windowHeight / VIRTUAL_HEIGHT;
+            scale = Math.min(scaleX, scaleY);
+
+            canvas.width = VIRTUAL_WIDTH * scale;
+            canvas.height = VIRTUAL_HEIGHT * scale;
+            ctx.imageSmoothingEnabled = false;
         }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // --- 3. HIGH-QUALITY PIXEL ART ASSETS ---
-        const Sprites = {
-            player: createPlayerSpriteSheet(),
-            tiles: createTileSpriteSheet(),
-            bonfire: createBonfireSpriteSheet(),
-            bench: createBenchSpriteSheet()
-        };
-
-        function createPlayerSpriteSheet() {
-            const c = document.createElement('canvas');
-            c.width = 64; c.height = 32; // 4 frames (16px each), Row 0: Idle, Row 1: Walk
-            const cx = c.getContext('2d');
-            for (let f = 0; f < 4; f++) {
-                const ox = f * 16;
-                const bounce = (f % 2 === 1) ? 1 : 0;
-
-                // Soft shadow
-                cx.fillStyle = 'rgba(0,0,0,0.4)';
-                cx.beginPath(); cx.ellipse(ox + 8, 29, 5, 2, 0, 0, Math.PI * 2); cx.fill();
-
-                // Boots/Pants
-                cx.fillStyle = '#1e272e';
-                cx.fillRect(ox + 5, 22 - bounce, 2, 6);
-                cx.fillRect(ox + 9, 22 + bounce, 2, 6);
-
-                // Anime Coat / Jacket
-                cx.fillStyle = '#0984e3';
-                cx.fillRect(ox + 4, 13 - bounce, 8, 10);
-                cx.fillStyle = '#74b9ff'; // Jacket Lapel
-                cx.fillRect(ox + 7, 13 - bounce, 2, 8);
-
-                // Crimson Scarf
-                cx.fillStyle = '#d63031';
-                cx.fillRect(ox + 3, 12 - bounce, 10, 3);
-                cx.fillRect(ox + 11, 13 - bounce, 3, 5); // Scarf tail
-
-                // Skin / Face
-                cx.fillStyle = '#ffeaa7';
-                cx.fillRect(ox + 4, 5 - bounce, 8, 8);
-
-                // Anime Eyes
-                cx.fillStyle = '#2d3436';
-                cx.fillRect(ox + 5, 8 - bounce, 2, 3);
-                cx.fillRect(ox + 9, 8 - bounce, 2, 3);
-                cx.fillStyle = '#ffffff';
-                cx.fillRect(ox + 5, 8 - bounce, 1, 1);
-                cx.fillRect(ox + 9, 8 - bounce, 1, 1);
-
-                // Styled Anime Hair (Pink/Violet)
-                cx.fillStyle = '#e84393';
-                cx.fillRect(ox + 3, 3 - bounce, 10, 4);
-                cx.fillRect(ox + 2, 5 - bounce, 3, 7);
-                cx.fillRect(ox + 11, 5 - bounce, 3, 7);
-            }
-            return c;
-        }
-
-        function createTileSpriteSheet() {
-            const c = document.createElement('canvas'); c.width = 64; c.height = 64;
-            const cx = c.getContext('2d');
-            // Sealed Hallway Wall
-            cx.fillStyle = '#111822'; cx.fillRect(0, 0, 16, 16);
-            cx.fillStyle = '#1f2937'; cx.fillRect(1, 1, 14, 14);
-            cx.fillStyle = '#374151'; cx.fillRect(3, 3, 4, 4); cx.fillRect(9, 9, 4, 4);
-
-            // Floor Tiles
-            cx.fillStyle = '#1f2430'; cx.fillRect(16, 0, 16, 16);
-            cx.fillStyle = '#282f40'; cx.fillRect(16, 0, 16, 1); cx.fillRect(16, 0, 1, 16);
-
-            // Door Frame
-            cx.fillStyle = '#3d2c8d'; cx.fillRect(32, 0, 16, 16);
-            cx.fillStyle = '#1e1b4b'; cx.fillRect(34, 2, 12, 14);
-            cx.fillStyle = '#fbbf24'; cx.fillRect(43, 9, 2, 2); // Handle
-
-            // Room Interior Brick
-            cx.fillStyle = '#312e81'; cx.fillRect(48, 0, 16, 16);
-            cx.fillStyle = '#1e1b4b'; cx.fillRect(48, 7, 16, 1); cx.fillRect(56, 0, 1, 7);
-            return c;
-        }
-
-        function createBonfireSpriteSheet() {
-            const c = document.createElement('canvas'); c.width = 64; c.height = 16;
-            const cx = c.getContext('2d');
-            for (let f = 0; f < 4; f++) {
-                const ox = f * 16;
-                // Logs
-                cx.fillStyle = '#4a2810'; cx.fillRect(ox + 2, 12, 12, 3);
-                cx.fillStyle = '#2d1505'; cx.fillRect(ox + 4, 10, 8, 3);
-                // Flames
-                const h = 7 + (f % 3) * 2;
-                cx.fillStyle = '#ef4444'; cx.fillRect(ox + 4, 12 - h, 8, h);
-                cx.fillStyle = '#f59e0b'; cx.fillRect(ox + 5, 13 - h, 6, h - 2);
-                cx.fillStyle = '#fef08a'; cx.fillRect(ox + 6, 14 - h, 4, h - 4);
-            }
-            return c;
-        }
-
-        function createBenchSpriteSheet() {
-            const c = document.createElement('canvas'); c.width = 32; c.height = 16;
-            const cx = c.getContext('2d');
-            // Log Bench for Sitting
-            cx.fillStyle = '#78350f'; cx.fillRect(0, 4, 32, 8);
-            cx.fillStyle = '#92400e'; cx.fillRect(2, 6, 28, 4);
-            cx.fillStyle = '#451a03'; cx.fillRect(4, 12, 4, 4); cx.fillRect(24, 12, 4, 4);
-            return c;
-        }
-
-        // --- 4. PLAYER & WORLD STATE ---
-        const localPlayer = {
-            id: 'player_' + Math.random().toString(36).substring(2, 7),
-            x: 48, y: 135, vx: 0, vy: 0, speed: 2.2,
-            facingRight: true, isMoving: false, isSitting: false, animFrame: 0, animTimer: 0,
-            currentRoom: 'hallway', lastDoorX: 48
-        };
-
-        const remotePlayers = {};
-        const keys = {};
-        const particles = [];
-
-        // --- 5. SUPABASE REALTIME SYNC ---
+        // --- SUPABASE REALTIME SYNC ---
         gameChannel
             .on('broadcast', { event: 'state' }, ({ payload }) => {
                 if (payload.id !== localPlayer.id) {
-                    remotePlayers[payload.id] = payload;
-                    updatePlayerCountUI();
+                    remotePlayers.set(payload.id, payload);
+                    updatePeerCountUI();
                 }
             })
             .on('broadcast', { event: 'chat' }, ({ payload }) => {
@@ -472,305 +258,433 @@
             })
             .subscribe((status) => {
                 if (status === 'SUBSCRIBED') {
-                    document.getElementById('status-dot').classList.add('online');
-                    document.getElementById('status-text').innerText = "Sanctuary Online";
+                    console.log('Connected to Supabase Cloud Hallway!');
                 }
             });
 
-        function broadcastState() {
+        function broadcastPlayerState() {
             gameChannel.send({
                 type: 'broadcast',
                 event: 'state',
-                payload: {
-                    id: localPlayer.id,
-                    x: localPlayer.x,
-                    y: localPlayer.y,
-                    facingRight: localPlayer.facingRight,
-                    isMoving: localPlayer.isMoving,
-                    isSitting: localPlayer.isSitting,
-                    animFrame: localPlayer.animFrame,
-                    room: localPlayer.currentRoom
-                }
+                payload: localPlayer
             });
         }
 
-        function updatePlayerCountUI() {
-            document.getElementById('peer-count').innerText = Object.keys(remotePlayers).length + 1;
+        function updatePeerCountUI() {
+            document.getElementById('peerCount').innerText = `Online: ${remotePlayers.size + 1}`;
         }
 
-        // --- 6. CONTROLS & INTERACTION ---
-        window.addEventListener('keydown', (e) => {
-            if (document.activeElement === document.getElementById('chat-input')) return;
-            keys[e.key.toLowerCase()] = true;
-            if (e.key.toLowerCase() === 'e') handleInteraction();
-        });
-        window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+        // --- PIXEL ART RENDERING ENGINE ---
+        const PixelArt = {
+            drawCharacter(ctx, x, y, player, isLocal = false) {
+                ctx.save();
+                ctx.translate(Math.round(x), Math.round(y));
 
-        let joystickActive = false;
-        const joystickZone = document.getElementById('joystick-zone');
-        const joystickKnob = document.getElementById('joystick-knob');
-        let touchVector = { x: 0, y: 0 };
+                if (player.facing === 'left') {
+                    ctx.scale(-1, 1);
+                }
 
-        joystickZone.addEventListener('touchstart', handleJoystickMove, { passive: false });
-        joystickZone.addEventListener('touchmove', handleJoystickMove, { passive: false });
-        joystickZone.addEventListener('touchend', () => {
-            joystickActive = false; touchVector = { x: 0, y: 0 };
-            joystickKnob.style.transform = `translate(-50%, -50%)`;
-        });
+                const animOffset = player.state === 'walk' ? Math.sin(player.frame * 0.5) * 1.5 : 0;
+                const bobbing = player.state === 'idle' ? Math.sin(Date.now() * 0.005) * 0.5 : 0;
 
-        function handleJoystickMove(e) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const rect = joystickZone.getBoundingClientRect();
-            let dx = touch.clientX - (rect.left + rect.width / 2);
-            let dy = touch.clientY - (rect.top + rect.height / 2);
-            const dist = Math.hypot(dx, dy), maxRadius = rect.width / 2;
-            if (dist > maxRadius) { dx = (dx / dist) * maxRadius; dy = (dy / dist) * maxRadius; }
-            joystickKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-            touchVector = { x: dx / maxRadius, y: dy / maxRadius };
-            joystickActive = true;
+                // Shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 7, 2.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Legs
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(-3, -4, 2, 4);
+                ctx.fillRect(1, -4, 2, 4);
+
+                // Outfit
+                ctx.fillStyle = player.outfitColor || '#4f46e5';
+                ctx.fillRect(-4, -12 + bobbing, 8, 8);
+
+                // Arms
+                ctx.fillStyle = '#f87171';
+                ctx.fillRect(-5, -11 + bobbing, 2, 6);
+                ctx.fillRect(3, -11 + bobbing, 2, 6);
+
+                // Head / Face
+                ctx.fillStyle = '#ffedd5';
+                ctx.fillRect(-4, -20 + bobbing, 8, 8);
+
+                // Eyes
+                ctx.fillStyle = '#1e1b4b';
+                ctx.fillRect(1, -17 + bobbing, 2, 3);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(2, -17 + bobbing, 1, 1);
+
+                // Hair
+                ctx.fillStyle = player.hairColor || '#fbbf24';
+                ctx.fillRect(-5, -22 + bobbing, 10, 4);
+                ctx.fillRect(-5, -18 + bobbing, 3, 5);
+                ctx.fillRect(2, -18 + bobbing, 3, 3);
+
+                ctx.restore();
+                ctx.save();
+                ctx.font = '5px "Press Start 2P"';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = isLocal ? '#a7f3d0' : '#e0e7ff';
+                ctx.fillText(player.name, Math.round(x), Math.round(y - 25));
+                ctx.restore();
+            },
+
+            drawDoor(ctx, x, y, doorNumber) {
+                ctx.save();
+                ctx.translate(Math.round(x), Math.round(y));
+                ctx.fillStyle = '#331900';
+                ctx.fillRect(-12, -32, 24, 32);
+                ctx.fillStyle = '#78350f';
+                ctx.fillRect(-10, -30, 20, 30);
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(-8, -27, 16, 10);
+                ctx.fillRect(-8, -14, 16, 12);
+                ctx.fillStyle = '#fbbf24';
+                ctx.fillRect(5, -15, 2, 2);
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(-6, -36, 12, 6);
+                ctx.fillStyle = '#f59e0b';
+                ctx.font = '4px "Press Start 2P"';
+                ctx.textAlign = 'center';
+                ctx.fillText(doorNumber, 0, -31);
+                ctx.restore();
+            },
+
+            drawSealedWall(ctx, x) {
+                ctx.save();
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(x - 15, 0, 15, VIRTUAL_HEIGHT);
+                ctx.fillStyle = '#1e293b';
+                for (let y = 10; y < VIRTUAL_HEIGHT; y += 12) {
+                    ctx.fillRect(x - 12, y, 10, 5);
+                }
+                ctx.fillStyle = '#dc2626';
+                ctx.fillRect(x - 10, 60, 8, 8);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '5px "Press Start 2P"';
+                ctx.fillText('X', x - 8, 66);
+                ctx.restore();
+            },
+
+            drawBonfire(ctx, x, y, frame) {
+                ctx.save();
+                ctx.translate(Math.round(x), Math.round(y));
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(-10, -3, 20, 4);
+                
+                const fireColors = ['#f59e0b', '#ef4444', '#facc15'];
+                for (let i = 0; i < 6; i++) {
+                    const color = fireColors[(i + frame) % fireColors.length];
+                    const fx = (Math.sin(frame * 0.2 + i) * 4);
+                    const fy = -6 - (i * 3);
+                    const size = Math.max(1, 6 - i);
+                    ctx.fillStyle = color;
+                    ctx.fillRect(fx - size / 2, fy, size, size);
+                }
+
+                const gradient = ctx.createRadialGradient(0, -10, 2, 0, -10, 60);
+                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.25)');
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, -10, 60, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        };
+
+        function spawnParticle(x, y, color, vx, vy, life) {
+            particles.push({ x, y, color, vx, vy, life, maxLife: life });
         }
 
-        document.getElementById('btn-action').addEventListener('touchstart', (e) => {
-            e.preventDefault(); handleInteraction();
-        });
-
-        function handleInteraction() {
-            if (localPlayer.currentRoom === 'hallway') {
-                const doorIndex = Math.floor(localPlayer.x / 80);
-                const doorX = doorIndex * 80 + 40;
-                if (Math.abs(localPlayer.x - doorX) < 24) {
-                    localPlayer.lastDoorX = localPlayer.x;
-                    localPlayer.currentRoom = `room_${doorIndex}`;
-                    localPlayer.x = CANVAS_WIDTH / 2; localPlayer.y = 190;
-                    localPlayer.isSitting = false;
-                }
-            } else {
-                // Check bench sitting proximity
-                const benchLeftX = 140, benchRightX = 300, benchY = 145;
-                const nearBench = Math.hypot(localPlayer.x - benchLeftX, localPlayer.y - benchY) < 25 ||
-                                  Math.hypot(localPlayer.x - benchRightX, localPlayer.y - benchY) < 25;
-                if (nearBench) {
-                    localPlayer.isSitting = !localPlayer.isSitting;
-                    if (localPlayer.isSitting) {
-                        localPlayer.x = Math.abs(localPlayer.x - benchLeftX) < Math.abs(localPlayer.x - benchRightX) ? benchLeftX : benchRightX;
-                        localPlayer.y = benchY - 4;
-                    }
-                    return;
-                }
-
-                // Exit room door check
-                if (localPlayer.y > 210) {
-                    localPlayer.currentRoom = 'hallway';
-                    localPlayer.x = localPlayer.lastDoorX; localPlayer.y = 135;
-                    localPlayer.isSitting = false;
-                }
+        function updateAndDrawParticles(ctx) {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+                ctx.fillRect(Math.round(p.x), Math.round(p.y), 1.5, 1.5);
+                ctx.globalAlpha = 1.0;
+                if (p.life <= 0) particles.splice(i, 1);
             }
         }
 
-        // --- 7. GAME LOOP & PHYSICS ---
-        function updatePlayer() {
-            if (localPlayer.isSitting) {
-                // If sitting, allow movement key or joystick to stand up
-                if (keys['w'] || keys['s'] || keys['a'] || keys['d'] || joystickActive) {
-                    localPlayer.isSitting = false;
-                } else {
-                    return;
+        function updateGame() {
+            if (keys.left) {
+                localPlayer.vx = -PLAYER_SPEED;
+                localPlayer.facing = 'left';
+                localPlayer.state = 'walk';
+            } else if (keys.right) {
+                localPlayer.vx = PLAYER_SPEED;
+                localPlayer.facing = 'right';
+                localPlayer.state = 'walk';
+            } else {
+                localPlayer.vx = 0;
+                localPlayer.state = 'idle';
+            }
+
+            localPlayer.x += localPlayer.vx;
+
+            if (localPlayer.currentRoom === null) {
+                if (localPlayer.x < LEFT_WALL_X + 8) localPlayer.x = LEFT_WALL_X + 8;
+            } else {
+                if (localPlayer.x < 20) localPlayer.x = 20;
+                if (localPlayer.x > VIRTUAL_WIDTH - 20) localPlayer.x = VIRTUAL_WIDTH - 20;
+            }
+
+            if (localPlayer.state === 'walk') {
+                localPlayer.animTimer++;
+                if (localPlayer.animTimer % 8 === 0) {
+                    localPlayer.frame++;
+                    spawnParticle(localPlayer.x, localPlayer.y, 'rgba(148, 163, 184, 0.4)', (Math.random() - 0.5) * 0.4, -0.2, 12);
                 }
             }
 
-            localPlayer.vx = 0; localPlayer.vy = 0;
-            if (keys['a'] || keys['arrowleft']) localPlayer.vx -= 1;
-            if (keys['d'] || keys['arrowright']) localPlayer.vx += 1;
-            if (keys['w'] || keys['arrowup']) localPlayer.vy -= 1;
-            if (keys['s'] || keys['arrowdown']) localPlayer.vy += 1;
-
-            if (joystickActive) { localPlayer.vx = touchVector.x; localPlayer.vy = touchVector.y; }
-
-            const len = Math.hypot(localPlayer.vx, localPlayer.vy);
-            if (len > 0.1) {
-                localPlayer.isMoving = true;
-                localPlayer.x += (localPlayer.vx / (len > 1 ? len : 1)) * localPlayer.speed;
-                localPlayer.y += (localPlayer.vy / (len > 1 ? len : 1)) * localPlayer.speed;
-                if (localPlayer.vx < -0.1) localPlayer.facingRight = false;
-                if (localPlayer.vx > 0.1) localPlayer.facingRight = true;
-            } else {
-                localPlayer.isMoving = false;
-            }
-
-            if (localPlayer.currentRoom === 'hallway') {
-                if (localPlayer.x < 24) localPlayer.x = 24;
-                if (localPlayer.y < 100) localPlayer.y = 100;
-                if (localPlayer.y > 170) localPlayer.y = 170;
-                const doorIndex = Math.floor(localPlayer.x / 80);
-                const nearDoor = Math.abs(localPlayer.x - (doorIndex * 80 + 40)) < 24;
-                document.getElementById('interaction-prompt').style.display = nearDoor ? 'block' : 'none';
-                if (nearDoor) document.getElementById('interaction-prompt').innerText = "Press [E] to Enter Door";
-            } else {
-                if (localPlayer.x < 60) localPlayer.x = 60;
-                if (localPlayer.x > CANVAS_WIDTH - 60) localPlayer.x = CANVAS_WIDTH - 60;
-                if (localPlayer.y < 90) localPlayer.y = 90;
-                if (localPlayer.y > 230) localPlayer.y = 230;
-
-                const benchLeftX = 140, benchRightX = 300, benchY = 145;
-                const nearBench = Math.hypot(localPlayer.x - benchLeftX, localPlayer.y - benchY) < 25 ||
-                                  Math.hypot(localPlayer.x - benchRightX, localPlayer.y - benchY) < 25;
-                const nearExit = localPlayer.y > 210;
-
-                const prompt = document.getElementById('interaction-prompt');
-                if (nearBench) {
-                    prompt.style.display = 'block';
-                    prompt.innerText = "Press [E] to Sit by Bonfire";
-                } else if (nearExit) {
-                    prompt.style.display = 'block';
-                    prompt.innerText = "Press [E] to Exit Hallway";
-                } else {
-                    prompt.style.display = 'none';
-                }
-            }
-
-            localPlayer.animTimer++;
-            if (localPlayer.animTimer % 8 === 0) localPlayer.animFrame = (localPlayer.animFrame + 1) % 4;
-            if (localPlayer.animTimer % 4 === 0) broadcastState();
-        }
-
-        // --- 8. RENDERING ENGINE ---
-        let globalAnimFrame = 0;
-        function render() {
-            globalAnimFrame++;
-            ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-            ctx.save();
-
-            if (localPlayer.currentRoom === 'hallway') {
-                const cameraX = localPlayer.x - CANVAS_WIDTH / 2;
-                ctx.translate(-cameraX, 0);
-                drawHallway(cameraX);
-            } else {
-                drawRoom();
-            }
-
-            // Render Remote Players
-            for (let id in remotePlayers) {
-                const rp = remotePlayers[id];
-                if (rp.room === localPlayer.currentRoom) {
-                    drawCharacter(rp.x, rp.y, rp.facingRight, rp.isMoving, rp.isSitting, rp.animFrame, id.substring(7), false);
-                }
-            }
-
-            // Render Local Player
-            drawCharacter(localPlayer.x, localPlayer.y, localPlayer.facingRight, localPlayer.isMoving, localPlayer.isSitting, localPlayer.animFrame, "You", true);
-
-            ctx.restore();
-            requestAnimationFrame(render);
+            broadcastPlayerState();
         }
 
         function drawHallway(cameraX) {
-            const startCol = Math.floor((cameraX - 30) / TILE_SIZE);
-            const endCol = Math.ceil((cameraX + CANVAS_WIDTH + 30) / TILE_SIZE);
-            for (let c = startCol; c <= endCol; c++) {
-                const worldX = c * TILE_SIZE;
-                if (c < 0) {
-                    ctx.drawImage(Sprites.tiles, 0, 0, 16, 16, worldX, 80, 16, 16);
-                    ctx.drawImage(Sprites.tiles, 0, 0, 16, 16, worldX, 64, 16, 16);
-                } else {
-                    ctx.fillStyle = '#111822'; ctx.fillRect(worldX, 64, 16, 36);
-                }
-                for (let r = 6; r < 12; r++) {
-                    ctx.drawImage(Sprites.tiles, 16, 0, 16, 16, worldX, r * 16, 16, 16);
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+
+            ctx.fillStyle = '#0f172a';
+            const startCol = Math.floor(cameraX / 20) - 1;
+            for (let i = 0; i < 20; i++) {
+                ctx.fillRect((startCol + i) * 20 - cameraX, 20, 18, 100);
+            }
+
+            ctx.fillStyle = '#1e1b4b';
+            ctx.fillRect(0, HALLWAY_GROUND_Y, VIRTUAL_WIDTH, VIRTUAL_HEIGHT - HALLWAY_GROUND_Y);
+            ctx.fillStyle = '#312e81';
+            ctx.fillRect(0, HALLWAY_GROUND_Y, VIRTUAL_WIDTH, 2);
+
+            const startDoorIndex = Math.floor((cameraX - 50) / DOOR_SPACING);
+            for (let i = 0; i < 5; i++) {
+                const doorIdx = Math.max(1, startDoorIndex + i);
+                const doorWorldX = doorIdx * DOOR_SPACING;
+                const doorScreenX = doorWorldX - cameraX;
+
+                PixelArt.drawDoor(ctx, doorScreenX, HALLWAY_GROUND_Y, `#${doorIdx}`);
+
+                if (Math.abs(localPlayer.x - doorWorldX) < 15 && localPlayer.currentRoom === null) {
+                    ctx.save();
+                    ctx.font = '5px "Press Start 2P"';
+                    ctx.fillStyle = '#facc15';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('[E] Enter', doorScreenX, HALLWAY_GROUND_Y - 42);
+                    ctx.restore();
                 }
             }
-            // Sealed Barrier
-            ctx.drawImage(Sprites.tiles, 0, 0, 16, 16, 0, 64, 16, 128);
-            ctx.fillStyle = '#ef4444'; ctx.fillRect(15, 64, 2, 128);
 
-            const startDoorIndex = Math.floor((cameraX - 80) / 80), endDoorIndex = Math.ceil((cameraX + CANVAS_WIDTH + 80) / 80);
-            for (let d = Math.max(0, startDoorIndex); d <= endDoorIndex; d++) {
-                const doorX = d * 80 + 40;
-                ctx.drawImage(Sprites.tiles, 32, 0, 16, 16, doorX - 8, 76, 20, 24);
-                ctx.fillStyle = '#fbbf24'; ctx.font = '8px monospace'; ctx.textAlign = 'center';
-                ctx.fillText(`ROOM ${d + 1}`, doorX + 2, 70);
+            PixelArt.drawSealedWall(ctx, LEFT_WALL_X - cameraX);
+        }
+
+        function drawBonfireRoom() {
+            ctx.fillStyle = '#1e1b4b';
+            ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+
+            ctx.fillStyle = '#312e81';
+            for (let x = 10; x < VIRTUAL_WIDTH; x += 25) {
+                ctx.fillRect(x, 10, 12, 120);
+            }
+
+            ctx.fillStyle = '#451a03';
+            ctx.fillRect(0, ROOM_GROUND_Y, VIRTUAL_WIDTH, VIRTUAL_HEIGHT - ROOM_GROUND_Y);
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(0, ROOM_GROUND_Y, VIRTUAL_WIDTH, 2);
+
+            PixelArt.drawDoor(ctx, 30, ROOM_GROUND_Y, 'Exit');
+            if (Math.abs(localPlayer.x - 30) < 15) {
+                ctx.save();
+                ctx.font = '5px "Press Start 2P"';
+                ctx.fillStyle = '#facc15';
+                ctx.textAlign = 'center';
+                ctx.fillText('[E] Exit', 30, ROOM_GROUND_Y - 42);
+                ctx.restore();
+            }
+
+            PixelArt.drawBonfire(ctx, BONFIRE_X, ROOM_GROUND_Y - 2, Math.floor(Date.now() / 100));
+
+            if (Math.random() < 0.3) {
+                spawnParticle(BONFIRE_X + (Math.random() - 0.5) * 8, ROOM_GROUND_Y - 12, '#facc15', (Math.random() - 0.5) * 0.3, -Math.random() * 0.8, 25);
             }
         }
 
-        function drawRoom() {
-            // Room background
-            ctx.fillStyle = '#0a0d14'; ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-            for (let x = 48; x < CANVAS_WIDTH - 48; x += 16) {
-                for (let y = 32; y < 90; y += 16) {
-                    ctx.drawImage(Sprites.tiles, 48, 0, 16, 16, x, y, 16, 16);
-                }
-            }
-            ctx.fillStyle = '#171d2c'; ctx.fillRect(48, 90, CANVAS_WIDTH - 96, 130);
-            ctx.drawImage(Sprites.tiles, 32, 0, 16, 16, CANVAS_WIDTH / 2 - 12, 210, 24, 20);
-
-            // Benches for sitting
-            ctx.drawImage(Sprites.bench, 140, 140, 32, 16);
-            ctx.drawImage(Sprites.bench, 300, 140, 32, 16);
-
-            // Animated Bonfire
-            const fireFrame = Math.floor(globalAnimFrame / 6) % 4;
-            const fireX = CANVAS_WIDTH / 2 - 16, fireY = 130;
-            const rad = 45 + Math.sin(globalAnimFrame * 0.1) * 5;
-            const grad = ctx.createRadialGradient(fireX + 16, fireY + 16, 4, fireX + 16, fireY + 16, rad);
-            grad.addColorStop(0, 'rgba(245, 158, 11, 0.45)');
-            grad.addColorStop(1, 'rgba(245, 158, 11, 0)');
-            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(fireX + 16, fireY + 16, rad, 0, Math.PI * 2); ctx.fill();
-            ctx.drawImage(Sprites.bonfire, fireFrame * 16, 0, 16, 16, fireX, fireY, 32, 32);
-        }
-
-        function drawCharacter(x, y, facingRight, isMoving, isSitting, frame, label, isLocal) {
+        function renderGame() {
             ctx.save();
-            ctx.translate(Math.floor(x), Math.floor(y));
-            if (!facingRight) ctx.scale(-1, 1);
+            ctx.scale(scale, scale);
 
-            const spriteY = isSitting ? 0 : (isMoving ? 16 : 0);
-            const spriteX = isSitting ? 48 : ((isMoving ? frame : 0) * 16);
+            let cameraX = 0;
+            if (localPlayer.currentRoom === null) {
+                cameraX = Math.max(0, localPlayer.x - VIRTUAL_WIDTH / 2);
+                drawHallway(cameraX);
+            } else {
+                drawBonfireRoom();
+            }
 
-            ctx.drawImage(Sprites.player, spriteX, spriteY, 16, 16, -12, -24, 24, 24);
-            ctx.restore();
-
-            ctx.fillStyle = isLocal ? '#2ed573' : '#70a1ff';
-            ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
-            ctx.fillText(label, Math.floor(x), Math.floor(y) - 28);
-        }
-
-        // --- 9. IMPROVED CHAT SYSTEM (AUTO-CLEAR MESSAGE) ---
-        function sendChatMessage() {
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            if (text === '') return;
-
-            addChatMessage("You", text);
-            gameChannel.send({
-                type: 'broadcast',
-                event: 'chat',
-                payload: { id: localPlayer.id, author: localPlayer.id.substring(7), text }
+            remotePlayers.forEach(p => {
+                if (p.currentRoom === localPlayer.currentRoom) {
+                    const screenX = localPlayer.currentRoom === null ? p.x - cameraX : p.x;
+                    PixelArt.drawCharacter(ctx, screenX, p.y, p, false);
+                }
             });
 
-            // Instantly clear message from chat input area
-            input.value = '';
-            input.blur();
+            const playerScreenX = localPlayer.currentRoom === null ? localPlayer.x - cameraX : localPlayer.x;
+            PixelArt.drawCharacter(ctx, playerScreenX, localPlayer.y, localPlayer, true);
+
+            updateAndDrawParticles(ctx);
+            ctx.restore();
         }
 
-        function addChatMessage(author, text) {
-            const box = document.getElementById('chat-messages');
-            const el = document.createElement('div'); el.className = 'chat-msg';
-            const cleanText = text.replace(/[&<>'"]/g, '');
-            el.innerHTML = `<span class="author">${author}:</span> ${cleanText}`;
-            box.appendChild(el); box.scrollTop = box.scrollHeight;
+        function gameLoop() {
+            updateGame();
+            renderGame();
+            requestAnimationFrame(gameLoop);
         }
 
-        document.getElementById('chat-input').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                sendChatMessage();
+        function handleInteraction() {
+            if (localPlayer.currentRoom === null) {
+                const doorIdx = Math.round(localPlayer.x / DOOR_SPACING);
+                const doorX = doorIdx * DOOR_SPACING;
+                if (Math.abs(localPlayer.x - doorX) < 18 && doorIdx >= 1) {
+                    localPlayer.currentRoom = doorIdx;
+                    localPlayer.x = 45;
+                    localPlayer.y = ROOM_GROUND_Y;
+                    document.getElementById('locationTag').innerText = `Room #${doorIdx}`;
+                    addChatMessage('System', `Entered Cozy Room #${doorIdx}`, 'text-amber-400');
+                }
+            } else {
+                if (Math.abs(localPlayer.x - 30) < 18) {
+                    const prevRoom = localPlayer.currentRoom;
+                    localPlayer.x = prevRoom * DOOR_SPACING;
+                    localPlayer.y = HALLWAY_GROUND_Y;
+                    localPlayer.currentRoom = null;
+                    document.getElementById('locationTag').innerText = 'Main Hallway';
+                    addChatMessage('System', `Exited back to Hallway`, 'text-indigo-400');
+                }
+            }
+        }
+
+        // --- CONTROLS ---
+        window.addEventListener('keydown', (e) => {
+            if (document.activeElement.tagName === 'INPUT') return;
+            if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') keys.left = true;
+            if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') keys.right = true;
+            if (e.key === 'e' || e.key === 'E' || e.key === ' ') handleInteraction();
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') keys.left = false;
+            if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') keys.right = false;
+        });
+
+        const btnLeft = document.getElementById('btnLeft');
+        const btnRight = document.getElementById('btnRight');
+        const btnInteract = document.getElementById('btnInteract');
+
+        const bindTouch = (elem, onPress, onRelease) => {
+            elem.addEventListener('touchstart', (e) => { e.preventDefault(); onPress(); });
+            elem.addEventListener('touchend', (e) => { e.preventDefault(); onRelease(); });
+            elem.addEventListener('mousedown', onPress);
+            elem.addEventListener('mouseup', onRelease);
+        };
+
+        bindTouch(btnLeft, () => { keys.left = true; }, () => { keys.left = false; });
+        bindTouch(btnRight, () => { keys.right = true; }, () => { keys.right = false; });
+        btnInteract.addEventListener('click', handleInteraction);
+
+        // --- CHAT SYSTEM (WITH AUTO-CLEAR MESSAGE) ---
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+
+        function addChatMessage(sender, msg, colorClass = 'text-slate-200') {
+            const div = document.createElement('div');
+            div.className = `${colorClass} break-words`;
+            div.innerHTML = `<span class="font-bold">${sender}:</span> ${msg}`;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (text.length > 0) {
+                addChatMessage(localPlayer.name, text, 'text-indigo-300');
+                
+                // Broadcast chat to other players via Supabase
+                gameChannel.send({
+                    type: 'broadcast',
+                    event: 'chat',
+                    payload: { author: localPlayer.name, text }
+                });
+
+                // Clear message from input box immediately upon sending
+                chatInput.value = '';
+                chatInput.blur();
             }
         });
 
-        // --- 10. BOOT GAME ---
-        window.addEventListener('load', () => {
-            requestAnimationFrame(render);
-            setInterval(updatePlayer, 1000 / 60);
+        // --- MICROPHONE / PROXIMITY VOICE CHAT ---
+        const btnMicToggle = document.getElementById('btnMicToggle');
+        const micIcon = document.getElementById('micIcon');
+
+        btnMicToggle.addEventListener('click', async () => {
+            if (!isMicActive) {
+                try {
+                    localAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    isMicActive = true;
+                    btnMicToggle.classList.remove('bg-rose-600');
+                    btnMicToggle.classList.add('bg-emerald-600');
+                    micIcon.className = 'fa-solid fa-microphone';
+                    addChatMessage('Voice', 'Microphone active. Spatial proximity chat enabled.', 'text-emerald-400');
+                } catch (err) {
+                    addChatMessage('Voice Error', 'Microphone permission denied or unsupported.', 'text-rose-400');
+                }
+            } else {
+                if (localAudioStream) {
+                    localAudioStream.getTracks().forEach(track => track.stop());
+                }
+                isMicActive = false;
+                btnMicToggle.classList.remove('bg-emerald-600');
+                btnMicToggle.classList.add('bg-rose-600');
+                micIcon.className = 'fa-solid fa-microphone-slash';
+                addChatMessage('Voice', 'Microphone muted.', 'text-amber-400');
+            }
         });
+
+        // --- AVATAR CUSTOMIZER MODAL ---
+        const btnCustomizer = document.getElementById('btnCustomizer');
+        const modalCustomizer = document.getElementById('modalCustomizer');
+        const btnCloseCustomizer = document.getElementById('btnCloseCustomizer');
+
+        btnCustomizer.addEventListener('click', () => modalCustomizer.classList.remove('hidden'));
+        btnCloseCustomizer.addEventListener('click', () => {
+            localPlayer.name = document.getElementById('inputPlayerName').value || 'AnimeWalker';
+            localPlayer.hairColor = document.getElementById('colorHair').value;
+            localPlayer.outfitColor = document.getElementById('colorOutfit').value;
+            document.getElementById('playerTag').innerText = localPlayer.name;
+            modalCustomizer.classList.add('hidden');
+        });
+
+        // --- APK GUIDE MODAL ---
+        const btnApkInfo = document.getElementById('btnApkInfo');
+        const modalApk = document.getElementById('modalApk');
+        const btnCloseApk = document.getElementById('btnCloseApk');
+        const btnCloseApk2 = document.getElementById('btnCloseApk2');
+
+        btnApkInfo.addEventListener('click', () => modalApk.classList.remove('hidden'));
+        btnCloseApk.addEventListener('click', () => modalApk.classList.add('hidden'));
+        btnCloseApk2.addEventListener('click', () => modalApk.classList.add('hidden'));
+
+        window.onload = () => {
+            gameLoop();
+        };
     </script>
 </body>
 </html>
