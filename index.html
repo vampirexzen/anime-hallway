@@ -26,7 +26,7 @@
       touch-action: none;
       -webkit-user-select: none;
       user-select: none;
-      background: #0f051d;
+      background: #090212;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
@@ -43,10 +43,10 @@
     }
 
     .glass-dark {
-      background: rgba(23, 10, 26, 0.88);
+      background: rgba(20, 8, 26, 0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(244, 114, 182, 0.3);
+      border: 1px solid rgba(244, 114, 182, 0.25);
     }
 
     .glass-input {
@@ -107,12 +107,25 @@
       background: #ec4899;
       color: white;
     }
+
+    /* Uniform 16:9 Letterboxed Aspect Ratio Wrapper */
+    #aspect-ratio-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 100dvw;
+      max-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #05010a;
+    }
   </style>
 </head>
-<body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
+<body class="flex h-full w-full overflow-hidden select-none bg-pink-950">
 
   <!-- AUTH MODAL OVERLAY -->
-  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/75 backdrop-blur-md flex items-center justify-center p-4">
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="glass w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 max-h-[90dvh] overflow-y-auto">
       <div class="text-center space-y-1">
         <div class="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 text-white shadow-lg shadow-pink-300 mb-1">
@@ -160,279 +173,253 @@
     </div>
   </div>
 
-  <!-- TOP HEADER NAVBAR -->
-  <header class="h-12 sm:h-14 glass px-3 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
-    <div class="flex items-center gap-2">
-      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shadow-pink-300 shrink-0">
-        <i data-lucide="flower-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style="animation-duration: 12s;"></i>
-      </div>
-      <div>
-        <h1 class="font-sakura text-xs sm:text-base text-pink-950 font-bold tracking-wide leading-none">Sakura Slime World 🌸</h1>
-        <p class="text-[9px] sm:text-[10px] text-pink-600 font-semibold uppercase mt-0.5" id="room-indicator">#sakura-park</p>
-      </div>
-    </div>
-
-    <!-- PLAYER DUNGEON STATS BADGE HUD -->
-    <div class="flex items-center gap-2 bg-pink-100/90 px-2.5 py-1 rounded-2xl border border-pink-300 shadow-sm text-xs">
-      <div class="flex items-center gap-1 font-bold text-purple-900">
-        <i data-lucide="shield" class="w-3.5 h-3.5 text-purple-600"></i>
-        <span>Lvl <strong id="hud-level" class="text-purple-700 text-sm">1</strong></span>
-      </div>
-      <span class="text-pink-300">|</span>
-      <div class="flex items-center gap-1 font-bold text-rose-700">
-        <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-500 fill-rose-500"></i>
-        <span id="hud-hp">100/100</span>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-1.5">
-      <!-- Player Counter Badge -->
-      <div class="flex items-center gap-1 px-2 py-1 rounded-xl bg-pink-100/90 border border-pink-200 text-pink-800 text-[10px] sm:text-xs font-semibold">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span id="player-count">1</span>
-      </div>
-
-      <!-- Music Jukebox Modal Trigger -->
-      <button onclick="toggleJukeboxModal()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Music Jukebox">
-        <i data-lucide="music" class="w-4 h-4 text-pink-600"></i>
-      </button>
-
-      <!-- Settings Customization Trigger -->
-      <button onclick="toggleSettingsModal()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Customize Slime">
-        <i data-lucide="user-cog" class="w-4 h-4"></i>
-      </button>
-    </div>
-  </header>
-
-  <!-- MAIN VIEWPORT CONTAINER -->
-  <div class="flex-1 relative flex overflow-hidden w-full h-full">
-
-    <!-- CANVAS VIEW (100% Dynamic Scaling on Desktop & Mobile) -->
-    <div class="flex-1 relative bg-pink-950/20 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
-      <canvas id="gameCanvas" class="block w-full h-full cursor-pointer touch-none"></canvas>
-
-      <!-- Top Overlay Room Switcher Pills -->
-      <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[95vw] overflow-x-auto">
-        <button onclick="switchChannel('sakura-park')" id="quick-btn-sakura-park" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap">
-          🌸 Sakura Park
-        </button>
-        <button onclick="switchChannel('disco-club')" id="quick-btn-disco-club" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
-          🪩 Disco Party
-        </button>
-        <button onclick="switchChannel('onsen-hotspring')" id="quick-btn-onsen-hotspring" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
-          🎋 Onsen Garden
-        </button>
-        <button onclick="switchChannel('portal-dungeon')" id="quick-btn-portal-dungeon" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-purple-900 bg-purple-100 border border-purple-300 hover:bg-purple-200 transition whitespace-nowrap flex items-center gap-1">
-          🏰 Portal Dungeon
-        </button>
-      </div>
-
-      <!-- Live Mini-Game HUD Banner -->
-      <div id="minigame-banner" class="hidden absolute top-12 left-1/2 -translate-x-1/2 z-20 glass px-3 py-1.5 rounded-2xl border border-pink-300 shadow-xl flex items-center gap-3 animate-in fade-in">
-        <div class="flex items-center gap-2 text-xs">
-          <span id="minigame-title" class="font-bold text-pink-950 uppercase">🌸 Petal Catch</span>
-          <span class="text-pink-300">|</span>
-          <span class="font-bold text-pink-800">Score: <strong id="minigame-score" class="text-pink-950 font-black text-sm">0</strong></span>
-          <span class="text-pink-300">|</span>
-          <span class="font-bold text-pink-800">Time: <strong id="minigame-timer" class="text-pink-950 font-black text-sm">30s</strong></span>
-        </div>
-        <button onclick="endMiniGame(true)" class="px-2 py-0.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-bold">Quit</button>
-      </div>
-
-      <!-- Emote & Action Toolbar Overlay -->
-      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2.5 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2">
-        <button onclick="triggerJump()" class="action-btn px-2.5 py-1 rounded-xl text-xs font-black text-pink-800 flex items-center gap-1" title="Jump / Bounce">
-          <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5 text-pink-600"></i>
-          <span>Jump</span>
-        </button>
-        <button onclick="triggerAttack()" class="action-btn px-2.5 py-1 rounded-xl text-xs font-black text-purple-900 bg-purple-100 hover:bg-purple-200 border-purple-300 flex items-center gap-1" title="Sword Slash Attack">
-          <i data-lucide="sword" class="w-3.5 h-3.5 text-purple-600"></i>
-          <span>Attack</span>
-        </button>
-        <span class="text-pink-300">|</span>
-        <button onclick="triggerEmote('🌸')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg">🌸</button>
-        <button onclick="triggerEmote('❤️')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg">❤️</button>
-        <button onclick="triggerEmote('✨')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg">✨</button>
-        <button onclick="triggerEmote('⚔️')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg">⚔️</button>
-        <button onclick="triggerEmote('🪩')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg">🪩</button>
-      </div>
-
-      <!-- Mobile Joystick & Attack Controls -->
-      <div class="absolute bottom-3 left-3 z-20 pointer-events-auto md:hidden">
-        <div id="joystick-container" class="joystick-base">
-          <div id="joystick-stick" class="joystick-stick"></div>
-        </div>
-      </div>
-
-      <div class="absolute bottom-3 right-3 z-20 pointer-events-auto md:hidden flex flex-col gap-2">
-        <button onclick="triggerAttack()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white text-xs font-black shadow-lg shadow-purple-500/50 active:scale-90 flex items-center justify-center border-2 border-white">
-          <i data-lucide="sword" class="w-5 h-5"></i>
-        </button>
-        <button onclick="triggerJump()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-[10px] font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
-          JUMP
-        </button>
-      </div>
-
-      <!-- Arcade Mini-Game Card Modal -->
-      <div id="arcade-card-modal" class="hidden absolute inset-0 z-30 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="glass w-full max-w-xs rounded-3xl p-4 shadow-2xl border border-white space-y-3 animate-in fade-in">
-          <div class="flex items-center justify-between border-b border-pink-200 pb-2">
-            <h3 class="font-bold text-pink-950 text-xs flex items-center gap-1.5">
-              <i data-lucide="gamepad-2" class="w-4 h-4 text-pink-600"></i> Slime Memory Match
-            </h3>
-            <button onclick="closeArcadeMemoryGame()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
-          </div>
-          <div class="grid grid-cols-4 gap-1.5" id="memory-grid"></div>
-          <p class="text-[10px] text-pink-700 font-semibold text-center" id="memory-status">Match pairs to win XP!</p>
-        </div>
-      </div>
-
-      <!-- Disco Rhythm Mini-Game Modal -->
-      <div id="rhythm-game-modal" class="hidden absolute inset-0 z-30 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="glass w-full max-w-xs rounded-3xl p-5 shadow-2xl border border-white space-y-4 text-center">
-          <div class="flex items-center justify-between border-b border-pink-200 pb-2">
-            <h3 class="font-bold text-pink-950 text-xs flex items-center gap-1.5">
-              <i data-lucide="disc" class="w-4 h-4 text-pink-600"></i> Disco Fever Rhythm
-            </h3>
-            <button onclick="closeRhythmGame()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
-          </div>
-          <p class="text-xs text-pink-800 font-medium">Tap the matching arrow button when highlighted!</p>
-          <div id="rhythm-target" class="text-4xl font-black text-pink-600 h-14 flex items-center justify-center bg-pink-100/80 rounded-2xl border border-pink-300">
-            ⬆️
-          </div>
-          <div class="grid grid-cols-4 gap-2">
-            <button onclick="pressRhythmKey('⬅️')" class="p-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow">⬅️</button>
-            <button onclick="pressRhythmKey('⬆️')" class="p-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow">⬆️</button>
-            <button onclick="pressRhythmKey('⬇️')" class="p-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow">⬇️</button>
-            <button onclick="pressRhythmKey('➡️')" class="p-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow">➡️</button>
-          </div>
-          <p id="rhythm-score-text" class="text-xs font-bold text-pink-950">Combo: 0</p>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- CHAT SIDEBAR DRAWER -->
-    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
-      <div class="p-3 border-b border-pink-200/30 bg-white/10 flex flex-col gap-2 shrink-0">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-pink-200 uppercase tracking-wider flex items-center gap-1.5">
-            <i data-lucide="compass" class="w-3.5 h-3.5 text-pink-400"></i> Lounge Rooms
-          </span>
-          <button onclick="toggleChatSidebar()" class="md:hidden text-pink-300 hover:text-white p-1">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
-        </div>
-        
-        <div class="grid grid-cols-4 gap-1">
-          <button onclick="switchChannel('sakura-park')" id="chan-btn-sakura-park" class="chan-btn px-1.5 py-1.5 rounded-xl text-[10px] font-bold bg-pink-500 text-white shadow-sm transition">
-            🌸 Park
-          </button>
-          <button onclick="switchChannel('disco-club')" id="chan-btn-disco-club" class="chan-btn px-1.5 py-1.5 rounded-xl text-[10px] font-medium text-pink-200 hover:bg-pink-900/50 transition">
-            🪩 Disco
-          </button>
-          <button onclick="switchChannel('onsen-hotspring')" id="chan-btn-onsen-hotspring" class="chan-btn px-1.5 py-1.5 rounded-xl text-[10px] font-medium text-pink-200 hover:bg-pink-900/50 transition">
-            🎋 Onsen
-          </button>
-          <button onclick="switchChannel('portal-dungeon')" id="chan-btn-portal-dungeon" class="chan-btn px-1.5 py-1.5 rounded-xl text-[10px] font-medium text-purple-300 hover:bg-purple-900/50 transition">
-            🏰 Dungeon
-          </button>
-        </div>
-      </div>
-
-      <!-- Mini-Games Launcher Panel -->
-      <div class="px-3 py-2 bg-pink-950/40 border-b border-pink-200/20 space-y-1 shrink-0">
-        <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider">Play Lounge Mini-Games:</span>
-        <div class="grid grid-cols-3 gap-1">
-          <button onclick="startMiniGame('petal-catch')" class="px-1.5 py-1 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-[10px] font-bold shadow-sm transition">
-            🌸 Petals
-          </button>
-          <button onclick="startMiniGame('shrine-dash')" class="px-1.5 py-1 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-[10px] font-bold shadow-sm transition">
-            ⛩️ Dash
-          </button>
-          <button onclick="openRhythmGame()" class="px-1.5 py-1 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-[10px] font-bold shadow-sm transition">
-            🪩 Rhythm
-          </button>
-        </div>
-      </div>
-
-      <!-- Chat Log Stream -->
-      <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2.5"></div>
-
-      <!-- Chat Input Form -->
-      <div class="p-2.5 bg-pink-950/80 border-t border-pink-200/30 shrink-0">
-        <form id="chat-form" class="flex items-center gap-2">
-          <input 
-            type="text" 
-            id="chat-input" 
-            placeholder="Type a message..." 
-            maxlength="120"
-            autocomplete="off"
-            class="glass-input flex-1 px-3 py-2 rounded-xl text-xs text-pink-950 placeholder-pink-400 font-medium"
-          />
-          <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl shadow-md transition shrink-0 active:scale-95">
-            <i data-lucide="send" class="w-4 h-4"></i>
-          </button>
-        </form>
-      </div>
-    </aside>
-  </div>
-
-  <!-- MOBILE BOTTOM FLOATING NAVIGATION BAR -->
-  <nav class="h-12 bg-pink-950/95 border-t border-pink-200/20 backdrop-blur-md flex items-center justify-around px-2 z-30 shrink-0 md:hidden">
-    <button onclick="toggleChatSidebar()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
-      <i data-lucide="message-square" class="w-4 h-4"></i>
-      <span class="text-[9px] font-bold">Chat</span>
-    </button>
-    <button onclick="startMiniGame('petal-catch')" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
-      <i data-lucide="gamepad-2" class="w-4 h-4"></i>
-      <span class="text-[9px] font-bold">Games</span>
-    </button>
-    <button onclick="toggleJukeboxModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
-      <i data-lucide="music" class="w-4 h-4"></i>
-      <span class="text-[9px] font-bold">Music</span>
-    </button>
-    <button onclick="toggleSettingsModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
-      <i data-lucide="user-cog" class="w-4 h-4"></i>
-      <span class="text-[9px] font-bold">Slime</span>
-    </button>
-  </nav>
-
-  <!-- MUSIC JUKEBOX MODAL -->
-  <div id="jukebox-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95">
-      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+  <!-- LEFT SIDEBAR CONTROL PANEL -->
+  <aside id="left-sidebar" class="w-64 sm:w-72 md:w-80 glass-dark border-r border-pink-200/30 flex flex-col justify-between z-40 shrink-0 h-full transition-transform duration-300 absolute md:relative -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none">
+    
+    <!-- Header Logo & User Profile -->
+    <div class="p-3 border-b border-pink-200/20 bg-white/5 space-y-3 shrink-0">
+      <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <i data-lucide="disc" class="w-5 h-5 text-pink-600 animate-spin" style="animation-duration: 8s;"></i>
-          <h3 class="font-bold text-pink-950 text-base">Sakura Music Jukebox</h3>
+          <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shadow-pink-300 shrink-0">
+            <i data-lucide="flower-2" class="w-5 h-5 animate-spin" style="animation-duration: 12s;"></i>
+          </div>
+          <div>
+            <h1 class="font-sakura text-sm sm:text-base text-pink-100 font-bold tracking-wide leading-none">Sakura Slime 🌸</h1>
+            <p class="text-[9px] text-pink-400 font-semibold uppercase mt-0.5" id="room-indicator">#sakura-park</p>
+          </div>
         </div>
-        <button onclick="toggleJukeboxModal()" class="text-pink-700 hover:text-pink-900 p-1">
+        <button onclick="toggleLeftSidebar()" class="md:hidden text-pink-300 hover:text-white p-1">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <div class="space-y-2">
-        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Select Lo-Fi / Synth Track</label>
-        <select id="song-select" onchange="changeMusicTrack(this.value)" class="glass-input w-full px-3 py-2 rounded-xl text-xs font-bold text-pink-950">
-          <option value="lofi">🌸 Track 1: Sakura Chill Lo-Fi</option>
-          <option value="bamboo">🎋 Track 2: Zen Bamboo Flute Melody</option>
-          <option value="disco">🪩 Track 3: Disco Club Synth Wave</option>
-          <option value="dungeon">🏰 Track 4: Dungeon Battle Chiptune</option>
-        </select>
-      </div>
-
-      <div class="flex items-center justify-between bg-pink-100/90 p-3 rounded-2xl border border-pink-200">
-        <button onclick="toggleBackgroundMusic()" id="modal-music-btn" class="px-4 py-2 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5">
-          <i data-lucide="play" class="w-4 h-4"></i> Play Music
-        </button>
-
-        <div class="flex items-center gap-2">
-          <i data-lucide="volume-2" class="w-4 h-4 text-pink-700"></i>
-          <input type="range" id="modal-volume" min="0" max="1" step="0.05" value="0.3" oninput="updateMusicVolume(this.value)" class="w-20 h-1.5 accent-pink-500 cursor-pointer" />
+      <!-- Player HUD Stats Badge -->
+      <div class="flex items-center justify-between bg-pink-900/40 p-2 rounded-2xl border border-pink-300/30 shadow-inner text-xs">
+        <div class="flex items-center gap-1.5 font-bold text-purple-200">
+          <i data-lucide="shield" class="w-3.5 h-3.5 text-purple-400"></i>
+          <span>Lvl <strong id="hud-level" class="text-purple-300 text-sm">1</strong></span>
+        </div>
+        <div class="flex items-center gap-1.5 font-bold text-rose-300">
+          <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-400 fill-rose-400"></i>
+          <span id="hud-hp">100/100</span>
+        </div>
+        <div class="flex items-center gap-1 font-semibold text-emerald-400 text-[10px]">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="player-count">1 Online</span>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- Navigation Options & Channels -->
+    <div class="p-3 space-y-3 overflow-y-auto flex-1">
+      <!-- Zone Switcher -->
+      <div class="space-y-1.5">
+        <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider flex items-center gap-1">
+          <i data-lucide="map-pin" class="w-3 h-3 text-pink-400"></i> Lounge Zones
+        </span>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button onclick="switchChannel('sakura-park')" id="chan-btn-sakura-park" class="chan-btn p-2 rounded-xl text-xs font-bold bg-pink-500 text-white shadow-sm transition flex items-center gap-1.5">
+            <span>🌸</span> Park
+          </button>
+          <button onclick="switchChannel('disco-club')" id="chan-btn-disco-club" class="chan-btn p-2 rounded-xl text-xs font-bold text-pink-200 hover:bg-pink-900/50 transition flex items-center gap-1.5">
+            <span>🪩</span> Disco
+          </button>
+          <button onclick="switchChannel('onsen-hotspring')" id="chan-btn-onsen-hotspring" class="chan-btn p-2 rounded-xl text-xs font-bold text-pink-200 hover:bg-pink-900/50 transition flex items-center gap-1.5">
+            <span>🎋</span> Onsen
+          </button>
+          <button onclick="switchChannel('portal-dungeon')" id="chan-btn-portal-dungeon" class="chan-btn p-2 rounded-xl text-xs font-bold text-purple-300 hover:bg-purple-900/50 transition flex items-center gap-1.5">
+            <span>🏰</span> Dungeon
+          </button>
+        </div>
+      </div>
+
+      <!-- Mini-Games Launcher -->
+      <div class="space-y-1.5 pt-2 border-t border-pink-200/20">
+        <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider flex items-center gap-1">
+          <i data-lucide="gamepad-2" class="w-3 h-3 text-pink-400"></i> Arcade Games
+        </span>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button onclick="startMiniGame('petal-catch')" class="p-2 rounded-xl bg-pink-900/40 hover:bg-pink-800/60 text-pink-100 text-xs font-semibold border border-pink-300/20 transition flex items-center gap-1.5">
+            <span>🌸</span> Petals
+          </button>
+          <button onclick="startMiniGame('shrine-dash')" class="p-2 rounded-xl bg-pink-900/40 hover:bg-pink-800/60 text-pink-100 text-xs font-semibold border border-pink-300/20 transition flex items-center gap-1.5">
+            <span>⛩️</span> Dash
+          </button>
+          <button onclick="openRhythmGame()" class="p-2 rounded-xl bg-pink-900/40 hover:bg-pink-800/60 text-pink-100 text-xs font-semibold border border-pink-300/20 transition flex items-center gap-1.5">
+            <span>🪩</span> Rhythm
+          </button>
+          <button onclick="openArcadeMemoryGame()" class="p-2 rounded-xl bg-pink-900/40 hover:bg-pink-800/60 text-pink-100 text-xs font-semibold border border-pink-300/20 transition flex items-center gap-1.5">
+            <span>🧠</span> Memory
+          </button>
+        </div>
+      </div>
+
+      <!-- Jukebox & Audio Track Selector -->
+      <div class="space-y-1.5 pt-2 border-t border-pink-200/20">
+        <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider flex items-center gap-1">
+          <i data-lucide="music" class="w-3 h-3 text-pink-400"></i> Lo-Fi Jukebox
+        </span>
+        <select id="left-song-select" onchange="changeMusicTrack(this.value)" class="glass-input w-full px-2.5 py-1.5 rounded-xl text-xs font-semibold text-pink-950">
+          <option value="lofi">🌸 Track 1: Sakura Chill Lo-Fi</option>
+          <option value="bamboo">🎋 Track 2: Zen Bamboo Flute</option>
+          <option value="disco">🪩 Track 3: Disco Club Synthwave</option>
+          <option value="dungeon">🏰 Track 4: Dungeon 8-Bit Battle</option>
+        </select>
+        <div class="flex items-center gap-2 pt-1">
+          <button onclick="toggleBackgroundMusic()" id="left-music-btn" class="flex-1 py-1.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs shadow transition flex items-center justify-center gap-1">
+            <i data-lucide="play" class="w-3.5 h-3.5"></i> Play Track
+          </button>
+          <input type="range" id="left-volume" min="0" max="1" step="0.05" value="0.3" oninput="updateMusicVolume(this.value)" class="w-16 h-1.5 accent-pink-500 cursor-pointer" title="Volume" />
+        </div>
+      </div>
+
+      <!-- Settings Customization Button -->
+      <div class="pt-2 border-t border-pink-200/20">
+        <button onclick="toggleSettingsModal()" class="w-full py-2 rounded-xl bg-white/10 hover:bg-white/20 text-pink-100 text-xs font-bold border border-pink-200/30 transition flex items-center justify-center gap-2">
+          <i data-lucide="user-cog" class="w-4 h-4 text-pink-400"></i> Customize Slime Avatar
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Chat Feed inside Sidebar -->
+    <div class="p-2.5 bg-black/40 border-t border-pink-200/20 flex flex-col h-44 shrink-0">
+      <div id="chat-messages" class="flex-1 overflow-y-auto space-y-1.5 pr-1 text-xs"></div>
+      <form id="chat-form" class="flex items-center gap-1.5 mt-1.5 shrink-0">
+        <input 
+          type="text" 
+          id="chat-input" 
+          placeholder="Type message..." 
+          maxlength="120"
+          autocomplete="off"
+          class="glass-input flex-1 px-2.5 py-1.5 rounded-xl text-xs text-pink-950 placeholder-pink-400 font-medium"
+        />
+        <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white p-1.5 rounded-xl shadow transition shrink-0">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT CONTAINER WITH FIXED 16:9 VIEWPORT CANVAS -->
+  <main class="flex-1 relative flex flex-col items-center justify-center overflow-hidden h-full w-full bg-pink-950/40">
+
+    <!-- Mobile Top Navigation Bar Toggle -->
+    <header class="w-full h-10 glass px-3 flex items-center justify-between z-30 shrink-0 md:hidden border-b border-pink-200/50">
+      <button onclick="toggleLeftSidebar()" class="p-1 rounded-lg bg-pink-100 text-pink-900 font-bold text-xs flex items-center gap-1">
+        <i data-lucide="menu" class="w-4 h-4"></i> Menu
+      </button>
+      <span class="font-sakura text-xs text-pink-950 font-bold">Sakura Slime World</span>
+      <button onclick="triggerJump()" class="p-1 px-2 rounded-lg bg-pink-500 text-white font-bold text-[10px]">
+        Jump
+      </button>
+    </header>
+
+    <!-- UNIFORM 16:9 ASPECT RATIO PLAY AREA CONTAINER -->
+    <div id="aspect-ratio-wrapper">
+      <div id="canvas-container" class="relative overflow-hidden shadow-2xl rounded-2xl border-2 border-pink-300/40 flex items-center justify-center">
+        
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas" class="block cursor-pointer touch-none"></canvas>
+
+        <!-- CAMERA ZOOM CONTROLS OVERLAY -->
+        <div class="absolute top-3 right-3 z-20 flex flex-col gap-1 bg-black/40 backdrop-blur-md p-1 rounded-2xl border border-white/20">
+          <button onclick="adjustCameraZoom(0.15)" class="w-8 h-8 rounded-xl bg-white/80 hover:bg-white text-pink-950 font-bold text-lg flex items-center justify-center shadow transition active:scale-90" title="Zoom In">
+            +
+          </button>
+          <button onclick="adjustCameraZoom(-0.15)" class="w-8 h-8 rounded-xl bg-white/80 hover:bg-white text-pink-950 font-bold text-lg flex items-center justify-center shadow transition active:scale-90" title="Zoom Out">
+            -
+          </button>
+          <button onclick="resetCameraZoom()" class="w-8 h-8 rounded-xl bg-white/80 hover:bg-white text-pink-950 font-bold text-[10px] flex items-center justify-center shadow transition active:scale-90" title="Reset Zoom">
+            100%
+          </button>
+        </div>
+
+        <!-- Live Mini-Game HUD Banner Overlay -->
+        <div id="minigame-banner" class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-20 glass px-3 py-1.5 rounded-2xl border border-pink-300 shadow-xl flex items-center gap-3 animate-in fade-in">
+          <div class="flex items-center gap-2 text-xs">
+            <span id="minigame-title" class="font-bold text-pink-950 uppercase">🌸 Petal Catch</span>
+            <span class="text-pink-300">|</span>
+            <span class="font-bold text-pink-800">Score: <strong id="minigame-score" class="text-pink-950 font-black text-sm">0</strong></span>
+            <span class="text-pink-300">|</span>
+            <span class="font-bold text-pink-800">Time: <strong id="minigame-timer" class="text-pink-950 font-black text-sm">30s</strong></span>
+          </div>
+          <button onclick="endMiniGame(true)" class="px-2 py-0.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-bold">Quit</button>
+        </div>
+
+        <!-- Emote & Quick Action Toolbar Overlay -->
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-1.5">
+          <button onclick="triggerJump()" class="action-btn px-2 py-1 rounded-xl text-xs font-black text-pink-800 flex items-center gap-1" title="Jump / Bounce">
+            <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5 text-pink-600"></i>
+            <span class="hidden sm:inline">Jump</span>
+          </button>
+          <button onclick="triggerAttack()" class="action-btn px-2 py-1 rounded-xl text-xs font-black text-purple-900 bg-purple-100 hover:bg-purple-200 border-purple-300 flex items-center gap-1" title="Sword Slash Attack">
+            <i data-lucide="sword" class="w-3.5 h-3.5 text-purple-600"></i>
+            <span class="hidden sm:inline">Attack</span>
+          </button>
+          <span class="text-pink-300">|</span>
+          <button onclick="triggerEmote('🌸')" class="hover:scale-125 active:scale-90 transition text-base">🌸</button>
+          <button onclick="triggerEmote('❤️')" class="hover:scale-125 active:scale-90 transition text-base">❤️</button>
+          <button onclick="triggerEmote('✨')" class="hover:scale-125 active:scale-90 transition text-base">✨</button>
+          <button onclick="triggerEmote('⚔️')" class="hover:scale-125 active:scale-90 transition text-base">⚔️</button>
+          <button onclick="triggerEmote('🪩')" class="hover:scale-125 active:scale-90 transition text-base">🪩</button>
+        </div>
+
+        <!-- Mobile Virtual Joystick & Action Buttons -->
+        <div class="absolute bottom-3 left-3 z-20 pointer-events-auto md:hidden">
+          <div id="joystick-container" class="joystick-base">
+            <div id="joystick-stick" class="joystick-stick"></div>
+          </div>
+        </div>
+
+        <div class="absolute bottom-3 right-3 z-20 pointer-events-auto md:hidden flex flex-col gap-2">
+          <button onclick="triggerAttack()" class="w-11 h-11 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white text-xs font-black shadow-lg shadow-purple-500/50 active:scale-90 flex items-center justify-center border-2 border-white">
+            <i data-lucide="sword" class="w-5 h-5"></i>
+          </button>
+          <button onclick="triggerJump()" class="w-11 h-11 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-[10px] font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
+            JUMP
+          </button>
+        </div>
+
+        <!-- Memory Arcade Mini-Game Modal -->
+        <div id="arcade-card-modal" class="hidden absolute inset-0 z-30 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div class="glass w-full max-w-xs rounded-3xl p-4 shadow-2xl border border-white space-y-3 animate-in fade-in">
+            <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+              <h3 class="font-bold text-pink-950 text-xs flex items-center gap-1.5">
+                <i data-lucide="gamepad-2" class="w-4 h-4 text-pink-600"></i> Slime Memory Match
+              </h3>
+              <button onclick="closeArcadeMemoryGame()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5" id="memory-grid"></div>
+            <p class="text-[10px] text-pink-700 font-semibold text-center" id="memory-status">Match pairs to win XP!</p>
+          </div>
+        </div>
+
+        <!-- Disco Rhythm Mini-Game Modal -->
+        <div id="rhythm-game-modal" class="hidden absolute inset-0 z-30 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div class="glass w-full max-w-xs rounded-3xl p-5 shadow-2xl border border-white space-y-4 text-center">
+            <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+              <h3 class="font-bold text-pink-950 text-xs flex items-center gap-1.5">
+                <i data-lucide="disc" class="w-4 h-4 text-pink-600"></i> Disco Fever Rhythm
+              </h3>
+              <button onclick="closeRhythmGame()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <p class="text-xs text-pink-800 font-medium">Tap the matching arrow button when highlighted!</p>
+            <div id="rhythm-target" class="text-4xl font-black text-pink-600 h-14 flex items-center justify-center bg-pink-100/80 rounded-2xl border border-pink-300">
+              ⬆️
+            </div>
+            <div class="grid grid-cols-4 gap-2">
+              <button onclick="pressRhythmKey('⬅️')" class="p-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow">⬅️</button>
+              <button onclick="pressRhythmKey('⬆️')" class="p-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow">⬆️</button>
+              <button onclick="pressRhythmKey('⬇️')" class="p-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow">⬇️</button>
+              <button onclick="pressRhythmKey('➡️')" class="p-3 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow">➡️</button>
+            </div>
+            <p id="rhythm-score-text" class="text-xs font-bold text-pink-950">Combo: 0</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
 
   <!-- CUSTOMIZATION SETTINGS MODAL -->
   <div id="settings-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
@@ -440,7 +427,7 @@
       <div class="flex items-center justify-between border-b border-pink-200 pb-2">
         <div class="flex items-center gap-2">
           <i data-lucide="sparkles" class="w-5 h-5 text-pink-600"></i>
-          <h3 class="font-bold text-pink-950 text-base">Customize Slime</h3>
+          <h3 class="font-bold text-pink-950 text-base">Customize Slime Avatar</h3>
         </div>
         <button onclick="toggleSettingsModal()" class="text-pink-700 hover:text-pink-900 p-1">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -458,7 +445,7 @@
       </div>
 
       <button onclick="saveAvatarSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs">
-        <i data-lucide="check" class="w-4 h-4"></i> Save Settings
+        <i data-lucide="check" class="w-4 h-4"></i> Save Customization
       </button>
     </div>
   </div>
@@ -469,7 +456,7 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- PROCEDURAL MULTI-TRACK AUDIO SYNTHESIZER ---
+    // --- PROCEDURAL AUDIO SYNTHESIZER ---
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     let musicPlaying = false;
@@ -581,13 +568,13 @@
     function toggleBackgroundMusic() {
       initAudio();
       musicPlaying = !musicPlaying;
-      const modalBtn = document.getElementById('modal-music-btn');
+      const leftBtn = document.getElementById('left-music-btn');
 
       if (musicPlaying) {
-        modalBtn.innerHTML = `<i data-lucide="pause" class="w-4 h-4"></i> Pause Music`;
+        if(leftBtn) leftBtn.innerHTML = `<i data-lucide="pause" class="w-3.5 h-3.5"></i> Pause Track`;
         playMusicNote();
       } else {
-        modalBtn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> Play Music`;
+        if(leftBtn) leftBtn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5"></i> Play Track`;
         clearTimeout(musicTimer);
       }
       lucide.createIcons();
@@ -605,6 +592,78 @@
       if (musicMasterGain) musicMasterGain.gain.value = parseFloat(val);
     }
 
+    // --- GAME CANVAS UNIFORM RATIO & ZOOM SYSTEM ---
+    const BASE_CANVAS_WIDTH = 960;
+    const BASE_CANVAS_HEIGHT = 540; // 16:9 Aspect Ratio
+    let cameraZoom = 1.0;
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvasResolution() {
+      const wrapper = document.getElementById('aspect-ratio-wrapper');
+      const container = document.getElementById('canvas-container');
+      
+      const availW = wrapper.clientWidth - 16;
+      const availH = wrapper.clientHeight - 16;
+      
+      let targetW = availW;
+      let targetH = targetW * (9 / 16);
+
+      if (targetH > availH) {
+        targetH = availH;
+        targetW = targetH * (16 / 9);
+      }
+
+      container.style.width = `${targetW}px`;
+      container.style.height = `${targetH}px`;
+
+      canvas.width = BASE_CANVAS_WIDTH;
+      canvas.height = BASE_CANVAS_HEIGHT;
+    }
+
+    function adjustCameraZoom(delta) {
+      cameraZoom = Math.max(0.65, Math.min(1.8, cameraZoom + delta));
+    }
+
+    function resetCameraZoom() {
+      cameraZoom = 1.0;
+    }
+
+    // Pinch Zoom Gestures
+    let initialPinchDist = null;
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 2) {
+        initialPinchDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      }
+    });
+
+    canvas.addEventListener('touchmove', e => {
+      if (e.touches.length === 2 && initialPinchDist) {
+        const currentDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const diff = (currentDist - initialPinchDist) * 0.003;
+        adjustCameraZoom(diff);
+        initialPinchDist = currentDist;
+      }
+    });
+
+    canvas.addEventListener('touchend', e => {
+      if (e.touches.length < 2) initialPinchDist = null;
+    });
+
+    // Mouse Wheel Zoom
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      adjustCameraZoom(e.deltaY < 0 ? 0.08 : -0.08);
+    }, { passive: false });
+
+
     // --- AVATAR TYPES & GAME STATE ---
     const AVATAR_TYPES = {
       sakura: { name: 'Sakura Pin', bodyColor: '#f472b6', accessory: '🌸' },
@@ -620,11 +679,11 @@
       id: 'usr_' + Math.random().toString(36).substring(2, 9),
       name: localStorage.getItem('sakura_avatar_name') || 'Slime_' + Math.floor(100 + Math.random() * 900),
       avatarType: localStorage.getItem('sakura_avatar_type') || 'sakura',
-      x: 400,
-      y: 300,
-      targetX: 400,
-      targetY: 300,
-      speed: 4.8,
+      x: 480,
+      y: 270,
+      targetX: 480,
+      targetY: 270,
+      speed: 5.2,
       direction: 'down',
       isMoving: false,
       isJumping: false,
@@ -655,7 +714,7 @@
     let discoBeams = [];
     let steamParticles = [];
 
-    // Mini-Game Active Variables
+    // Mini-Game Variables
     let activeMiniGame = null;
     let miniGameScore = 0;
     let miniGameTimeLeft = 0;
@@ -677,16 +736,6 @@
     // Inputs
     const keys = { up: false, down: false, left: false, right: false };
     const joystick = { active: false, dx: 0, dy: 0 };
-
-    // Canvas Setup
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-
-    function resizeCanvas() {
-      const container = document.getElementById('canvas-container');
-      canvas.width = container.clientWidth;
-      canvas.height = container.clientHeight;
-    }
 
     // --- AUTHENTICATION HANDLERS ---
     let authMode = 'signin';
@@ -762,10 +811,10 @@
     // --- ENVIRONMENT & PARTICLES INITIALIZATION ---
     function initEnvironmentElements() {
       petals = [];
-      for (let i = 0; i < 40; i++) {
+      for (let i = 0; i < 45; i++) {
         petals.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight,
+          x: Math.random() * BASE_CANVAS_WIDTH,
+          y: Math.random() * BASE_CANVAS_HEIGHT,
           size: Math.random() * 5 + 3,
           speedY: Math.random() * 1.2 + 0.6,
           speedX: Math.random() * 0.8 - 0.4,
@@ -778,17 +827,17 @@
       for (let i = 0; i < 8; i++) {
         discoBeams.push({
           angle: (i * Math.PI) / 4,
-          length: 300,
+          length: 350,
           color: `hsl(${i * 45}, 100%, 65%)`
         });
       }
 
       steamParticles = [];
-      for (let i = 0; i < 25; i++) {
+      for (let i = 0; i < 30; i++) {
         steamParticles.push({
-          x: Math.random() * 200 + 100,
-          y: Math.random() * 100 + 150,
-          r: Math.random() * 12 + 8,
+          x: Math.random() * 220 + 370,
+          y: Math.random() * 120 + 200,
+          r: Math.random() * 14 + 6,
           alpha: Math.random() * 0.4 + 0.1,
           speedY: Math.random() * 0.6 + 0.3
         });
@@ -799,9 +848,9 @@
 
     function spawnDungeonMonsters() {
       dungeonMonsters = [
-        { id: 'm1', name: 'Shadow Slime', x: 250, y: 220, hp: 40, maxHp: 40, level: 1, type: 'slime', color: '#8b5cf6' },
-        { id: 'm2', name: 'Goblin Scout', x: 550, y: 300, hp: 60, maxHp: 60, level: 2, type: 'goblin', color: '#22c55e' },
-        { id: 'm3', name: 'Dark Imp', x: 380, y: 420, hp: 50, maxHp: 50, level: 2, type: 'imp', color: '#ef4444' }
+        { id: 'm1', name: 'Shadow Slime', x: 250, y: 200, hp: 40, maxHp: 40, level: 1, type: 'slime', color: '#8b5cf6' },
+        { id: 'm2', name: 'Goblin Scout', x: 680, y: 280, hp: 60, maxHp: 60, level: 2, type: 'goblin', color: '#22c55e' },
+        { id: 'm3', name: 'Dark Imp', x: 480, y: 400, hp: 50, maxHp: 50, level: 2, type: 'imp', color: '#ef4444' }
       ];
     }
 
@@ -812,9 +861,9 @@
         p.x += p.speedX + Math.sin(p.y * 0.015) * 0.4;
         p.rotation += p.rotSpeed;
 
-        if (p.y > canvas.height + 15) {
+        if (p.y > BASE_CANVAS_HEIGHT + 15) {
           p.y = -15;
-          p.x = Math.random() * canvas.width;
+          p.x = Math.random() * BASE_CANVAS_WIDTH;
         }
 
         ctx.save();
@@ -890,44 +939,44 @@
       }
     }
 
-    // --- ROOM ENVIRONMENTS DRAWING ---
+    // --- ROOM MAP ENVIRONMENTS ---
     function drawEnvironment() {
-      const w = canvas.width;
-      const h = canvas.height;
+      const w = BASE_CANVAS_WIDTH;
+      const h = BASE_CANVAS_HEIGHT;
 
       if (currentChannel === 'sakura-park') {
-        // Map 1: 🌸 Sakura Shrine & Park with Interactive Swings & Slide
+        // Map 1: 🌸 Sakura Shrine & Park
         ctx.fillStyle = '#fce7f3';
         ctx.fillRect(0, 0, w, h);
 
-        // Grass/Tatami Tiles
+        // Grid Grass Lines
         ctx.strokeStyle = 'rgba(244, 114, 182, 0.2)';
         ctx.lineWidth = 2;
-        for (let x = 0; x < w; x += 70) {
-          for (let y = 0; y < h; y += 70) {
-            ctx.strokeRect(x, y, 70, 70);
+        for (let x = 0; x < w; x += 60) {
+          for (let y = 0; y < h; y += 60) {
+            ctx.strokeRect(x, y, 60, 60);
           }
         }
 
         // Stepping Stones
         ctx.fillStyle = '#cbd5e1';
         [ {x: w*0.2, y: h*0.3}, {x: w*0.35, y: h*0.4}, {x: w*0.5, y: h*0.45} ].forEach(s => {
-          ctx.beginPath(); ctx.ellipse(s.x, s.y, 18, 10, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.ellipse(s.x, s.y, 22, 12, 0, 0, Math.PI * 2); ctx.fill();
         });
 
-        // Interactive Playground Swing Set
-        drawParkSwings(w * 0.25, h * 0.6);
-        // Playground Slide
-        drawParkSlide(w * 0.12, h * 0.65);
+        // Interactive Playground Swing & Slide
+        drawParkSwings(w * 0.22, h * 0.65);
+        drawParkSlide(w * 0.1, h * 0.7);
 
         // Torii Gate & Trees
         drawToriiGate(w * 0.5, h * 0.22);
-        drawSakuraTree(w * 0.85, h * 0.25, 50);
+        drawSakuraTree(w * 0.85, h * 0.28, 55);
+        drawSakuraTree(w * 0.15, h * 0.25, 45);
         drawLantern(w * 0.38, h * 0.25);
         drawLantern(w * 0.62, h * 0.25);
 
         // Dungeon Portal Entrance Gate
-        drawPortalGate(w * 0.88, h * 0.72);
+        drawPortalGate(w * 0.88, h * 0.75);
 
       } else if (currentChannel === 'disco-club') {
         // Map 2: 🪩 Disco Neon Party Club
@@ -936,18 +985,18 @@
 
         // Flashing Rainbow Disco Tiles
         const time = Date.now() * 0.003;
-        for (let x = 0; x < w; x += 50) {
-          for (let y = 0; y < h; y += 50) {
+        for (let x = 0; x < w; x += 60) {
+          for (let y = 0; y < h; y += 60) {
             const hue = (x + y + time * 50) % 360;
-            ctx.fillStyle = `hsla(${hue}, 80%, 45%, 0.25)`;
-            ctx.fillRect(x + 2, y + 2, 46, 46);
+            ctx.fillStyle = `hsla(${hue}, 80%, 45%, 0.22)`;
+            ctx.fillRect(x + 2, y + 2, 56, 56);
           }
         }
 
         // DJ Booth
-        drawDJBooth(w * 0.5, h * 0.2);
+        drawDJBooth(w * 0.5, h * 0.22);
         // Animated Disco Ball & Light Beams
-        drawDiscoBall(w * 0.5, h * 0.1);
+        drawDiscoBall(w * 0.5, h * 0.12);
         // Loudspeakers
         drawSpeaker(w * 0.2, h * 0.25);
         drawSpeaker(w * 0.8, h * 0.25);
@@ -957,13 +1006,13 @@
         ctx.fillStyle = '#064e3b';
         ctx.fillRect(0, 0, w, h);
 
-        for (let x = 20; x < w; x += 45) {
-          if (x < w * 0.3 || x > w * 0.7) drawBambooStalk(x, h * 0.15, h * 0.7);
+        for (let x = 25; x < w; x += 50) {
+          if (x < w * 0.32 || x > w * 0.68) drawBambooStalk(x, h * 0.1, h * 0.8);
         }
 
-        drawOnsenPool(w * 0.5, h * 0.55, 140, 80);
-        drawLantern(w * 0.32, h * 0.35);
-        drawLantern(w * 0.68, h * 0.35);
+        drawOnsenPool(w * 0.5, h * 0.55, 160, 90);
+        drawLantern(w * 0.3, h * 0.35);
+        drawLantern(w * 0.7, h * 0.35);
 
       } else if (currentChannel === 'portal-dungeon') {
         // Map 4: 🏰 Portal Dungeon Arena
@@ -982,7 +1031,7 @@
         // Glowing Rune Circles
         ctx.strokeStyle = 'rgba(168, 85, 247, 0.4)';
         ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.arc(w * 0.5, h * 0.5, 120, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(w * 0.5, h * 0.5, 140, 0, Math.PI * 2); ctx.stroke();
 
         // Draw Dungeon Monsters
         drawDungeonMonsters();
@@ -993,13 +1042,12 @@
       ctx.strokeRect(0, 0, w, h);
     }
 
-    // DRAWING HELPERS
+    // DECORATIVE DRAWING HELPERS
     function drawParkSwings(x, y) {
       ctx.strokeStyle = '#475569'; ctx.lineWidth = 4;
       ctx.beginPath(); ctx.moveTo(x - 35, y + 40); ctx.lineTo(x - 20, y - 30); ctx.lineTo(x + 20, y - 30); ctx.lineTo(x + 35, y + 40); ctx.stroke();
       ctx.fillRect(x - 22, y - 32, 44, 4);
 
-      // Swing Chain & Seat Physics
       const swingRopeAngle = Math.sin(Date.now() * 0.004) * 0.25;
       const seatX = x + Math.sin(swingRopeAngle) * 35;
       const seatY = y - 30 + Math.cos(swingRopeAngle) * 35;
@@ -1011,7 +1059,6 @@
       ctx.fillStyle = '#b45309';
       ctx.fillRect(seatX - 14, seatY, 28, 6);
 
-      // Swing Riding Collision Check
       if (Math.hypot(localPlayer.x - seatX, localPlayer.y - seatY) < 25) {
         localPlayer.isSwinging = true;
         localPlayer.x = seatX;
@@ -1021,7 +1068,7 @@
 
     function drawParkSlide(x, y) {
       ctx.fillStyle = '#ef4444';
-      ctx.beginPath(); ctx.moveTo(x, y + 30); ctx.lineTo(x + 30, y - 30); ctx.lineTo(x + 40, y - 30); ctx.lineTo(x + 10, y + 30); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x, y + 30); ctx.lineTo(x + 35, y - 35); ctx.lineTo(x + 45, y - 35); ctx.lineTo(x + 10, y + 30); ctx.closePath(); ctx.fill();
     }
 
     function drawToriiGate(x, y) {
@@ -1057,7 +1104,7 @@
       ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.ellipse(x, y, 18, 30, Date.now() * 0.002, 0, Math.PI * 2); ctx.stroke();
 
-      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
       ctx.fillText('DUNGEON PORTAL', x, y + 42);
 
       if (Math.hypot(localPlayer.x - x, localPlayer.y - y) < 30) {
@@ -1074,10 +1121,10 @@
       const rot = Date.now() * 0.002;
       discoBeams.forEach(b => {
         ctx.strokeStyle = b.color; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(b.angle + rot) * 250, y + Math.sin(b.angle + rot) * 250); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(b.angle + rot) * 300, y + Math.sin(b.angle + rot) * 300); ctx.stroke();
       });
 
-      ctx.fillStyle = '#e2e8f0'; ctx.beginPath(); ctx.arc(x, y, 18, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#e2e8f0'; ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
     }
 
     function drawSpeaker(x, y) {
@@ -1095,7 +1142,7 @@
       steamParticles.forEach(p => {
         p.y -= p.speedY; if (p.y < y - ry) p.y = y + ry * 0.5;
         ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
-        ctx.beginPath(); ctx.arc(p.x + x - 200, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
       });
     }
 
@@ -1120,7 +1167,7 @@
         ctx.fillStyle = '#22c55e'; ctx.fillRect(-20, -28, (m.hp / m.maxHp) * 40, 5);
 
         // Name
-        ctx.fillStyle = '#e9d5ff'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillStyle = '#e9d5ff'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
         ctx.fillText(`${m.name} Lvl.${m.level}`, 0, -32);
 
         ctx.restore();
@@ -1145,8 +1192,8 @@
               localPlayer.xp += 25;
               checkLevelUp();
               m.hp = m.maxHp;
-              m.x = Math.random() * (canvas.width - 100) + 50;
-              m.y = Math.random() * (canvas.height - 100) + 50;
+              m.x = Math.random() * (BASE_CANVAS_WIDTH - 120) + 60;
+              m.y = Math.random() * (BASE_CANVAS_HEIGHT - 120) + 60;
             }
           }
         });
@@ -1211,7 +1258,7 @@
       ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
       ctx.fillText(type.accessory, 0 + eyeOffsetX, -18);
 
-      // Weapon Slash Effect
+      // Weapon Slash
       if (isAttacking) {
         ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 4;
         ctx.beginPath(); ctx.arc(15, -5, 22, -Math.PI/3, Math.PI/3); ctx.stroke();
@@ -1219,7 +1266,7 @@
 
       ctx.restore();
 
-      // Self Indicator
+      // Self Indicator Ring
       if (isSelf) {
         ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.ellipse(x, y + 14, 18, 7, 0, 0, Math.PI * 2); ctx.stroke();
@@ -1234,7 +1281,7 @@
       ctx.fillStyle = isSelf ? '#ffffff' : '#831843'; ctx.textAlign = 'center';
       ctx.fillText(name, x, drawY + 31);
 
-      // Emotes & Bubbles
+      // Emotes & Speech Bubbles
       if (activeEmote && activeEmote.expiresAt > Date.now()) {
         ctx.font = '20px sans-serif'; ctx.textAlign = 'center';
         ctx.fillText(activeEmote.emoji, x, drawY - 40);
@@ -1306,8 +1353,8 @@
         }
       }
 
-      localPlayer.x = Math.max(20, Math.min(canvas.width - 20, localPlayer.x));
-      localPlayer.y = Math.max(20, Math.min(canvas.height - 20, localPlayer.y));
+      localPlayer.x = Math.max(20, Math.min(BASE_CANVAS_WIDTH - 20, localPlayer.x));
+      localPlayer.y = Math.max(20, Math.min(BASE_CANVAS_HEIGHT - 20, localPlayer.y));
 
       if (activeMiniGame) checkMiniGameCollisions();
       if (localPlayer.isMoving && realtimeChannel) broadcastState();
@@ -1344,8 +1391,8 @@
     function spawnCollectibles(count = 6) {
       for (let i = 0; i < count; i++) {
         gameCollectibles.push({
-          x: Math.random() * (canvas.width - 60) + 30,
-          y: Math.random() * (canvas.height - 60) + 30,
+          x: Math.random() * (BASE_CANVAS_WIDTH - 60) + 30,
+          y: Math.random() * (BASE_CANVAS_HEIGHT - 60) + 30,
           type: Math.random() > 0.2 ? '🌸' : '⭐'
         });
       }
@@ -1418,11 +1465,11 @@
 
       icons.forEach(icon => {
         const btn = document.createElement('button');
-        btn.className = 'h-12 rounded-xl bg-pink-200 text-transparent text-lg font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
+        btn.className = 'h-11 rounded-xl bg-pink-200 text-transparent text-lg font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
         btn.textContent = icon;
         btn.onclick = () => {
           if (btn.classList.contains('bg-white')) return;
-          btn.className = 'h-12 rounded-xl bg-white text-lg font-bold transition flex items-center justify-center border-2 border-pink-500 shadow-sm';
+          btn.className = 'h-11 rounded-xl bg-white text-lg font-bold transition flex items-center justify-center border-2 border-pink-500 shadow-sm';
           if (!firstCard) { firstCard = { btn, icon }; }
           else {
             if (firstCard.icon === icon) {
@@ -1430,8 +1477,8 @@
               if (matchedCount === icons.length) document.getElementById('memory-status').textContent = '🎉 Winner! +50 XP';
             } else {
               setTimeout(() => {
-                btn.className = 'h-12 rounded-xl bg-pink-200 text-transparent text-lg font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
-                firstCard.btn.className = 'h-12 rounded-xl bg-pink-200 text-transparent text-lg font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
+                btn.className = 'h-11 rounded-xl bg-pink-200 text-transparent text-lg font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
+                firstCard.btn.className = 'h-11 rounded-xl bg-pink-200 text-transparent text-lg font-bold transition flex items-center justify-center border border-pink-300 shadow-sm';
                 firstCard = null;
               }, 500);
             }
@@ -1446,9 +1493,16 @@
       document.getElementById('arcade-card-modal').classList.add('hidden');
     }
 
-    // MAIN RENDER LOOP
+    // MAIN RENDER LOOP WITH CAMERA ZOOM
     function render() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      
+      // Camera Zoom centering
+      ctx.translate(BASE_CANVAS_WIDTH / 2, BASE_CANVAS_HEIGHT / 2);
+      ctx.scale(cameraZoom, cameraZoom);
+      ctx.translate(-BASE_CANVAS_WIDTH / 2, -BASE_CANVAS_HEIGHT / 2);
 
       drawEnvironment();
       updateAndDrawPetals();
@@ -1461,6 +1515,8 @@
       drawSlime(localPlayer, true);
 
       updateAndDrawParticles();
+
+      ctx.restore();
 
       requestAnimationFrame(render);
     }
@@ -1487,7 +1543,7 @@
               count++;
             }
           });
-          document.getElementById('player-count').textContent = count;
+          document.getElementById('player-count').textContent = `${count} Online`;
         })
         .on('broadcast', { event: 'player-move' }, payload => {
           const p = payload.payload;
@@ -1541,7 +1597,7 @@
       container.innerHTML = '';
       const messages = chatMemory[channel] || [];
       if (messages.length === 0) {
-        container.innerHTML = `<div class="text-center text-[10px] text-pink-300 my-4 italic">Welcome to #${channel}! Chat with slimes 🌸</div>`;
+        container.innerHTML = `<div class="text-center text-[10px] text-pink-300 my-2 italic">Welcome to #${channel}! 🌸</div>`;
         return;
       }
       messages.forEach(msg => displayChatMessage(msg));
@@ -1615,10 +1671,10 @@
 
       msgDiv.innerHTML = `
         <div class="flex items-center gap-1 px-1">
-          <span class="text-[10px] font-bold text-pink-200">${escapeHtml(msg.sender)}</span>
+          <span class="text-[9px] font-bold text-pink-200">${escapeHtml(msg.sender)}</span>
           <span class="text-[8px] text-pink-400">${msg.time || ''}</span>
         </div>
-        <div class="px-3 py-1.5 rounded-2xl text-xs max-w-[88%] shadow-sm ${
+        <div class="px-2.5 py-1 rounded-xl text-xs max-w-[90%] shadow-sm ${
           isSelf ? 'bg-pink-500 text-white rounded-tr-none' : 'bg-white/95 text-pink-950 rounded-tl-none font-medium'
         }">
           ${escapeHtml(msg.content)}
@@ -1633,7 +1689,7 @@
       const div = document.createElement('div'); div.innerText = text; return div.innerHTML;
     }
 
-    // EVENT LISTENERS & CONTROLS
+    // KEYBOARD CONTROLS
     window.addEventListener('keydown', e => {
       if (document.activeElement.tagName === 'INPUT') return;
       if (e.key === ' ' || e.key === 'Spacebar') { triggerAttack(); return; }
@@ -1675,28 +1731,25 @@
     canvas.addEventListener('pointerdown', e => {
       if (e.target !== canvas) return;
       const rect = canvas.getBoundingClientRect();
-      localPlayer.targetX = e.clientX - rect.left;
-      localPlayer.targetY = e.clientY - rect.top;
+      const scaleX = BASE_CANVAS_WIDTH / rect.width;
+      const scaleY = BASE_CANVAS_HEIGHT / rect.height;
+
+      localPlayer.targetX = (e.clientX - rect.left) * scaleX;
+      localPlayer.targetY = (e.clientY - rect.top) * scaleY;
     });
 
     function switchChannel(channelName) {
       if (currentChannel === channelName) return;
 
-      document.querySelectorAll('.chan-btn, .quick-chan-btn').forEach(btn => {
+      document.querySelectorAll('.chan-btn').forEach(btn => {
         btn.classList.remove('bg-pink-500', 'text-white', 'shadow-sm');
-        btn.classList.add('text-pink-800', 'text-pink-200');
+        btn.classList.add('text-pink-200');
       });
 
       const activeBtn = document.getElementById(`chan-btn-${channelName}`);
-      const quickBtn = document.getElementById(`quick-btn-${channelName}`);
       if (activeBtn) activeBtn.classList.add('bg-pink-500', 'text-white', 'shadow-sm');
-      if (quickBtn) quickBtn.classList.add('bg-pink-500', 'text-white', 'shadow-sm');
 
       initSupabaseChannel(channelName);
-    }
-
-    function toggleJukeboxModal() {
-      document.getElementById('jukebox-modal').classList.toggle('hidden');
     }
 
     function renderAvatarPicker() {
@@ -1749,21 +1802,23 @@
       toggleSettingsModal();
     }
 
-    function toggleChatSidebar() {
-      document.getElementById('chat-sidebar').classList.toggle('translate-x-full');
+    function toggleLeftSidebar() {
+      document.getElementById('left-sidebar').classList.toggle('-translate-x-full');
     }
 
-    // INITIALIZATION
-    window.addEventListener('resize', resizeCanvas);
+    // INITIALIZATION & RESIZE HANDLERS
+    window.addEventListener('resize', () => {
+      resizeCanvasResolution();
+    });
 
     window.addEventListener('load', async () => {
       lucide.createIcons();
-      resizeCanvas();
+      resizeCanvasResolution();
       initEnvironmentElements();
       updateHUD();
 
-      localPlayer.x = canvas.width / 2;
-      localPlayer.y = canvas.height / 2 + 30;
+      localPlayer.x = BASE_CANVAS_WIDTH / 2;
+      localPlayer.y = BASE_CANVAS_HEIGHT / 2;
       localPlayer.targetX = localPlayer.x;
       localPlayer.targetY = localPlayer.y;
 
