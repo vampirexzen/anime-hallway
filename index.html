@@ -78,6 +78,11 @@
 
         <!-- System Controls -->
         <div class="flex items-center gap-2">
+            <!-- Background Music Toggle -->
+            <button id="btnMusicToggle" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-amber-600">
+                <i id="musicIcon" class="fa-solid fa-music"></i>
+                <span class="hidden md:inline">Music</span>
+            </button>
             <!-- Proximity Mic Button -->
             <button id="btnMicToggle" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-rose-600">
                 <i id="micIcon" class="fa-solid fa-microphone-slash"></i>
@@ -138,7 +143,7 @@
     <div id="modalAuth" class="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
         <div class="bg-slate-900 border-2 border-indigo-500 rounded-xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
             <h2 class="text-sm text-indigo-400 font-bold"><i class="fa-solid fa-shield-halved"></i> Sanctuary Login</h2>
-            <p class="text-[9px] text-slate-400">Sign in with your email & password to save your display name and progress.</p>
+            <p class="text-[9px] text-slate-400">Sign in with your email & password to save your avatar, display name, and progress.</p>
             
             <form id="authForm" class="space-y-3 text-xs text-left">
                 <div>
@@ -189,7 +194,7 @@
             </div>
 
             <button id="btnCloseCustomizer" class="pixel-btn w-full py-2 rounded text-white bg-indigo-600 text-xs">
-                Save Changes
+                Save & Close
             </button>
         </div>
     </div>
@@ -201,7 +206,7 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const gameChannel = supabaseClient.channel('endless_anime_sanctuary_v4');
+        const gameChannel = supabaseClient.channel('endless_anime_sanctuary_v5');
 
         // --- GAME ENGINE STATE & CONSTANTS ---
         const canvas = document.getElementById('gameCanvas');
@@ -226,7 +231,7 @@
             y: HALLWAY_GROUND_Y,
             vx: 0,
             facing: 'right',
-            state: 'idle', // 'idle', 'walk', 'sit'
+            state: 'idle',
             hairColor: '#fbbf24',
             outfitColor: '#4f46e5',
             currentRoom: null,
@@ -298,7 +303,13 @@
                 const { data, error } = await supabaseClient.auth.signUp({
                     email,
                     password,
-                    options: { data: { display_name: name } }
+                    options: { 
+                        data: { 
+                            display_name: name,
+                            hair_color: '#fbbf24',
+                            outfit_color: '#4f46e5'
+                        } 
+                    }
                 });
                 if (error) {
                     authError.innerText = error.message;
@@ -325,11 +336,14 @@
             localPlayer.id = user.id;
             localPlayer.email = user.email;
             localPlayer.name = metadata.display_name || user.email.split('@')[0];
+            localPlayer.hairColor = metadata.hair_color || '#fbbf24';
+            localPlayer.outfitColor = metadata.outfit_color || '#4f46e5';
             
             document.getElementById('playerTag').innerText = localPlayer.name;
             document.getElementById('inputPlayerName').value = localPlayer.name;
+            document.getElementById('colorHair').value = localPlayer.hairColor;
+            document.getElementById('colorOutfit').value = localPlayer.outfitColor;
 
-            // Start Supabase Realtime channel subscription
             initRealtimeSync();
         }
 
@@ -338,7 +352,6 @@
             location.reload();
         });
 
-        // Check existing session on load
         window.addEventListener('load', async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session && session.user) {
@@ -352,19 +365,19 @@
         function initRealtimeSync() {
             gameChannel
                 .on('broadcast', { event: 'state' }, ({ payload }) => {
-                    if (payload.id !== localPlayer.id) {
+                    if (payload && payload.id && payload.id !== localPlayer.id) {
                         remotePlayers.set(payload.id, payload);
                         updatePeerCountUI();
                     }
                 })
                 .on('broadcast', { event: 'chat' }, ({ payload }) => {
-                    if (payload.id !== localPlayer.id) {
+                    if (payload && payload.author && payload.author !== localPlayer.name) {
                         addChatMessage(payload.author, payload.text);
                     }
                 })
                 .subscribe((status) => {
                     if (status === 'SUBSCRIBED') {
-                        console.log('Realtime synchronization active.');
+                        console.log('Realtime sync active.');
                     }
                 });
         }
@@ -382,6 +395,57 @@
             document.getElementById('peerCount').innerText = `Online: ${remotePlayers.size + 1}`;
         }
 
+        // --- PROCEDURAL BACKGROUND MUSIC (WEB AUDIO API) ---
+        let audioCtx = null;
+        let isMusicPlaying = false;
+        let musicInterval = null;
+
+        function toggleBackgroundMusic() {
+            const btnMusic = document.getElementById('btnMusicToggle');
+            const musicIcon = document.getElementById('musicIcon');
+
+            if (!isMusicPlaying) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                isMusicPlaying = true;
+                btnMusic.classList.remove('bg-amber-600');
+                btnMusic.classList.add('bg-emerald-600');
+                musicIcon.className = 'fa-solid fa-volume-high';
+
+                // Play soothing minor chord arpeggios
+                const notes = [220.00, 261.63, 329.63, 392.00, 440.00]; // A minor pentatonic
+                musicInterval = setInterval(() => {
+                    if (!isMusicPlaying || !audioCtx) return;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    osc.type = 'sine';
+                    const freq = notes[Math.floor(Math.random() * notes.length)];
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3.5);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 3.5);
+                }, 1200);
+
+            } else {
+                isMusicPlaying = false;
+                if (musicInterval) clearInterval(musicInterval);
+                if (audioCtx) audioCtx.close();
+                
+                btnMusic.classList.remove('bg-emerald-600');
+                btnMusic.classList.add('bg-amber-600');
+                musicIcon.className = 'fa-solid fa-music';
+            }
+        }
+        document.getElementById('btnMusicToggle').addEventListener('click', toggleBackgroundMusic);
+
         // --- PIXEL ART RENDERING ENGINE ---
         const PixelArt = {
             drawCharacter(ctx, x, y, player, isLocal = false) {
@@ -396,24 +460,21 @@
                 const bobbing = player.state === 'idle' ? Math.sin(Date.now() * 0.005) * 0.5 : 0;
                 const isSitting = player.state === 'sit';
 
-                // Shadow
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
                 ctx.beginPath();
                 ctx.ellipse(0, 0, 7, 2.5, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (isSitting) {
-                    // Sitting Pose
                     ctx.fillStyle = '#1e293b';
-                    ctx.fillRect(-3, -2, 3, 3); // Sitting legs
+                    ctx.fillRect(-3, -2, 3, 3);
                     ctx.fillStyle = player.outfitColor || '#4f46e5';
-                    ctx.fillRect(-4, -9, 8, 6); // Torso sitting
+                    ctx.fillRect(-4, -9, 8, 6);
                     ctx.fillStyle = '#ffedd5';
-                    ctx.fillRect(-4, -16, 8, 7); // Head sitting
+                    ctx.fillRect(-4, -16, 8, 7);
                     ctx.fillStyle = player.hairColor || '#fbbf24';
                     ctx.fillRect(-5, -18, 10, 4);
                 } else {
-                    // Standing / Walking Pose
                     ctx.fillStyle = '#1e293b';
                     ctx.fillRect(-3, -4, 2, 4);
                     ctx.fillRect(1, -4, 2, 4);
@@ -486,32 +547,26 @@
             },
 
             drawBonfireRoom(ctx) {
-                // Background wall
                 ctx.fillStyle = '#1e1b4b';
                 ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 
-                // Brick Patterns & Lanterns
                 ctx.fillStyle = '#312e81';
                 for (let x = 10; x < VIRTUAL_WIDTH; x += 25) {
                     ctx.fillRect(x, 10, 12, 120);
                 }
-                // Wall Lanterns
                 ctx.fillStyle = '#f59e0b';
                 ctx.fillRect(80, 45, 6, 8);
                 ctx.fillRect(234, 45, 6, 8);
 
-                // Floor
                 ctx.fillStyle = '#451a03';
                 ctx.fillRect(0, ROOM_GROUND_Y, VIRTUAL_WIDTH, VIRTUAL_HEIGHT - ROOM_GROUND_Y);
                 ctx.fillStyle = '#78350f';
                 ctx.fillRect(0, ROOM_GROUND_Y, VIRTUAL_WIDTH, 2);
 
-                // Sitting Log Benches on both sides of bonfire
                 ctx.fillStyle = '#78350f';
                 ctx.fillRect(BONFIRE_X - 65, ROOM_GROUND_Y - 6, 28, 6);
                 ctx.fillRect(BONFIRE_X + 37, ROOM_GROUND_Y - 6, 28, 6);
 
-                // Bonfire Center
                 const frame = Math.floor(Date.now() / 100);
                 ctx.fillStyle = '#451a03';
                 ctx.fillRect(BONFIRE_X - 10, ROOM_GROUND_Y - 3, 20, 4);
@@ -526,7 +581,6 @@
                     ctx.fillRect(fx - size / 2, fy, size, size);
                 }
 
-                // Warm lighting
                 const gradient = ctx.createRadialGradient(BONFIRE_X, ROOM_GROUND_Y - 15, 2, BONFIRE_X, ROOM_GROUND_Y - 15, 75);
                 gradient.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
                 gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
@@ -699,7 +753,6 @@
                     localPlayer.state = 'idle';
                     localPlayer.y = ROOM_GROUND_Y;
                 } else {
-                    // Snap to nearest bench
                     const leftBenchX = BONFIRE_X - 50;
                     const rightBenchX = BONFIRE_X + 50;
                     const targetBenchX = Math.abs(localPlayer.x - leftBenchX) < Math.abs(localPlayer.x - rightBenchX) ? leftBenchX : rightBenchX;
@@ -762,7 +815,7 @@
                 gameChannel.send({
                     type: 'broadcast',
                     event: 'chat',
-                    payload: { id: localPlayer.id, author: localPlayer.name, text }
+                    payload: { author: localPlayer.name, text }
                 });
                 chatInput.value = '';
                 chatInput.blur();
@@ -795,7 +848,7 @@
             }
         });
 
-        // --- IN-GAME SETTINGS / PROFILE MODAL ---
+        // --- IN-GAME SETTINGS / PROFILE MODAL (PERSISTENT) ---
         const btnCustomizer = document.getElementById('btnCustomizer');
         const modalCustomizer = document.getElementById('modalCustomizer');
         const btnCloseCustomizer = document.getElementById('btnCloseCustomizer');
@@ -803,14 +856,21 @@
         btnCustomizer.addEventListener('click', () => modalCustomizer.classList.remove('hidden'));
         btnCloseCustomizer.addEventListener('click', async () => {
             const newName = document.getElementById('inputPlayerName').value.trim() || 'AnimeWalker';
+            const newHair = document.getElementById('colorHair').value;
+            const newOutfit = document.getElementById('colorOutfit').value;
+
             localPlayer.name = newName;
-            localPlayer.hairColor = document.getElementById('colorHair').value;
-            localPlayer.outfitColor = document.getElementById('colorOutfit').value;
+            localPlayer.hairColor = newHair;
+            localPlayer.outfitColor = newOutfit;
             document.getElementById('playerTag').innerText = newName;
 
-            // Update user metadata in Supabase
+            // Save permanently in Supabase User Metadata
             await supabaseClient.auth.updateUser({
-                data: { display_name: newName }
+                data: { 
+                    display_name: newName,
+                    hair_color: newHair,
+                    outfit_color: newOutfit
+                }
             });
 
             modalCustomizer.classList.add('hidden');
