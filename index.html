@@ -3,806 +3,553 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sakura Lounge - Chat Room</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Google Fonts: Noto Serif JP & M PLUS Rounded 1c -->
+  <title>Sakura Chat Room</title>
+  <!-- Supabase JS Client library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Fonts for Sakura Theme -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Supabase JS Client v2 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            sakura: {
-              50: '#fff5f7',
-              100: '#ffe3eb',
-              200: '#ffcad9',
-              300: '#fba1b7',
-              400: '#f66b8f',
-              500: '#eb3e6d',
-              600: '#d72152',
-              700: '#b4163f',
-              800: '#961538',
-              900: '#7e1633',
-            },
-            matcha: {
-              50: '#f4f8f4',
-              100: '#e3ebe3',
-              500: '#7da07a',
-              700: '#4e6a4b',
-            },
-            wood: '#5c4033',
-          },
-          fontFamily: {
-            sans: ['"M PLUS Rounded 1c"', 'sans-serif'],
-            serif: ['"Noto Serif JP"', 'serif'],
-          }
-        }
-      }
-    }
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* Custom Scrollbar for aesthetic fit */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(255, 227, 235, 0.3);
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(246, 107, 143, 0.4);
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(246, 107, 143, 0.7);
+    :root {
+      --bg-gradient: linear-gradient(135deg, #fff0f5 0%, #ffd1dc 50%, #fbe7ef 100%);
+      --sakura-pink: #ffb7c5;
+      --sakura-dark-pink: #e07a93;
+      --sakura-deep: #b34d63;
+      --glass-bg: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --text-main: #4a2e35;
+      --text-muted: #8c6870;
+      --shadow-soft: 0 8px 32px 0 rgba(224, 122, 147, 0.15);
     }
 
-    /* Glassmorphism utility */
-    .glass-card {
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 202, 217, 0.5);
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    .glass-card-dark {
-      background: rgba(255, 245, 247, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(251, 161, 183, 0.4);
-    }
-
-    /* Canvas overlay behind components */
-    #sakura-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
       height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Falling Petals Background Animation */
+    .petal {
+      position: absolute;
+      background: linear-gradient(135deg, #ffc0cb, #ffe4e1);
+      border-radius: 150% 0 150% 0;
+      opacity: 0.7;
       pointer-events: none;
       z-index: 0;
+      animation: fall linear infinite;
     }
 
-    /* Custom subtle pulse animation for active badges */
-    @keyframes gentlePulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.85; transform: scale(1.03); }
+    @keyframes fall {
+      0% {
+        transform: translateY(-10vh) rotate(0deg) scale(0.8);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(105vh) rotate(360deg) scale(1.2);
+        opacity: 0.2;
+      }
     }
-    .gentle-pulse {
-      animation: gentlePulse 3s infinite ease-in-out;
+
+    /* Main Container */
+    .app-container {
+      position: relative;
+      z-index: 10;
+      width: 90%;
+      max-width: 1100px;
+      height: 85vh;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar - Channels */
+    .sidebar {
+      width: 280px;
+      background: rgba(255, 240, 245, 0.5);
+      border-right: 1px solid rgba(224, 122, 147, 0.2);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(224, 122, 147, 0.2);
+    }
+
+    .brand h1 {
+      font-family: 'Marcellus', serif;
+      font-size: 1.4rem;
+      color: var(--sakura-deep);
+    }
+
+    .channel-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-grow: 1;
+    }
+
+    .channel-item {
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .channel-item:hover {
+      background: rgba(255, 183, 197, 0.3);
+      color: var(--sakura-deep);
+    }
+
+    .channel-item.active {
+      background: var(--sakura-dark-pink);
+      color: white;
+      box-shadow: 0 4px 12px rgba(224, 122, 147, 0.3);
+    }
+
+    .user-profile {
+      padding-top: 15px;
+      border-top: 1px solid rgba(224, 122, 147, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: var(--sakura-deep);
+      font-size: 0.95rem;
+    }
+
+    /* Main Chat Window */
+    .chat-area {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .chat-header {
+      padding: 20px 30px;
+      border-bottom: 1px solid rgba(224, 122, 147, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-header h2 {
+      font-family: 'Marcellus', serif;
+      color: var(--sakura-deep);
+      font-size: 1.3rem;
+    }
+
+    .messages-container {
+      flex-grow: 1;
+      padding: 25px 30px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      max-width: 70%;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.own {
+      align-self: flex-end;
+    }
+
+    .message.other {
+      align-self: flex-start;
+    }
+
+    .message-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .message.own .message-meta {
+      justify-content: flex-end;
+    }
+
+    .message-bubble {
+      padding: 12px 18px;
+      border-radius: 18px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .message.own .message-bubble {
+      background: var(--sakura-dark-pink);
+      color: white;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 12px rgba(224, 122, 147, 0.2);
+    }
+
+    .message.other .message-bubble {
+      background: white;
+      color: var(--text-main);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Input Area */
+    .input-area {
+      padding: 20px 30px;
+      border-top: 1px solid rgba(224, 122, 147, 0.15);
+      display: flex;
+      gap: 12px;
+    }
+
+    .message-input {
+      flex-grow: 1;
+      padding: 14px 20px;
+      border-radius: 30px;
+      border: 1px solid rgba(224, 122, 147, 0.3);
+      outline: none;
+      background: rgba(255, 255, 255, 0.8);
+      font-size: 0.95rem;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    .message-input:focus {
+      border-color: var(--sakura-dark-pink);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(224, 122, 147, 0.2);
+    }
+
+    .send-btn {
+      background: var(--sakura-dark-pink);
+      color: white;
+      border: none;
+      padding: 0 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .send-btn:hover {
+      background: var(--sakura-deep);
+    }
+
+    /* Modal for Username */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(74, 46, 53, 0.4);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .modal {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .modal h3 {
+      font-family: 'Marcellus', serif;
+      color: var(--sakura-deep);
+      margin-bottom: 10px;
+    }
+
+    .modal p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(224, 122, 147, 0.4);
+      margin-bottom: 15px;
+      outline: none;
+    }
+
+    .modal button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: var(--sakura-dark-pink);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-sakura-50 via-pink-100 to-sakura-100 text-gray-800 font-sans h-screen flex flex-col overflow-hidden relative">
+<body>
 
-  <!-- Floating Sakura Canvas -->
-  <canvas id="sakura-canvas"></canvas>
+  <!-- Petal Background Generator Script -->
+  <div id="petals-container"></div>
 
-  <!-- Login / User Setup Modal -->
-  <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sakura-900/30 backdrop-blur-md transition-opacity duration-300">
-    <div class="glass-card-dark rounded-3xl p-8 max-w-md w-full shadow-2xl border border-sakura-200 transform transition-all scale-100 relative overflow-hidden">
-      <!-- Decorative background accent -->
-      <div class="absolute -top-10 -right-10 w-32 h-32 bg-sakura-300/30 rounded-full blur-2xl"></div>
-      <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-matcha-500/20 rounded-full blur-2xl"></div>
-
-      <div class="text-center mb-6 relative">
-        <span class="inline-block p-3 rounded-full bg-sakura-100 text-sakura-500 mb-2 shadow-inner">
-          <i class="fa-solid font-serif text-3xl">🌸</i>
-        </span>
-        <h2 class="text-2xl font-serif font-bold text-sakura-800 tracking-wide">Welcome to Sakura Lounge</h2>
-        <p class="text-sm text-gray-600 mt-1">Choose your nickname and avatar to enter the lounge</p>
-      </div>
-
-      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5 relative">
-        <div>
-          <label class="block text-xs font-semibold text-sakura-800 uppercase tracking-wider mb-2">Your Username</label>
-          <div class="relative">
-            <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-sakura-400"></i>
-            <input type="text" id="username-input" required maxlength="20" placeholder="e.g. Hanako, Haruto, Blossom"
-              class="w-full pl-11 pr-4 py-3 bg-white/80 border border-sakura-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sakura-400 focus:bg-white text-gray-800 transition shadow-sm" />
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-sakura-800 uppercase tracking-wider mb-2">Select Avatar</label>
-          <div class="grid grid-cols-5 gap-2" id="avatar-selector">
-            <!-- Avatars injected via JS -->
-          </div>
-        </div>
-
-        <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-sakura-400 to-sakura-500 hover:from-sakura-500 hover:to-sakura-600 text-white font-semibold rounded-2xl shadow-lg shadow-sakura-400/30 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
-          <span>Enter Lounge</span>
-          <i class="fa-solid fa-arrow-right text-xs"></i>
-        </button>
-      </form>
+  <!-- Nickname Prompt Modal -->
+  <div class="modal-overlay" id="nickname-modal">
+    <div class="modal">
+      <h3>Welcome to Sakura Chat</h3>
+      <p>Enter a display name to join the conversation.</p>
+      <input type="text" id="username-input" placeholder="Your username..." maxlength="20">
+      <button id="join-btn">Join Chat</button>
     </div>
   </div>
 
-  <!-- Main Chat Application Container -->
-  <div class="flex-1 flex h-full max-w-7xl w-full mx-auto p-2 sm:p-4 md:p-6 gap-4 z-10 overflow-hidden">
-
-    <!-- Mobile Navigation Bar Header -->
-    <div class="md:hidden fixed top-0 left-0 right-0 z-30 bg-white/80 backdrop-blur-md border-b border-sakura-200 px-4 py-3 flex items-center justify-between shadow-sm">
-      <div class="flex items-center gap-2">
-        <span class="text-xl">🌸</span>
-        <h1 class="font-serif font-bold text-sakura-800 text-lg">Sakura Lounge</h1>
+  <!-- Chat Application Interface -->
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="brand">
+        <span>🌸</span>
+        <h1>Sakura Lounge</h1>
       </div>
-      <button onclick="toggleMobileSidebar()" class="p-2 rounded-xl bg-sakura-100 text-sakura-600 hover:bg-sakura-200 transition">
-        <i class="fa-solid fa-bars text-lg"></i>
-      </button>
-    </div>
-
-    <!-- Sidebar: Channels & Online Users -->
-    <aside id="sidebar" class="fixed md:relative inset-y-0 left-0 z-40 w-72 bg-white/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col gap-4 p-4 md:p-0 shadow-2xl md:shadow-none">
-      
-      <!-- App Header Banner (Desktop) -->
-      <div class="glass-card rounded-2xl p-4 hidden md:flex items-center gap-3 shadow-md border-sakura-200">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sakura-300 to-sakura-500 flex items-center justify-center text-white text-xl shadow-md">
-          🌸
-        </div>
-        <div>
-          <h1 class="font-serif font-bold text-sakura-900 text-lg leading-tight">Sakura Lounge</h1>
-          <p class="text-xs text-sakura-600 flex items-center gap-1.5 mt-0.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            Real-time Chat
-          </p>
-        </div>
-      </div>
-
-      <!-- Channels Card -->
-      <div class="glass-card rounded-2xl p-4 flex-1 flex flex-col overflow-hidden shadow-md">
-        <div class="flex items-center justify-between mb-3 px-1">
-          <span class="text-xs font-bold text-sakura-800 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-hashtag text-sakura-400"></i> Channels
-          </span>
-          <button onclick="openCreateChannelModal()" title="Create Channel" class="w-6 h-6 rounded-lg bg-sakura-100 text-sakura-600 hover:bg-sakura-200 flex items-center justify-center transition">
-            <i class="fa-solid fa-plus text-xs"></i>
-          </button>
-        </div>
-
-        <!-- Channels Navigation List -->
-        <div id="channels-list" class="space-y-1.5 overflow-y-auto pr-1 flex-1">
-          <!-- Channels rendered via JS -->
-        </div>
-
-        <hr class="my-3 border-sakura-200/60" />
-
-        <!-- User Profile Footer in Sidebar -->
-        <div class="flex items-center justify-between pt-1">
-          <div class="flex items-center gap-2.5 min-w-0">
-            <div id="user-avatar-display" class="w-9 h-9 rounded-full bg-sakura-100 border border-sakura-300 flex items-center justify-center text-lg flex-shrink-0">
-              🌸
-            </div>
-            <div class="truncate">
-              <div id="user-name-display" class="font-semibold text-sm text-gray-800 truncate">Guest</div>
-              <div class="text-[10px] text-emerald-600 font-medium flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
-              </div>
-            </div>
-          </div>
-          <button onclick="changeUserProfile()" title="Edit Profile" class="text-xs text-sakura-400 hover:text-sakura-600 p-2 rounded-lg hover:bg-sakura-100 transition">
-            <i class="fa-solid fa-gear"></i>
-          </button>
-        </div>
+      <ul class="channel-list">
+        <li class="channel-item active" data-channel="general"># general</li>
+        <li class="channel-item" data-channel="lounge"># lounge</li>
+        <li class="channel-item" data-channel="gaming"># gaming</li>
+        <li class="channel-item" data-channel="sakura-viewing"># sakura-viewing</li>
+      </ul>
+      <div class="user-profile">
+        <span class="user-name" id="current-user-display">Guest</span>
       </div>
     </aside>
 
-    <!-- Sidebar Overlay for Mobile -->
-    <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 hidden md:hidden"></div>
-
-    <!-- Main Chat Window Area -->
-    <main class="flex-1 flex flex-col glass-card rounded-2xl md:rounded-3xl shadow-xl overflow-hidden border-sakura-200 mt-12 md:mt-0 relative">
-
-      <!-- Chat Header -->
-      <div class="px-6 py-3.5 bg-white/50 border-b border-sakura-200/70 flex items-center justify-between backdrop-blur-md">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-sakura-100 text-sakura-600 flex items-center justify-center font-bold text-lg">
-            #
-          </div>
-          <div>
-            <h2 id="current-channel-title" class="font-bold text-sakura-900 text-base flex items-center gap-2">
-              sakura-lounge
-            </h2>
-            <p id="current-channel-desc" class="text-xs text-gray-500">Relax, chat and enjoy the cherry blossoms.</p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2 text-xs text-sakura-700 bg-sakura-100/70 px-3 py-1.5 rounded-full border border-sakura-200">
-          <i class="fa-solid fa-users text-sakura-400"></i>
-          <span id="active-status-text">Live Sync</span>
-        </div>
-      </div>
-
-      <!-- Messages Stream Container -->
-      <div id="messages-container" class="flex-1 p-4 md:p-6 overflow-y-auto space-y-4">
-        <!-- Messages loaded here -->
-      </div>
-
-      <!-- Image Attachment Preview Box (Hidden by default) -->
-      <div id="attachment-preview" class="hidden px-6 py-2 bg-sakura-50/80 border-t border-sakura-200 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <img id="preview-img-src" class="w-10 h-10 object-cover rounded-lg border border-sakura-300" src="" alt="preview" />
-          <span class="text-xs text-gray-600 truncate max-w-xs" id="preview-img-url">Image Attached</span>
-        </div>
-        <button onclick="clearAttachment()" class="text-gray-400 hover:text-sakura-600 text-xs p-1">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <!-- Chat Input Toolbar & Form -->
-      <div class="p-3 md:p-4 bg-white/60 border-t border-sakura-200/70 relative">
-        
-        <!-- Quick Emoji Popover Bar (Hidden by default) -->
-        <div id="emoji-picker" class="hidden absolute bottom-full left-4 mb-2 p-2 bg-white rounded-2xl shadow-xl border border-sakura-200 grid grid-cols-6 gap-1 z-20">
-          <!-- Emoji buttons dynamically inserted -->
-        </div>
-
-        <form id="chat-form" onsubmit="sendMessage(event)" class="flex items-center gap-2">
-          
-          <!-- Emoji Toggle Button -->
-          <button type="button" onclick="toggleEmojiPicker()" class="p-2.5 rounded-xl text-sakura-500 hover:bg-sakura-100/80 transition flex-shrink-0" title="Add Emoji">
-            <i class="fa-regular fa-face-smile text-xl"></i>
-          </button>
-
-          <!-- Attach Image URL Modal Toggle -->
-          <button type="button" onclick="promptImageUrl()" class="p-2.5 rounded-xl text-sakura-500 hover:bg-sakura-100/80 transition flex-shrink-0" title="Attach Image URL">
-            <i class="fa-solid fa-image text-xl"></i>
-          </button>
-
-          <!-- Message Input -->
-          <input type="text" id="message-input" autocomplete="off" placeholder="Type a message in #sakura-lounge..."
-            class="flex-1 py-3 px-4 bg-white/90 border border-sakura-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sakura-400 focus:bg-white text-gray-800 text-sm transition shadow-inner" />
-
-          <!-- Send Button -->
-          <button type="submit" class="p-3 bg-gradient-to-r from-sakura-400 to-sakura-500 hover:from-sakura-500 hover:to-sakura-600 text-white rounded-2xl shadow-md shadow-sakura-400/30 transition transform active:scale-95 flex items-center justify-center flex-shrink-0 w-11 h-11">
-            <i class="fa-solid fa-paper-plane text-sm"></i>
-          </button>
-        </form>
-      </div>
-
+    <main class="chat-area">
+      <header class="chat-header">
+        <h2 id="current-channel-title"># general</h2>
+      </header>
+      <div class="messages-container" id="messages-container"></div>
+      <form class="input-area" id="chat-form">
+        <input type="text" class="message-input" id="message-input" placeholder="Send a message..." autocomplete="off">
+        <button type="submit" class="send-btn">Send</button>
+      </form>
     </main>
   </div>
 
-  <!-- Create Channel Modal -->
-  <div id="create-channel-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm hidden">
-    <div class="glass-card-dark rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-sakura-200">
-      <h3 class="text-lg font-serif font-bold text-sakura-900 mb-1">Create New Channel</h3>
-      <p class="text-xs text-gray-500 mb-4">Start a new room for blossoms to gather.</p>
-      
-      <form onsubmit="handleCreateChannel(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-sakura-800 uppercase tracking-wider mb-1">Channel Name</label>
-          <input type="text" id="new-channel-name" required placeholder="e.g. tea-room" maxlength="20"
-            class="w-full px-4 py-2.5 bg-white/80 border border-sakura-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sakura-400 text-sm" />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-sakura-800 uppercase tracking-wider mb-1">Description</label>
-          <input type="text" id="new-channel-desc" placeholder="e.g. Chat about matcha & snacks" maxlength="50"
-            class="w-full px-4 py-2.5 bg-white/80 border border-sakura-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sakura-400 text-sm" />
-        </div>
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <button type="button" onclick="closeCreateChannelModal()" class="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-sakura-100 rounded-xl transition">
-            Cancel
-          </button>
-          <button type="submit" class="px-4 py-2 text-xs font-semibold bg-sakura-500 hover:bg-sakura-600 text-white rounded-xl shadow-md transition">
-            Create Channel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Notification Toast Container -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-  <!-- MAIN SCRIPT -->
   <script>
-    // --- 1. Supabase Initialization ---
-    const SUPABASE_URL = "https://brvyjdtnxzjlrhukngjn.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE";
+    // ==========================================
+    // 1. SUPABASE CONFIGURATION
+    // Replace with your Supabase credentials before building/deploying
+    // ==========================================
+    const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
-    let supabase = null;
-    try {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } catch (e) {
-      console.warn("Supabase init fallback:", e);
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // App State
+    let username = localStorage.getItem('sakura_chat_username') || '';
+    let currentChannel = 'general';
+    let activeSubscription = null;
+
+    // DOM Elements
+    const modal = document.getElementById('nickname-modal');
+    const usernameInput = document.getElementById('username-input');
+    const joinBtn = document.getElementById('join-btn');
+    const userDisplay = document.getElementById('current-user-display');
+    const channelItems = document.querySelectorAll('.channel-item');
+    const channelTitle = document.getElementById('current-channel-title');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const messagesContainer = document.getElementById('messages-container');
+
+    // ==========================================
+    // 2. INITIALIZATION & AUTH HANDLER
+    // ==========================================
+    function init() {
+      if (!username) {
+        modal.style.display = 'flex';
+      } else {
+        modal.style.display = 'none';
+        userDisplay.textContent = username;
+        loadChannel(currentChannel);
+      }
+      createPetals();
     }
 
-    // --- 2. Application State ---
-    const AVATARS = ['🌸', '🍡', '🍵', '🦊', '🎏', '🍱', '⛩️', '🏮', '🐱', '✨'];
-    const POPULAR_EMOJIS = ['🌸', '💖', '🍡', '🍵', '✨', '🥺', '🎉', '🏮', '😍', '👏', '⛩️', '🐱'];
+    joinBtn.addEventListener('click', () => {
+      const input = usernameInput.value.trim();
+      if (input) {
+        username = input;
+        localStorage.setItem('sakura_chat_username', username);
+        userDisplay.textContent = username;
+        modal.style.display = 'none';
+        loadChannel(currentChannel);
+      }
+    });
 
-    let currentUser = {
-      username: '',
-      avatar: '🌸'
-    };
-
-    let channels = [
-      { id: 'sakura-lounge', name: 'sakura-lounge', desc: 'Relax, chat and enjoy the cherry blossoms.' },
-      { id: 'general', name: 'general', desc: 'General community chat room.' },
-      { id: 'anime-talk', name: 'anime-talk', desc: 'Discuss your favorite anime & manga.' },
-      { id: 'chill-vibes', name: 'chill-vibes', desc: 'Lo-fi beats, warm tea, and good vibes.' }
-    ];
-
-    let currentChannel = 'sakura-lounge';
-    let attachedImageUrl = '';
-    let isRealtimeConnected = false;
-    let fallbackPollTimer = null;
-    let localMessagesFallback = [];
-
-    // --- 3. Sakura Floating Petals Canvas ---
-    function initSakuraAnimation() {
-      const canvas = document.getElementById('sakura-canvas');
-      const ctx = canvas.getContext('2d');
-
-      let width = (canvas.width = window.innerWidth);
-      let height = (canvas.height = window.innerHeight);
-
-      window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+    // ==========================================
+    // 3. CHANNEL & MESSAGES HANDLING
+    // ==========================================
+    channelItems.forEach(item => {
+      item.addEventListener('click', () => {
+        channelItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        currentChannel = item.dataset.channel;
+        channelTitle.textContent = `# ${currentChannel}`;
+        loadChannel(currentChannel);
       });
+    });
 
-      const petals = [];
-      const petalCount = Math.min(35, Math.floor(width / 30));
+    async function loadChannel(channel) {
+      messagesContainer.innerHTML = '';
 
-      class Petal {
-        constructor() {
-          this.reset();
-        }
+      // Unsubscribe from existing realtime subscription if any
+      if (activeSubscription) {
+        supabase.removeChannel(activeSubscription);
+      }
 
-        reset() {
-          this.x = Math.random() * width;
-          this.y = Math.random() * -height;
-          this.size = Math.random() * 8 + 8;
-          this.speedY = Math.random() * 1.2 + 0.8;
-          this.speedX = Math.random() * 1 - 0.5;
-          this.rotation = Math.random() * 360;
-          this.rotationSpeed = (Math.random() - 0.5) * 1.5;
-          this.opacity = Math.random() * 0.5 + 0.4;
-          this.color = ['#ffcad9', '#fba1b7', '#ffe3eb', '#f66b8f'][Math.floor(Math.random() * 4)];
-        }
+      // Fetch message history
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('channel', channel)
+        .order('created_at', { ascending: true })
+        .limit(100);
 
-        update() {
-          this.y += this.speedY;
-          this.x += Math.sin(this.y / 30) + this.speedX;
-          this.rotation += this.rotationSpeed;
+      if (error) {
+        console.error('Error fetching messages:', error);
+      } else if (data) {
+        data.forEach(msg => appendMessage(msg));
+        scrollToBottom();
+      }
 
-          if (this.y > height + 20) {
-            this.reset();
+      // Subscribe to live inserts on current channel
+      activeSubscription = supabase
+        .channel(`public:messages:channel=eq.${channel}`)
+        .on('postgres_changes', { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'messages',
+          filter: `channel=eq.${channel}`
+        }, payload => {
+          appendMessage(payload.new);
+          scrollToBottom();
+        })
+        .subscribe();
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const content = messageInput.value.trim();
+      if (!content) return;
+
+      messageInput.value = '';
+
+      const { error } = await supabase
+        .from('messages')
+        .insert([
+          { 
+            username: username, 
+            content: content, 
+            channel: currentChannel 
           }
-        }
+        ]);
 
-        draw() {
-          ctx.save();
-          ctx.translate(this.x, this.y);
-          ctx.rotate((this.rotation * Math.PI) / 180);
-          ctx.globalAlpha = this.opacity;
-          ctx.fillStyle = this.color;
-          ctx.beginPath();
-          // Render petal shape
-          ctx.moveTo(0, 0);
-          ctx.bezierCurveTo(-this.size, -this.size / 2, -this.size, this.size / 2, 0, this.size);
-          ctx.bezierCurveTo(this.size, this.size / 2, this.size, -this.size / 2, 0, 0);
-          ctx.fill();
-          ctx.restore();
-        }
+      if (error) {
+        console.error('Error sending message:', error);
       }
+    });
 
-      for (let i = 0; i < petalCount; i++) {
-        petals.push(new Petal());
-      }
+    function appendMessage(msg) {
+      const isOwn = msg.username === username;
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isOwn ? 'own' : 'other'}`;
 
-      function animate() {
-        ctx.clearRect(0, 0, width, height);
-        petals.forEach((petal) => {
-          petal.update();
-          petal.draw();
-        });
-        requestAnimationFrame(animate);
-      }
+      const timeString = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      animate();
-    }
+      messageDiv.innerHTML = `
+        <div class="message-meta">
+          <span>${msg.username}</span>
+          <span>${timeString}</span>
+        </div>
+        <div class="message-bubble">${escapeHtml(msg.content)}</div>
+      `;
 
-    // --- 4. Render UI Components ---
-    function renderAvatarSelector() {
-      const container = document.getElementById('avatar-selector');
-      container.innerHTML = AVATARS.map((av) => `
-        <button type="button" onclick="selectAvatar('${av}')" 
-          class="avatar-option w-11 h-11 rounded-2xl flex items-center justify-center text-xl bg-white/60 border border-sakura-200 hover:bg-sakura-100 transition transform hover:scale-105 ${av === currentUser.avatar ? 'ring-2 ring-sakura-500 bg-sakura-100' : ''}">
-          ${av}
-        </button>
-      `).join('');
-    }
-
-    function selectAvatar(avatar) {
-      currentUser.avatar = avatar;
-      renderAvatarSelector();
-    }
-
-    function renderChannels() {
-      const container = document.getElementById('channels-list');
-      container.innerHTML = channels.map((ch) => {
-        const isActive = ch.id === currentChannel;
-        return `
-          <button onclick="switchChannel('${ch.id}')" 
-            class="w-full text-left px-3.5 py-2.5 rounded-xl transition flex items-center justify-between group ${
-              isActive 
-                ? 'bg-gradient-to-r from-sakura-400 to-sakura-500 text-white shadow-md font-medium' 
-                : 'text-gray-700 hover:bg-sakura-100/70 hover:text-sakura-800'
-            }">
-            <div class="flex items-center gap-2.5 truncate">
-              <span class="${isActive ? 'text-white' : 'text-sakura-400 group-hover:text-sakura-600'} font-semibold text-base">#</span>
-              <span class="truncate text-sm">${ch.name}</span>
-            </div>
-            ${isActive ? '<span class="w-2 h-2 rounded-full bg-white shadow-sm"></span>' : ''}
-          </button>
-        `;
-      }).join('');
-    }
-
-    function renderEmojiPicker() {
-      const container = document.getElementById('emoji-picker');
-      container.innerHTML = POPULAR_EMOJIS.map(e => `
-        <button type="button" onclick="insertEmoji('${e}')" class="p-2 text-lg hover:bg-sakura-100 rounded-xl transition transform hover:scale-110">
-          ${e}
-        </button>
-      `).join('');
-    }
-
-    // --- 5. Message Formatting & DOM ---
-    function renderMessages(messages) {
-      const container = document.getElementById('messages-container');
-      
-      if (!messages || messages.length === 0) {
-        container.innerHTML = `
-          <div class="h-full flex flex-col items-center justify-center text-center p-8 text-sakura-400/80">
-            <span class="text-5xl mb-3 animate-bounce">🌸</span>
-            <p class="font-serif font-medium text-sakura-800 text-lg">No messages in #${currentChannel} yet</p>
-            <p class="text-xs text-gray-500 mt-1">Be the first to say konnichiwa!</p>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = messages.map(msg => {
-        const isSelf = msg.username === currentUser.username;
-        const timeStr = msg.created_at 
-          ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        return `
-          <div class="flex items-start gap-3 ${isSelf ? 'flex-row-reverse' : ''} group">
-            <!-- Avatar -->
-            <div class="w-9 h-9 rounded-full bg-white shadow-sm border border-sakura-200 flex items-center justify-center text-lg flex-shrink-0">
-              ${msg.avatar || '🌸'}
-            </div>
-
-            <!-- Bubble Content -->
-            <div class="max-w-[80%] sm:max-w-[70%]">
-              <div class="flex items-center gap-2 mb-1 px-1 ${isSelf ? 'justify-end' : ''}">
-                <span class="text-xs font-semibold text-gray-700">${msg.username || 'Anonymous'}</span>
-                <span class="text-[10px] text-gray-400">${timeStr}</span>
-              </div>
-
-              <div class="rounded-2xl px-4 py-2.5 text-sm shadow-sm leading-relaxed ${
-                isSelf 
-                  ? 'bg-gradient-to-r from-sakura-400 to-sakura-500 text-white rounded-tr-xs' 
-                  : 'bg-white text-gray-800 rounded-tl-xs border border-sakura-100'
-              }">
-                ${msg.message ? escapeHTML(msg.message) : ''}
-                
-                ${msg.image_url ? `
-                  <div class="mt-2 rounded-xl overflow-hidden border border-sakura-200/50">
-                    <img src="${escapeHTML(msg.image_url)}" onerror="this.style.display='none'" alt="attachment" class="max-h-60 w-full object-cover rounded-xl" />
-                  </div>
-                ` : ''}
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      scrollToBottom();
+      messagesContainer.appendChild(messageDiv);
     }
 
     function scrollToBottom() {
-      const container = document.getElementById('messages-container');
-      container.scrollTop = container.scrollHeight;
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    function escapeHTML(str) {
-      if (!str) return '';
-      return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // --- 6. Realtime Sync & Supabase Data Layer ---
-    async function loadMessages() {
-      if (!supabase) {
-        fetchFallbackMessages();
-        return;
-      }
+    // ==========================================
+    // 4. SAKURA PETALS BACKGROUND EFFECT
+    // ==========================================
+    function createPetals() {
+      const container = document.getElementById('petals-container');
+      const petalCount = 20;
 
-      try {
-        const { data, error } = await supabase
-          .from('messages')
-          .select('*')
-          .eq('channel', currentChannel)
-          .order('created_at', { ascending: true })
-          .limit(100);
-
-        if (error) throw error;
+      for (let i = 0; i < petalCount; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal';
         
-        renderMessages(data || []);
-      } catch (err) {
-        console.warn("Supabase load error (switching to local dynamic mode):", err.message);
-        fetchFallbackMessages();
+        const size = Math.random() * 10 + 10;
+        petal.style.width = `${size}px`;
+        petal.style.height = `${size}px`;
+        petal.style.left = `${Math.random() * 100}vw`;
+        petal.style.animationDuration = `${Math.random() * 5 + 5}s`;
+        petal.style.animationDelay = `${Math.random() * 5}s`;
+
+        container.appendChild(petal);
       }
     }
 
-    function subscribeToRealtime() {
-      if (!supabase) return;
-
-      try {
-        const channelSubscription = supabase
-          .channel(`public:messages:${currentChannel}`)
-          .on('postgres_changes', { 
-            event: 'INSERT', 
-            schema: 'public', 
-            table: 'messages',
-            filter: `channel=eq.${currentChannel}`
-          }, (payload) => {
-            appendSingleMessage(payload.new);
-          })
-          .subscribe((status) => {
-            if (status === 'SUBSCRIBED') {
-              isRealtimeConnected = true;
-              document.getElementById('active-status-text').innerText = 'Supabase Realtime';
-            }
-          });
-      } catch (e) {
-        console.warn("Realtime channel failed:", e);
-      }
-    }
-
-    function appendSingleMessage(msg) {
-      if (msg.channel !== currentChannel) return;
-      loadMessages(); // Refresh view
-    }
-
-    // Fallback Local Storage Simulation if DB tables are uninitialized
-    function fetchFallbackMessages() {
-      document.getElementById('active-status-text').innerText = 'Local Live Sync';
-      const stored = localStorage.getItem(`sakura_messages_${currentChannel}`);
-      if (stored) {
-        localMessagesFallback = JSON.parse(stored);
-      } else {
-        localMessagesFallback = [
-          { username: 'SakuraBot', avatar: '🌸', message: `Welcome to #${currentChannel}! 🌸`, created_at: new Date().toISOString() }
-        ];
-      }
-      renderMessages(localMessagesFallback);
-    }
-
-    async function sendMessage(e) {
-      e.preventDefault();
-      const input = document.getElementById('message-input');
-      const messageText = input.value.trim();
-
-      if (!messageText && !attachedImageUrl) return;
-
-      const newMessagePayload = {
-        username: currentUser.username || 'CherryBlossom',
-        avatar: currentUser.avatar || '🌸',
-        message: messageText,
-        channel: currentChannel,
-        image_url: attachedImageUrl,
-        created_at: new Date().toISOString()
-      };
-
-      input.value = '';
-      clearAttachment();
-
-      // Try Supabase insert
-      let insertedSuccessfully = false;
-      if (supabase) {
-        try {
-          const { error } = await supabase.from('messages').insert([newMessagePayload]);
-          if (!error) {
-            insertedSuccessfully = true;
-            loadMessages();
-          }
-        } catch (err) {
-          console.warn("Database payload fallback triggered", err);
-        }
-      }
-
-      // If database direct write didn't succeed, fallback local store seamlessly
-      if (!insertedSuccessfully) {
-        localMessagesFallback.push(newMessagePayload);
-        localStorage.setItem(`sakura_messages_${currentChannel}`, JSON.stringify(localMessagesFallback));
-        renderMessages(localMessagesFallback);
-      }
-    }
-
-    // --- 7. Event Handlers & Interactions ---
-    function handleLogin(e) {
-      e.preventDefault();
-      const nameInput = document.getElementById('username-input').value.trim();
-      if (!nameInput) return;
-
-      currentUser.username = nameInput;
-      document.getElementById('user-name-display').innerText = currentUser.username;
-      document.getElementById('user-avatar-display').innerText = currentUser.avatar;
-
-      document.getElementById('login-modal').classList.add('opacity-0', 'pointer-events-none');
-      setTimeout(() => {
-        document.getElementById('login-modal').classList.add('hidden');
-      }, 300);
-
-      showToast(`Welcome to Sakura Lounge, ${currentUser.username}! 🌸`);
-      loadMessages();
-      subscribeToRealtime();
-    }
-
-    function switchChannel(channelId) {
-      currentChannel = channelId;
-      const ch = channels.find(c => c.id === channelId);
-
-      document.getElementById('current-channel-title').innerText = ch ? ch.name : channelId;
-      document.getElementById('current-channel-desc').innerText = ch ? ch.desc : '';
-      document.getElementById('message-input').placeholder = `Type a message in #${ch ? ch.name : channelId}...`;
-
-      renderChannels();
-      loadMessages();
-      subscribeToRealtime();
-
-      // Close mobile sidebar if open
-      const sidebar = document.getElementById('sidebar');
-      if (!sidebar.classList.contains('-translate-x-full')) {
-        toggleMobileSidebar();
-      }
-    }
-
-    function toggleMobileSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebar-overlay');
-      const isOpen = !sidebar.classList.contains('-translate-x-full');
-
-      if (isOpen) {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-      } else {
-        sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('hidden');
-      }
-    }
-
-    function toggleEmojiPicker() {
-      const picker = document.getElementById('emoji-picker');
-      picker.classList.toggle('hidden');
-    }
-
-    function insertEmoji(emoji) {
-      const input = document.getElementById('message-input');
-      input.value += emoji;
-      toggleEmojiPicker();
-      input.focus();
-    }
-
-    function promptImageUrl() {
-      const url = prompt("Enter an Image URL (e.g., https://images.unsplash.com/...):");
-      if (url && url.startsWith("http")) {
-        attachedImageUrl = url;
-        document.getElementById('preview-img-src').src = url;
-        document.getElementById('preview-img-url').innerText = url;
-        document.getElementById('attachment-preview').classList.remove('hidden');
-      }
-    }
-
-    function clearAttachment() {
-      attachedImageUrl = '';
-      document.getElementById('preview-img-src').src = '';
-      document.getElementById('attachment-preview').classList.add('hidden');
-    }
-
-    function openCreateChannelModal() {
-      document.getElementById('create-channel-modal').classList.remove('hidden');
-    }
-
-    function closeCreateChannelModal() {
-      document.getElementById('create-channel-modal').classList.add('hidden');
-    }
-
-    function handleCreateChannel(e) {
-      e.preventDefault();
-      const nameInput = document.getElementById('new-channel-name').value.trim().toLowerCase().replace(/\s+/g, '-');
-      const descInput = document.getElementById('new-channel-desc').value.trim();
-
-      if (!nameInput) return;
-
-      if (channels.some(c => c.id === nameInput)) {
-        showToast("Channel already exists!");
-        return;
-      }
-
-      const newChan = { id: nameInput, name: nameInput, desc: descInput || 'Custom Sakura Channel' };
-      channels.push(newChan);
-      renderChannels();
-      switchChannel(newChan.id);
-      closeCreateChannelModal();
-
-      document.getElementById('new-channel-name').value = '';
-      document.getElementById('new-channel-desc').value = '';
-      showToast(`Channel #${nameInput} created!`);
-    }
-
-    function changeUserProfile() {
-      document.getElementById('login-modal').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
-    }
-
-    function showToast(message) {
-      const toast = document.createElement('div');
-      toast.className = 'glass-card-dark px-4 py-3 rounded-2xl shadow-xl text-sm font-medium text-sakura-900 border border-sakura-300 transform transition-all duration-300 translate-y-5 opacity-0 flex items-center gap-2';
-      toast.innerHTML = `<span>🌸</span> <span>${message}</span>`;
-
-      const container = document.getElementById('toast-container');
-      container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.classList.remove('translate-y-5', 'opacity-0');
-      }, 10);
-
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
-
-    // --- 8. App Launch On Load ---
-    window.addEventListener('DOMContentLoaded', () => {
-      initSakuraAnimation();
-      renderAvatarSelector();
-      renderEmojiPicker();
-      renderChannels();
-    });
+    init();
   </script>
 </body>
 </html>
