@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Sakura World 🌸 - 2D Virtual Realtime Chatroom</title>
+  <title>Sakura Slime Lounge 🌸 - 2D Virtual World</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -29,14 +29,14 @@
 
     /* Glassmorphism Styles */
     .glass {
-      background: rgba(255, 255, 255, 0.78);
+      background: rgba(255, 255, 255, 0.82);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.9);
     }
 
     .glass-dark {
-      background: rgba(255, 241, 248, 0.92);
+      background: rgba(255, 241, 248, 0.94);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(244, 114, 182, 0.35);
@@ -55,7 +55,7 @@
       box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25);
     }
 
-    /* Scrollbar Styling */
+    /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 5px;
     }
@@ -72,7 +72,7 @@
 
     /* Controls UI */
     .dpad-btn {
-      background: rgba(255, 255, 255, 0.82);
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(6px);
       border: 1px solid rgba(244, 114, 182, 0.5);
       user-select: none;
@@ -84,9 +84,73 @@
       color: white;
       transform: scale(0.92);
     }
+
+    /* Animated pulse glow */
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.6)); }
+      50% { filter: drop-shadow(0 0 14px rgba(236, 72, 153, 0.9)); }
+    }
+    .glow-effect {
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
   </style>
 </head>
 <body class="flex flex-col h-screen w-screen overflow-hidden select-none">
+
+  <!-- AUTH MODAL OVERLAY -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/40 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass w-full max-w-md rounded-3xl p-6 md:p-8 shadow-2xl border border-white space-y-5 animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Auth Header -->
+      <div class="text-center space-y-1">
+        <div class="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 text-white shadow-lg shadow-pink-300 mb-1">
+          <i data-lucide="sparkles" class="w-7 h-7"></i>
+        </div>
+        <h2 class="font-sakura text-2xl font-bold text-pink-950">Sakura Slime World</h2>
+        <p class="text-xs text-pink-600 font-medium">Sign in to sync your profile & friends across devices</p>
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="grid grid-cols-2 gap-1 p-1 bg-pink-100/80 rounded-2xl text-xs font-bold text-pink-800">
+        <button id="tab-signin" onclick="switchAuthTab('signin')" class="py-2.5 rounded-xl bg-white shadow text-pink-900 transition">Sign In</button>
+        <button id="tab-signup" onclick="switchAuthTab('signup')" class="py-2.5 rounded-xl transition text-pink-600 hover:text-pink-900">Sign Up</button>
+      </div>
+
+      <!-- Auth Notification Alert -->
+      <div id="auth-alert" class="hidden text-xs p-3 rounded-xl border font-medium"></div>
+
+      <!-- Auth Form -->
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-3">
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold text-pink-800 uppercase tracking-wider">Email Address</label>
+          <input type="email" id="auth-email" required placeholder="slime@sakura.com" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-[11px] font-bold text-pink-800 uppercase tracking-wider">Password</label>
+          <input type="password" id="auth-password" required minlength="6" placeholder="••••••••" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" />
+        </div>
+        <div id="username-field" class="space-y-1 hidden">
+          <label class="text-[11px] font-bold text-pink-800 uppercase tracking-wider">Slime Display Name</label>
+          <input type="text" id="auth-username" maxlength="15" placeholder="BouncySlime" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" />
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-sm mt-2">
+          <span>Sign In</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+
+      <div class="relative flex items-center justify-center my-2">
+        <div class="border-t border-pink-200 w-full"></div>
+        <span class="bg-white/80 px-3 text-[10px] font-bold uppercase text-pink-400 absolute">or</span>
+      </div>
+
+      <!-- Guest Play Option -->
+      <button onclick="loginAsGuest()" class="w-full bg-white hover:bg-pink-50 text-pink-800 font-semibold py-2.5 rounded-2xl border border-pink-200/80 transition active:scale-95 text-xs flex items-center justify-center gap-1.5 shadow-sm">
+        <i data-lucide="user" class="w-4 h-4 text-pink-500"></i> Continue as Guest Slime
+      </button>
+    </div>
+  </div>
 
   <!-- Top Navigation Header -->
   <header class="h-14 glass px-4 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
@@ -95,7 +159,7 @@
         <i data-lucide="flower-2" class="w-5 h-5 animate-spin" style="animation-duration: 12s;"></i>
       </div>
       <div>
-        <h1 class="font-sakura text-lg text-pink-950 font-bold tracking-wide leading-none">Sakura World 🌸</h1>
+        <h1 class="font-sakura text-lg text-pink-950 font-bold tracking-wide leading-none">Sakura Slime World 🌸</h1>
         <p class="text-[10px] text-pink-600 font-semibold tracking-wider uppercase mt-0.5" id="room-indicator">#sakura-lounge</p>
       </div>
     </div>
@@ -108,10 +172,19 @@
         <span id="player-count">1 Online</span>
       </div>
 
+      <!-- User Profile Badge -->
+      <div id="user-profile-badge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 border border-pink-200/80 text-pink-900 text-xs font-bold shadow-sm">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-500"></i>
+        <span id="user-display-name">Guest</span>
+        <button onclick="handleSignOut()" class="hover:text-rose-600 ml-1 p-0.5" title="Sign Out">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+
       <!-- Settings / Customization Modal Button -->
-      <button onclick="toggleSettingsModal()" class="p-2 rounded-xl bg-white/80 hover:bg-pink-100 text-pink-800 transition border border-pink-200/60 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-semibold" title="Customize Avatar">
+      <button onclick="toggleSettingsModal()" class="p-2 rounded-xl bg-white/80 hover:bg-pink-100 text-pink-800 transition border border-pink-200/60 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-semibold" title="Customize Slime">
         <i data-lucide="user-cog" class="w-4 h-4"></i>
-        <span class="hidden sm:inline">Avatar</span>
+        <span class="hidden sm:inline">Slime</span>
       </button>
 
       <!-- Toggle Chat Drawer Button -->
@@ -128,19 +201,32 @@
     <div class="flex-1 relative bg-pink-900/10 flex items-center justify-center overflow-hidden" id="canvas-container">
       <canvas id="gameCanvas" class="block w-full h-full cursor-pointer touch-none"></canvas>
 
+      <!-- Expressive Emote Toolbar Overlay (Bottom Center) -->
+      <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 glass px-3 py-1.5 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1.5 backdrop-blur-md">
+        <span class="text-[10px] font-bold text-pink-700 uppercase tracking-wider hidden sm:inline mr-1">Emotes:</span>
+        <button onclick="triggerEmote('🌸')" class="hover:scale-125 active:scale-90 transition text-lg p-1" title="Sakura Blossom">🌸</button>
+        <button onclick="triggerEmote('❤️')" class="hover:scale-125 active:scale-90 transition text-lg p-1" title="Heart">❤️</button>
+        <button onclick="triggerEmote('✨')" class="hover:scale-125 active:scale-90 transition text-lg p-1" title="Sparkles">✨</button>
+        <button onclick="triggerEmote('🍵')" class="hover:scale-125 active:scale-90 transition text-lg p-1" title="Matcha Tea">🍵</button>
+        <button onclick="triggerEmote('😂')" class="hover:scale-125 active:scale-90 transition text-lg p-1" title="Laugh">😂</button>
+        <button onclick="triggerEmote('🎉')" class="hover:scale-125 active:scale-90 transition text-lg p-1" title="Party">🎉</button>
+        <button onclick="triggerEmote('🎮')" class="hover:scale-125 active:scale-90 transition text-lg p-1" title="Gaming">🎮</button>
+        <button onclick="triggerEmote('💬')" class="hover:scale-125 active:scale-90 transition text-lg p-1" title="Talk">💬</button>
+      </div>
+
       <!-- On-Screen Controls Hint Overlay (Fades out) -->
       <div id="controls-hint" class="absolute top-4 left-4 pointer-events-none glass px-3.5 py-2 rounded-2xl border border-pink-200/80 shadow-md text-xs text-pink-950 flex items-center gap-2 transition-opacity duration-500 z-10">
         <i data-lucide="gamepad-2" class="w-4 h-4 text-pink-600"></i>
-        <span>Move: <strong class="text-pink-700">WASD / Arrows / Tap Screen</strong></span>
+        <span>Explore freely: <strong class="text-pink-700">WASD / Arrows / Tap Anywhere</strong></span>
       </div>
 
       <!-- On-Screen Virtual Touch D-Pad (Visible on Mobile) -->
-      <div class="absolute bottom-6 left-6 z-20 grid grid-cols-3 gap-1.5 w-36 h-36 md:hidden pointer-events-auto">
+      <div class="absolute bottom-20 left-6 z-20 grid grid-cols-3 gap-1.5 w-32 h-32 md:hidden pointer-events-auto">
         <div></div>
         <button ontouchstart="startMove('up', event)" ontouchend="stopMove('up', event)" onmousedown="startMove('up', event)" onmouseup="stopMove('up', event)" class="dpad-btn rounded-t-2xl flex items-center justify-center font-bold text-pink-800 text-xl shadow">▲</button>
         <div></div>
         <button ontouchstart="startMove('left', event)" ontouchend="stopMove('left', event)" onmousedown="startMove('left', event)" onmouseup="stopMove('left', event)" class="dpad-btn rounded-l-2xl flex items-center justify-center font-bold text-pink-800 text-xl shadow">◀</button>
-        <div class="dpad-btn rounded-lg bg-pink-200/50 flex items-center justify-center text-[10px] text-pink-700 font-bold">PAD</div>
+        <div class="dpad-btn rounded-lg bg-pink-200/50 flex items-center justify-center text-[9px] text-pink-700 font-bold">PAD</div>
         <button ontouchstart="startMove('right', event)" ontouchend="stopMove('right', event)" onmousedown="startMove('right', event)" onmouseup="stopMove('right', event)" class="dpad-btn rounded-r-2xl flex items-center justify-center font-bold text-pink-800 text-xl shadow">▶</button>
         <div></div>
         <button ontouchstart="startMove('down', event)" ontouchend="stopMove('down', event)" onmousedown="startMove('down', event)" onmouseup="stopMove('down', event)" class="dpad-btn rounded-b-2xl flex items-center justify-center font-bold text-pink-800 text-xl shadow">▼</button>
@@ -178,7 +264,7 @@
 
       <!-- Chat Log Stream -->
       <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3">
-        <!-- Messages rendered dynamically with persistence -->
+        <!-- Messages rendered dynamically -->
       </div>
 
       <!-- Input Bar -->
@@ -209,7 +295,7 @@
       <div class="flex items-center justify-between border-b border-pink-200/80 pb-3">
         <div class="flex items-center gap-2">
           <i data-lucide="sparkles" class="w-5 h-5 text-pink-600"></i>
-          <h3 class="font-bold text-pink-950 text-lg">Customize Your Character</h3>
+          <h3 class="font-bold text-pink-950 text-lg">Customize Slime Companion</h3>
         </div>
         <button onclick="toggleSettingsModal()" class="text-pink-700 hover:text-pink-900 p-1">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -219,12 +305,12 @@
       <!-- Username Customization -->
       <div class="space-y-1.5">
         <label class="text-xs font-bold text-pink-800 uppercase tracking-wider">Display Name</label>
-        <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" placeholder="Your Avatar Name..." />
+        <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" placeholder="Your Slime Name..." />
       </div>
 
-      <!-- Avatar Selection -->
+      <!-- Slime Preset Selection -->
       <div class="space-y-2">
-        <label class="text-xs font-bold text-pink-800 uppercase tracking-wider">Choose Chibi Companion</label>
+        <label class="text-xs font-bold text-pink-800 uppercase tracking-wider">Choose Slime Style & Accessory</label>
         <div class="grid grid-cols-2 gap-3" id="avatar-picker">
           <!-- Rendered dynamically -->
         </div>
@@ -232,58 +318,116 @@
 
       <!-- Save Button -->
       <button onclick="saveAvatarSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2">
-        <i data-lucide="check" class="w-5 h-5"></i> Save Avatar & Explore
+        <i data-lucide="check" class="w-5 h-5"></i> Save & Bouncing Around
       </button>
     </div>
   </div>
 
   <script>
-    // --- SUPABASE CONFIGURATION (Realtime Channel & Presence) ---
+    // --- SUPABASE CONFIGURATION ---
     const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- AVATAR TYPES & PRESETS ---
+    // --- SOUND EFFECTS SYNTHESIZER (Web Audio API) ---
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+      try {
+        initAudio();
+        if (!audioCtx) return;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'bounce') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(440, now + 0.15);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'emote') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.2); // A5
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'msg') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        }
+      } catch (e) {
+        // Ignore audio failures on muted browsers
+      }
+    }
+
+    // --- SLIME TYPES & ACCESSORIES PRESETS ---
     const AVATAR_TYPES = {
-      sakura: { name: 'Sakura Chibi', bodyColor: '#f472b6', accentColor: '#fb7185', earType: 'flower', item: '🌸' },
-      spirit: { name: 'Ocean Neko', bodyColor: '#38bdf8', accentColor: '#0284c7', earType: 'cat', item: '🌊' },
-      fox:    { name: 'Kitsune Fox', bodyColor: '#fb923c', accentColor: '#c2410c', earType: 'fox', item: '🦊' },
-      ninja:  { name: 'Matcha Slime', bodyColor: '#4ade80', accentColor: '#15803d', earType: 'ribbon', item: '🍵' }
+      sakura: { name: 'Sakura Slime', bodyColor: '#f472b6', accentColor: '#fb7185', accessory: '🌸' },
+      spirit: { name: 'Ocean Neko', bodyColor: '#38bdf8', accentColor: '#0284c7', accessory: '🐱' },
+      fox:    { name: 'Kitsune Slime', bodyColor: '#fb923c', accentColor: '#c2410c', accessory: '🦊' },
+      matcha: { name: 'Matcha Boba', bodyColor: '#4ade80', accentColor: '#15803d', accessory: '🍵' },
+      crown:  { name: 'Royal Slime', bodyColor: '#a855f7', accentColor: '#7e22ce', accessory: '👑' },
+      bunny:  { name: 'Bunny Slime', bodyColor: '#f43f5e', accentColor: '#be123c', accessory: '🐰' }
     };
 
     // --- GAME & PLAYER STATE ---
+    let currentUser = null;
     let localPlayer = {
       id: 'usr_' + Math.random().toString(36).substring(2, 9),
-      name: localStorage.getItem('sakura_avatar_name') || 'Wanderer_' + Math.floor(100 + Math.random() * 900),
+      name: localStorage.getItem('sakura_avatar_name') || 'Slime_' + Math.floor(100 + Math.random() * 900),
       avatarType: localStorage.getItem('sakura_avatar_type') || 'sakura',
       x: 400,
       y: 300,
       targetX: 400,
       targetY: 300,
-      vx: 0,
-      vy: 0,
-      speed: 4.2,
+      speed: 4.5,
       direction: 'down',
       isMoving: false,
-      speechBubble: null // { text: '', expiresAt: 0 }
+      bounceOffset: 0,
+      bouncePhase: 0,
+      scaleX: 1,
+      scaleY: 1,
+      speechBubble: null,
+      activeEmote: null // { emoji: '', expiresAt: 0 }
     };
 
     let remotePlayers = {};
+    let floatingParticles = [];
     let currentChannel = 'sakura-lounge';
     let realtimeChannel = null;
     let petals = [];
 
-    // --- PERSISTENT CHAT STORAGE (Client-side memory + LocalStorage buffer) ---
+    // --- PERSISTENT CHAT MEMORY ---
     const chatMemory = {
       'sakura-lounge': JSON.parse(localStorage.getItem('chat_sakura-lounge') || '[]'),
       'gaming-shrine': JSON.parse(localStorage.getItem('chat_gaming-shrine') || '[]'),
       'arcade-lounge': JSON.parse(localStorage.getItem('chat_arcade-lounge') || '[]')
     };
 
-    // Keyboard Controls
+    // Keyboard state
     const keys = { up: false, down: false, left: false, right: false };
 
-    // --- CANVAS SETUP ---
+    // Canvas Setup
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -291,17 +435,111 @@
       const container = document.getElementById('canvas-container');
       canvas.width = container.clientWidth;
       canvas.height = container.clientHeight;
-      
-      // Clamp player inside view
-      localPlayer.x = Math.max(40, Math.min(canvas.width - 40, localPlayer.x));
-      localPlayer.y = Math.max(40, Math.min(canvas.height - 40, localPlayer.y));
     }
 
-    // --- PETAL PARTICLES ---
+    // --- AUTHENTICATION HANDLERS ---
+    let authMode = 'signin'; // 'signin' or 'signup'
+
+    function switchAuthTab(mode) {
+      authMode = mode;
+      const tabSignIn = document.getElementById('tab-signin');
+      const tabSignUp = document.getElementById('tab-signup');
+      const usernameField = document.getElementById('username-field');
+      const submitBtn = document.getElementById('auth-submit-btn');
+
+      if (mode === 'signin') {
+        tabSignIn.className = "py-2.5 rounded-xl bg-white shadow text-pink-900 transition";
+        tabSignUp.className = "py-2.5 rounded-xl transition text-pink-600 hover:text-pink-900";
+        usernameField.classList.add('hidden');
+        submitBtn.querySelector('span').textContent = 'Sign In';
+      } else {
+        tabSignUp.className = "py-2.5 rounded-xl bg-white shadow text-pink-900 transition";
+        tabSignIn.className = "py-2.5 rounded-xl transition text-pink-600 hover:text-pink-900";
+        usernameField.classList.remove('hidden');
+        submitBtn.querySelector('span').textContent = 'Create Account';
+      }
+      hideAuthAlert();
+    }
+
+    function showAuthAlert(msg, isError = true) {
+      const alert = document.getElementById('auth-alert');
+      alert.classList.remove('hidden', 'bg-rose-100', 'text-rose-800', 'border-rose-300', 'bg-emerald-100', 'text-emerald-800', 'border-emerald-300');
+      if (isError) {
+        alert.classList.add('bg-rose-100', 'text-rose-800', 'border-rose-300');
+      } else {
+        alert.classList.add('bg-emerald-100', 'text-emerald-800', 'border-emerald-300');
+      }
+      alert.textContent = msg;
+    }
+
+    function hideAuthAlert() {
+      document.getElementById('auth-alert').classList.add('hidden');
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const username = document.getElementById('auth-username').value.trim();
+
+      hideAuthAlert();
+
+      try {
+        if (authMode === 'signup') {
+          const { data, error } = await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: { data: { display_name: username || 'Slime' } }
+          });
+          if (error) throw error;
+          
+          showAuthAlert('Account created successfully! Logging you in...', false);
+          setTimeout(() => completeUserLogin(data.user, username || email.split('@')[0]), 1000);
+        } else {
+          const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+
+          showAuthAlert('Welcome back! Loading world...', false);
+          const dispName = data.user.user_metadata?.display_name || email.split('@')[0];
+          setTimeout(() => completeUserLogin(data.user, dispName), 800);
+        }
+      } catch (err) {
+        showAuthAlert(err.message || 'Authentication failed. Please try again.');
+      }
+    }
+
+    function loginAsGuest() {
+      const guestName = 'Slime_' + Math.floor(100 + Math.random() * 900);
+      completeUserLogin(null, guestName);
+    }
+
+    function completeUserLogin(user, displayName) {
+      currentUser = user;
+      localPlayer.name = displayName;
+      if (user) localPlayer.id = user.id;
+
+      localStorage.setItem('sakura_avatar_name', displayName);
+
+      // UI updates
+      document.getElementById('auth-modal').classList.add('hidden');
+      document.getElementById('user-profile-badge').classList.remove('hidden');
+      document.getElementById('user-display-name').textContent = displayName;
+
+      // Initialize Supabase realtime channel after login
+      initSupabaseChannel(currentChannel);
+    }
+
+    async function handleSignOut() {
+      if (currentUser) {
+        await supabaseClient.auth.signOut();
+      }
+      location.reload();
+    }
+
+    // --- PETALS & PARTICLES ANIMATIONS ---
     function initPetals() {
       petals = [];
-      const count = 45;
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < 50; i++) {
         petals.push({
           x: Math.random() * window.innerWidth,
           y: Math.random() * window.innerHeight,
@@ -315,7 +553,7 @@
     }
 
     function updateAndDrawPetals() {
-      ctx.fillStyle = 'rgba(251, 207, 232, 0.8)';
+      ctx.fillStyle = 'rgba(251, 207, 232, 0.85)';
       petals.forEach(p => {
         p.y += p.speedY;
         p.x += p.speedX + Math.sin(p.y * 0.015) * 0.4;
@@ -336,7 +574,42 @@
       });
     }
 
-    // --- MAP DRAWING (ROOM SPECIFIC TREES & DETAILS) ---
+    // Floating Emote Particles System
+    function addFloatingParticle(x, y, text) {
+      for (let i = 0; i < 4; i++) {
+        floatingParticles.push({
+          x: x + (Math.random() - 0.5) * 20,
+          y: y - 20,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: -Math.random() * 2 - 1.5,
+          alpha: 1,
+          size: Math.random() * 8 + 14,
+          text: text
+        });
+      }
+    }
+
+    function updateAndDrawParticles() {
+      for (let i = floatingParticles.length - 1; i >= 0; i--) {
+        const p = floatingParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.02;
+
+        if (p.alpha <= 0) {
+          floatingParticles.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.font = `${p.size}px sans-serif`;
+        ctx.fillText(p.text, p.x, p.y);
+        ctx.restore();
+      }
+    }
+
+    // --- MAP & ENVIRONMENT DRAWING ---
     function drawEnvironment() {
       const w = canvas.width;
       const h = canvas.height;
@@ -346,7 +619,7 @@
         ctx.fillStyle = '#fce7f3';
         ctx.fillRect(0, 0, w, h);
 
-        // Tatami Floor Mats
+        // Tatami Tiles
         ctx.strokeStyle = 'rgba(244, 114, 182, 0.25)';
         ctx.lineWidth = 2;
         const tileSize = 90;
@@ -356,18 +629,18 @@
           }
         }
 
-        // Zen Koi Pond in Center Bottom
-        drawPond(w / 2, h / 2 + 80, 120, 60);
+        // Zen Koi Pond
+        drawPond(w / 2, h / 2 + 60, 130, 70);
 
-        // Multiple Blossoming Sakura Trees (4 Trees around map)
-        drawSakuraTree(110, 110, 48);
-        drawSakuraTree(w - 110, 110, 48);
-        drawSakuraTree(120, h - 120, 44);
-        drawSakuraTree(w - 120, h - 120, 44);
+        // Blooming Sakura Trees
+        drawSakuraTree(110, 110, 52);
+        drawSakuraTree(w - 110, 110, 52);
+        drawSakuraTree(120, h - 120, 48);
+        drawSakuraTree(w - 120, h - 120, 48);
 
-        // Lanterns & Mats
-        drawLantern(220, 90);
-        drawLantern(w - 220, 90);
+        // Stone Lanterns
+        drawLantern(220, 100);
+        drawLantern(w - 220, 100);
 
       } else if (currentChannel === 'gaming-shrine') {
         // Red Shrine Courtyard
@@ -378,28 +651,23 @@
         ctx.strokeStyle = 'rgba(225, 29, 72, 0.15)';
         ctx.lineWidth = 1.5;
         for (let x = 0; x < w; x += 60) {
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, h);
-          ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
         }
 
-        // Torii Gate Shrine Center
+        // Torii Gate
         drawToriiGate(w / 2, 130);
 
-        // 5 Cherry Blossom Trees framing the Shrine
+        // Framing Cherry Trees
         drawSakuraTree(80, 120, 42);
         drawSakuraTree(w - 80, 120, 42);
         drawSakuraTree(w / 2 - 200, 180, 45);
         drawSakuraTree(w / 2 + 200, 180, 45);
-        drawSakuraTree(w / 2, h - 100, 50);
 
-        // Stone Lanterns
         drawLantern(w / 2 - 110, 160);
         drawLantern(w / 2 + 110, 160);
 
       } else if (currentChannel === 'arcade-lounge') {
-        // Neon Pink Arcade Room
+        // Cyber Arcade Room
         ctx.fillStyle = '#2e1065';
         ctx.fillRect(0, 0, w, h);
 
@@ -413,24 +681,20 @@
           ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
         }
 
-        // Glowing Arcade Cabinets
-        drawArcadeCabinet(120, 100, '#ec4899', 'PAC-SAKURA');
-        drawArcadeCabinet(220, 100, '#8b5cf6', 'NEON DASH');
+        // Neon Cabinets
+        drawArcadeCabinet(120, 100, '#ec4899', 'PAC-SLIME');
+        drawArcadeCabinet(220, 100, '#8b5cf6', 'NEON BOUNCE');
         drawArcadeCabinet(w - 220, 100, '#06b6d4', 'BOBA HERO');
         drawArcadeCabinet(w - 120, 100, '#f59e0b', 'CHIBI KOI');
-
-        // Indoor Sakura Pots in Arcade
-        drawPottedSakuraTree(90, h - 120);
-        drawPottedSakuraTree(w - 90, h - 120);
       }
 
-      // Outer Room Border
-      ctx.lineWidth = 10;
+      // Outer Glow Frame
+      ctx.lineWidth = 8;
       ctx.strokeStyle = 'rgba(244, 114, 182, 0.4)';
       ctx.strokeRect(0, 0, w, h);
     }
 
-    // --- ENVIRONMENT HELPERS ---
+    // --- MAP HELPERS ---
     function drawSakuraTree(x, y, radius) {
       // Tree Shadow
       ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
@@ -446,7 +710,7 @@
       ctx.quadraticCurveTo(x - 5, y + 10, x, y - radius * 0.2);
       ctx.stroke();
 
-      // Fluffy Sakura Canopy
+      // Canopy Clusters
       const clusters = [
         { dx: 0, dy: -radius * 0.4, r: radius * 0.6, color: '#f472b6' },
         { dx: -radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#ec4899' },
@@ -461,16 +725,6 @@
         ctx.arc(x + c.dx, y + c.dy, c.r, 0, Math.PI * 2);
         ctx.fill();
       });
-    }
-
-    function drawPottedSakuraTree(x, y) {
-      // Pot
-      ctx.fillStyle = '#ec4899';
-      ctx.beginPath();
-      ctx.roundRect(x - 18, y + 10, 36, 25, 6);
-      ctx.fill();
-
-      drawSakuraTree(x, y - 10, 32);
     }
 
     function drawPond(x, y, rx, ry) {
@@ -490,26 +744,21 @@
 
     function drawToriiGate(x, y) {
       ctx.fillStyle = '#dc2626';
-      // Pillars
       ctx.fillRect(x - 60, y - 60, 12, 80);
       ctx.fillRect(x + 48, y - 60, 12, 80);
-      // Top Beams
       ctx.fillRect(x - 80, y - 60, 160, 14);
       ctx.fillRect(x - 70, y - 42, 140, 10);
-      // Black Accent Top
       ctx.fillStyle = '#0f172a';
       ctx.fillRect(x - 84, y - 66, 168, 6);
     }
 
     function drawLantern(x, y) {
-      // Glow
       const glow = ctx.createRadialGradient(x, y, 4, x, y, 28);
       glow.addColorStop(0, 'rgba(253, 224, 71, 0.6)');
       glow.addColorStop(1, 'rgba(253, 224, 71, 0)');
       ctx.fillStyle = glow;
       ctx.beginPath(); ctx.arc(x, y, 28, 0, Math.PI * 2); ctx.fill();
 
-      // Body
       ctx.fillStyle = '#f97316';
       ctx.beginPath(); ctx.roundRect(x - 10, y - 12, 20, 24, 4); ctx.fill();
       ctx.fillStyle = '#451a03';
@@ -521,113 +770,141 @@
       ctx.fillStyle = '#1e1b4b';
       ctx.fillRect(x - 22, y - 40, 44, 70);
       ctx.fillStyle = color;
-      ctx.fillRect(x - 20, y - 38, 40, 15); // Screen header
+      ctx.fillRect(x - 20, y - 38, 40, 15);
       ctx.fillStyle = '#0284c7';
-      ctx.fillRect(x - 18, y - 20, 36, 26); // Screen
+      ctx.fillRect(x - 18, y - 20, 36, 26);
 
-      // Screen glow text
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 7px "Plus Jakarta Sans"';
       ctx.textAlign = 'center';
       ctx.fillText(title, x, y - 7);
     }
 
-    // --- REFINED AVATAR & SPEECH BUBBLE RENDERING ---
-    function drawAvatar(player, isSelf = false) {
-      const { x, y, name, avatarType, direction, speechBubble } = player;
+    // --- REFINED BOUNCY SLIME ANIMATION & DRAWING ---
+    function drawSlime(player, isSelf = false) {
+      const { x, y, name, avatarType, direction, isMoving, speechBubble, activeEmote } = player;
       const type = AVATAR_TYPES[avatarType] || AVATAR_TYPES.sakura;
 
       ctx.save();
-      ctx.translate(x, y);
 
-      // Shadow
+      // Dynamic Bounce & Squish Calculations
+      player.bouncePhase = (player.bouncePhase || 0) + (isMoving ? 0.22 : 0.05);
+      const bounceHeight = isMoving ? Math.abs(Math.sin(player.bouncePhase)) * 12 : Math.sin(player.bouncePhase) * 2;
+      
+      // Squish/Stretch scale factor
+      const scaleX = isMoving ? 1 + Math.sin(player.bouncePhase) * 0.15 : 1 + Math.sin(player.bouncePhase) * 0.03;
+      const scaleY = isMoving ? 1 - Math.sin(player.bouncePhase) * 0.15 : 1 - Math.sin(player.bouncePhase) * 0.03;
+
+      const drawY = y - bounceHeight;
+
+      ctx.translate(x, drawY);
+
+      // Shadow on Ground
       ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
       ctx.beginPath();
-      ctx.ellipse(0, 18, 18, 8, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, y - drawY + 16, 18 * scaleX, 7, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Walking bounce effect
-      const bounce = player.isMoving ? Math.sin(Date.now() * 0.018) * 3.5 : 0;
+      // Apply Squish Scale
+      ctx.scale(scaleX, scaleY);
 
-      // Body Slime/Chibi Shape
+      // Slime Body (Organic Jelly Shape)
       ctx.fillStyle = type.bodyColor;
       ctx.beginPath();
-      ctx.arc(0, bounce, 18, Math.PI * 0.85, Math.PI * 2.15);
-      ctx.quadraticCurveTo(0, 20 + bounce, -18, bounce);
+      ctx.arc(0, 0, 20, Math.PI * 0.82, Math.PI * 2.18);
+      ctx.quadraticCurveTo(0, 22, -20, 0);
       ctx.fill();
 
+      // Shiny Top Highlight Overlay
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(-6, -10, 7, 3.5, -Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Outline
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Expressive Face Features
+      // Expressive Face Calculations
       let eyeOffsetX = 0;
       if (direction === 'left') eyeOffsetX = -5;
       if (direction === 'right') eyeOffsetX = 5;
 
       if (direction !== 'up') {
-        // Eyes
+        // Cute Blinking Eyes
+        const blink = Math.sin(Date.now() * 0.003) > 0.96 ? 0.2 : 1;
+
         ctx.fillStyle = '#0f172a';
         ctx.beginPath();
-        ctx.arc(-5 + eyeOffsetX, -2 + bounce, 2.5, 0, Math.PI * 2);
-        ctx.arc(5 + eyeOffsetX, -2 + bounce, 2.5, 0, Math.PI * 2);
+        ctx.ellipse(-6 + eyeOffsetX, -2, 2.5, 3 * blink, 0, 0, Math.PI * 2);
+        ctx.ellipse(6 + eyeOffsetX, -2, 2.5, 3 * blink, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Eye highlights
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(-6 + eyeOffsetX, -3 + bounce, 1, 0, Math.PI * 2);
-        ctx.arc(4 + eyeOffsetX, -3 + bounce, 1, 0, Math.PI * 2);
-        ctx.fill();
+        // Eye Light Reflections
+        if (blink > 0.5) {
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(-7 + eyeOffsetX, -3, 1, 0, Math.PI * 2);
+          ctx.arc(5 + eyeOffsetX, -3, 1, 0, Math.PI * 2);
+          ctx.fill();
+        }
 
-        // Cute Blush
-        ctx.fillStyle = 'rgba(244, 114, 182, 0.65)';
+        // Rosy Blush
+        ctx.fillStyle = 'rgba(244, 114, 182, 0.7)';
         ctx.beginPath();
-        ctx.ellipse(-8 + eyeOffsetX, 3 + bounce, 3.5, 2, 0, 0, Math.PI * 2);
-        ctx.ellipse(8 + eyeOffsetX, 3 + bounce, 3.5, 2, 0, 0, Math.PI * 2);
+        ctx.ellipse(-9 + eyeOffsetX, 3, 4, 2, 0, 0, Math.PI * 2);
+        ctx.ellipse(9 + eyeOffsetX, 3, 4, 2, 0, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Accessory / Accessory Item
-      ctx.font = '12px sans-serif';
+      // Slime Accessory / Hat
+      ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(type.item, 10 + eyeOffsetX, -12 + bounce);
+      ctx.fillText(type.accessory, 0 + eyeOffsetX, -20);
 
-      // Self Highlight Ring
+      ctx.restore(); // Restore transform before rendering UI overlay tags
+
+      // Local Player Highlight Ring
       if (isSelf) {
         ctx.strokeStyle = '#ec4899';
         ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.ellipse(0, 18, 22, 10, 0, 0, Math.PI * 2);
+        ctx.ellipse(x, y + 16, 22, 9, 0, 0, Math.PI * 2);
         ctx.stroke();
       }
 
       // Name Tag
       ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
-      const nameWidth = ctx.measureText(name).width + 14;
-      ctx.fillStyle = isSelf ? '#ec4899' : 'rgba(255, 255, 255, 0.9)';
+      const nameWidth = ctx.measureText(name).width + 16;
+      ctx.fillStyle = isSelf ? '#ec4899' : 'rgba(255, 255, 255, 0.92)';
       ctx.beginPath();
-      ctx.roundRect(-nameWidth / 2, 24, nameWidth, 18, 9);
+      ctx.roundRect(x - nameWidth / 2, drawY + 24, nameWidth, 18, 9);
       ctx.fill();
       ctx.strokeStyle = 'rgba(244, 114, 182, 0.5)';
       ctx.lineWidth = 1;
       ctx.stroke();
 
       ctx.fillStyle = isSelf ? '#ffffff' : '#831843';
-      ctx.fillText(name, 0, 37);
+      ctx.textAlign = 'center';
+      ctx.fillText(name, x, drawY + 37);
 
-      // SPEECH BUBBLE (STABLE & NEVER TRUNCATED PREMATURELY)
-      if (speechBubble && speechBubble.expiresAt > Date.now()) {
-        drawSpeechBubble(speechBubble.text);
+      // Active Floating Emote ABOVE Slime
+      if (activeEmote && activeEmote.expiresAt > Date.now()) {
+        ctx.font = '22px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(activeEmote.emoji, x, drawY - 45);
       }
 
-      ctx.restore();
+      // SPEECH BUBBLE WITH CRISP MULTI-LINE WRAPPING
+      if (speechBubble && speechBubble.expiresAt > Date.now()) {
+        drawSpeechBubble(x, drawY - 35, speechBubble.text);
+      }
     }
 
-    function drawSpeechBubble(text) {
+    function drawSpeechBubble(x, y, text) {
       ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
       
-      // Multi-line text wrapping logic for speech bubbles
       const maxLineWidth = 160;
       const words = text.split(' ');
       let lines = [];
@@ -654,16 +931,16 @@
 
       const bubbleWidth = Math.max(60, maxMeasuredWidth + padding * 2);
       const bubbleHeight = lines.length * lineHeight + padding * 1.2;
-      const bubbleX = -bubbleWidth / 2;
-      const bubbleY = -35 - bubbleHeight;
+      const bubbleX = x - bubbleWidth / 2;
+      const bubbleY = y - bubbleHeight;
 
-      // Bubble Outer Shadow
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+      // Shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
       ctx.beginPath();
       ctx.roundRect(bubbleX + 2, bubbleY + 2, bubbleWidth, bubbleHeight, 12);
       ctx.fill();
 
-      // Bubble Body (Glass White)
+      // Body
       ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
       ctx.beginPath();
       ctx.roundRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight, 12);
@@ -673,23 +950,23 @@
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Bubble Pointer Tail
+      // Tail
       ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
       ctx.beginPath();
-      ctx.moveTo(-6, bubbleY + bubbleHeight - 1);
-      ctx.lineTo(0, bubbleY + bubbleHeight + 7);
-      ctx.lineTo(6, bubbleY + bubbleHeight - 1);
+      ctx.moveTo(x - 6, bubbleY + bubbleHeight - 1);
+      ctx.lineTo(x, bubbleY + bubbleHeight + 7);
+      ctx.lineTo(x + 6, bubbleY + bubbleHeight - 1);
       ctx.fill();
 
-      // Render Text Lines
+      // Text Lines
       ctx.fillStyle = '#831843';
       ctx.textAlign = 'center';
       lines.forEach((line, index) => {
-        ctx.fillText(line, 0, bubbleY + padding + 11 + index * lineHeight);
+        ctx.fillText(line, x, bubbleY + padding + 11 + index * lineHeight);
       });
     }
 
-    // --- CONTROLS & SMOOTH PHYSICS MOVEMENT ---
+    // --- CONTROLS, PHYSICS & SLIME INTERACTIONS ---
     function updatePlayerMovement() {
       let dx = 0;
       let dy = 0;
@@ -698,6 +975,8 @@
       if (keys.down) { dy += 1; localPlayer.direction = 'down'; }
       if (keys.left) { dx -= 1; localPlayer.direction = 'left'; }
       if (keys.right) { dx += 1; localPlayer.direction = 'right'; }
+
+      const prevMoving = localPlayer.isMoving;
 
       if (dx !== 0 || dy !== 0) {
         const len = Math.hypot(dx, dy);
@@ -708,7 +987,7 @@
         localPlayer.targetY = localPlayer.y;
         localPlayer.isMoving = true;
       } else {
-        // Smooth Click-to-Move Target Pursuit
+        // Target move click interpolation
         const distX = localPlayer.targetX - localPlayer.x;
         const distY = localPlayer.targetY - localPlayer.y;
         const distance = Math.hypot(distX, distY);
@@ -728,9 +1007,26 @@
         }
       }
 
-      // Canvas Boundary Clamping
-      localPlayer.x = Math.max(30, Math.min(canvas.width - 30, localPlayer.x));
-      localPlayer.y = Math.max(40, Math.min(canvas.height - 40, localPlayer.y));
+      // Play bounce audio on move start
+      if (!prevMoving && localPlayer.isMoving) {
+        playSound('bounce');
+      }
+
+      // Unrestricted Freedom Traversal Clamping
+      localPlayer.x = Math.max(25, Math.min(canvas.width - 25, localPlayer.x));
+      localPlayer.y = Math.max(25, Math.min(canvas.height - 25, localPlayer.y));
+
+      // Slime-to-Slime Proximity Hug / Soft Bounce Physics
+      Object.values(remotePlayers).forEach(p => {
+        const dist = Math.hypot(localPlayer.x - p.x, localPlayer.y - p.y);
+        if (dist < 32 && dist > 0) {
+          // Gentle push bounce away
+          const pushX = (localPlayer.x - p.x) / dist;
+          const pushY = (localPlayer.y - p.y) / dist;
+          localPlayer.x += pushX * 2;
+          localPlayer.y += pushY * 2;
+        }
+      });
 
       // Broadcast Realtime Movement Stream
       if (localPlayer.isMoving && realtimeChannel) {
@@ -741,11 +1037,11 @@
     function render() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Environment & Petals
+      // Map & Petals
       drawEnvironment();
       updateAndDrawPetals();
 
-      // Click Target Indicator Ring
+      // Click Ripple Target Ring
       const targetDist = Math.hypot(localPlayer.targetX - localPlayer.x, localPlayer.targetY - localPlayer.y);
       if (targetDist > 8) {
         ctx.strokeStyle = 'rgba(236, 72, 153, 0.6)';
@@ -755,19 +1051,22 @@
         ctx.stroke();
       }
 
-      // Draw Remote Players
+      // Render Remote Players
       Object.values(remotePlayers).forEach(p => {
-        drawAvatar(p, false);
+        drawSlime(p, false);
       });
 
-      // Update & Draw Local Player
+      // Update & Draw Local Player Slime
       updatePlayerMovement();
-      drawAvatar(localPlayer, true);
+      drawSlime(localPlayer, true);
+
+      // Particles
+      updateAndDrawParticles();
 
       requestAnimationFrame(render);
     }
 
-    // --- REALTIME CHANNELS & PERSISTENT CHAT LOGIC ---
+    // --- REALTIME SUPABASE CHANNEL & PRESENCE ---
     async function initSupabaseChannel(channelName) {
       if (realtimeChannel) {
         supabaseClient.removeChannel(realtimeChannel);
@@ -809,20 +1108,24 @@
         })
         .on('broadcast', { event: 'chat-message' }, payload => {
           const msg = payload.payload;
-          
-          // Save to local channel buffer
           saveChatMessageToMemory(msg.channel || currentChannel, msg);
           
-          // If message is for current active room, render immediately
           if ((msg.channel || currentChannel) === currentChannel) {
             displayChatMessage(msg);
+            playSound('msg');
           }
 
-          // Speech Bubble Trigger
           if (msg.playerId === localPlayer.id) {
-            localPlayer.speechBubble = { text: msg.content, expiresAt: Date.now() + 6000 };
+            localPlayer.speechBubble = { text: msg.content, expiresAt: Date.now() + 6500 };
           } else if (remotePlayers[msg.playerId]) {
-            remotePlayers[msg.playerId].speechBubble = { text: msg.content, expiresAt: Date.now() + 6000 };
+            remotePlayers[msg.playerId].speechBubble = { text: msg.content, expiresAt: Date.now() + 6500 };
+          }
+        })
+        .on('broadcast', { event: 'player-emote' }, payload => {
+          const data = payload.payload;
+          if (remotePlayers[data.playerId]) {
+            remotePlayers[data.playerId].activeEmote = { emoji: data.emoji, expiresAt: Date.now() + 3500 };
+            addFloatingParticle(remotePlayers[data.playerId].x, remotePlayers[data.playerId].y, data.emoji);
           }
         })
         .subscribe(async (status) => {
@@ -838,17 +1141,14 @@
           }
         });
 
-      // Render Persistent Chat History for this channel
       renderChatLogForChannel(channelName);
     }
 
     function saveChatMessageToMemory(channel, msg) {
       if (!chatMemory[channel]) chatMemory[channel] = [];
       chatMemory[channel].push(msg);
-      // Keep max 50 recent messages per channel
       if (chatMemory[channel].length > 50) chatMemory[channel].shift();
       
-      // Save buffer in LocalStorage
       try {
         localStorage.setItem(`chat_${channel}`, JSON.stringify(chatMemory[channel]));
       } catch(e) {}
@@ -861,13 +1161,11 @@
       const messages = chatMemory[channel] || [];
 
       if (messages.length === 0) {
-        container.innerHTML = `<div class="text-center text-xs text-pink-500 my-6 italic">Welcome to #${channel}! Send a message to start chatting 🌸</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-pink-500 my-6 italic">Welcome to #${channel}! Bounce & send a message 🌸</div>`;
         return;
       }
 
-      messages.forEach(msg => {
-        displayChatMessage(msg);
-      });
+      messages.forEach(msg => displayChatMessage(msg));
     }
 
     function broadcastState() {
@@ -885,6 +1183,21 @@
           isMoving: localPlayer.isMoving
         }
       });
+    }
+
+    // Trigger Emote Action
+    function triggerEmote(emoji) {
+      playSound('emote');
+      localPlayer.activeEmote = { emoji: emoji, expiresAt: Date.now() + 3500 };
+      addFloatingParticle(localPlayer.x, localPlayer.y, emoji);
+
+      if (realtimeChannel) {
+        realtimeChannel.send({
+          type: 'broadcast',
+          event: 'player-emote',
+          payload: { playerId: localPlayer.id, emoji: emoji }
+        });
+      }
     }
 
     // Submit Chat Message
@@ -906,14 +1219,12 @@
         channel: currentChannel
       };
 
-      // Set local speech bubble
-      localPlayer.speechBubble = { text: text, expiresAt: Date.now() + 6000 };
+      playSound('msg');
+      localPlayer.speechBubble = { text: text, expiresAt: Date.now() + 6500 };
 
-      // Save to memory and view
       saveChatMessageToMemory(currentChannel, msgObj);
       displayChatMessage(msgObj);
 
-      // Broadcast to other players in room
       if (realtimeChannel) {
         realtimeChannel.send({
           type: 'broadcast',
@@ -954,7 +1265,7 @@
       return div.innerHTML;
     }
 
-    // --- INPUT EVENT LISTENERS ---
+    // --- INPUT LISTENERS ---
     window.addEventListener('keydown', e => {
       if (document.activeElement.tagName === 'INPUT') return;
 
@@ -971,24 +1282,26 @@
       if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
     });
 
-    // Click/Tap to Move
+    // Unrestricted Movement Tap/Click Anywhere
     canvas.addEventListener('pointerdown', e => {
       const rect = canvas.getBoundingClientRect();
       localPlayer.targetX = e.clientX - rect.left;
       localPlayer.targetY = e.clientY - rect.top;
+
+      // Check if clicked another player slime to trigger high-five emote!
+      Object.values(remotePlayers).forEach(p => {
+        const clickDist = Math.hypot(localPlayer.targetX - p.x, localPlayer.targetY - p.y);
+        if (clickDist < 35) {
+          triggerEmote('❤️');
+        }
+      });
     });
 
-    // Mobile D-Pad Handlers
-    function startMove(dir, ev) { 
-      if (ev) ev.preventDefault();
-      keys[dir] = true; 
-    }
-    function stopMove(dir, ev) { 
-      if (ev) ev.preventDefault();
-      keys[dir] = false; 
-    }
+    // Virtual D-Pad
+    function startMove(dir, ev) { if (ev) ev.preventDefault(); keys[dir] = true; }
+    function stopMove(dir, ev) { if (ev) ev.preventDefault(); keys[dir] = false; }
 
-    // Switch Room / Channel
+    // Switch Room Channel
     function switchChannel(channelName) {
       if (currentChannel === channelName) return;
 
@@ -1006,7 +1319,7 @@
       initSupabaseChannel(channelName);
     }
 
-    // --- AVATAR SETTINGS MODAL ---
+    // --- SETTINGS MODAL ---
     function renderAvatarPicker() {
       const picker = document.getElementById('avatar-picker');
       picker.innerHTML = Object.keys(AVATAR_TYPES).map(key => {
@@ -1023,7 +1336,7 @@
             }"
           >
             <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-sm shrink-0" style="background-color: ${type.bodyColor}">
-              ${type.item}
+              ${type.accessory}
             </div>
             <span class="text-xs font-bold text-pink-900">${type.name}</span>
           </div>
@@ -1050,6 +1363,7 @@
       if (newName) {
         localPlayer.name = newName;
         localStorage.setItem('sakura_avatar_name', localPlayer.name);
+        document.getElementById('user-display-name').textContent = newName;
       }
       localStorage.setItem('sakura_avatar_type', localPlayer.avatarType);
 
@@ -1071,7 +1385,6 @@
       sidebar.classList.toggle('translate-x-full');
     }
 
-    // Controls hint auto fade
     setTimeout(() => {
       const hint = document.getElementById('controls-hint');
       if (hint) hint.style.opacity = '0.35';
@@ -1080,18 +1393,24 @@
     // --- INITIALIZATION ---
     window.addEventListener('resize', resizeCanvas);
 
-    window.addEventListener('load', () => {
+    window.addEventListener('load', async () => {
       lucide.createIcons();
       resizeCanvas();
       initPetals();
 
-      // Spawn player in central map area
       localPlayer.x = canvas.width / 2;
       localPlayer.y = canvas.height / 2 + 30;
       localPlayer.targetX = localPlayer.x;
       localPlayer.targetY = localPlayer.y;
 
-      initSupabaseChannel('sakura-lounge');
+      // Check existing Supabase session
+      const { data } = await supabaseClient.auth.getSession();
+      if (data.session) {
+        const user = data.session.user;
+        const dispName = user.user_metadata?.display_name || user.email.split('@')[0];
+        completeUserLogin(user, dispName);
+      }
+
       requestAnimationFrame(render);
     });
   </script>
