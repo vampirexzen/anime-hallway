@@ -1,206 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Endless Anime Sanctuary - Cinematic Pixel Edition</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font: Press Start 2P -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * {
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
-        body {
-            font-family: 'Press Start 2P', monospace;
-            background-color: #05050a;
-            color: #e0e6ed;
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-        }
-        canvas {
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            display: block;
-        }
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.4);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #6366f1;
-            border-radius: 3px;
-        }
-        .pixel-btn {
-            background: #4f46e5;
-            box-shadow: inset -2px -2px 0px 0px #312e81, inset 2px 2px 0px 0px #818cf8;
-            transition: all 0.1s ease;
-        }
-        .pixel-btn:active {
-            box-shadow: inset 2px 2px 0px 0px #312e81, inset -2px -2px 0px 0px #818cf8;
-            transform: translateY(2px);
-        }
-    </style>
-</head>
-<body class="w-screen h-screen flex flex-col justify-between relative bg-slate-950">
-
-    <!-- GAME CANVAS CONTAINER -->
-    <div id="canvasContainer" class="absolute inset-0 z-0 flex items-center justify-center bg-black">
-        <canvas id="gameCanvas"></canvas>
-    </div>
-
-    <!-- TOP BAR HUD -->
-    <div class="relative z-10 p-3 flex justify-between items-center bg-slate-950/85 backdrop-blur-md border-b-2 border-indigo-950 text-xs shadow-lg">
-        <div class="flex items-center gap-3">
-            <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-md border border-indigo-900/50 shadow-inner">
-                <i class="fa-solid fa-user text-indigo-400"></i>
-                <span id="playerTag" class="text-indigo-300 font-bold">AnimeWalker</span>
-            </div>
-            <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-md border border-indigo-900/50 shadow-inner">
-                <i class="fa-solid fa-location-dot text-amber-400"></i>
-                <span id="locationTag" class="text-amber-200">Main Hallway</span>
-            </div>
-        </div>
-
-        <!-- System Controls -->
-        <div class="flex items-center gap-2">
-            <button id="btnMusicToggle" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-amber-600 shadow">
-                <i id="musicIcon" class="fa-solid fa-music"></i>
-                <span class="hidden md:inline">Music</span>
-            </button>
-            <button id="btnMicToggle" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-rose-600 shadow">
-                <i id="micIcon" class="fa-solid fa-microphone-slash"></i>
-                <span class="hidden md:inline">Mic Off</span>
-            </button>
-            <button id="btnCustomizer" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-indigo-600 shadow">
-                <i class="fa-solid fa-gear"></i>
-                <span class="hidden md:inline">Settings</span>
-            </button>
-            <button id="btnLogout" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-slate-800 hidden shadow">
-                <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- MAIN CHAT OVERLAY -->
-    <div class="relative z-10 p-2 md:p-4 pointer-events-none flex justify-between items-end mb-16 md:mb-0">
-        <div class="pointer-events-auto w-80 max-w-[85vw] bg-slate-950/90 border-2 border-indigo-900/60 rounded-lg p-3 flex flex-col h-48 backdrop-blur-md shadow-2xl">
-            <div class="text-[10px] text-indigo-400 mb-2 border-b border-indigo-900/40 pb-1 flex justify-between items-center">
-                <span><i class="fa-solid fa-comments"></i> Proximity Sanctuary Chat</span>
-                <span id="peerCount" class="text-slate-400">Online: 1</span>
-            </div>
-            <div id="chatMessages" class="flex-1 overflow-y-auto space-y-2 pr-1 text-[10px] leading-relaxed">
-                <div class="text-emerald-400"><i class="fa-solid fa-circle-info"></i> Welcome! Walk right to enter rooms and enjoy the ambient bonfire sanctuary.</div>
-            </div>
-            <form id="chatForm" class="mt-2 flex gap-1">
-                <input id="chatInput" type="text" maxlength="60" placeholder="Type a message..." class="flex-1 bg-slate-900 border border-indigo-900/50 rounded px-2 py-1 text-[10px] text-slate-200 focus:outline-none focus:border-indigo-500 shadow-inner">
-                <button type="submit" class="pixel-btn bg-indigo-600 text-white px-2 py-1 rounded text-[10px]"><i class="fa-solid fa-paper-plane"></i></button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MOBILE TOUCH CONTROLS -->
-    <div id="mobileControls" class="relative z-20 p-4 flex justify-between items-center pointer-events-none mb-2">
-        <div class="pointer-events-auto flex gap-2">
-            <button id="btnLeft" class="w-14 h-14 bg-slate-900/90 active:bg-indigo-600 border-2 border-indigo-900 rounded-lg flex items-center justify-center text-white text-xl shadow-xl">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <button id="btnRight" class="w-14 h-14 bg-slate-900/90 active:bg-indigo-600 border-2 border-indigo-900 rounded-lg flex items-center justify-center text-white text-xl shadow-xl">
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </div>
-        <div class="pointer-events-auto flex gap-2">
-            <button id="btnSit" class="w-14 h-14 bg-emerald-700/90 active:bg-emerald-600 border-2 border-emerald-400 rounded-full flex flex-col items-center justify-center text-white font-bold text-xs shadow-xl">
-                <i class="fa-solid fa-chair text-sm"></i>
-                <span class="text-[7px] mt-0.5">SIT</span>
-            </button>
-            <button id="btnInteract" class="w-16 h-16 bg-amber-600/90 active:bg-amber-500 border-2 border-amber-300 rounded-full flex flex-col items-center justify-center text-white font-bold text-xs shadow-xl">
-                <i class="fa-solid fa-door-open text-lg"></i>
-                <span class="text-[8px] mt-0.5">DOOR</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- AUTHENTICATION MODAL -->
-    <div id="modalAuth" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-slate-950 border-2 border-indigo-500/80 rounded-xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
-            <h2 class="text-sm text-indigo-400 font-bold"><i class="fa-solid fa-shield-halved"></i> Sanctuary Login</h2>
-            <p class="text-[9px] text-slate-400">Sign in with your email & password to preserve your avatar customizations and credentials.</p>
-            
-            <form id="authForm" class="space-y-3 text-xs text-left">
-                <div>
-                    <label class="block text-[10px] text-slate-400 mb-1">Email:</label>
-                    <input id="authEmail" type="email" required placeholder="user@domain.com" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200 text-xs shadow-inner">
-                </div>
-                <div>
-                    <label class="block text-[10px] text-slate-400 mb-1">Password:</label>
-                    <input id="authPassword" type="password" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200 text-xs shadow-inner">
-                </div>
-                <div id="displayNameGroup" class="hidden">
-                    <label class="block text-[10px] text-slate-400 mb-1">Display Name:</label>
-                    <input id="authDisplayName" type="text" maxlength="12" placeholder="AnimeWalker" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-indigo-300 text-xs shadow-inner">
-                </div>
-
-                <div id="authError" class="text-[9px] text-rose-400 text-center h-4"></div>
-
-                <button type="submit" id="btnAuthSubmit" class="pixel-btn w-full py-2.5 rounded text-white bg-indigo-600 text-xs font-bold shadow-lg">
-                    Login
-                </button>
-            </form>
-
-            <div class="text-[9px] text-slate-400 pt-2 border-t border-slate-900">
-                <span id="authSwitchText">Don't have an account?</span> 
-                <button id="btnSwitchAuthMode" class="text-indigo-400 underline font-bold ml-1">Sign Up</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SETTINGS & PROFILE MODAL -->
-    <div id="modalCustomizer" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center hidden p-4 backdrop-blur-sm">
-        <div class="bg-slate-950 border-2 border-indigo-500 rounded-xl p-5 max-w-sm w-full text-center space-y-4 shadow-2xl">
-            <h2 class="text-sm text-indigo-400 font-bold"><i class="fa-solid fa-gear"></i> Avatar & Settings</h2>
-            
-            <div class="space-y-3 text-xs text-left">
-                <div>
-                    <label class="block text-slate-400 mb-1">Display Name:</label>
-                    <input id="inputPlayerName" type="text" maxlength="12" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-indigo-300 text-xs shadow-inner">
-                </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">Hair Color:</label>
-                    <input id="colorHair" type="color" value="#fbbf24" class="w-full h-8 bg-transparent cursor-pointer rounded border border-slate-700">
-                </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">Outfit Color:</label>
-                    <input id="colorOutfit" type="color" value="#4f46e5" class="w-full h-8 bg-transparent cursor-pointer rounded border border-slate-700">
-                </div>
-            </div>
-
-            <button id="btnCloseCustomizer" class="pixel-btn w-full py-2 rounded text-white bg-indigo-600 text-xs shadow-lg">
-                Save & Close
-            </button>
-        </div>
-    </div>
-
-    <!-- GAME ENGINE SCRIPT -->
+<!-- GAME ENGINE SCRIPT -->
     <script>
         // --- SUPABASE CONFIGURATION ---
         const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
 
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const gameChannel = supabaseClient.channel('endless_anime_sanctuary_v6', {
-            config: { broadcast: { self: false } }
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+            realtime: {
+                heartbeatIntervalMs: 15000 // Keeps the WebSocket connection alive to prevent silent timeouts
+            }
         });
+
+        let gameChannel = null;
 
         // --- GAME ENGINE STATE ---
         const canvas = document.getElementById('gameCanvas');
@@ -342,6 +152,7 @@
         }
 
         btnLogout.addEventListener('click', async () => {
+            if (gameChannel) supabaseClient.removeChannel(gameChannel);
             await supabaseClient.auth.signOut();
             location.reload();
         });
@@ -356,8 +167,16 @@
             gameLoop();
         });
 
-        // --- RELIABLE REALTIME SYNC FIX ---
+        // --- ROBUST REALTIME CONNECTION & CHAT FIX ---
         function initRealtimeSync() {
+            if (gameChannel) {
+                supabaseClient.removeChannel(gameChannel);
+            }
+
+            gameChannel = supabaseClient.channel('endless_anime_sanctuary_room', {
+                config: { broadcast: { self: false } }
+            });
+
             gameChannel
                 .on('broadcast', { event: 'state' }, ({ payload }) => {
                     if (payload && payload.id && payload.id !== localPlayer.id) {
@@ -370,20 +189,30 @@
                         addChatMessage(payload.author, payload.text);
                     }
                 })
-                .subscribe((status) => {
+                .subscribe((status, err) => {
                     if (status === 'SUBSCRIBED') {
-                        console.log('Sanctuary Realtime Connected Successfully.');
+                        console.log('Realtime Connected.');
+                    }
+                    if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                        console.warn('Realtime connection interrupted. Reconnecting...');
+                        setTimeout(() => gameChannel.subscribe(), 2000);
                     }
                 });
         }
 
+        let lastBroadcastTime = 0;
         function broadcastPlayerState() {
-            if (!currentUser) return;
-            gameChannel.send({
-                type: 'broadcast',
-                event: 'state',
-                payload: localPlayer
-            });
+            if (!currentUser || !gameChannel) return;
+            const now = Date.now();
+            // Throttle packet sends to prevent hitting broadcast rate limits
+            if (now - lastBroadcastTime > 50) {
+                gameChannel.send({
+                    type: 'broadcast',
+                    event: 'state',
+                    payload: localPlayer
+                });
+                lastBroadcastTime = now;
+            }
         }
 
         function updatePeerCountUI() {
@@ -408,7 +237,7 @@
                 btnMusic.classList.add('bg-emerald-600');
                 musicIcon.className = 'fa-solid fa-volume-high';
 
-                const notes = [220.00, 246.94, 293.66, 329.63, 392.00]; // Atmospheric pentatonic scale
+                const notes = [220.00, 246.94, 293.66, 329.63, 392.00]; 
                 musicInterval = setInterval(() => {
                     if (!isMusicPlaying || !audioCtx) return;
                     const osc = audioCtx.createOscillator();
@@ -440,7 +269,7 @@
         }
         document.getElementById('btnMusicToggle').addEventListener('click', toggleBackgroundMusic);
 
-        // --- HIGH-FIDELITY PIXEL ART & AMBIENT LIGHTING ENGINE ---
+        // --- PIXEL ART & AMBIENT LIGHTING ENGINE ---
         const PixelArt = {
             drawCharacter(ctx, x, y, player, isLocal = false) {
                 ctx.save();
@@ -454,7 +283,6 @@
                 const bobbing = player.state === 'idle' ? Math.sin(Date.now() * 0.005) * 0.6 : 0;
                 const isSitting = player.state === 'sit';
 
-                // Soft floor shadow
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
                 ctx.beginPath();
                 ctx.ellipse(0, 0, 8, 3, 0, 0, Math.PI * 2);
@@ -470,37 +298,31 @@
                     ctx.fillStyle = player.hairColor || '#fbbf24';
                     ctx.fillRect(-5, -19, 10, 5);
                 } else {
-                    // Refined Anime Sprite Styling
                     ctx.fillStyle = '#0f172a';
                     ctx.fillRect(-3, -4, 2, 4);
                     ctx.fillRect(1, -4, 2, 4);
 
-                    // Outfit & Scarf / Capelet
                     ctx.fillStyle = player.outfitColor || '#4f46e5';
                     ctx.fillRect(-4, -12 + bobbing, 8, 8);
                     ctx.fillStyle = '#e2e8f0';
-                    ctx.fillRect(-3, -12 + bobbing, 6, 2); // Collar
+                    ctx.fillRect(-3, -12 + bobbing, 6, 2);
 
-                    // Sleeves & Arms
                     ctx.fillStyle = '#f87171';
                     ctx.fillRect(-5, -11 + bobbing, 2, 6);
                     ctx.fillRect(3, -11 + bobbing, 2, 6);
 
-                    // Head & Face
                     ctx.fillStyle = '#ffedd5';
                     ctx.fillRect(-4, -20 + bobbing, 8, 8);
 
-                    // Anime Eyes
                     ctx.fillStyle = '#0f172a';
                     ctx.fillRect(1, -17 + bobbing, 2, 3);
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(2, -17 + bobbing, 1, 1);
 
-                    // Detailed Anime Spiky Hair
                     ctx.fillStyle = player.hairColor || '#fbbf24';
                     ctx.fillRect(-5, -23 + bobbing, 10, 5);
-                    ctx.fillRect(-6, -20 + bobbing, 3, 6); // Left strand
-                    ctx.fillRect(3, -19 + bobbing, 3, 4);  // Right strand
+                    ctx.fillRect(-6, -20 + bobbing, 3, 6);
+                    ctx.fillRect(3, -19 + bobbing, 3, 4);
                 }
 
                 ctx.restore();
@@ -550,7 +372,6 @@
             },
 
             drawBonfireRoom(ctx) {
-                // Atmospheric Room Walls
                 ctx.fillStyle = '#0f172a';
                 ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 
@@ -559,18 +380,15 @@
                     ctx.fillRect(x, 10, 12, 120);
                 }
 
-                // Wall Lanterns with Glow
                 ctx.fillStyle = '#f59e0b';
                 ctx.fillRect(80, 45, 6, 8);
                 ctx.fillRect(234, 45, 6, 8);
 
-                // Room Floor
                 ctx.fillStyle = '#291104';
                 ctx.fillRect(0, ROOM_GROUND_Y, VIRTUAL_WIDTH, VIRTUAL_HEIGHT - ROOM_GROUND_Y);
                 ctx.fillStyle = '#78350f';
                 ctx.fillRect(0, ROOM_GROUND_Y, VIRTUAL_WIDTH, 2);
 
-                // Sitting Benches
                 ctx.fillStyle = '#78350f';
                 ctx.fillRect(BONFIRE_X - 65, ROOM_GROUND_Y - 6, 28, 6);
                 ctx.fillStyle = '#451a03';
@@ -581,7 +399,6 @@
                 ctx.fillStyle = '#451a03';
                 ctx.fillRect(BONFIRE_X + 39, ROOM_GROUND_Y - 4, 24, 2);
 
-                // Bonfire Logs & Animated Flame
                 const frame = Math.floor(Date.now() / 100);
                 ctx.fillStyle = '#291104';
                 ctx.fillRect(BONFIRE_X - 10, ROOM_GROUND_Y - 3, 20, 4);
@@ -596,7 +413,6 @@
                     ctx.fillRect(fx - size / 2, fy, size, size);
                 }
 
-                // Cinematic Ambient Lighting Gradient
                 const gradient = ctx.createRadialGradient(BONFIRE_X, ROOM_GROUND_Y - 15, 4, BONFIRE_X, ROOM_GROUND_Y - 15, 95);
                 gradient.addColorStop(0, 'rgba(245, 158, 11, 0.35)');
                 gradient.addColorStop(0.6, 'rgba(239, 68, 68, 0.1)');
@@ -719,7 +535,6 @@
                     ctx.restore();
                 }
 
-                // Ambient glowing ember particles floating inside rooms
                 if (Math.random() < 0.4) {
                     spawnParticle(
                         BONFIRE_X + (Math.random() - 0.5) * 60,
@@ -824,7 +639,7 @@
         btnInteract.addEventListener('click', handleInteraction);
         btnSit.addEventListener('click', toggleSit);
 
-        // --- FIXED CHAT SYSTEM ---
+        // --- CHAT SYSTEM ---
         const chatForm = document.getElementById('chatForm');
         const chatInput = document.getElementById('chatInput');
         const chatMessages = document.getElementById('chatMessages');
@@ -840,7 +655,7 @@
         chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const text = chatInput.value.trim();
-            if (text.length > 0) {
+            if (text.length > 0 && gameChannel) {
                 addChatMessage(localPlayer.name, text, 'text-indigo-300');
                 gameChannel.send({
                     type: 'broadcast',
@@ -905,5 +720,3 @@
             modalCustomizer.classList.add('hidden');
         });
     </script>
-</body>
-</html>
