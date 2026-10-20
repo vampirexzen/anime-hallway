@@ -1,786 +1,715 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full w-full overflow-hidden">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Sakura Slime World & Dungeon 🌸</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Sakura Slime World 🌸 - Lounge & Dungeon</title>
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Yuji+Mai&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Yuji+Mai&display=swap" rel="stylesheet" />
 
   <style>
-    * {
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 50%, #f472b6 100%);
-      min-height: 100vh;
-      min-height: 100dvh;
-      overflow: hidden;
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      width: 100%;
+      width: 100dvw;
       margin: 0;
+      padding: 0;
+      overflow: hidden;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+      background: #180914;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    .font-sakura { font-family: 'Yuji Mai', serif; }
+
+    .font-sakura {
+      font-family: 'Yuji Mai', serif;
+    }
+
     .glass {
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.9);
     }
+
     .glass-dark {
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(30, 15, 28, 0.85);
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(244, 114, 182, 0.3);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(244, 114, 182, 0.25);
     }
-    /* Falling Petals Animation */
-    .petal {
-      position: fixed;
-      background-color: #fbcfe8;
-      border-radius: 150% 0 150% 0;
-      opacity: 0.7;
-      pointer-events: none;
-      z-index: 0;
-      animation: fall linear infinite;
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(244, 114, 182, 0.4);
     }
-    @keyframes fall {
-      0% { opacity: 0.8; top: -10%; transform: translateX(0) rotate(0deg); }
-      100% { opacity: 0.2; top: 110%; transform: translateX(80px) rotate(360deg); }
+
+    .glass-input:focus {
+      border-color: #ec4899;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25);
     }
-    #canvas-wrapper {
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(244, 114, 182, 0.5);
+      border-radius: 10px;
+    }
+
+    .joystick-base {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      border: 2px solid rgba(244, 114, 182, 0.6);
+      backdrop-filter: blur(8px);
       position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      touch-action: none;
     }
-    canvas {
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
+    .joystick-stick {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+      box-shadow: 0 4px 10px rgba(236, 72, 153, 0.5);
+      position: absolute;
+      top: 25px;
+      left: 25px;
+      pointer-events: none;
+      transition: transform 0.04s ease-out;
     }
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
-    ::-webkit-scrollbar-thumb { background: rgba(244,114,182,0.4); border-radius: 10px; }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(244, 114, 182, 0.5);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+    }
+    .action-btn:active {
+      transform: scale(0.92);
+      background: #ec4899;
+      color: white;
+    }
   </style>
 </head>
-<body class="flex flex-col md:flex-row h-screen w-screen p-2 sm:p-4 gap-3 relative overflow-hidden">
+<body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
 
-  <!-- Petals background container -->
-  <div id="petals-container"></div>
+  <!-- HEADER NAVBAR -->
+  <header class="h-12 sm:h-14 glass px-3 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
+    <div class="flex items-center gap-2">
+      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shrink-0">
+        <i data-lucide="flower-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style="animation-duration: 12s;"></i>
+      </div>
+      <div>
+        <h1 class="font-sakura text-xs sm:text-base text-pink-950 font-bold tracking-wide leading-none">Sakura World 🌸</h1>
+        <p class="text-[9px] sm:text-[10px] text-pink-600 font-semibold uppercase mt-0.5" id="room-indicator">#sakura-lounge</p>
+      </div>
+    </div>
 
-  <!-- Left Sidebar Controls & Navigation -->
-  <aside class="w-full md:w-80 glass rounded-3xl shadow-2xl flex flex-col justify-between p-4 z-20 shrink-0 border border-pink-200/60 max-h-[96vh]">
-    <div class="overflow-y-auto pr-1">
-      
-      <!-- Title Header -->
-      <div class="flex items-center justify-between pb-3 mb-3 border-b border-pink-200/60">
-        <div class="flex items-center gap-2.5">
-          <div class="bg-pink-500 text-white p-2 rounded-2xl shadow-md shadow-pink-300">
-            <i data-lucide="flower-2" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h1 class="font-sakura text-base text-pink-900 font-bold">Sakura Slime World</h1>
-            <p class="text-[10px] text-pink-600 font-medium">Virtual Lounge & RPG Dungeon</p>
-          </div>
+    <!-- CURRENCY & CONTROLS -->
+    <div class="flex items-center gap-1.5">
+      <!-- Gem Counter -->
+      <div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 text-xs font-extrabold shadow-sm">
+        <i data-lucide="gem" class="w-3.5 h-3.5 text-amber-600"></i>
+        <span id="gem-count">100</span>
+      </div>
+
+      <!-- Shop Trigger -->
+      <button onclick="toggleShopModal()" class="p-1.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-amber-950 border border-amber-300 shadow-sm active:scale-95" title="Slime Shop">
+        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+      </button>
+
+      <!-- Settings Customization -->
+      <button onclick="toggleSettingsModal()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Customize Slime">
+        <i data-lucide="user-cog" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <div class="flex-1 relative flex overflow-hidden w-full h-full">
+    
+    <!-- CANVAS VIEW -->
+    <div class="flex-1 relative bg-pink-950/20 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
+      <canvas id="gameCanvas" class="block w-full h-full cursor-crosshair touch-none"></canvas>
+
+      <!-- Navigation Switcher Pills -->
+      <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[95vw] overflow-x-auto">
+        <button onclick="switchMode('lounge')" id="mode-btn-lounge" class="mode-btn px-3 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap">🌸 Zen Lounge</button>
+        <button onclick="switchMode('dungeon')" id="mode-btn-dungeon" class="mode-btn px-3 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">⚔️ Acid Dungeon</button>
+      </div>
+
+      <!-- Dungeon HUD -->
+      <div id="dungeon-hud" class="hidden absolute top-12 left-1/2 -translate-x-1/2 z-20 glass px-3 py-1.5 rounded-2xl border border-rose-300 shadow-xl flex items-center gap-3">
+        <div class="flex items-center gap-2 text-xs">
+          <span class="font-bold text-rose-950 uppercase">Enemies Defeated: <strong id="dungeon-kills" class="text-rose-600 font-black">0</strong></span>
+          <span class="text-pink-300">|</span>
+          <span class="font-bold text-emerald-800">Health: <strong id="dungeon-hp" class="text-emerald-600 font-black">100 HP</strong></span>
         </div>
       </div>
 
-      <!-- User Profile & Level Stats Card -->
-      <div class="bg-white/80 p-3 rounded-2xl border border-pink-200 shadow-sm mb-3">
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center gap-2.5">
-            <div id="user-avatar-badge" class="w-9 h-9 rounded-full bg-pink-500 text-white font-bold flex items-center justify-center text-xs shadow">
-              🌸
-            </div>
-            <div>
-              <p id="user-name-display" class="text-xs font-bold text-pink-950 truncate max-w-[100px]">Slime Hero</p>
-              <p id="user-level-badge" class="text-[10px] text-pink-600 font-bold">Lvl 1 Adventurer</p>
-            </div>
-          </div>
-          <button onclick="openCustomizer()" class="px-2.5 py-1.5 bg-pink-100 hover:bg-pink-200 text-pink-700 rounded-xl text-xs font-semibold transition flex items-center gap-1 shadow-xs">
-            <i data-lucide="palette" class="w-3.5 h-3.5"></i> Customize
+      <!-- Controls Overlay -->
+      <div id="lounge-controls" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2.5 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2">
+        <button onclick="triggerJump()" class="action-btn px-2 py-0.5 rounded-xl text-xs font-black text-pink-800 flex items-center gap-1">
+          <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5 text-pink-600"></i>
+          <span class="hidden sm:inline">Jump</span>
+        </button>
+        <span class="text-pink-300">|</span>
+        <button onclick="triggerEmote('🌸')" class="hover:scale-125 transition text-base sm:text-lg">🌸</button>
+        <button onclick="triggerEmote('❤️')" class="hover:scale-125 transition text-base sm:text-lg">❤️</button>
+        <button onclick="triggerEmote('✨')" class="hover:scale-125 transition text-base sm:text-lg">✨</button>
+        <button onclick="triggerEmote('🔥')" class="hover:scale-125 transition text-base sm:text-lg">🔥</button>
+      </div>
+
+      <!-- Mobile Dungeon Attack Button -->
+      <div id="dungeon-attack-btn" class="hidden absolute bottom-3 right-3 z-20 pointer-events-auto md:hidden">
+        <button onclick="shootAcidMobile()" class="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-500 to-green-400 text-white text-xs font-black shadow-lg shadow-emerald-500/40 active:scale-90 flex items-center justify-center border-2 border-white">
+          ACID 🧪
+        </button>
+      </div>
+
+      <!-- Mobile D-Pad -->
+      <div class="absolute bottom-3 left-3 z-20 pointer-events-auto md:hidden">
+        <div id="joystick-container" class="joystick-base">
+          <div id="joystick-stick" class="joystick-stick"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR CHAT -->
+    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
+      <div class="p-3 border-b border-pink-200/30 bg-white/10 flex flex-col gap-2 shrink-0">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-pink-200 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="message-square" class="w-3.5 h-3.5 text-pink-400"></i> World Chat
+          </span>
+          <button onclick="toggleChatSidebar()" class="md:hidden text-pink-300 hover:text-white p-1">
+            <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
-        <!-- EXP Progress Bar -->
-        <div class="w-full bg-pink-100/80 h-2 rounded-full overflow-hidden border border-pink-200">
-          <div id="exp-bar" class="bg-gradient-to-r from-emerald-400 to-green-500 h-full transition-all duration-300" style="width: 0%"></div>
-        </div>
-        <p id="exp-text" class="text-[9px] text-right text-pink-600 mt-0.5 font-medium">EXP: 0 / 100</p>
       </div>
 
-      <!-- Room Selector Zones -->
-      <h2 class="text-[11px] font-bold text-pink-700 uppercase tracking-wider mb-2 px-1">Select Room Zone</h2>
-      <div class="grid grid-cols-2 gap-1.5 mb-3">
-        <button onclick="switchRoom('park')" id="btn-room-park" class="room-nav-btn flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-xs font-semibold bg-pink-500 text-white shadow-sm transition">
-          <i data-lucide="trees" class="w-4 h-4"></i> Swing Park
-        </button>
-        <button onclick="switchRoom('disco')" id="btn-room-disco" class="room-nav-btn flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-xs font-medium text-pink-800 bg-white/60 hover:bg-pink-100 transition">
-          <i data-lucide="disc" class="w-4 h-4"></i> Disco Club
-        </button>
-        <button onclick="switchRoom('onsen')" id="btn-room-onsen" class="room-nav-btn flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-xs font-medium text-pink-800 bg-white/60 hover:bg-pink-100 transition">
-          <i data-lucide="waves" class="w-4 h-4"></i> Onsen Spa
-        </button>
-        <button onclick="switchRoom('dungeon')" id="btn-room-dungeon" class="room-nav-btn flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-xs font-bold text-purple-900 bg-purple-200/80 border border-purple-300 hover:bg-purple-300 transition">
-          <i data-lucide="skull" class="w-4 h-4"></i> RPG Dungeon
-        </button>
-      </div>
-
-      <!-- Live Room Chat Box -->
-      <div class="flex flex-col h-36 bg-white/60 rounded-2xl border border-pink-200/60 p-2.5 shadow-inner">
-        <h3 class="text-[11px] font-bold text-pink-800 mb-1.5 flex items-center gap-1">
-          <i data-lucide="message-square" class="w-3.5 h-3.5 text-pink-500"></i> Room Chat Feed
-        </h3>
-        <div id="chat-messages" class="flex-1 overflow-y-auto space-y-1.5 text-[11px] pr-1">
-          <p class="text-pink-400 italic text-center mt-4 text-[10px]">Welcome! Say hello in the room.</p>
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2.5 text-xs text-pink-100">
+        <div class="bg-pink-900/40 p-2 rounded-xl border border-pink-500/20">
+          <strong class="text-pink-300">System:</strong> Welcome to Sakura World! Use WASD or Click/Tap to move. Switch to Acid Dungeon to fight enemies and earn Gems!
         </div>
       </div>
-    </div>
 
-    <!-- Chat Input Form -->
-    <form id="chat-form" class="flex items-center gap-1.5 mt-2 pt-2 border-t border-pink-200/60">
-      <input 
-        type="text" 
-        id="chat-input" 
-        placeholder="Type a message..." 
-        autocomplete="off" 
-        maxlength="90"
-        class="flex-1 bg-white/80 border border-pink-300/50 rounded-xl px-3 py-2 text-xs text-pink-955 placeholder-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-400 shadow-inner"
-      />
-      <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white p-2.5 rounded-xl shadow-md shadow-pink-300 transition">
-        <i data-lucide="send" class="w-3.5 h-3.5"></i>
-      </button>
-    </form>
-  </aside>
-
-  <!-- Main Canvas Play Area -->
-  <main class="flex-1 glass rounded-3xl shadow-2xl flex flex-col h-full relative overflow-hidden border border-pink-200/60">
-    
-    <!-- Top Floating Overlay Bar -->
-    <div class="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
-      <div class="bg-white/80 backdrop-blur border border-pink-200 px-3 py-1.5 rounded-2xl flex items-center gap-2.5 shadow-sm pointer-events-auto">
-        <span id="room-title-badge" class="text-xs font-bold text-pink-900">🌸 Swing Park Zone</span>
-        <span class="text-[10px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200 font-semibold flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span id="online-count">1</span> Online
-        </span>
+      <div class="p-2.5 bg-pink-950/80 border-t border-pink-200/30 shrink-0">
+        <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex items-center gap-2">
+          <input type="text" id="chat-input" placeholder="Type a message..." maxlength="120" autocomplete="off" class="glass-input flex-1 px-3 py-2 rounded-xl text-xs text-pink-950 placeholder-pink-400 font-medium" />
+          <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl shadow-md transition shrink-0 active:scale-95">
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </form>
       </div>
+    </aside>
+  </div>
 
-      <!-- Zoom In / Zoom Out Controls -->
-      <div class="flex items-center gap-1.5 pointer-events-auto">
-        <button onclick="adjustZoom(-0.1)" class="w-8 h-8 bg-white/80 hover:bg-white border border-pink-200 text-pink-900 rounded-xl font-bold text-sm shadow flex items-center justify-center">
-          -
-        </button>
-        <span id="zoom-level-text" class="text-[11px] font-mono text-pink-900 bg-white/80 border border-pink-200 px-2 py-1 rounded-xl shadow-xs">100%</span>
-        <button onclick="adjustZoom(0.1)" class="w-8 h-8 bg-white/80 hover:bg-white border border-pink-200 text-pink-900 rounded-xl font-bold text-sm shadow flex items-center justify-center">
-          +
-        </button>
-      </div>
-    </div>
-
-    <!-- Canvas Wrapper with locked Aspect Ratio -->
-    <div id="canvas-wrapper">
-      <canvas id="gameCanvas" width="960" height="540"></canvas>
-    </div>
-
-    <!-- Mobile Action Touch Controls (Jump & Acid Shoot) -->
-    <div class="absolute bottom-4 right-4 z-20 flex items-center gap-3 md:hidden pointer-events-auto">
-      <button id="btn-action-shoot" onclick="shootAcid()" class="hidden w-14 h-14 bg-gradient-to-tr from-emerald-600 to-green-400 text-white font-bold rounded-full shadow-lg shadow-emerald-500/40 border-2 border-white/60 flex flex-col items-center justify-center text-[10px] active:scale-95 transition">
-        <i data-lucide="crosshair" class="w-5 h-5"></i> SHOOT
-      </button>
-      <button onclick="triggerJump()" class="w-14 h-14 bg-gradient-to-tr from-pink-500 to-rose-400 text-white font-bold rounded-full shadow-lg shadow-pink-500/40 border-2 border-white/60 flex flex-col items-center justify-center text-[10px] active:scale-95 transition">
-        <i data-lucide="arrow-up" class="w-5 h-5"></i> JUMP
-      </button>
-    </div>
-  </main>
-
-  <!-- Slime Customizer Modal -->
-  <div id="customizer-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="glass w-full max-w-md rounded-3xl p-6 shadow-2xl border border-pink-200 space-y-4">
-      <div class="flex items-center justify-between pb-2 border-b border-pink-200">
-        <h2 class="font-sakura text-lg text-pink-900 font-bold">Customize Your Slime</h2>
-        <button onclick="closeCustomizer()" class="text-pink-500 hover:text-pink-700 p-1">
+  <!-- SHOP MODAL -->
+  <div id="shop-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 max-h-[90dvh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+        <div class="flex items-center gap-2">
+          <i data-lucide="shopping-bag" class="w-5 h-5 text-amber-600"></i>
+          <h3 class="font-bold text-pink-950 text-base">Slime Shop</h3>
+        </div>
+        <button onclick="toggleShopModal()" class="text-pink-700 hover:text-pink-900 p-1">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <!-- Name Input -->
-      <div>
-        <label class="text-xs font-bold text-pink-800 block mb-1">Slime Name</label>
-        <input type="text" id="modal-name-input" maxlength="15" class="w-full bg-white/80 border border-pink-300 rounded-xl px-3 py-2 text-xs text-pink-950 focus:outline-none focus:ring-2 focus:ring-pink-400" />
+      <div class="space-y-2" id="shop-items">
+        <!-- Dynamic Shop Items -->
       </div>
+    </div>
+  </div>
 
-      <!-- Color Palette -->
-      <div>
-        <label class="text-xs font-bold text-pink-800 block mb-1.5">Slime Color</label>
-        <div class="flex items-center gap-3">
-          <button onclick="selectColor('#f472b6')" class="w-8 h-8 rounded-full bg-pink-400 border-2 border-white shadow color-pick-btn" data-color="#f472b6"></button>
-          <button onclick="selectColor('#38bdf8')" class="w-8 h-8 rounded-full bg-sky-400 border-2 border-white shadow color-pick-btn" data-color="#38bdf8"></button>
-          <button onclick="selectColor('#34d399')" class="w-8 h-8 rounded-full bg-emerald-400 border-2 border-white shadow color-pick-btn" data-color="#34d399"></button>
-          <button onclick="selectColor('#a78bfa')" class="w-8 h-8 rounded-full bg-purple-400 border-2 border-white shadow color-pick-btn" data-color="#a78bfa"></button>
-          <button onclick="selectColor('#fbbf24')" class="w-8 h-8 rounded-full bg-amber-400 border-2 border-white shadow color-pick-btn" data-color="#fbbf24"></button>
+  <!-- CUSTOMIZATION SETTINGS MODAL -->
+  <div id="settings-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 max-h-[90dvh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+        <div class="flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-5 h-5 text-pink-600"></i>
+          <h3 class="font-bold text-pink-950 text-base">Customize Slime</h3>
         </div>
+        <button onclick="toggleSettingsModal()" class="text-pink-700 hover:text-pink-900 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
 
-      <!-- Accessory Selector -->
-      <div>
-        <label class="text-xs font-bold text-pink-800 block mb-1.5">Accessory</label>
-        <div class="grid grid-cols-4 gap-2">
-          <button onclick="selectAccessory('none')" class="acc-btn p-2 rounded-xl bg-white/70 border border-pink-200 text-xs font-semibold text-pink-900 hover:bg-pink-100 transition" data-acc="none">None</button>
-          <button onclick="selectAccessory('flower')" class="acc-btn p-2 rounded-xl bg-white/70 border border-pink-200 text-xs font-semibold text-pink-900 hover:bg-pink-100 transition" data-acc="flower">🌸 Flower</button>
-          <button onclick="selectAccessory('crown')" class="acc-btn p-2 rounded-xl bg-white/70 border border-pink-200 text-xs font-semibold text-pink-900 hover:bg-pink-100 transition" data-acc="crown">👑 Crown</button>
-          <button onclick="selectAccessory('ninja')" class="acc-btn p-2 rounded-xl bg-white/70 border border-pink-200 text-xs font-semibold text-pink-900 hover:bg-pink-100 transition" data-acc="ninja">🥷 Ninja</button>
-        </div>
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Display Name</label>
+        <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs font-semibold text-pink-950" value="BouncySlime" />
       </div>
 
-      <button onclick="saveCustomization()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md shadow-pink-300 transition">
-        Save & Apply
+      <div class="space-y-1.5">
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Select Style</label>
+        <div class="grid grid-cols-2 gap-2" id="avatar-picker"></div>
+      </div>
+
+      <button onclick="saveAvatarSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-xs">
+        <i data-lucide="check" class="w-4 h-4"></i> Save Settings
       </button>
     </div>
   </div>
 
   <script>
-    // Supabase Credentials
-    const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    lucide.createIcons();
 
-    // Player State
-    let myId = 'user_' + Math.random().toString(36).substring(2, 9);
-    let myName = localStorage.getItem('slime_name') || ('Slime_' + Math.floor(100 + Math.random() * 900));
-    let myLevel = parseInt(localStorage.getItem('slime_lvl') || '1');
-    let myExp = parseInt(localStorage.getItem('slime_exp') || '0');
-    let expToNext = myLevel * 100;
+    // --- GAME DATA & STATE ---
+    let mode = 'lounge'; // 'lounge' or 'dungeon'
+    let gems = 100;
+    let kills = 0;
+    
+    // Extended Customizations
+    const AVATAR_STYLES = {
+      sakura: { name: 'Sakura Pin', color: '#f472b6', accessory: '🌸', owned: true },
+      spirit: { name: 'Cat Ears', color: '#38bdf8', accessory: '🐱', owned: true },
+      matcha: { name: 'Matcha Tea', color: '#4ade80', accessory: '🍵', owned: true },
+      demon:  { name: 'Demon Horns', color: '#ef4444', accessory: '😈', owned: false, price: 50 },
+      galaxy: { name: 'Star Aura', color: '#a855f7', accessory: '⭐', owned: false, price: 80 },
+      golden: { name: 'Royal Crown', color: '#eab308', accessory: '👑', owned: false, price: 150 }
+    };
 
-    let currentRoom = 'park';
-    let myColor = localStorage.getItem('slime_color') || '#f472b6';
-    let myAccessory = localStorage.getItem('slime_acc') || 'flower';
+    let selectedStyle = 'sakura';
 
-    // Position & Physics
-    let myX = 480, myY = 270;
-    let targetX = 480, targetY = 270;
-    let jumpZ = 0, jumpVelocity = 0;
-    let isJumping = false;
-    let zoomLevel = 1.0;
+    let slime = {
+      x: 300,
+      y: 300,
+      radius: 24,
+      targetX: 300,
+      targetY: 300,
+      speed: 4,
+      hp: 100,
+      maxHp: 100,
+      jumpOffset: 0,
+      jumpVel: 0,
+      isJumping: false
+    };
 
-    // Projectiles & Dungeon Enemies
-    let acidProjectiles = [];
-    let dungeonEnemies = [];
+    let acidBullets = [];
+    let enemies = [];
+    let particles = [];
 
-    // Multiplayer State
-    let players = {};
-    let chatBubbles = {};
-    let roomChannel = null;
-
-    // Input Keys
-    const keys = {};
-
-    // Canvas
+    // Setup Canvas Aspect Ratio Handler
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      updatePlayerStatsUI();
-      setupCanvasScale();
-      window.addEventListener('resize', setupCanvasScale);
-      setupControls();
-      connectRealtime();
-      createPetals();
-      requestAnimationFrame(gameLoop);
+    function resizeCanvas() {
+      const container = document.getElementById('canvas-container');
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+      if (slime.x > canvas.width) slime.x = canvas.width / 2;
+      if (slime.y > canvas.height) slime.y = canvas.height / 2;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Movement and Controls
+    const keys = {};
+    window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+    window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+    canvas.addEventListener('pointerdown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      if (mode === 'dungeon') {
+        shootAcid(clickX, clickY);
+      } else {
+        slime.targetX = clickX;
+        slime.targetY = clickY;
+      }
     });
 
-    // Ratio Scaling for Desktop & Mobile
-    function setupCanvasScale() {
-      const wrapper = document.getElementById('canvas-wrapper');
-      const w = wrapper.clientWidth;
-      const h = wrapper.clientHeight;
-      const aspect = 960 / 540;
-
-      let renderW = w;
-      let renderH = w / aspect;
-
-      if (renderH > h) {
-        renderH = h;
-        renderW = h * aspect;
-      }
-
-      canvas.style.width = `${renderW}px`;
-      canvas.style.height = `${renderH}px`;
-    }
-
-    function adjustZoom(delta) {
-      zoomLevel = Math.max(0.7, Math.min(1.5, zoomLevel + delta));
-      document.getElementById('zoom-level-text').textContent = `${Math.round(zoomLevel * 100)}%`;
-    }
-
-    function updatePlayerStatsUI() {
-      localStorage.setItem('slime_name', myName);
-      localStorage.setItem('slime_lvl', myLevel);
-      localStorage.setItem('slime_exp', myExp);
-      localStorage.setItem('slime_color', myColor);
-      localStorage.setItem('slime_acc', myAccessory);
-
-      document.getElementById('user-name-display').textContent = myName;
-      document.getElementById('user-level-badge').textContent = `Lvl ${myLevel} Adventurer`;
-      document.getElementById('user-avatar-badge').style.backgroundColor = myColor;
-
-      expToNext = myLevel * 100;
-      const pct = Math.min(100, Math.floor((myExp / expToNext) * 100));
-      document.getElementById('exp-bar').style.width = `${pct}%`;
-      document.getElementById('exp-text').textContent = `EXP: ${myExp} / ${expToNext}`;
-    }
-
-    // Customizer Modal Handlers
-    function openCustomizer() {
-      document.getElementById('modal-name-input').value = myName;
-      document.getElementById('customizer-modal').classList.remove('hidden');
-    }
-    function closeCustomizer() {
-      document.getElementById('customizer-modal').classList.add('hidden');
-    }
-    function selectColor(c) { myColor = c; }
-    function selectAccessory(acc) { myAccessory = acc; }
-    function saveCustomization() {
-      const val = document.getElementById('modal-name-input').value.trim();
-      if (val) myName = val;
-      updatePlayerStatsUI();
-      closeCustomizer();
-      broadcastPosition();
-    }
-
-    // Switch Rooms
-    function switchRoom(roomName) {
-      currentRoom = roomName;
-      document.querySelectorAll('.room-nav-btn').forEach(btn => {
-        btn.classList.remove('bg-pink-500', 'text-white', 'shadow-sm', 'font-semibold');
-        btn.classList.add('text-pink-800', 'bg-white/60');
+    function shootAcid(targetX, targetY) {
+      const angle = Math.atan2(targetY - slime.y, targetX - slime.x);
+      acidBullets.push({
+        x: slime.x,
+        y: slime.y,
+        vx: Math.cos(angle) * 8,
+        vy: Math.sin(angle) * 8,
+        radius: 6,
+        life: 100
       });
-      const activeBtn = document.getElementById(`btn-room-${roomName}`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-pink-500', 'text-white', 'shadow-sm', 'font-semibold');
-        activeBtn.classList.remove('text-pink-800', 'bg-white/60');
+    }
+
+    function shootAcidMobile() {
+      // Shoot forward in current direction
+      shootAcid(slime.x + 100, slime.y);
+    }
+
+    function spawnEnemy() {
+      if (enemies.length < 6 && mode === 'dungeon') {
+        const side = Math.floor(Math.random() * 4);
+        let x, y;
+        if (side === 0) { x = Math.random() * canvas.width; y = -20; }
+        else if (side === 1) { x = canvas.width + 20; y = Math.random() * canvas.height; }
+        else if (side === 2) { x = Math.random() * canvas.width; y = canvas.height + 20; }
+        else { x = -20; y = Math.random() * canvas.height; }
+
+        enemies.push({
+          x: x,
+          y: y,
+          radius: 16,
+          speed: 1.5 + Math.random() * 1,
+          hp: 20
+        });
       }
+    }
 
-      const titles = {
-        park: '🌸 Swing Park Zone',
-        disco: '🪩 Disco Club Zone',
-        onsen: '♨️ Onsen Spa Zone',
-        dungeon: '⚔️ Monster Dungeon Portal'
-      };
-      document.getElementById('room-title-badge').textContent = titles[roomName] || roomName;
+    setInterval(spawnEnemy, 1500);
 
-      const shootBtn = document.getElementById('btn-action-shoot');
-      if (roomName === 'dungeon') {
-        shootBtn.classList.remove('hidden');
-        spawnDungeonEnemies();
+    // --- GAME LOOP ---
+    function update() {
+      // Slime Movement
+      let dx = 0, dy = 0;
+      if (keys['w'] || keys['arrowup']) dy -= slime.speed;
+      if (keys['s'] || keys['arrowdown']) dy += slime.speed;
+      if (keys['a'] || keys['arrowleft']) dx -= slime.speed;
+      if (keys['d'] || keys['arrowright']) dx += slime.speed;
+
+      if (dx !== 0 || dy !== 0) {
+        slime.x += dx;
+        slime.y += dy;
+        slime.targetX = slime.x;
+        slime.targetY = slime.y;
       } else {
-        shootBtn.classList.add('hidden');
+        // Smooth position interpolation for click to move
+        const dist = Math.hypot(slime.targetX - slime.x, slime.targetY - slime.y);
+        if (dist > 4) {
+          slime.x += ((slime.targetX - slime.x) / dist) * slime.speed;
+          slime.y += ((slime.targetY - slime.y) / dist) * slime.speed;
+        }
       }
 
-      players = {};
-      chatBubbles = {};
-      connectRealtime();
-    }
+      // Keep within bounds
+      slime.x = Math.max(slime.radius, Math.min(canvas.width - slime.radius, slime.x));
+      slime.y = Math.max(slime.radius, Math.min(canvas.height - slime.radius, slime.y));
 
-    // Realtime Sync
-    function connectRealtime() {
-      if (roomChannel) supabaseClient.removeChannel(roomChannel);
+      // Jump Physics
+      if (slime.isJumping) {
+        slime.jumpOffset += slime.jumpVel;
+        slime.jumpVel -= 0.8;
+        if (slime.jumpOffset <= 0) {
+          slime.jumpOffset = 0;
+          slime.isJumping = false;
+        }
+      }
 
-      roomChannel = supabaseClient.channel(`room:${currentRoom}`, {
-        config: { presence: { key: myId } }
-      });
+      // Acid Bullets Update
+      for (let i = acidBullets.length - 1; i >= 0; i--) {
+        const b = acidBullets[i];
+        b.x += b.vx;
+        b.y += b.vy;
+        b.life--;
 
-      roomChannel
-        .on('broadcast', { event: 'move' }, p => {
-          if (p.payload.id !== myId) players[p.payload.id] = p.payload;
-        })
-        .on('broadcast', { event: 'chat' }, p => {
-          triggerChatBubble(p.payload.id, p.payload.text);
-          appendChatLog(p.payload.name, p.payload.text);
-        })
-        .on('broadcast', { event: 'shoot' }, p => {
-          if (p.payload.id !== myId) {
-            acidProjectiles.push({
-              x: p.payload.x, y: p.payload.y,
-              vx: p.payload.vx, vy: p.payload.vy,
-              color: '#34d399', life: 60
-            });
+        // Collision with Enemies
+        for (let j = enemies.length - 1; j >= 0; j--) {
+          const e = enemies[j];
+          if (Math.hypot(b.x - e.x, b.y - e.y) < b.radius + e.radius) {
+            e.hp -= 10;
+            b.life = 0;
+
+            // Spawn splat particles
+            for (let p = 0; p < 4; p++) {
+              particles.push({
+                x: e.x, y: e.y,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4,
+                life: 15,
+                color: '#22c55e'
+              });
+            }
+
+            if (e.hp <= 0) {
+              enemies.splice(j, 1);
+              kills++;
+              gems += 15;
+              document.getElementById('dungeon-kills').textContent = kills;
+              document.getElementById('gem-count').textContent = gems;
+            }
+            break;
           }
-        })
-        .subscribe(async (status) => {
-          if (status === 'SUBSCRIBED') {
-            await roomChannel.track({ id: myId, name: myName, level: myLevel, room: currentRoom });
-            broadcastPosition();
+        }
+
+        if (b.life <= 0 || b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+          acidBullets.splice(i, 1);
+        }
+      }
+
+      // Enemies Update
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const e = enemies[i];
+        const angle = Math.atan2(slime.y - e.y, slime.x - e.x);
+        e.x += Math.cos(angle) * e.speed;
+        e.y += Math.sin(angle) * e.speed;
+
+        // Enemy collision with Slime
+        if (Math.hypot(slime.x - e.x, slime.y - e.y) < slime.radius + e.radius) {
+          slime.hp -= 0.2;
+          document.getElementById('dungeon-hp').textContent = Math.max(0, Math.floor(slime.hp)) + ' HP';
+          if (slime.hp <= 0) {
+            alert('Game Over! Respawning Slime...');
+            slime.hp = 100;
+            switchMode('lounge');
           }
+        }
+      }
+
+      // Update Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].x += particles[i].vx;
+        particles[i].y += particles[i].vy;
+        particles[i].life--;
+        if (particles[i].life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Render Environment Background
+      if (mode === 'lounge') {
+        ctx.fillStyle = '#2d112c';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Zen Grid pattern
+        ctx.strokeStyle = 'rgba(244, 114, 182, 0.08)';
+        for (let x = 0; x < canvas.width; x += 40) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+      } else {
+        // Dungeon Floor
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = 'rgba(225, 29, 72, 0.15)';
+        for (let x = 0; x < canvas.width; x += 40) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+      }
+
+      // Render Particles
+      particles.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Render Enemies
+      if (mode === 'dungeon') {
+        enemies.forEach(e => {
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Enemy eyes
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(e.x - 4, e.y - 3, 3, 0, Math.PI * 2);
+          ctx.arc(e.x + 4, e.y - 3, 3, 0, Math.PI * 2);
+          ctx.fill();
         });
 
-      roomChannel.on('presence', { event: 'sync' }, () => {
-        const state = roomChannel.presenceState();
-        let total = 0;
-        Object.values(state).forEach(presences => total += presences.length);
-        document.getElementById('online-count').textContent = total;
+        // Render Acid Bullets
+        acidBullets.forEach(b => {
+          ctx.fillStyle = '#4ade80';
+          ctx.shadowColor = '#22c55e';
+          ctx.shadowBlur = 8;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        });
+      }
+
+      // Render Slime
+      const style = AVATAR_STYLES[selectedStyle];
+      const drawY = slime.y - slime.jumpOffset;
+
+      ctx.fillStyle = style.color;
+      ctx.beginPath();
+      ctx.arc(slime.x, drawY, slime.radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Slime Eyes & Accessory
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(slime.x - 7, drawY - 4, 5, 0, Math.PI * 2);
+      ctx.arc(slime.x + 7, drawY - 4, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#180914';
+      ctx.beginPath();
+      ctx.arc(slime.x - 7, drawY - 4, 2, 0, Math.PI * 2);
+      ctx.arc(slime.x + 7, drawY - 4, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Accessory Emoji
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(style.accessory, slime.x, drawY - slime.radius - 2);
+
+      // Display Name
+      const name = document.getElementById('setting-username').value;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px "Plus Jakarta Sans"';
+      ctx.fillText(name, slime.x, drawY + slime.radius + 14);
+    }
+
+    function loop() {
+      update();
+      render();
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    // --- UI CONTROLLERS ---
+    function switchMode(newMode) {
+      mode = newMode;
+      const btnLounge = document.getElementById('mode-btn-lounge');
+      const btnDungeon = document.getElementById('mode-btn-dungeon');
+      const dungeonHud = document.getElementById('dungeon-hud');
+      const dungeonAttack = document.getElementById('dungeon-attack-btn');
+
+      if (mode === 'lounge') {
+        btnLounge.className = "mode-btn px-3 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap";
+        btnDungeon.className = "mode-btn px-3 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap";
+        dungeonHud.classList.add('hidden');
+        dungeonAttack.classList.add('hidden');
+        document.getElementById('room-indicator').textContent = '#sakura-lounge';
+        enemies = [];
+      } else {
+        btnDungeon.className = "mode-btn px-3 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-rose-600 text-white shadow-sm transition whitespace-nowrap";
+        btnLounge.className = "mode-btn px-3 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap";
+        dungeonHud.classList.remove('hidden');
+        dungeonAttack.classList.remove('hidden');
+        document.getElementById('room-indicator').textContent = '⚔️ Acid Dungeon';
+      }
+    }
+
+    function triggerJump() {
+      if (!slime.isJumping) {
+        slime.isJumping = true;
+        slime.jumpVel = 10;
+      }
+    }
+
+    function triggerEmote(emoji) {
+      particles.push({
+        x: slime.x,
+        y: slime.y - slime.radius - 20,
+        vx: 0,
+        vy: -1,
+        life: 40,
+        color: '#f472b6'
       });
     }
 
-    function broadcastPosition() {
-      if (!roomChannel) return;
-      roomChannel.send({
-        type: 'broadcast',
-        event: 'move',
-        payload: { id: myId, name: myName, level: myLevel, x: myX, y: myY, jumpZ, color: myColor, accessory: myAccessory }
+    function toggleChatSidebar() {
+      document.getElementById('chat-sidebar').classList.toggle('translate-x-full');
+    }
+
+    function toggleSettingsModal() {
+      renderAvatarPicker();
+      document.getElementById('settings-modal').classList.toggle('hidden');
+    }
+
+    function toggleShopModal() {
+      renderShopItems();
+      document.getElementById('shop-modal').classList.toggle('hidden');
+    }
+
+    function renderAvatarPicker() {
+      const picker = document.getElementById('avatar-picker');
+      picker.innerHTML = '';
+      Object.keys(AVATAR_STYLES).forEach(key => {
+        const item = AVATAR_STYLES[key];
+        if (!item.owned) return;
+        
+        const btn = document.createElement('button');
+        btn.className = `p-2 rounded-xl border flex items-center justify-between gap-1 text-xs font-bold ${selectedStyle === key ? 'border-pink-500 bg-pink-100' : 'border-pink-200'}`;
+        btn.onclick = () => { selectedStyle = key; renderAvatarPicker(); };
+        btn.innerHTML = `<span>${item.accessory} ${item.name}</span>`;
+        picker.appendChild(btn);
       });
     }
 
-    // Dungeon combat & acid shooting
-    function shootAcid() {
-      if (currentRoom !== 'dungeon') return;
+    function renderShopItems() {
+      const shopContainer = document.getElementById('shop-items');
+      shopContainer.innerHTML = '';
+      Object.keys(AVATAR_STYLES).forEach(key => {
+        const item = AVATAR_STYLES[key];
+        if (item.owned) return;
 
-      let angle = Math.atan2(targetY - myY, targetX - myX);
-      if (Math.abs(targetX - myX) < 5 && Math.abs(targetY - myY) < 5) {
-        angle = -Math.PI / 2;
-      }
+        const div = document.createElement('div');
+        div.className = "flex items-center justify-between p-3 rounded-2xl bg-white/80 border border-pink-200";
+        div.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="text-xl">${item.accessory}</span>
+            <div>
+              <p class="text-xs font-bold text-pink-950">${item.name}</p>
+              <p class="text-[10px] text-amber-600 font-extrabold flex items-center gap-0.5"><i data-lucide="gem" class="w-3 h-3"></i> ${item.price} Gems</p>
+            </div>
+          </div>
+          <button onclick="buyItem('${key}')" class="px-3 py-1 rounded-xl bg-amber-400 hover:bg-amber-500 text-amber-950 text-xs font-bold transition">Buy</button>
+        `;
+        shopContainer.appendChild(div);
+      });
+      lucide.createIcons();
+    }
 
-      const speed = 7;
-      const vx = Math.cos(angle) * speed;
-      const vy = Math.sin(angle) * speed;
-
-      acidProjectiles.push({ x: myX, y: myY - 10, vx, vy, color: '#34d399', life: 60 });
-
-      if (roomChannel) {
-        roomChannel.send({
-          type: 'broadcast',
-          event: 'shoot',
-          payload: { id: myId, x: myX, y: myY - 10, vx, vy }
-        });
+    function buyItem(key) {
+      const item = AVATAR_STYLES[key];
+      if (gems >= item.price) {
+        gems -= item.price;
+        item.owned = true;
+        document.getElementById('gem-count').textContent = gems;
+        renderShopItems();
+        alert(`Successfully bought ${item.name}! You can now equip it in Customize Settings.`);
+      } else {
+        alert('Not enough Gems! Fight enemies in the Dungeon to gain more.');
       }
     }
 
-    function spawnDungeonEnemies() {
-      dungeonEnemies = [];
-      for (let i = 0; i < 6; i++) {
-        dungeonEnemies.push({
-          id: i,
-          x: 120 + Math.random() * 720,
-          y: 100 + Math.random() * 340,
-          hp: 2, maxHp: 2
-        });
-      }
+    function saveAvatarSettings() {
+      toggleSettingsModal();
     }
 
-    // Chat handling
-    document.getElementById('chat-form').addEventListener('submit', (e) => {
+    function handleChatSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
       if (!text) return;
+
+      const msgBox = document.getElementById('chat-messages');
+      const msg = document.createElement('div');
+      const name = document.getElementById('setting-username').value;
+      msg.className = "bg-white/10 p-2 rounded-xl border border-pink-200/20";
+      msg.innerHTML = `<strong class="text-pink-300">${name}:</strong> ${text}`;
+      msgBox.appendChild(msg);
+      msgBox.scrollTop = msgBox.scrollHeight;
       input.value = '';
-
-      triggerChatBubble(myId, text);
-      appendChatLog(myName, text);
-
-      if (roomChannel) {
-        roomChannel.send({
-          type: 'broadcast',
-          event: 'chat',
-          payload: { id: myId, name: myName, text }
-        });
-      }
-    });
-
-    function triggerChatBubble(id, text) {
-      chatBubbles[id] = { text, timer: 160 };
-    }
-
-    function appendChatLog(name, text) {
-      const box = document.getElementById('chat-messages');
-      const div = document.createElement('div');
-      div.className = "bg-white/80 p-1.5 rounded-xl border border-pink-200/50";
-      div.innerHTML = `<span class="font-bold text-pink-900">${escapeHtml(name)}:</span> <span class="text-pink-950">${escapeHtml(text)}</span>`;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function escapeHtml(s) {
-      const d = document.createElement('div');
-      d.innerText = s;
-      return d.innerHTML;
-    }
-
-    // Controls & Events
-    function setupControls() {
-      window.addEventListener('keydown', e => {
-        if (document.activeElement.tagName === 'INPUT') return;
-        keys[e.code] = true;
-        if (e.code === 'Space') triggerJump();
-        if (e.code === 'KeyF') shootAcid();
-      });
-
-      window.addEventListener('keyup', e => { keys[e.code] = false; });
-
-      canvas.addEventListener('pointerdown', e => {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-
-        targetX = (e.clientX - rect.left) * scaleX;
-        targetY = (e.clientY - rect.top) * scaleY;
-
-        if (currentRoom === 'dungeon') shootAcid();
-      });
-    }
-
-    function triggerJump() {
-      if (!isJumping) {
-        isJumping = true;
-        jumpVelocity = 7;
-      }
-    }
-
-    // Game Loop
-    let lastBroadcastTime = 0;
-    function gameLoop(time) {
-      updatePhysics();
-      renderScene();
-
-      if (time - lastBroadcastTime > 80) {
-        broadcastPosition();
-        lastBroadcastTime = time;
-      }
-
-      requestAnimationFrame(gameLoop);
-    }
-
-    function updatePhysics() {
-      let dx = 0, dy = 0;
-      if (keys['KeyW'] || keys['ArrowUp']) dy -= 1;
-      if (keys['KeyS'] || keys['ArrowDown']) dy += 1;
-      if (keys['KeyA'] || keys['ArrowLeft']) dx -= 1;
-      if (keys['KeyD'] || keys['ArrowRight']) dx += 1;
-
-      const spd = 3.5;
-      if (dx !== 0 || dy !== 0) {
-        const len = Math.hypot(dx, dy);
-        myX += (dx / len) * spd;
-        myY += (dy / len) * spd;
-        targetX = myX; targetY = myY;
-      } else {
-        const dist = Math.hypot(targetX - myX, targetY - myY);
-        if (dist > 3) {
-          myX += ((targetX - myX) / dist) * spd;
-          myY += ((targetY - myY) / dist) * spd;
-        }
-      }
-
-      myX = Math.max(30, Math.min(canvas.width - 30, myX));
-      myY = Math.max(50, Math.min(canvas.height - 30, myY));
-
-      if (isJumping) {
-        jumpZ += jumpVelocity;
-        jumpVelocity -= 0.5;
-        if (jumpZ <= 0) {
-          jumpZ = 0;
-          isJumping = false;
-        }
-      }
-
-      // Acid collision update
-      for (let i = acidProjectiles.length - 1; i >= 0; i--) {
-        const p = acidProjectiles[i];
-        p.x += p.vx; p.y += p.vy;
-        p.life--;
-
-        if (currentRoom === 'dungeon') {
-          dungeonEnemies.forEach(e => {
-            if (e.hp > 0 && Math.hypot(p.x - e.x, p.y - e.y) < 24) {
-              e.hp--;
-              p.life = 0;
-              if (e.hp <= 0) {
-                myExp += 25;
-                if (myExp >= expToNext) {
-                  myLevel++;
-                  myExp -= expToNext;
-                  triggerChatBubble(myId, `🎉 LEVEL UP! LVL ${myLevel}!`);
-                }
-                updatePlayerStatsUI();
-              }
-            }
-          });
-        }
-        if (p.life <= 0) acidProjectiles.splice(i, 1);
-      }
-    }
-
-    // Render Scene
-    function renderScene() {
-      ctx.save();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Apply Zoom around center
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.scale(zoomLevel, zoomLevel);
-      ctx.translate(-canvas.width / 2, -canvas.height / 2);
-
-      drawRoomEnvironment();
-
-      if (currentRoom === 'dungeon') {
-        dungeonEnemies.forEach(e => { if (e.hp > 0) drawEnemy(e); });
-      }
-
-      acidProjectiles.forEach(p => {
-        ctx.fillStyle = p.color;
-        ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.fill();
-      });
-
-      Object.values(players).forEach(p => {
-        drawSlime(p.x, p.y, p.jumpZ || 0, p.name, p.level || 1, p.color, p.accessory || 'flower', p.id);
-      });
-
-      drawSlime(myX, myY, jumpZ, myName, myLevel, myColor, myAccessory, myId);
-
-      ctx.restore();
-    }
-
-    function drawRoomEnvironment() {
-      if (currentRoom === 'park') {
-        ctx.fillStyle = '#bbf7d0';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Swings
-        ctx.strokeStyle = '#f472b6'; ctx.lineWidth = 4;
-        ctx.strokeRect(200, 100, 120, 80);
-        ctx.fillStyle = '#db2777';
-        ctx.fillRect(220, 150, 20, 6); ctx.fillRect(280, 150, 20, 6);
-
-        drawSakuraTree(100, 120);
-        drawSakuraTree(860, 400);
-      } else if (currentRoom === 'disco') {
-        ctx.fillStyle = '#1e1b4b';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const t = Date.now() * 0.003;
-        for (let x = 80; x < canvas.width - 80; x += 60) {
-          for (let y = 80; y < canvas.height - 80; y += 60) {
-            const h = Math.floor((x + y + t * 100) % 360);
-            ctx.fillStyle = `hsla(${h}, 80%, 60%, 0.4)`;
-            ctx.fillRect(x, y, 56, 56);
-          }
-        }
-      } else if (currentRoom === 'onsen') {
-        ctx.fillStyle = '#a7f3d0';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#0284c7';
-        ctx.beginPath(); ctx.ellipse(480, 270, 220, 130, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 6; ctx.stroke();
-      } else if (currentRoom === 'dungeon') {
-        ctx.fillStyle = '#31103f';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = 'rgba(244, 114, 182, 0.15)'; ctx.lineWidth = 2;
-        for (let x = 0; x < canvas.width; x += 60) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-        }
-        for (let y = 0; y < canvas.height; y += 60) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-        }
-      }
-    }
-
-    function drawSakuraTree(x, y) {
-      ctx.fillStyle = '#f472b6';
-      ctx.beginPath(); ctx.arc(x, y - 30, 45, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#78350f';
-      ctx.fillRect(x - 8, y - 10, 16, 35);
-    }
-
-    function drawEnemy(e) {
-      ctx.fillStyle = '#ef4444';
-      ctx.beginPath(); ctx.arc(e.x, e.y, 16, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(e.x - 16, e.y - 26, 32, 5);
-      ctx.fillStyle = '#22c55e';
-      ctx.fillRect(e.x - 16, e.y - 26, (e.hp / e.maxHp) * 32, 5);
-    }
-
-    function drawSlime(x, y, z, name, level, color, acc, id) {
-      const renderY = y - z;
-
-      // Shadow
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-      ctx.beginPath(); ctx.ellipse(x, y + 10, 16, 6, 0, 0, Math.PI * 2); ctx.fill();
-
-      // Slime Body
-      const squish = z > 0 ? 0.85 : 1.0;
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.ellipse(x, renderY, 18 * (2 - squish), 16 * squish, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.5; ctx.stroke();
-
-      // Eyes
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(x - 5, renderY - 3, 3, 0, Math.PI * 2);
-      ctx.arc(x + 5, renderY - 3, 3, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Accessories
-      if (acc === 'flower') {
-        ctx.fillStyle = '#fb7185';
-        ctx.beginPath(); ctx.arc(x + 8, renderY - 12, 6, 0, Math.PI * 2); ctx.fill();
-      } else if (acc === 'crown') {
-        ctx.fillStyle = '#facc15';
-        ctx.fillRect(x - 8, renderY - 22, 16, 6);
-      } else if (acc === 'ninja') {
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(x - 14, renderY - 10, 28, 6);
-      }
-
-      // Name Badge
-      ctx.fillStyle = '#831843';
-      ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(`Lvl ${level} ${name}`, x, renderY - 26);
-
-      // Chat Bubble
-      if (chatBubbles[id] && chatBubbles[id].timer > 0) {
-        chatBubbles[id].timer--;
-        const bText = chatBubbles[id].text;
-
-        ctx.font = '11px "Plus Jakarta Sans", sans-serif';
-        const tw = ctx.measureText(bText).width;
-        const bw = Math.max(tw + 16, 36);
-
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        ctx.strokeStyle = '#f472b6'; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.roundRect(x - bw / 2, renderY - 58, bw, 24, 8);
-        ctx.fill(); ctx.stroke();
-
-        ctx.fillStyle = '#831843';
-        ctx.fillText(bText, x, renderY - 42);
-      }
-    }
-
-    function createPetals() {
-      const container = document.getElementById('petals-container');
-      for (let i = 0; i < 18; i++) {
-        const p = document.createElement('div');
-        p.className = 'petal';
-        const size = Math.random() * 10 + 6;
-        p.style.width = `${size}px`;
-        p.style.height = `${size}px`;
-        p.style.left = `${Math.random() * 100}vw`;
-        p.style.animationDuration = `${Math.random() * 7 + 5}s`;
-        p.style.animationDelay = `${Math.random() * 5}s`;
-        container.appendChild(p);
-      }
     }
   </script>
 </body>
