@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Endless Anime Hallway - Pixel Sanctuary</title>
-    <!-- Tailwind CSS for UI framing -->
+    <title>Endless Anime Sanctuary - Cinematic Pixel Edition</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font: Press Start 2P for retro aesthetic -->
+    <!-- Google Font: Press Start 2P -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <!-- Supabase Client for Auth & Realtime Sync -->
+    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
@@ -20,7 +20,7 @@
         }
         body {
             font-family: 'Press Start 2P', monospace;
-            background-color: #0b0c10;
+            background-color: #05050a;
             color: #e0e6ed;
             overflow: hidden;
             margin: 0;
@@ -32,18 +32,14 @@
             display: block;
         }
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.4);
         }
         ::-webkit-scrollbar-thumb {
-            background: #4f46e5;
+            background: #6366f1;
             border-radius: 3px;
-        }
-        .pixel-border {
-            border: 4px solid #1f293d;
-            box-shadow: inset -4px -4px 0px 0px #0f172a, inset 4px 4px 0px 0px #384152;
         }
         .pixel-btn {
             background: #4f46e5;
@@ -64,13 +60,13 @@
     </div>
 
     <!-- TOP BAR HUD -->
-    <div class="relative z-10 p-3 flex justify-between items-center bg-slate-900/80 backdrop-blur-md border-b-2 border-slate-800 text-xs">
+    <div class="relative z-10 p-3 flex justify-between items-center bg-slate-950/85 backdrop-blur-md border-b-2 border-indigo-950 text-xs shadow-lg">
         <div class="flex items-center gap-3">
-            <div class="flex items-center gap-2 bg-slate-800/90 px-3 py-1.5 rounded-md border border-slate-700">
+            <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-md border border-indigo-900/50 shadow-inner">
                 <i class="fa-solid fa-user text-indigo-400"></i>
                 <span id="playerTag" class="text-indigo-300 font-bold">AnimeWalker</span>
             </div>
-            <div class="flex items-center gap-2 bg-slate-800/90 px-3 py-1.5 rounded-md border border-slate-700">
+            <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-md border border-indigo-900/50 shadow-inner">
                 <i class="fa-solid fa-location-dot text-amber-400"></i>
                 <span id="locationTag" class="text-amber-200">Main Hallway</span>
             </div>
@@ -78,23 +74,19 @@
 
         <!-- System Controls -->
         <div class="flex items-center gap-2">
-            <!-- Background Music Toggle -->
-            <button id="btnMusicToggle" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-amber-600">
+            <button id="btnMusicToggle" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-amber-600 shadow">
                 <i id="musicIcon" class="fa-solid fa-music"></i>
                 <span class="hidden md:inline">Music</span>
             </button>
-            <!-- Proximity Mic Button -->
-            <button id="btnMicToggle" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-rose-600">
+            <button id="btnMicToggle" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-rose-600 shadow">
                 <i id="micIcon" class="fa-solid fa-microphone-slash"></i>
                 <span class="hidden md:inline">Mic Off</span>
             </button>
-            <!-- Settings / Customizer Button -->
-            <button id="btnCustomizer" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-indigo-600">
+            <button id="btnCustomizer" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-indigo-600 shadow">
                 <i class="fa-solid fa-gear"></i>
                 <span class="hidden md:inline">Settings</span>
             </button>
-            <!-- Logout Button -->
-            <button id="btnLogout" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-slate-700 hidden">
+            <button id="btnLogout" class="pixel-btn px-3 py-2 rounded text-white flex items-center gap-2 bg-slate-800 hidden shadow">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </button>
         </div>
@@ -102,16 +94,16 @@
 
     <!-- MAIN CHAT OVERLAY -->
     <div class="relative z-10 p-2 md:p-4 pointer-events-none flex justify-between items-end mb-16 md:mb-0">
-        <div class="pointer-events-auto w-80 max-w-[85vw] bg-slate-900/90 border-2 border-indigo-900/60 rounded-lg p-3 flex flex-col h-48 backdrop-blur-md shadow-2xl">
+        <div class="pointer-events-auto w-80 max-w-[85vw] bg-slate-950/90 border-2 border-indigo-900/60 rounded-lg p-3 flex flex-col h-48 backdrop-blur-md shadow-2xl">
             <div class="text-[10px] text-indigo-400 mb-2 border-b border-indigo-900/40 pb-1 flex justify-between items-center">
-                <span><i class="fa-solid fa-comments"></i> Local Proximity Chat</span>
+                <span><i class="fa-solid fa-comments"></i> Proximity Sanctuary Chat</span>
                 <span id="peerCount" class="text-slate-400">Online: 1</span>
             </div>
             <div id="chatMessages" class="flex-1 overflow-y-auto space-y-2 pr-1 text-[10px] leading-relaxed">
-                <div class="text-emerald-400"><i class="fa-solid fa-circle-info"></i> Welcome! Walk right to enter bonfire rooms and sit by the fire.</div>
+                <div class="text-emerald-400"><i class="fa-solid fa-circle-info"></i> Welcome! Walk right to enter rooms and enjoy the ambient bonfire sanctuary.</div>
             </div>
             <form id="chatForm" class="mt-2 flex gap-1">
-                <input id="chatInput" type="text" maxlength="60" placeholder="Type a message..." class="flex-1 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-[10px] text-slate-200 focus:outline-none focus:border-indigo-500">
+                <input id="chatInput" type="text" maxlength="60" placeholder="Type a message..." class="flex-1 bg-slate-900 border border-indigo-900/50 rounded px-2 py-1 text-[10px] text-slate-200 focus:outline-none focus:border-indigo-500 shadow-inner">
                 <button type="submit" class="pixel-btn bg-indigo-600 text-white px-2 py-1 rounded text-[10px]"><i class="fa-solid fa-paper-plane"></i></button>
             </form>
         </div>
@@ -120,10 +112,10 @@
     <!-- MOBILE TOUCH CONTROLS -->
     <div id="mobileControls" class="relative z-20 p-4 flex justify-between items-center pointer-events-none mb-2">
         <div class="pointer-events-auto flex gap-2">
-            <button id="btnLeft" class="w-14 h-14 bg-slate-800/80 active:bg-indigo-600 border-2 border-slate-600 rounded-lg flex items-center justify-center text-white text-xl shadow-lg">
+            <button id="btnLeft" class="w-14 h-14 bg-slate-900/90 active:bg-indigo-600 border-2 border-indigo-900 rounded-lg flex items-center justify-center text-white text-xl shadow-xl">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
-            <button id="btnRight" class="w-14 h-14 bg-slate-800/80 active:bg-indigo-600 border-2 border-slate-600 rounded-lg flex items-center justify-center text-white text-xl shadow-lg">
+            <button id="btnRight" class="w-14 h-14 bg-slate-900/90 active:bg-indigo-600 border-2 border-indigo-900 rounded-lg flex items-center justify-center text-white text-xl shadow-xl">
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
@@ -139,61 +131,61 @@
         </div>
     </div>
 
-    <!-- AUTHENTICATION / LOGIN / SIGNUP MODAL -->
-    <div id="modalAuth" class="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border-2 border-indigo-500 rounded-xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
+    <!-- AUTHENTICATION MODAL -->
+    <div id="modalAuth" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-slate-950 border-2 border-indigo-500/80 rounded-xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
             <h2 class="text-sm text-indigo-400 font-bold"><i class="fa-solid fa-shield-halved"></i> Sanctuary Login</h2>
-            <p class="text-[9px] text-slate-400">Sign in with your email & password to save your avatar, display name, and progress.</p>
+            <p class="text-[9px] text-slate-400">Sign in with your email & password to preserve your avatar customizations and credentials.</p>
             
             <form id="authForm" class="space-y-3 text-xs text-left">
                 <div>
                     <label class="block text-[10px] text-slate-400 mb-1">Email:</label>
-                    <input id="authEmail" type="email" required placeholder="user@domain.com" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-slate-200 text-xs">
+                    <input id="authEmail" type="email" required placeholder="user@domain.com" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200 text-xs shadow-inner">
                 </div>
                 <div>
                     <label class="block text-[10px] text-slate-400 mb-1">Password:</label>
-                    <input id="authPassword" type="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-slate-200 text-xs">
+                    <input id="authPassword" type="password" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200 text-xs shadow-inner">
                 </div>
                 <div id="displayNameGroup" class="hidden">
                     <label class="block text-[10px] text-slate-400 mb-1">Display Name:</label>
-                    <input id="authDisplayName" type="text" maxlength="12" placeholder="AnimeWalker" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-indigo-300 text-xs">
+                    <input id="authDisplayName" type="text" maxlength="12" placeholder="AnimeWalker" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-indigo-300 text-xs shadow-inner">
                 </div>
 
                 <div id="authError" class="text-[9px] text-rose-400 text-center h-4"></div>
 
-                <button type="submit" id="btnAuthSubmit" class="pixel-btn w-full py-2.5 rounded text-white bg-indigo-600 text-xs font-bold">
+                <button type="submit" id="btnAuthSubmit" class="pixel-btn w-full py-2.5 rounded text-white bg-indigo-600 text-xs font-bold shadow-lg">
                     Login
                 </button>
             </form>
 
-            <div class="text-[9px] text-slate-400 pt-2 border-t border-slate-800">
+            <div class="text-[9px] text-slate-400 pt-2 border-t border-slate-900">
                 <span id="authSwitchText">Don't have an account?</span> 
                 <button id="btnSwitchAuthMode" class="text-indigo-400 underline font-bold ml-1">Sign Up</button>
             </div>
         </div>
     </div>
 
-    <!-- SETTINGS & PROFILE CUSTOMIZER MODAL -->
-    <div id="modalCustomizer" class="fixed inset-0 z-50 bg-black/75 flex items-center justify-center hidden p-4">
-        <div class="bg-slate-900 border-2 border-indigo-500 rounded-xl p-5 max-w-sm w-full text-center space-y-4 shadow-2xl">
-            <h2 class="text-sm text-indigo-400 font-bold"><i class="fa-solid fa-gear"></i> Game Settings & Profile</h2>
+    <!-- SETTINGS & PROFILE MODAL -->
+    <div id="modalCustomizer" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center hidden p-4 backdrop-blur-sm">
+        <div class="bg-slate-950 border-2 border-indigo-500 rounded-xl p-5 max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <h2 class="text-sm text-indigo-400 font-bold"><i class="fa-solid fa-gear"></i> Avatar & Settings</h2>
             
             <div class="space-y-3 text-xs text-left">
                 <div>
                     <label class="block text-slate-400 mb-1">Display Name:</label>
-                    <input id="inputPlayerName" type="text" maxlength="12" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-indigo-300 text-xs">
+                    <input id="inputPlayerName" type="text" maxlength="12" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-indigo-300 text-xs shadow-inner">
                 </div>
                 <div>
                     <label class="block text-slate-400 mb-1">Hair Color:</label>
-                    <input id="colorHair" type="color" value="#fbbf24" class="w-full h-8 bg-transparent cursor-pointer rounded">
+                    <input id="colorHair" type="color" value="#fbbf24" class="w-full h-8 bg-transparent cursor-pointer rounded border border-slate-700">
                 </div>
                 <div>
                     <label class="block text-slate-400 mb-1">Outfit Color:</label>
-                    <input id="colorOutfit" type="color" value="#4f46e5" class="w-full h-8 bg-transparent cursor-pointer rounded">
+                    <input id="colorOutfit" type="color" value="#4f46e5" class="w-full h-8 bg-transparent cursor-pointer rounded border border-slate-700">
                 </div>
             </div>
 
-            <button id="btnCloseCustomizer" class="pixel-btn w-full py-2 rounded text-white bg-indigo-600 text-xs">
+            <button id="btnCloseCustomizer" class="pixel-btn w-full py-2 rounded text-white bg-indigo-600 text-xs shadow-lg">
                 Save & Close
             </button>
         </div>
@@ -201,14 +193,16 @@
 
     <!-- GAME ENGINE SCRIPT -->
     <script>
-        // --- SUPABASE CLOUD CONFIGURATION ---
+        // --- SUPABASE CONFIGURATION ---
         const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const gameChannel = supabaseClient.channel('endless_anime_sanctuary_v5');
+        const gameChannel = supabaseClient.channel('endless_anime_sanctuary_v6', {
+            config: { broadcast: { self: false } }
+        });
 
-        // --- GAME ENGINE STATE & CONSTANTS ---
+        // --- GAME ENGINE STATE ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         ctx.imageSmoothingEnabled = false;
@@ -260,7 +254,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // --- AUTHENTICATION & SESSION MANAGEMENT ---
+        // --- AUTHENTICATION & SESSION ---
         let isSignUpMode = false;
         const modalAuth = document.getElementById('modalAuth');
         const authForm = document.getElementById('authForm');
@@ -294,7 +288,7 @@
 
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            authError.innerText = "Processing...";
+            authError.innerText = "Connecting...";
             const email = authEmail.value.trim();
             const password = authPassword.value.trim();
 
@@ -314,7 +308,7 @@
                 if (error) {
                     authError.innerText = error.message;
                 } else {
-                    alert("Account created successfully! You are now logged in.");
+                    alert("Account registered! You are now logged in.");
                     initSession(data.user);
                 }
             } else {
@@ -362,6 +356,7 @@
             gameLoop();
         });
 
+        // --- RELIABLE REALTIME SYNC FIX ---
         function initRealtimeSync() {
             gameChannel
                 .on('broadcast', { event: 'state' }, ({ payload }) => {
@@ -371,13 +366,13 @@
                     }
                 })
                 .on('broadcast', { event: 'chat' }, ({ payload }) => {
-                    if (payload && payload.author && payload.author !== localPlayer.name) {
+                    if (payload && payload.author && payload.text) {
                         addChatMessage(payload.author, payload.text);
                     }
                 })
                 .subscribe((status) => {
                     if (status === 'SUBSCRIBED') {
-                        console.log('Realtime sync active.');
+                        console.log('Sanctuary Realtime Connected Successfully.');
                     }
                 });
         }
@@ -395,7 +390,7 @@
             document.getElementById('peerCount').innerText = `Online: ${remotePlayers.size + 1}`;
         }
 
-        // --- PROCEDURAL BACKGROUND MUSIC (WEB AUDIO API) ---
+        // --- PROCEDURAL AMBIENT MUSIC (WEB AUDIO API) ---
         let audioCtx = null;
         let isMusicPlaying = false;
         let musicInterval = null;
@@ -413,8 +408,7 @@
                 btnMusic.classList.add('bg-emerald-600');
                 musicIcon.className = 'fa-solid fa-volume-high';
 
-                // Play soothing minor chord arpeggios
-                const notes = [220.00, 261.63, 329.63, 392.00, 440.00]; // A minor pentatonic
+                const notes = [220.00, 246.94, 293.66, 329.63, 392.00]; // Atmospheric pentatonic scale
                 musicInterval = setInterval(() => {
                     if (!isMusicPlaying || !audioCtx) return;
                     const osc = audioCtx.createOscillator();
@@ -424,15 +418,15 @@
                     const freq = notes[Math.floor(Math.random() * notes.length)];
                     osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
 
-                    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3.5);
+                    gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 4.0);
 
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
 
                     osc.start();
-                    osc.stop(audioCtx.currentTime + 3.5);
-                }, 1200);
+                    osc.stop(audioCtx.currentTime + 4.0);
+                }, 1500);
 
             } else {
                 isMusicPlaying = false;
@@ -446,7 +440,7 @@
         }
         document.getElementById('btnMusicToggle').addEventListener('click', toggleBackgroundMusic);
 
-        // --- PIXEL ART RENDERING ENGINE ---
+        // --- HIGH-FIDELITY PIXEL ART & AMBIENT LIGHTING ENGINE ---
         const PixelArt = {
             drawCharacter(ctx, x, y, player, isLocal = false) {
                 ctx.save();
@@ -457,12 +451,13 @@
                 }
 
                 const animOffset = player.state === 'walk' ? Math.sin(player.frame * 0.5) * 1.5 : 0;
-                const bobbing = player.state === 'idle' ? Math.sin(Date.now() * 0.005) * 0.5 : 0;
+                const bobbing = player.state === 'idle' ? Math.sin(Date.now() * 0.005) * 0.6 : 0;
                 const isSitting = player.state === 'sit';
 
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                // Soft floor shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
                 ctx.beginPath();
-                ctx.ellipse(0, 0, 7, 2.5, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, 8, 3, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (isSitting) {
@@ -473,46 +468,54 @@
                     ctx.fillStyle = '#ffedd5';
                     ctx.fillRect(-4, -16, 8, 7);
                     ctx.fillStyle = player.hairColor || '#fbbf24';
-                    ctx.fillRect(-5, -18, 10, 4);
+                    ctx.fillRect(-5, -19, 10, 5);
                 } else {
-                    ctx.fillStyle = '#1e293b';
+                    // Refined Anime Sprite Styling
+                    ctx.fillStyle = '#0f172a';
                     ctx.fillRect(-3, -4, 2, 4);
                     ctx.fillRect(1, -4, 2, 4);
 
+                    // Outfit & Scarf / Capelet
                     ctx.fillStyle = player.outfitColor || '#4f46e5';
                     ctx.fillRect(-4, -12 + bobbing, 8, 8);
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.fillRect(-3, -12 + bobbing, 6, 2); // Collar
 
+                    // Sleeves & Arms
                     ctx.fillStyle = '#f87171';
                     ctx.fillRect(-5, -11 + bobbing, 2, 6);
                     ctx.fillRect(3, -11 + bobbing, 2, 6);
 
+                    // Head & Face
                     ctx.fillStyle = '#ffedd5';
                     ctx.fillRect(-4, -20 + bobbing, 8, 8);
 
-                    ctx.fillStyle = '#1e1b4b';
+                    // Anime Eyes
+                    ctx.fillStyle = '#0f172a';
                     ctx.fillRect(1, -17 + bobbing, 2, 3);
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(2, -17 + bobbing, 1, 1);
 
+                    // Detailed Anime Spiky Hair
                     ctx.fillStyle = player.hairColor || '#fbbf24';
-                    ctx.fillRect(-5, -22 + bobbing, 10, 4);
-                    ctx.fillRect(-5, -18 + bobbing, 3, 5);
-                    ctx.fillRect(2, -18 + bobbing, 3, 3);
+                    ctx.fillRect(-5, -23 + bobbing, 10, 5);
+                    ctx.fillRect(-6, -20 + bobbing, 3, 6); // Left strand
+                    ctx.fillRect(3, -19 + bobbing, 3, 4);  // Right strand
                 }
 
                 ctx.restore();
                 ctx.save();
                 ctx.font = '5px "Press Start 2P"';
                 ctx.textAlign = 'center';
-                ctx.fillStyle = isLocal ? '#a7f3d0' : '#e0e7ff';
-                ctx.fillText(player.name, Math.round(x), Math.round(y - (isSitting ? 20 : 25)));
+                ctx.fillStyle = isLocal ? '#34d399' : '#93c5fd';
+                ctx.fillText(player.name, Math.round(x), Math.round(y - (isSitting ? 20 : 26)));
                 ctx.restore();
             },
 
             drawDoor(ctx, x, y, doorNumber) {
                 ctx.save();
                 ctx.translate(Math.round(x), Math.round(y));
-                ctx.fillStyle = '#331900';
+                ctx.fillStyle = '#1c1917';
                 ctx.fillRect(-12, -32, 24, 32);
                 ctx.fillStyle = '#78350f';
                 ctx.fillRect(-10, -30, 20, 30);
@@ -521,7 +524,7 @@
                 ctx.fillRect(-8, -14, 16, 12);
                 ctx.fillStyle = '#fbbf24';
                 ctx.fillRect(5, -15, 2, 2);
-                ctx.fillStyle = '#1e293b';
+                ctx.fillStyle = '#0f172a';
                 ctx.fillRect(-6, -36, 12, 6);
                 ctx.fillStyle = '#f59e0b';
                 ctx.font = '4px "Press Start 2P"';
@@ -532,13 +535,13 @@
 
             drawSealedWall(ctx, x) {
                 ctx.save();
-                ctx.fillStyle = '#0f172a';
+                ctx.fillStyle = '#020617';
                 ctx.fillRect(x - 15, 0, 15, VIRTUAL_HEIGHT);
-                ctx.fillStyle = '#1e293b';
+                ctx.fillStyle = '#0f172a';
                 for (let y = 10; y < VIRTUAL_HEIGHT; y += 12) {
                     ctx.fillRect(x - 12, y, 10, 5);
                 }
-                ctx.fillStyle = '#dc2626';
+                ctx.fillStyle = '#ef4444';
                 ctx.fillRect(x - 10, 60, 8, 8);
                 ctx.fillStyle = '#ffffff';
                 ctx.font = '5px "Press Start 2P"';
@@ -547,31 +550,43 @@
             },
 
             drawBonfireRoom(ctx) {
-                ctx.fillStyle = '#1e1b4b';
+                // Atmospheric Room Walls
+                ctx.fillStyle = '#0f172a';
                 ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 
-                ctx.fillStyle = '#312e81';
+                ctx.fillStyle = '#1e1b4b';
                 for (let x = 10; x < VIRTUAL_WIDTH; x += 25) {
                     ctx.fillRect(x, 10, 12, 120);
                 }
+
+                // Wall Lanterns with Glow
                 ctx.fillStyle = '#f59e0b';
                 ctx.fillRect(80, 45, 6, 8);
                 ctx.fillRect(234, 45, 6, 8);
 
-                ctx.fillStyle = '#451a03';
+                // Room Floor
+                ctx.fillStyle = '#291104';
                 ctx.fillRect(0, ROOM_GROUND_Y, VIRTUAL_WIDTH, VIRTUAL_HEIGHT - ROOM_GROUND_Y);
                 ctx.fillStyle = '#78350f';
                 ctx.fillRect(0, ROOM_GROUND_Y, VIRTUAL_WIDTH, 2);
 
+                // Sitting Benches
                 ctx.fillStyle = '#78350f';
                 ctx.fillRect(BONFIRE_X - 65, ROOM_GROUND_Y - 6, 28, 6);
-                ctx.fillRect(BONFIRE_X + 37, ROOM_GROUND_Y - 6, 28, 6);
-
-                const frame = Math.floor(Date.now() / 100);
                 ctx.fillStyle = '#451a03';
+                ctx.fillRect(BONFIRE_X - 63, ROOM_GROUND_Y - 4, 24, 2);
+
+                ctx.fillStyle = '#78350f';
+                ctx.fillRect(BONFIRE_X + 37, ROOM_GROUND_Y - 6, 28, 6);
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(BONFIRE_X + 39, ROOM_GROUND_Y - 4, 24, 2);
+
+                // Bonfire Logs & Animated Flame
+                const frame = Math.floor(Date.now() / 100);
+                ctx.fillStyle = '#291104';
                 ctx.fillRect(BONFIRE_X - 10, ROOM_GROUND_Y - 3, 20, 4);
                 
-                const fireColors = ['#f59e0b', '#ef4444', '#facc15'];
+                const fireColors = ['#f59e0b', '#ef4444', '#facc15', '#ffffff'];
                 for (let i = 0; i < 6; i++) {
                     const color = fireColors[(i + frame) % fireColors.length];
                     const fx = BONFIRE_X + (Math.sin(frame * 0.2 + i) * 4);
@@ -581,16 +596,19 @@
                     ctx.fillRect(fx - size / 2, fy, size, size);
                 }
 
-                const gradient = ctx.createRadialGradient(BONFIRE_X, ROOM_GROUND_Y - 15, 2, BONFIRE_X, ROOM_GROUND_Y - 15, 75);
-                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
+                // Cinematic Ambient Lighting Gradient
+                const gradient = ctx.createRadialGradient(BONFIRE_X, ROOM_GROUND_Y - 15, 4, BONFIRE_X, ROOM_GROUND_Y - 15, 95);
+                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.35)');
+                gradient.addColorStop(0.6, 'rgba(239, 68, 68, 0.1)');
                 gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
                 ctx.fillStyle = gradient;
                 ctx.beginPath();
-                ctx.arc(BONFIRE_X, ROOM_GROUND_Y - 15, 75, 0, Math.PI * 2);
+                ctx.arc(BONFIRE_X, ROOM_GROUND_Y - 15, 95, 0, Math.PI * 2);
                 ctx.fill();
             }
         };
 
+        // --- PARTICLE SYSTEM ---
         function spawnParticle(x, y, color, vx, vy, life) {
             particles.push({ x, y, color, vx, vy, life, maxLife: life });
         }
@@ -700,6 +718,18 @@
                     ctx.fillText('[E] Exit', 30, ROOM_GROUND_Y - 42);
                     ctx.restore();
                 }
+
+                // Ambient glowing ember particles floating inside rooms
+                if (Math.random() < 0.4) {
+                    spawnParticle(
+                        BONFIRE_X + (Math.random() - 0.5) * 60,
+                        ROOM_GROUND_Y - 15 - Math.random() * 40,
+                        '#fbbf24',
+                        (Math.random() - 0.5) * 0.5,
+                        -0.3 - Math.random() * 0.5,
+                        40
+                    );
+                }
             }
 
             remotePlayers.forEach(p => {
@@ -794,7 +824,7 @@
         btnInteract.addEventListener('click', handleInteraction);
         btnSit.addEventListener('click', toggleSit);
 
-        // --- CHAT SYSTEM ---
+        // --- FIXED CHAT SYSTEM ---
         const chatForm = document.getElementById('chatForm');
         const chatInput = document.getElementById('chatInput');
         const chatMessages = document.getElementById('chatMessages');
@@ -822,7 +852,7 @@
             }
         });
 
-        // --- PROXIMITY VOICE CHAT ---
+        // --- PROXIMITY VOICE ---
         const btnMicToggle = document.getElementById('btnMicToggle');
         const micIcon = document.getElementById('micIcon');
 
@@ -848,7 +878,7 @@
             }
         });
 
-        // --- IN-GAME SETTINGS / PROFILE MODAL (PERSISTENT) ---
+        // --- SETTINGS MODAL ---
         const btnCustomizer = document.getElementById('btnCustomizer');
         const modalCustomizer = document.getElementById('modalCustomizer');
         const btnCloseCustomizer = document.getElementById('btnCloseCustomizer');
@@ -864,7 +894,6 @@
             localPlayer.outfitColor = newOutfit;
             document.getElementById('playerTag').innerText = newName;
 
-            // Save permanently in Supabase User Metadata
             await supabaseClient.auth.updateUser({
                 data: { 
                     display_name: newName,
