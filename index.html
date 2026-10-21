@@ -165,56 +165,52 @@
     </div>
   </div>
 
-  <!-- TOP NAVIGATION HEADER BAR (Instagram-Style Direct Messaging & Friends) -->
-  <header class="h-12 sm:h-14 glass px-3 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
-    <div class="flex items-center gap-2">
-      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shadow-pink-300 shrink-0">
-        <i data-lucide="flower-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style="animation-duration: 12s;"></i>
+  <!-- TOP NAVIGATION HEADER BAR -->
+  <header class="h-14 sm:h-16 glass px-3 sm:px-5 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm gap-2">
+    <!-- Website Name / Title (More open & better looking) -->
+    <div class="flex items-center gap-3 shrink-0">
+      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-2 rounded-2xl shadow-md shadow-pink-300 shrink-0">
+        <i data-lucide="flower-2" class="w-5 h-5 sm:w-6 sm:h-6 animate-spin" style="animation-duration: 12s;"></i>
       </div>
       <div>
-        <h1 class="font-sakura text-xs sm:text-base text-pink-950 font-bold tracking-wide leading-none">Sakura Slime 🌸</h1>
-        <p class="text-[9px] sm:text-[10px] text-pink-600 font-semibold uppercase mt-0.5" id="room-indicator">#sakura-lounge</p>
+        <h1 class="font-sakura text-base sm:text-xl text-pink-950 font-extrabold tracking-wide leading-tight">Sakura Slime World 🌸</h1>
+        <p class="text-[10px] sm:text-xs text-pink-600 font-bold uppercase tracking-wider" id="room-indicator">#sakura-lounge</p>
       </div>
     </div>
 
+    <!-- Music Bar placed right after the title -->
+    <div class="hidden md:flex items-center bg-pink-100/90 rounded-2xl px-2.5 py-1 border border-pink-200 shadow-inner shrink-0">
+      <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1.5 rounded-xl hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs font-bold" title="Toggle Lo-Fi Music">
+        <i data-lucide="music" id="music-icon" class="w-4 h-4 text-pink-600"></i>
+        <span class="text-[11px]">Lo-Fi</span>
+      </button>
+      <input type="range" id="bg-volume" min="0" max="1" step="0.05" value="0.3" oninput="updateMusicVolume(this.value)" class="w-16 sm:w-24 h-1.5 accent-pink-500 cursor-pointer mx-2" />
+    </div>
+
     <!-- Right Controls Header -->
-    <div class="flex items-center gap-1.5">
-      <!-- Sakura Flowers Balance Badge (Starts at 0 for everyone) -->
-      <div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-black shadow-sm">
-        <span class="text-sm">🌸</span>
+    <div class="flex items-center gap-2 shrink-0">
+      <!-- Flower Count -->
+      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs sm:text-sm font-black shadow-sm">
+        <span class="text-base">🌸</span>
         <span id="coin-counter">0</span>
       </div>
 
-      <!-- Instagram-style Direct Messages Trigger -->
-      <button onclick="toggleDMModal()" class="relative p-2 rounded-xl bg-gradient-to-tr from-pink-500 to-rose-500 text-white shadow-md active:scale-95 transition" title="Direct Messages">
-        <i data-lucide="send" class="w-4 h-4"></i>
-        <span id="dm-unread-dot" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
+      <!-- Message in the corner (Instagram-style Direct Messages Trigger) -->
+      <button onclick="toggleDMModal()" class="relative p-2.5 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-500 text-white shadow-md active:scale-95 transition" title="Direct Messages">
+        <i data-lucide="send" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        <span id="dm-unread-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
       </button>
 
-      <!-- Friend Requests Center -->
-      <button onclick="toggleFriendsModal()" class="relative p-2 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Friend Requests">
-        <i data-lucide="users" class="w-4 h-4"></i>
-        <span id="friend-req-count" class="hidden absolute -top-1 -right-1 px-1 py-0.2 bg-pink-600 text-white text-[8px] font-black rounded-full">0</span>
+      <!-- Profile & Right Drawer Toggle -->
+      <button onclick="toggleRightDrawer()" class="relative p-2.5 rounded-2xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-md active:scale-95 transition" title="Profile & Friends Menu">
+        <i data-lucide="user-circle" class="w-5 h-5"></i>
+        <span id="friend-req-count-badge" class="hidden absolute -top-1 -right-1 px-1.5 py-0.2 bg-pink-600 text-white text-[9px] font-black rounded-full">0</span>
       </button>
 
       <!-- Developer Mode Key Trigger -->
-      <button onclick="promptDevMode()" class="p-1.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-800 border border-purple-300 shadow-sm active:scale-95" title="Developer Controls">
-        <i data-lucide="code" class="w-4 h-4"></i>
+      <button onclick="promptDevMode()" class="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-2xl bg-purple-100 hover:bg-purple-200 text-purple-800 border border-purple-300 shadow-sm active:scale-95 text-xs font-bold" title="Developer Controls">
+        <i data-lucide="code" class="w-4 h-4"></i> Dev
       </button>
-
-      <!-- Audio Synth Control -->
-      <div class="flex items-center bg-pink-100/90 rounded-xl p-1 border border-pink-200">
-        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Lo-Fi Music">
-          <i data-lucide="music" id="music-icon" class="w-3.5 h-3.5 text-pink-600"></i>
-        </button>
-        <input type="range" id="bg-volume" min="0" max="1" step="0.05" value="0.3" oninput="updateMusicVolume(this.value)" class="w-10 sm:w-14 h-1 accent-pink-500 cursor-pointer mx-1" />
-      </div>
-
-      <!-- Player Counter Badge -->
-      <div class="hidden sm:flex items-center gap-1 px-2 py-1 rounded-xl bg-pink-100/90 border border-pink-200 text-pink-800 text-[10px] font-semibold">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span id="player-count">1</span>
-      </div>
     </div>
   </header>
 
@@ -352,8 +348,8 @@
       </div>
     </div>
 
-    <!-- SIDEBAR DRAWER -->
-    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
+    <!-- LEFT CHAT SIDEBAR DRAWER -->
+    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-r border-pink-200/80 flex flex-col justify-between absolute md:relative left-0 top-0 bottom-0 z-40 transition-transform duration-300 transform -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
       
       <!-- Drawer Room Selector -->
       <div class="p-3 border-b border-pink-200/30 bg-white/10 flex flex-col gap-2 shrink-0">
@@ -382,14 +378,6 @@
         </div>
       </div>
 
-      <!-- Games Selection Modal Trigger Section (No auto play on press) -->
-      <div class="px-3 py-2 bg-pink-950/40 border-b border-pink-200/20 flex items-center justify-between shrink-0">
-        <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider">Mini-Games Lounge</span>
-        <button onclick="openGamesSelectionModal()" class="px-3 py-1 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold shadow-md flex items-center gap-1 active:scale-95 transition">
-          <i data-lucide="gamepad-2" class="w-3.5 h-3.5"></i> Select Game
-        </button>
-      </div>
-
       <!-- Chat Log Stream -->
       <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2.5"></div>
 
@@ -413,25 +401,74 @@
         </form>
       </div>
     </aside>
+
+    <!-- RIGHT CORNER PROFILE & FRIEND REQUESTS DRAWER -->
+    <aside id="right-drawer" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full shadow-2xl md:shadow-none h-full">
+      <div class="p-4 border-b border-pink-200/30 bg-white/10 flex items-center justify-between shrink-0">
+        <span class="text-xs font-bold text-pink-200 uppercase tracking-wider flex items-center gap-1.5">
+          <i data-lucide="user-check" class="w-4 h-4 text-pink-400"></i> Profile & Friends
+        </span>
+        <button onclick="toggleRightDrawer()" class="text-pink-300 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Profile Card with Developer Mode user name, email & sign out at the end -->
+        <div class="glass p-4 rounded-3xl border border-pink-300 space-y-3 shadow-lg">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white text-xl shadow-md font-bold">
+              🌸
+            </div>
+            <div class="overflow-hidden">
+              <h3 id="profile-card-name" class="font-bold text-pink-950 text-sm truncate">Slime Player</h3>
+              <p id="profile-card-email" class="text-[11px] text-pink-600 truncate font-medium">slime@sakura.com</p>
+              <span id="profile-card-dev-badge" class="hidden inline-block mt-1 px-2 py-0.5 rounded-lg bg-purple-600 text-white text-[9px] font-bold">Developer Mode Active</span>
+            </div>
+          </div>
+
+          <div class="border-t border-pink-200 pt-2 flex items-center justify-between text-xs text-pink-900 font-bold">
+            <span>Flowers Balance:</span>
+            <span class="text-amber-800 bg-amber-100 px-2.5 py-1 rounded-xl border border-amber-300">🌸 <strong id="drawer-coin-count">0</strong></span>
+          </div>
+
+          <button onclick="handleSignOut()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 rounded-2xl shadow-md transition active:scale-95 text-xs flex items-center justify-center gap-1.5 mt-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+          </button>
+        </div>
+
+        <!-- Friend Requests Section put into this area -->
+        <div class="glass p-4 rounded-3xl border border-pink-300 space-y-3 shadow-lg">
+          <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+            <h4 class="font-bold text-pink-950 text-xs flex items-center gap-1.5">
+              <i data-lucide="users" class="w-4 h-4 text-pink-600"></i> Friend Requests
+            </h4>
+            <span id="friend-req-subcount" class="px-2 py-0.5 bg-pink-600 text-white text-[9px] font-black rounded-full">0</span>
+          </div>
+          <div id="friends-requests-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
+        </div>
+      </div>
+    </aside>
+
   </div>
 
-  <!-- MOBILE BOTTOM NAVIGATION -->
-  <nav class="h-12 bg-pink-950/90 border-t border-pink-200/20 backdrop-blur-md flex items-center justify-around px-2 z-30 shrink-0 md:hidden">
+  <!-- MOBILE / DESKTOP BOTTOM NAVIGATION (ORDER: GAMES, CHAT, SHOP, SLIME STUDIO) -->
+  <nav class="h-14 bg-pink-950/90 border-t border-pink-200/20 backdrop-blur-md flex items-center justify-around px-2 z-30 shrink-0">
+    <button onclick="openGamesSelectionModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
+      <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Games</span>
+    </button>
     <button onclick="toggleChatSidebar()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
-      <i data-lucide="message-square" class="w-4 h-4"></i>
-      <span class="text-[9px] font-bold">Chat</span>
+      <i data-lucide="message-square" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Chat</span>
     </button>
     <button onclick="toggleShopModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
-      <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-      <span class="text-[9px] font-bold">Shop</span>
+      <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Shop</span>
     </button>
     <button onclick="toggleCustomStudioModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
-      <i data-lucide="palette" class="w-4 h-4"></i>
-      <span class="text-[9px] font-bold">Studio</span>
-    </button>
-    <button onclick="openGamesSelectionModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
-      <i data-lucide="gamepad-2" class="w-4 h-4"></i>
-      <span class="text-[9px] font-bold">Games</span>
+      <i data-lucide="palette" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Studio</span>
     </button>
   </nav>
 
@@ -499,20 +536,6 @@
           </form>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- FRIEND REQUESTS MODAL -->
-  <div id="friends-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 max-h-[80dvh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
-        <h3 class="font-bold text-pink-950 text-sm flex items-center gap-1.5">
-          <i data-lucide="users" class="w-4 h-4 text-pink-600"></i> Friend Requests
-        </h3>
-        <button onclick="toggleFriendsModal()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-
-      <div id="friends-requests-list" class="space-y-2"></div>
     </div>
   </div>
 
@@ -596,7 +619,7 @@
     </div>
   </div>
 
-  <!-- CUSTOMIZATION STUDIO MODAL (No Live Preview) -->
+  <!-- CUSTOMIZATION STUDIO MODAL -->
   <div id="custom-studio-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white space-y-4 max-h-[90dvh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-pink-200 pb-2">
@@ -787,11 +810,9 @@
     };
 
     // --- GAME STATE ---
-    // Zero initial balance for all users & guests
     let sakuraCoins = parseInt(localStorage.getItem('sakura_coins') || '0');
     let unlockedItems = JSON.parse(localStorage.getItem('sakura_unlocked_items') || '["sakura","spirit"]');
 
-    // Social, Friends & Direct Messages Stores
     let myFriends = JSON.parse(localStorage.getItem('sakura_friends') || '[]');
     let friendRequests = JSON.parse(localStorage.getItem('sakura_friend_reqs') || '[]');
     let directMessages = JSON.parse(localStorage.getItem('sakura_direct_msgs') || '{}');
@@ -810,6 +831,7 @@
     let localPlayer = {
       id: 'usr_' + Math.random().toString(36).substring(2, 9),
       name: localStorage.getItem('sakura_avatar_name') || 'Slime_' + Math.floor(100 + Math.random() * 900),
+      email: localStorage.getItem('sakura_avatar_email') || 'guest@sakura.com',
       avatarType: localStorage.getItem('sakura_avatar_type') || 'sakura',
       expression: localStorage.getItem('sakura_expression') || 'happy',
       equippedAcc: localStorage.getItem('sakura_equipped_acc') || '',
@@ -840,9 +862,11 @@
     let trailParticles = [];
     let currentChannel = 'sakura-lounge';
     let realtimeChannel = null;
+
+    // Room Environmental Particles
     let petals = [];
-    let koiFish = [];
-    let bonfireFlames = [];
+    let fireflies = [];
+    let discoCityLights = [];
 
     let ferrisWheelAngle = 0;
     let discoHue = 0;
@@ -890,6 +914,8 @@
       sakuraCoins += amount;
       localStorage.setItem('sakura_coins', sakuraCoins);
       document.getElementById('coin-counter').textContent = sakuraCoins;
+      const drawerCoin = document.getElementById('drawer-coin-count');
+      if (drawerCoin) drawerCoin.textContent = sakuraCoins;
     }
 
     // --- DEVELOPER FLOWERS GRANTING & CONTROLS ---
@@ -906,6 +932,7 @@
       localPlayer.avatarType = 'dev_white';
       alert("Developer Mode Activated!");
       toggleDevModal();
+      updateProfileCardUI();
       if (realtimeChannel) broadcastState();
     }
 
@@ -915,6 +942,7 @@
       localPlayer.avatarType = isAdminRole ? 'admin_black' : 'sakura';
       toggleDevModal();
       alert("Developer Mode Deactivated.");
+      updateProfileCardUI();
       if (realtimeChannel) broadcastState();
     }
 
@@ -964,33 +992,64 @@
       if (myFriends.includes(target.id)) {
         alert(`You are already friends with ${target.name}!`); closeUserMenu(); return;
       }
+      // Add to friend requests list mock
+      friendRequests.push({ id: target.id, name: target.name });
+      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
       alert(`Friend request sent to ${target.name}!`);
       closeUserMenu();
+      updateFriendBadges();
+      renderFriendRequests();
     }
 
-    function toggleFriendsModal() {
-      const modal = document.getElementById('friends-modal');
-      modal.classList.toggle('hidden');
-      if (!modal.classList.contains('hidden')) renderFriendRequests();
+    function toggleRightDrawer() {
+      const drawer = document.getElementById('right-drawer');
+      drawer.classList.toggle('translate-x-full');
+      if (!drawer.classList.contains('translate-x-full')) {
+        updateProfileCardUI();
+        renderFriendRequests();
+      }
+    }
+
+    function updateProfileCardUI() {
+      document.getElementById('profile-card-name').textContent = localPlayer.name;
+      document.getElementById('profile-card-email').textContent = localPlayer.email;
+      document.getElementById('drawer-coin-count').textContent = sakuraCoins;
+      const devBadge = document.getElementById('profile-card-dev-badge');
+      if (isDevMode) devBadge.classList.remove('hidden');
+      else devBadge.classList.add('hidden');
+    }
+
+    function handleSignOut() {
+      supabaseClient.auth.signOut();
+      localStorage.clear();
+      location.reload();
     }
 
     function renderFriendRequests() {
       const list = document.getElementById('friends-requests-list');
+      const badgeCount = document.getElementById('friend-req-count-badge');
+      const subCount = document.getElementById('friend-req-subcount');
       list.innerHTML = '';
 
-      if (friendRequests.length === 0) {
+      if (friendRequests.length > 0) {
+        badgeCount.textContent = friendRequests.length;
+        badgeCount.classList.remove('hidden');
+        subCount.textContent = friendRequests.length;
+      } else {
+        badgeCount.classList.add('hidden');
+        subCount.textContent = '0';
         list.innerHTML = '<div class="text-[10px] text-pink-400 italic text-center py-4">No pending friend requests.</div>';
         return;
       }
 
       friendRequests.forEach((req, idx) => {
         const item = document.createElement('div');
-        item.className = 'flex items-center justify-between p-2 rounded-xl bg-pink-100/80 border border-pink-200 text-xs font-bold text-pink-950';
+        item.className = 'flex items-center justify-between p-2 rounded-2xl bg-pink-100/80 border border-pink-200 text-xs font-bold text-pink-950';
         item.innerHTML = `
           <span>${req.name}</span>
           <div class="flex gap-1">
-            <button onclick="acceptFriendRequest(${idx})" class="px-2 py-1 rounded-lg bg-emerald-500 text-white text-[10px]">Accept</button>
-            <button onclick="declineFriendRequest(${idx})" class="px-2 py-1 rounded-lg bg-rose-500 text-white text-[10px]">Decline</button>
+            <button onclick="acceptFriendRequest(${idx})" class="px-2 py-1 rounded-xl bg-emerald-500 text-white text-[10px]">Accept</button>
+            <button onclick="declineFriendRequest(${idx})" class="px-2 py-1 rounded-xl bg-rose-500 text-white text-[10px]">Decline</button>
           </div>
         `;
         list.appendChild(item);
@@ -1015,7 +1074,7 @@
     }
 
     function updateFriendBadges() {
-      const badge = document.getElementById('friend-req-count');
+      const badge = document.getElementById('friend-req-count-badge');
       if (friendRequests.length > 0) {
         badge.textContent = friendRequests.length;
         badge.classList.remove('hidden');
@@ -1283,13 +1342,13 @@
           });
           if (error) throw error;
           showAuthAlert('Account created! Logging in...', false);
-          setTimeout(() => completeUserLogin(data.user, username || email.split('@')[0]), 800);
+          setTimeout(() => completeUserLogin(data.user, username || email.split('@')[0], email), 800);
         } else {
           const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
           if (error) throw error;
           showAuthAlert('Welcome back!', false);
           const dispName = data.user.user_metadata?.display_name || email.split('@')[0];
-          setTimeout(() => completeUserLogin(data.user, dispName), 800);
+          setTimeout(() => completeUserLogin(data.user, dispName, email), 800);
         }
       } catch (err) {
         showAuthAlert(err.message || 'Authentication failed.');
@@ -1298,12 +1357,14 @@
 
     function loginAsGuest() {
       const guestName = 'Slime_' + Math.floor(100 + Math.random() * 900);
-      completeUserLogin(null, guestName);
+      const guestEmail = 'guest_' + Math.floor(1000 + Math.random() * 9000) + '@sakura.com';
+      completeUserLogin(null, guestName, guestEmail);
     }
 
-    function completeUserLogin(user, displayName) {
+    function completeUserLogin(user, displayName, email) {
       currentUser = user;
       localPlayer.name = displayName;
+      localPlayer.email = email;
       if (user) localPlayer.id = user.id;
 
       if (!registeredUsers.some(u => u.id === localPlayer.id)) {
@@ -1312,14 +1373,16 @@
       }
 
       localStorage.setItem('sakura_avatar_name', displayName);
+      localStorage.setItem('sakura_avatar_email', email);
       document.getElementById('auth-modal').classList.add('hidden');
       initSupabaseChannel(currentChannel);
     }
 
-    // --- ENVIRONMENT ---
+    // --- ENVIRONMENT PARTICLES ---
     function initEnvironmentElements() {
+      // 1. Sakura Petals for Zen Garden & Fair
       petals = [];
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < 50; i++) {
         petals.push({
           x: Math.random() * window.innerWidth,
           y: Math.random() * window.innerHeight,
@@ -1331,34 +1394,76 @@
         });
       }
 
-      koiFish = [
-        { x: 200, y: 200, angle: 0, color: '#f97316' },
-        { x: 240, y: 220, angle: Math.PI / 2, color: '#ef4444' }
-      ];
+      // 2. Fireflies / Buglight for Bonfire Camp
+      fireflies = [];
+      for (let i = 0; i < 35; i++) {
+        fireflies.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          size: Math.random() * 3 + 2,
+          alpha: Math.random() * 0.7 + 0.3,
+          pulseSpeed: Math.random() * 0.05 + 0.02
+        });
+      }
 
-      bonfireFlames = [];
-      for (let i = 0; i < 30; i++) {
-        bonfireFlames.push({
-          x: 0, y: 0,
-          vx: (Math.random() - 0.5) * 1.5,
-          vy: -Math.random() * 2.5 - 1.5,
-          size: Math.random() * 8 + 4,
-          life: 1.0,
-          color: Math.random() > 0.3 ? '#f97316' : '#ef4444'
+      // 3. Disco Citylights for Disco Arcade Lounge
+      discoCityLights = [];
+      const colors = ['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#10b981', '#ec4899', '#6366f1'];
+      for (let i = 0; i < 45; i++) {
+        discoCityLights.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          size: Math.random() * 6 + 4,
+          speedY: Math.random() * 2 + 1,
+          color: colors[Math.floor(Math.random() * colors.length)]
         });
       }
     }
 
-    function updateAndDrawPetals() {
-      ctx.fillStyle = 'rgba(251, 207, 232, 0.85)';
-      petals.forEach(p => {
-        p.y += p.speedY; p.x += p.speedX + Math.sin(p.y * 0.015) * 0.4;
-        p.rotation += p.rotSpeed;
-        if (p.y > canvas.height + 15) { p.y = -15; p.x = Math.random() * canvas.width; }
-        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation);
-        ctx.beginPath(); ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-      });
+    function updateAndDrawEnvironmentParticles() {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      if (currentChannel === 'sakura-lounge' || currentChannel === 'amusement-park') {
+        // Draw Sakura Petals
+        ctx.fillStyle = 'rgba(251, 207, 232, 0.85)';
+        petals.forEach(p => {
+          p.y += p.speedY; p.x += p.speedX + Math.sin(p.y * 0.015) * 0.4;
+          p.rotation += p.rotSpeed;
+          if (p.y > h + 15) { p.y = -15; p.x = Math.random() * w; }
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation);
+          ctx.beginPath(); ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+        });
+      } else if (currentChannel === 'bonfire-park') {
+        // Draw Fireflies / Buglight
+        fireflies.forEach(f => {
+          f.x += f.vx; f.y += f.vy;
+          f.alpha += Math.sin(Date.now() * f.pulseSpeed) * 0.02;
+          if (f.x < 0) f.x = w; if (f.x > w) f.x = 0;
+          if (f.y < 0) f.y = h; if (f.y > h) f.y = 0;
+
+          ctx.save();
+          ctx.globalAlpha = Math.max(0.1, Math.min(1.0, f.alpha));
+          ctx.fillStyle = '#fde047';
+          ctx.shadowColor = '#facc15'; ctx.shadowBlur = 10;
+          ctx.beginPath(); ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+        });
+      } else if (currentChannel === 'arcade-lounge') {
+        // Draw Disco Citylights falling
+        discoCityLights.forEach(l => {
+          l.y += l.speedY;
+          if (l.y > h + 10) { l.y = -10; l.x = Math.random() * w; }
+          ctx.save();
+          ctx.fillStyle = l.color;
+          ctx.shadowColor = l.color; ctx.shadowBlur = 8;
+          ctx.fillRect(l.x, l.y, l.size, l.size * 1.5);
+          ctx.restore();
+        });
+      }
     }
 
     function addFloatingParticle(x, y, text) {
@@ -1398,95 +1503,31 @@
       }
     }
 
-    // --- ENVIRONMENT RENDERING (Removed orange/red shape from Sakura Fair) ---
+    // --- ENVIRONMENT BACKGROUND RENDERING ---
     function drawEnvironment() {
       const w = canvas.width;
       const h = canvas.height;
 
       if (currentChannel === 'sakura-lounge') {
-        // Room 1: 🌸 Zen Garden
         ctx.fillStyle = '#fce7f3'; ctx.fillRect(0, 0, w, h);
         ctx.strokeStyle = 'rgba(244, 114, 182, 0.2)'; ctx.lineWidth = 2;
         for (let x = 0; x < w; x += 70) { for (let y = 0; y < h; y += 70) ctx.strokeRect(x, y, 70, 70); }
-
-        ctx.fillStyle = '#cbd5e1';
-        [ {x: w*0.2, y: h*0.3}, {x: w*0.35, y: h*0.4}, {x: w*0.5, y: h*0.45}, {x: w*0.65, y: h*0.4} ].forEach(s => {
-          ctx.beginPath(); ctx.ellipse(s.x, s.y, 18, 10, 0, 0, Math.PI * 2); ctx.fill();
-        });
-
-        drawPond(w * 0.75, h * 0.65, 110, 65);
-        drawWoodenBridge(w * 0.75, h * 0.65, 80, 30);
         drawToriiGate(w * 0.5, h * 0.22);
-
-        drawSakuraTree(w * 0.08, h * 0.18, 60);
-        drawSakuraTree(w * 0.25, h * 0.12, 50);
-        drawSakuraTree(w * 0.5, h * 0.1, 55);
-        drawSakuraTree(w * 0.75, h * 0.12, 50);
-        drawSakuraTree(w * 0.92, h * 0.18, 60);
-        drawSakuraTree(w * 0.1, h * 0.7, 55);
-        drawSakuraTree(w * 0.9, h * 0.7, 55);
-
-        drawLantern(w * 0.35, h * 0.25); drawLantern(w * 0.65, h * 0.25);
-
       } else if (currentChannel === 'bonfire-park') {
-        // Room 2: 🔥 Bonfire Night Camp
         ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, w, h);
         ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(w / 2, h / 2, 180, 0, Math.PI * 2); ctx.fill();
-
-        drawCampTent(w * 0.25, h * 0.35, '#f43f5e');
-        drawCampTent(w * 0.75, h * 0.35, '#38bdf8');
-        drawWoodenLog(w * 0.35, h * 0.55); drawWoodenLog(w * 0.65, h * 0.55);
         drawBonfireWithParticles(w * 0.5, h * 0.5);
-
       } else if (currentChannel === 'amusement-park') {
-        // Room 3: 🎡 Sakura Fair (Clean Park Fair Decor - Removed orange/red shape)
         ctx.fillStyle = '#fce7f3'; ctx.fillRect(0, 0, w, h);
-
-        ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(0, 40); ctx.quadraticCurveTo(w/2, 80, w, 40); ctx.stroke();
-        ['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#10b981', '#ec4899'].forEach((col, idx, arr) => {
-          ctx.fillStyle = col;
-          const px = (w / (arr.length + 1)) * (idx + 1);
-          const py = 50 + Math.sin((idx + 1) * 0.5) * 15;
-          ctx.beginPath(); ctx.moveTo(px - 10, py); ctx.lineTo(px + 10, py); ctx.lineTo(px, py + 18); ctx.fill();
-        });
-
         drawFerrisWheel(w * 0.25, h * 0.38, 85);
-        drawFestivalBooth(w * 0.15, h * 0.75, '🎪 BALLOON POP', '#f43f5e');
-        drawFestivalBooth(w * 0.42, h * 0.75, '🍿 COTTON CANDY', '#ec4899');
-        drawFestivalBooth(w * 0.78, h * 0.75, '🎯 RING TOSS', '#8b5cf6');
-
-        drawSakuraTree(w * 0.1, h * 0.2, 50); drawSakuraTree(w * 0.9, h * 0.2, 50);
-
       } else if (currentChannel === 'arcade-lounge') {
-        // Room 4: 🕹️ Neon Arcade
         ctx.fillStyle = '#090514'; ctx.fillRect(0, 0, w, h);
-
         discoHue = (discoHue + 2) % 360;
         drawDiscoFloor(w * 0.5, h * 0.65, 220, 110, `hsl(${discoHue}, 100%, 60%)`);
-
-        drawArcadeCabinet(w * 0.15, h * 0.28, '#ec4899', 'SLIME MATCH');
-        drawArcadeCabinet(w * 0.35, h * 0.28, '#8b5cf6', 'NEON DASH');
-        drawArcadeCabinet(w * 0.65, h * 0.28, '#06b6d4', 'BOBA HERO');
-        drawArcadeCabinet(w * 0.85, h * 0.28, '#f59e0b', 'CHIBI KOI');
-
         drawNeonSign(w * 0.5, h * 0.09, 'DISCO ARCADE LOUNGE');
       }
 
       ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(244, 114, 182, 0.4)'; ctx.strokeRect(0, 0, w, h);
-    }
-
-    function drawSakuraTree(x, y, radius) {
-      ctx.fillStyle = 'rgba(0,0,0,0.15)';
-      ctx.beginPath(); ctx.ellipse(x, y + radius * 0.7, radius, radius * 0.3, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#582f0e'; ctx.lineWidth = 10;
-      ctx.beginPath(); ctx.moveTo(x, y + radius * 0.6); ctx.quadraticCurveTo(x - 5, y, x, y - radius * 0.2); ctx.stroke();
-
-      [{ dx: 0, dy: -radius * 0.4, r: radius * 0.6, color: '#f472b6' },
-       { dx: -radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#ec4899' },
-       { dx: radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#fb7185' }].forEach(c => {
-        ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(x + c.dx, y + c.dy, c.r, 0, Math.PI * 2); ctx.fill();
-      });
     }
 
     function drawBonfireWithParticles(x, y) {
@@ -1497,24 +1538,6 @@
       const glow = ctx.createRadialGradient(x, y, 5, x, y, 70);
       glow.addColorStop(0, 'rgba(249, 115, 22, 0.8)'); glow.addColorStop(1, 'rgba(249, 115, 22, 0)');
       ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 70, 0, Math.PI * 2); ctx.fill();
-
-      bonfireFlames.forEach(p => {
-        p.x += p.vx; p.y += p.vy; p.life -= 0.03;
-        if (p.life <= 0) {
-          p.x = x + (Math.random() - 0.5) * 15; p.y = y + 5;
-          p.vx = (Math.random() - 0.5) * 1.5; p.vy = -Math.random() * 2.5 - 1.5; p.life = 1.0;
-        }
-        ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1.0;
-      });
-    }
-
-    function drawCampTent(x, y, color) {
-      ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(x, y - 30); ctx.lineTo(x - 30, y + 20); ctx.lineTo(x + 30, y + 20); ctx.closePath(); ctx.fill();
-    }
-
-    function drawWoodenLog(x, y) {
-      ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.roundRect(x - 25, y - 8, 50, 16, 6); ctx.fill();
     }
 
     function drawFerrisWheel(x, y, radius) {
@@ -1532,53 +1555,15 @@
       }
     }
 
-    function drawFestivalBooth(x, y, title, color) {
-      ctx.fillStyle = color; ctx.fillRect(x - 35, y - 25, 70, 45);
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 30, y - 20, 60, 18);
-      ctx.fillStyle = '#831843'; ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(title, x, y - 8);
-    }
-
-    function drawPond(x, y, rx, ry) {
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.5)';
-      ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)'; ctx.lineWidth = 3; ctx.stroke();
-
-      koiFish.forEach(fish => {
-        fish.angle += 0.02;
-        fish.x = x + Math.cos(fish.angle) * (rx * 0.5);
-        fish.y = y + Math.sin(fish.angle) * (ry * 0.5);
-        ctx.fillStyle = fish.color;
-        ctx.beginPath(); ctx.ellipse(fish.x, fish.y, 7, 3, fish.angle, 0, Math.PI * 2); ctx.fill();
-      });
-    }
-
-    function drawWoodenBridge(x, y, w, h) {
-      ctx.fillStyle = '#78350f'; ctx.fillRect(x - w / 2, y - h / 2, w, h);
-    }
-
     function drawToriiGate(x, y) {
       ctx.fillStyle = '#dc2626';
       ctx.fillRect(x - 50, y - 50, 10, 70); ctx.fillRect(x + 40, y - 50, 10, 70);
       ctx.fillRect(x - 65, y - 50, 130, 12);
     }
 
-    function drawLantern(x, y) {
-      ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.roundRect(x - 8, y - 10, 16, 20, 4); ctx.fill();
-    }
-
-    function drawArcadeCabinet(x, y, color, title) {
-      ctx.fillStyle = '#0f172a'; ctx.fillRect(x - 22, y - 38, 44, 65);
-      ctx.fillStyle = color; ctx.fillRect(x - 19, y - 35, 38, 14);
-      ctx.fillStyle = '#38bdf8'; ctx.fillRect(x - 17, y - 18, 34, 24);
-      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 6px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(title, x, y - 5);
-    }
-
     function drawDiscoFloor(x, y, w, h, activeColor) {
       ctx.fillStyle = activeColor; ctx.shadowColor = activeColor; ctx.shadowBlur = 15;
       ctx.fillRect(x - w / 2, y - h / 2, w, h); ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
-      for (let dx = x - w / 2; dx < x + w / 2; dx += 25) { ctx.beginPath(); ctx.moveTo(dx, y - h / 2); ctx.lineTo(dx, y + h / 2); ctx.stroke(); }
-      for (let dy = y - h / 2; dy < y + h / 2; dy += 25) { ctx.beginPath(); ctx.moveTo(x - w / 2, dy); ctx.lineTo(x + w / 2, dy); ctx.stroke(); }
     }
 
     function drawNeonSign(x, y, text) {
@@ -1867,11 +1852,12 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       drawEnvironment();
-      updateAndDrawPetals();
+      updateAndDrawEnvironmentParticles();
       updateAndDrawTrails();
 
       if (activeMiniGame) drawMiniGameCollectibles();
 
+      // Render all remote players in the same lobby
       Object.values(remotePlayers).forEach(p => drawSlime(p, false));
 
       updatePlayerMovement();
@@ -1882,12 +1868,13 @@
       requestAnimationFrame(render);
     }
 
-    // --- REALTIME SUPABASE ---
+    // --- REALTIME SUPABASE FIX FOR LOBBIES ---
     async function initSupabaseChannel(channelName) {
       if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
 
       currentChannel = channelName;
       document.getElementById('room-indicator').textContent = '#' + channelName;
+      remotePlayers = {}; // Reset remote list when switching lobbies
 
       realtimeChannel = supabaseClient.channel(`room_${channelName}`, {
         config: { presence: { key: localPlayer.id } }
@@ -1896,18 +1883,23 @@
       realtimeChannel
         .on('presence', { event: 'sync' }, () => {
           const state = realtimeChannel.presenceState();
-          remotePlayers = {};
+          const newRemotePlayers = {};
           let count = 1;
           Object.keys(state).forEach(key => {
-            if (key !== localPlayer.id && state[key][0]) {
-              remotePlayers[key] = state[key][0]; count++;
+            if (key !== localPlayer.id && state[key] && state[key].length > 0) {
+              const playerData = state[key][state[key].length - 1];
+              newRemotePlayers[key] = playerData;
+              count++;
             }
           });
-          document.getElementById('player-count').textContent = count;
+          remotePlayers = newRemotePlayers;
+          document.getElementById('player-count')?.textContent || count;
         })
         .on('broadcast', { event: 'player-move' }, payload => {
           const p = payload.payload;
-          if (p.id !== localPlayer.id) remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
+          if (p && p.id && p.id !== localPlayer.id) {
+            remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
+          }
         })
         .on('broadcast', { event: 'chat-message' }, payload => {
           const msg = payload.payload;
@@ -1975,6 +1967,15 @@
           title: localPlayer.title, x: localPlayer.x, y: localPlayer.y,
           isMoving: localPlayer.isMoving, isDancing: localPlayer.isDancing
         }
+      });
+      // Also update presence state sync
+      realtimeChannel.track({
+        id: localPlayer.id, name: localPlayer.name,
+        avatarType: localPlayer.avatarType, expression: localPlayer.expression,
+        equippedAcc: localPlayer.equippedAcc, equippedClothing: localPlayer.equippedClothing,
+        equippedMakeup: localPlayer.equippedMakeup, equippedTrail: localPlayer.equippedTrail,
+        equippedTitle: localPlayer.equippedTitle, title: localPlayer.title,
+        x: localPlayer.x, y: localPlayer.y
       });
     }
 
@@ -2243,7 +2244,7 @@
     }
 
     function toggleChatSidebar() {
-      document.getElementById('chat-sidebar').classList.toggle('translate-x-full');
+      document.getElementById('chat-sidebar').classList.toggle('-translate-x-full');
     }
 
     // INITIALIZATION
@@ -2266,7 +2267,7 @@
       if (data?.session?.user) {
         const user = data.session.user;
         const dispName = user.user_metadata?.display_name || user.email.split('@')[0];
-        completeUserLogin(user, dispName);
+        completeUserLogin(user, dispName, user.email);
       } else {
         loginAsGuest();
       }
