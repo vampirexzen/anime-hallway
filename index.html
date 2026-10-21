@@ -23,6 +23,7 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
+      touch-action: manipulation;
       -webkit-user-select: none;
       user-select: none;
       background: #180914;
@@ -115,7 +116,7 @@
 </head>
 <body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
 
-  <!-- AUTH MODAL OVERLAY -->
+  <!-- AUTH MODAL OVERLAY (Shown on sign out or first visit) -->
   <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/85 backdrop-blur-md flex items-center justify-center p-4">
     <div class="glass w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90dvh] overflow-y-auto">
       <div class="text-center space-y-1">
@@ -165,32 +166,37 @@
     </div>
   </div>
 
-  <!-- TOP NAVIGATION HEADER BAR (Optimized for both mobile & desktop alignment) -->
-  <header class="h-14 sm:h-16 glass px-2 sm:px-5 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm gap-1 sm:gap-3">
-    <!-- Left Section: Title & Room Indicator -->
-    <div class="flex items-center gap-2 sm:gap-3 shrink-0 overflow-hidden">
+  <!-- TOP NAVIGATION HEADER BAR (Cleaned up: removed top search bar, responsive layout fix for mobile & desktop) -->
+  <header class="h-14 sm:h-16 glass px-2 sm:px-5 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm gap-1 sm:gap-2 overflow-x-hidden">
+    <!-- Left Section: Title & Admin/Dev-Controlled Music Picker -->
+    <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
       <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 sm:p-2 rounded-2xl shadow-md shadow-pink-300 shrink-0">
         <i data-lucide="flower-2" class="w-4 h-4 sm:w-6 sm:h-6 animate-spin" style="animation-duration: 12s;"></i>
       </div>
-      <div class="flex flex-col justify-center truncate">
-        <h1 class="font-sakura text-xs sm:text-lg text-pink-950 font-bold tracking-wider leading-tight truncate">Sakura Slime World 🌸</h1>
-        <p class="text-[9px] sm:text-[10px] text-pink-600 font-bold uppercase tracking-wider truncate" id="room-indicator">#sakura-lounge</p>
+      <div class="flex flex-col justify-center">
+        <h1 class="font-sakura text-xs sm:text-lg text-pink-950 font-bold tracking-wider leading-tight whitespace-nowrap">Sakura Slime World 🌸</h1>
+        <p class="text-[9px] sm:text-[10px] text-pink-600 font-bold uppercase tracking-wider" id="room-indicator">#sakura-lounge</p>
       </div>
 
-      <!-- Music Controller (Admin/Dev selectable tracks or simple toggle) -->
-      <div class="flex items-center bg-pink-100/90 rounded-xl px-1.5 sm:px-2 py-1 border border-pink-200 gap-1 shrink-0">
-        <button onclick="toggleSimpleAudio()" id="simple-audio-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Music">
-          <i data-lucide="volume-x" id="simple-audio-icon" class="w-3.5 h-3.5 text-pink-600"></i>
+      <!-- Music Selector Dropdown (Admin & Dev controlled, available to all for selection when unlocked or defaulted) -->
+      <div class="flex items-center bg-pink-100/90 rounded-xl px-1.5 sm:px-2 py-1 border border-pink-200 gap-1 ml-1">
+        <button onclick="toggleMusicPlayback()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Play/Pause Music">
+          <i data-lucide="volume-x" id="music-icon" class="w-3.5 h-3.5 text-pink-600"></i>
         </button>
-        <span id="music-track-label" class="hidden sm:inline text-[10px] font-bold text-pink-900 truncate max-w-[70px]">Zen Lullaby</span>
-        <button id="change-music-btn" onclick="openMusicSelector()" class="hidden p-0.5 rounded bg-pink-500 text-white text-[9px] font-bold px-1.5 shadow-sm" title="Change Music Track">🎵</button>
+        <select id="bg-music-selector" onchange="changeBackgroundMusic(this.value)" class="bg-transparent text-[10px] sm:text-xs font-bold text-pink-900 outline-none cursor-pointer">
+          <option value="zen">🌸 Zen Garden Lullaby</option>
+          <option value="arcade">🕹️ Retro Arcade Synth</option>
+          <option value="fair">🎡 Sakura Fair Waltz</option>
+          <option value="campfire">🔥 Cozy Campfire Chords</option>
+        </select>
+        <span id="music-control-badge" class="hidden text-[8px] px-1 bg-purple-600 text-white rounded font-black">PRO</span>
       </div>
     </div>
 
-    <!-- Right Controls Header (Properly spaced & responsive for mobile) -->
-    <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+    <!-- Right Controls Header (Flowers, DM, Menu) -->
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
       <!-- Flowers Balance Badge -->
-      <div class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-black shadow-sm shrink-0">
+      <div class="flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-2xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-black shadow-sm shrink-0">
         <span class="text-xs sm:text-sm">🌸</span>
         <span id="coin-counter">0</span>
       </div>
@@ -212,31 +218,31 @@
   <!-- MAIN VIEWPORT CONTAINER -->
   <div class="flex-1 relative flex overflow-hidden w-full h-full">
 
-    <!-- CANVAS VIEWPORT (Fixed Virtual Map Bounds: 1200x800 with Pinch / Zoom Controls) -->
+    <!-- CANVAS VIEWPORT (Fixed Virtual Map Bounds: 1200x800 for identical size on mobile & desktop with Pinch-to-Zoom / Zoom buttons) -->
     <div class="flex-1 relative bg-pink-950/20 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
       <canvas id="gameCanvas" class="block cursor-pointer touch-none origin-center transition-transform duration-75" width="1200" height="800"></canvas>
 
-      <!-- Map Zoom In / Out Overlay HUD for Mobile & Desktop -->
-      <div class="absolute top-12 sm:top-14 right-3 z-20 flex flex-col gap-1 glass p-1 rounded-2xl border border-pink-200 shadow-lg">
-        <button onclick="adjustMapZoom(0.15)" class="w-8 h-8 rounded-xl bg-white hover:bg-pink-100 text-pink-900 font-bold flex items-center justify-center text-sm shadow-sm active:scale-95" title="Zoom In">+</button>
-        <button onclick="resetMapZoom()" class="w-8 h-8 rounded-xl bg-pink-500 text-white font-bold flex items-center justify-center text-[10px] shadow-sm active:scale-95" title="Reset Zoom">1x</button>
-        <button onclick="adjustMapZoom(-0.15)" class="w-8 h-8 rounded-xl bg-white hover:bg-pink-100 text-pink-900 font-bold flex items-center justify-center text-sm shadow-sm active:scale-95" title="Zoom Out">-</button>
-      </div>
-
       <!-- Room Switcher Top Overlay -->
-      <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[92vw] overflow-x-auto">
-        <button onclick="switchChannel('sakura-lounge')" id="quick-btn-sakura-lounge" class="quick-chan-btn px-2 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap">
+      <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[96vw] overflow-x-auto">
+        <button onclick="switchChannel('sakura-lounge')" id="quick-btn-sakura-lounge" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap">
           🌸 Zen Garden
         </button>
-        <button onclick="switchChannel('bonfire-park')" id="quick-btn-bonfire-park" class="quick-chan-btn px-2 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
+        <button onclick="switchChannel('bonfire-park')" id="quick-btn-bonfire-park" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
           🔥 Bonfire Camp
         </button>
-        <button onclick="switchChannel('amusement-park')" id="quick-btn-amusement-park" class="quick-chan-btn px-2 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
+        <button onclick="switchChannel('amusement-park')" id="quick-btn-amusement-park" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
           🎡 Sakura Fair
         </button>
-        <button onclick="switchChannel('arcade-lounge')" id="quick-btn-arcade-lounge" class="quick-chan-btn px-2 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
+        <button onclick="switchChannel('arcade-lounge')" id="quick-btn-arcade-lounge" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
           🕹️ Neon Arcade
         </button>
+      </div>
+
+      <!-- Map Zoom In / Out Controls (For better mobile & desktop visibility) -->
+      <div class="absolute top-14 right-3 z-20 flex flex-col gap-1 glass p-1 rounded-2xl border border-pink-200 shadow-md">
+        <button onclick="adjustMapZoom(0.15)" class="w-8 h-8 rounded-xl bg-white hover:bg-pink-100 text-pink-900 font-bold flex items-center justify-center text-sm shadow-sm active:scale-90" title="Zoom In">➕</button>
+        <button onclick="resetMapZoom()" class="w-8 h-8 rounded-xl bg-white hover:bg-pink-100 text-pink-900 font-bold flex items-center justify-center text-[10px] shadow-sm active:scale-90" title="Reset Zoom">1:1</button>
+        <button onclick="adjustMapZoom(-0.15)" class="w-8 h-8 rounded-xl bg-white hover:bg-pink-100 text-pink-900 font-bold flex items-center justify-center text-sm shadow-sm active:scale-90" title="Zoom Out">➖</button>
       </div>
 
       <!-- Mini-Game Active HUD Banner -->
@@ -353,7 +359,7 @@
       </div>
     </div>
 
-    <!-- CHAT DRAWER -->
+    <!-- CHAT DRAWER (Unified across mobile & desktop) -->
     <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-r md:border-r-0 md:border-l border-pink-200/80 flex flex-col justify-between absolute md:relative left-0 md:left-auto right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
       
       <!-- Drawer Room Selector -->
@@ -407,10 +413,10 @@
       </div>
     </aside>
 
-    <!-- RIGHT DRAWER: Profile Card, Friend Search, Requests, Friends List, and Sign Out -->
+    <!-- RIGHT DRAWER: Profile Card, Friend Search, Requests, Friends List, and Sign Out (Responsive fix for mobile layout overflow) -->
     <aside id="right-drawer" class="w-full sm:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute right-0 top-0 bottom-0 z-50 transition-transform duration-300 transform translate-x-full shadow-2xl h-full">
       <!-- Drawer Header -->
-      <div class="p-4 border-b border-pink-200/30 flex items-center justify-between bg-white/5 shrink-0">
+      <div class="p-4 border-b border-pink-200/30 flex items-center justify-between bg-white/5">
         <div class="flex items-center gap-2">
           <div class="p-2 rounded-xl bg-pink-500 text-white shadow-md">
             <i data-lucide="user-cog" class="w-4 h-4"></i>
@@ -428,7 +434,7 @@
         <div class="p-4 rounded-3xl glass border border-pink-300/60 shadow-lg space-y-3">
           <div class="flex items-center gap-3">
             <div class="relative group cursor-pointer" onclick="document.getElementById('profile-img-upload').click()">
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white text-xl shadow-md overflow-hidden shrink-0" id="profile-avatar-container">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white text-xl shadow-md overflow-hidden" id="profile-avatar-container">
                 <span id="profile-avatar-emoji">🌸</span>
                 <img id="profile-avatar-img" class="hidden w-full h-full object-cover" />
               </div>
@@ -517,19 +523,6 @@
     </button>
   </nav>
 
-  <!-- MUSIC TRACK SELECTOR MODAL (Admin & Developers can change anytime) -->
-  <div id="music-selector-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-3">
-      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
-        <h3 class="font-bold text-pink-950 text-sm flex items-center gap-1.5">
-          <i data-lucide="music" class="w-4 h-4 text-pink-600"></i> Select Lobby Background Music
-        </h3>
-        <button onclick="closeMusicSelector()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <div class="space-y-2" id="music-tracks-list"></div>
-    </div>
-  </div>
-
   <!-- GAMES SELECTION MODAL -->
   <div id="games-selection-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4">
@@ -564,16 +557,16 @@
     </div>
   </div>
 
-  <!-- DIRECT MESSAGES MODAL (Fully responsive modal fitting mobile & desktop) -->
+  <!-- DIRECT MESSAGES MODAL (Responsive fix for mobile layout overflow) -->
   <div id="dm-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 hidden">
-    <div class="glass w-full max-w-md rounded-3xl p-4 sm:p-5 shadow-2xl border border-white flex flex-col h-[85dvh] max-h-[600px] animate-in fade-in">
+    <div class="glass w-full max-w-md rounded-3xl p-3 sm:p-5 shadow-2xl border border-white flex flex-col h-[85dvh] sm:h-[80dvh] animate-in fade-in">
       <div class="flex items-center justify-between border-b border-pink-200 pb-3 shrink-0">
         <div class="flex items-center gap-2">
           <div class="p-2 rounded-xl bg-pink-500 text-white shadow-md">
             <i data-lucide="send" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-bold text-pink-950 text-sm sm:text-base">Direct Messages</h3>
+            <h3 class="font-bold text-pink-950 text-base">Direct Messages</h3>
             <p class="text-[10px] text-pink-600 font-semibold">Private 1-on-1 conversations</p>
           </div>
         </div>
@@ -717,19 +710,12 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- ENHANCED HASSLE-FREE AUDIO SYSTEM WITH MULTIPLE TRACKS (Admin/Dev selectable anytime) ---
+    // --- ENHANCED HASSLE-FREE MULTI-TRACK AUDIO SYSTEM ---
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     let musicPlaying = false;
-    let simpleAudioInterval = null;
-    let currentTrackIndex = parseInt(localStorage.getItem('sakura_music_track') || '0');
-
-    const MUSIC_TRACKS = [
-      { id: 0, name: 'Zen Lullaby', notes: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25], tempo: 600 },
-      { id: 1, name: 'Sakura Waltz', notes: [329.63, 392.00, 440.00, 493.88, 523.25, 659.25], tempo: 500 },
-      { id: 2, name: 'Arcade Dream', notes: [440.00, 523.25, 587.33, 659.25, 783.99, 880.00], tempo: 350 },
-      { id: 3, name: 'Bonfire Serenade', notes: [220.00, 246.94, 293.66, 329.63, 392.00, 440.00], tempo: 750 }
-    ];
+    let musicType = 'zen';
+    let musicInterval = null;
 
     function initAudio() {
       if (!audioCtx) {
@@ -738,87 +724,69 @@
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    function playSimpleNote() {
+    function playMusicStep() {
       if (!musicPlaying || !audioCtx) return;
       try {
         const now = audioCtx.currentTime;
-        const track = MUSIC_TRACKS[currentTrackIndex] || MUSIC_TRACKS[0];
-        const freq = track.notes[Math.floor(Math.random() * track.notes.length)];
+        let scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+        let waveType = 'sine';
+        let tempo = 600;
 
+        if (musicType === 'arcade') {
+          scale = [220, 277.18, 329.63, 440, 554.37, 659.25];
+          waveType = 'square';
+          tempo = 250;
+        } else if (musicType === 'fair') {
+          scale = [329.63, 392.00, 440.00, 493.88, 523.25, 659.25];
+          waveType = 'triangle';
+          tempo = 450;
+        } else if (musicType === 'campfire') {
+          scale = [196.00, 220.00, 246.94, 293.66, 329.63];
+          waveType = 'sine';
+          tempo = 800;
+        }
+
+        const freq = scale[Math.floor(Math.random() * scale.length)];
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = currentTrackIndex === 2 ? 'square' : 'sine';
+        osc.type = waveType;
         osc.frequency.setValueAtTime(freq, now);
 
         gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(0.07, now + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+        gain.gain.linearRampToValueAtTime(musicType === 'arcade' ? 0.04 : 0.07, now + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (tempo / 1000) * 1.5);
 
         osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(now); osc.stop(now + 1.2);
+        osc.start(now); osc.stop(now + (tempo / 1000) * 1.5);
 
-        simpleAudioInterval = setTimeout(playSimpleNote, track.tempo);
+        musicInterval = setTimeout(playMusicStep, tempo);
       } catch (e) {}
     }
 
-    function toggleSimpleAudio() {
+    function changeBackgroundMusic(type) {
+      musicType = type;
+      if (musicPlaying) {
+        clearTimeout(musicInterval);
+        playMusicStep();
+      }
+    }
+
+    function toggleMusicPlayback() {
       initAudio();
       musicPlaying = !musicPlaying;
-      const icon = document.getElementById('simple-audio-icon');
-      const btn = document.getElementById('simple-audio-btn');
+      const icon = document.getElementById('music-icon');
+      const btn = document.getElementById('music-toggle-btn');
 
       if (musicPlaying) {
         icon.setAttribute('data-lucide', 'volume-2');
         btn.classList.add('bg-pink-200', 'text-pink-900');
-        playSimpleNote();
+        playMusicStep();
       } else {
         icon.setAttribute('data-lucide', 'volume-x');
         btn.classList.remove('bg-pink-200', 'text-pink-900');
-        clearTimeout(simpleAudioInterval);
+        clearTimeout(musicInterval);
       }
       lucide.createIcons();
-    }
-
-    function openMusicSelector() {
-      const modal = document.getElementById('music-selector-modal');
-      const list = document.getElementById('music-tracks-list');
-      list.innerHTML = '';
-      
-      MUSIC_TRACKS.forEach(t => {
-        const item = document.createElement('div');
-        item.className = `flex items-center justify-between p-2.5 rounded-2xl border cursor-pointer transition ${
-          currentTrackIndex === t.id ? 'bg-pink-500 text-white border-pink-500 shadow-sm' : 'bg-pink-50/80 text-pink-950 border-pink-200 hover:bg-pink-100'
-        }`;
-        item.innerHTML = `
-          <span class="text-xs font-bold">${t.name}</span>
-          <span class="text-[10px] ${currentTrackIndex === t.id ? 'text-white' : 'text-pink-600'}">${currentTrackIndex === t.id ? 'Playing' : 'Select'}</span>
-        `;
-        item.onclick = () => {
-          currentTrackIndex = t.id;
-          localStorage.setItem('sakura_music_track', currentTrackIndex);
-          document.getElementById('music-track-label').textContent = t.name;
-          closeMusicSelector();
-          if (musicPlaying) {
-            clearTimeout(simpleAudioInterval);
-            playSimpleNote();
-          }
-        };
-        list.appendChild(item);
-      });
-      modal.classList.remove('hidden');
-    }
-
-    function closeMusicSelector() {
-      document.getElementById('music-selector-modal').classList.add('hidden');
-    }
-
-    function checkMusicPermissionUI() {
-      const btn = document.getElementById('change-music-btn');
-      if (isAdminRole || isDevMode) {
-        btn.classList.remove('hidden');
-      } else {
-        btn.classList.add('hidden');
-      }
     }
 
     function playSound(type) {
@@ -914,8 +882,7 @@
     let showAdminTitle = false;
     let currentUser = null;
 
-    // Map Zoom State (allows mobile & desktop users to zoom in/out for better visibility)
-    let currentMapZoom = 1.0;
+    let mapZoomScale = 1.0;
 
     let storedLocalId = localStorage.getItem('sakura_local_uid');
     if (!storedLocalId) {
@@ -1010,18 +977,18 @@
         renderWidth = containerHeight * targetAspect;
       }
 
-      canvas.style.width = renderWidth + 'px';
-      canvas.style.height = renderHeight + 'px';
+      canvas.style.width = (renderWidth * mapZoomScale) + 'px';
+      canvas.style.height = (renderHeight * mapZoomScale) + 'px';
     }
 
     function adjustMapZoom(delta) {
-      currentMapZoom = Math.min(2.0, Math.max(0.7, currentMapZoom + delta));
-      canvas.style.transform = `scale(${currentMapZoom})`;
+      mapZoomScale = Math.max(0.6, Math.min(2.5, mapZoomScale + delta));
+      resizeCanvas();
     }
 
     function resetMapZoom() {
-      currentMapZoom = 1.0;
-      canvas.style.transform = `scale(1.0)`;
+      mapZoomScale = 1.0;
+      resizeCanvas();
     }
 
     function addCoins(amount) {
@@ -1133,7 +1100,6 @@
       localStorage.setItem('sakura_avatar_name', displayName);
       document.getElementById('auth-modal').classList.add('hidden');
       initSupabaseChannel(currentChannel);
-      checkMusicPermissionUI();
     }
 
     // --- DRAWER & SOCIAL ---
@@ -1169,21 +1135,13 @@
       }
     }
 
-    // Upon sign out, take user directly back to the sign-in/sign-up & guest auth modal page
     function handleSignOut() {
       if (currentUser) supabaseClient.auth.signOut();
       localStorage.removeItem('sakura_avatar_name');
       localStorage.removeItem('sakura_avatar_type');
       
-      // Close any open drawers or modals
+      // Re-show the auth modal with Sign In / Sign Up / Guest page options
       document.getElementById('right-drawer').classList.add('translate-x-full');
-      document.getElementById('dm-modal').classList.add('hidden');
-      document.getElementById('developer-modal').classList.add('hidden');
-      document.getElementById('shop-modal').classList.add('hidden');
-      document.getElementById('custom-studio-modal').classList.add('hidden');
-
-      // Reset auth modal view to sign-in and show it
-      switchAuthTab('signin');
       document.getElementById('auth-modal').classList.remove('hidden');
     }
 
@@ -1266,7 +1224,7 @@
         item.className = 'flex items-center justify-between p-2 rounded-xl bg-pink-100/90 border border-pink-200 text-xs font-bold text-pink-950';
         item.innerHTML = `
           <div class="flex items-center gap-2 truncate">
-            <div class="w-6 h-6 rounded-full bg-pink-400 flex items-center justify-center text-white text-[10px] overflow-hidden shrink-0">
+            <div class="w-6 h-6 rounded-full bg-pink-400 flex items-center justify-center text-white text-[10px] overflow-hidden">
               ${friend.profilePic ? `<img src="${friend.profilePic}" class="w-full h-full object-cover"/>` : '🌸'}
             </div>
             <span class="truncate">${friend.name}</span>
@@ -1305,8 +1263,8 @@
         const item = document.createElement('div');
         item.className = 'flex items-center justify-between p-2 rounded-xl bg-pink-100/80 border border-pink-200 text-xs font-bold text-pink-950';
         item.innerHTML = `
-          <span class="truncate">${req.name}</span>
-          <div class="flex gap-1 shrink-0">
+          <span>${req.name}</span>
+          <div class="flex gap-1">
             <button onclick="acceptFriendRequest(${idx})" class="px-2 py-1 rounded-lg bg-emerald-500 text-white text-[10px]">Accept</button>
             <button onclick="declineFriendRequest(${idx})" class="px-2 py-1 rounded-lg bg-rose-500 text-white text-[10px]">Decline</button>
           </div>
@@ -1358,7 +1316,7 @@
         const friendObj = registeredUsers.find(u => u.id === friendId) || { id: friendId, name: friendId };
         const b = document.createElement('button');
         b.className = 'w-full text-left p-2 rounded-xl text-xs font-bold text-pink-950 hover:bg-pink-100 transition truncate flex items-center gap-1.5';
-        b.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span> <span class="truncate">${friendObj.name}</span>`;
+        b.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> ${friendObj.name}`;
         b.onclick = () => selectDMTarget(friendObj.id, friendObj.name);
         container.appendChild(b);
       });
@@ -1432,7 +1390,6 @@
       localPlayer.title = 'Dev';
       localPlayer.avatarType = 'dev_white';
       alert("Developer Mode Activated!");
-      checkMusicPermissionUI();
       toggleDevModal();
       if (realtimeChannel) broadcastState();
     }
@@ -1493,7 +1450,7 @@
 
       const adminActions = document.getElementById('admin-actions');
       const devActions = document.getElementById('dev-actions');
-      if (isAdminRole) adminActions.classList.remove('hidden'); else adminActions.classList.add('hidden');
+      if (isAdminRole || isDevMode) adminActions.classList.remove('hidden'); else adminActions.classList.add('hidden');
       if (isDevMode) {
         devActions.classList.remove('hidden');
         document.getElementById('revoke-ban-btn').classList.toggle('hidden', !bannedUsers.includes(player.id));
@@ -1538,7 +1495,6 @@
       if (idx > -1) adminUsers.splice(idx, 1); else adminUsers.push(targetId);
       localStorage.setItem('sakura_admin_users', JSON.stringify(adminUsers));
       isAdminRole = adminUsers.includes(localPlayer.id);
-      checkMusicPermissionUI();
       closeUserMenu();
     }
 
@@ -1576,8 +1532,8 @@
         const item = document.createElement('div');
         item.className = 'flex items-center justify-between p-2 rounded-xl bg-purple-50/80 border border-purple-200 text-xs font-bold text-purple-950';
         item.innerHTML = `
-          <span class="truncate">${u.name} ${isAdmin ? '👑' : ''}</span>
-          <button onclick="devToggleAdminForId('${u.id}')" class="px-2 py-0.5 rounded-lg text-[10px] shrink-0 ${isAdmin ? 'bg-rose-500 text-white' : 'bg-purple-600 text-white'}">
+          <span>${u.name} ${isAdmin ? '👑' : ''}</span>
+          <button onclick="devToggleAdminForId('${u.id}')" class="px-2 py-0.5 rounded-lg text-[10px] ${isAdmin ? 'bg-rose-500 text-white' : 'bg-purple-600 text-white'}">
             ${isAdmin ? 'Revoke Admin' : 'Make Admin'}
           </button>
         `;
@@ -1590,7 +1546,6 @@
       if (idx > -1) adminUsers.splice(idx, 1); else adminUsers.push(id);
       localStorage.setItem('sakura_admin_users', JSON.stringify(adminUsers));
       isAdminRole = adminUsers.includes(localPlayer.id);
-      checkMusicPermissionUI();
       renderDevUserList();
     }
 
@@ -1604,8 +1559,8 @@
         const item = document.createElement('div');
         item.className = 'flex items-center justify-between p-2 rounded-xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-950';
         item.innerHTML = `
-          <span class="truncate">ID: ${id}</span>
-          <button onclick="devRevokeBan('${id}')" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white text-[10px] shrink-0">Revoke Ban</button>
+          <span>ID: ${id}</span>
+          <button onclick="devRevokeBan('${id}')" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white text-[10px]">Revoke Ban</button>
         `;
         list.appendChild(item);
       });
@@ -1613,7 +1568,7 @@
 
     function filterDevUserList() { renderDevUserList(); }
 
-    // --- ORGANIZED SCENERY & MAP ROOMS (Clear doors/gates) ---
+    // --- ORGANIZED SCENERY & MAP ROOMS ---
     function initEnvironmentElements() {
       petals = [];
       for (let i = 0; i < 60; i++) {
@@ -2405,11 +2360,11 @@
       msgDiv.className = `flex flex-col ${isSelf ? 'items-end' : 'items-start'} space-y-0.5 animate-in fade-in`;
       msgDiv.innerHTML = `
         <div class="flex items-center gap-1.5 px-1">
-          <div class="w-4 h-4 rounded-full bg-pink-400 flex items-center justify-center text-white text-[8px] overflow-hidden shrink-0">
+          <div class="w-4 h-4 rounded-full bg-pink-400 flex items-center justify-center text-white text-[8px] overflow-hidden">
             ${msg.profilePic ? `<img src="${msg.profilePic}" class="w-full h-full object-cover"/>` : '🌸'}
           </div>
-          <span class="text-[10px] font-bold text-pink-200 truncate">${escapeHtml(msg.sender)}</span>
-          <span class="text-[8px] text-pink-400 shrink-0">${msg.time || ''}</span>
+          <span class="text-[10px] font-bold text-pink-200">${escapeHtml(msg.sender)}</span>
+          <span class="text-[8px] text-pink-400">${msg.time || ''}</span>
         </div>
         <div class="px-3 py-1.5 rounded-2xl text-xs max-w-[88%] shadow-sm ${
           isSelf ? 'bg-pink-500 text-white rounded-tr-none' : 'bg-white/95 text-pink-950 rounded-tl-none font-medium'
@@ -2595,7 +2550,7 @@
             <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0" style="background-color: ${type.bodyColor}">
               ${type.accessory}
             </div>
-            <span class="text-[10px] font-bold text-pink-900 truncate">${type.name}</span>
+            <span class="text-[10px] font-bold text-pink-900">${type.name}</span>
           </div>
         `;
       }).join('');
@@ -2606,7 +2561,7 @@
         return `
           <button 
             onclick="selectExpression('${key}')"
-            class="py-1 px-2 rounded-xl text-[10px] font-bold border transition truncate ${
+            class="py-1 px-2 rounded-xl text-[10px] font-bold border transition ${
               isSelected ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-pink-900 border-pink-200'
             }"
           >
@@ -2655,7 +2610,7 @@
         const dispName = user.user_metadata?.display_name || user.email.split('@')[0];
         completeUserLogin(user, dispName);
       } else {
-        loginAsGuest();
+        // Leave the auth modal visible so user can Sign In, Sign Up, or continue as Guest
       }
 
       requestAnimationFrame(render);
