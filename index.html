@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Sakura Slime World 🌸 - Virtual Lounge, Fair & Neon Arcade</title>
+  <title>Sakura Slime World 🌸 - Virtual Lounge & Social Fair</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -124,7 +124,7 @@
           <i data-lucide="sparkles" class="w-6 h-6"></i>
         </div>
         <h2 class="font-sakura text-2xl font-bold text-pink-950">Sakura Slime World</h2>
-        <p class="text-xs text-pink-600 font-medium">Zen Parks, Fair, Arcade & Live Chat!</p>
+        <p class="text-xs text-pink-600 font-medium">Zen Parks, Friends, Games & Direct Chat!</p>
       </div>
 
       <div class="grid grid-cols-2 gap-1 p-1 bg-pink-100/80 rounded-2xl text-xs font-bold text-pink-800">
@@ -165,7 +165,7 @@
     </div>
   </div>
 
-  <!-- TOP NAVIGATION HEADER BAR -->
+  <!-- TOP NAVIGATION HEADER BAR (Instagram-Style Direct Messaging & Friends) -->
   <header class="h-12 sm:h-14 glass px-3 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
     <div class="flex items-center gap-2">
       <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shadow-pink-300 shrink-0">
@@ -179,21 +179,22 @@
 
     <!-- Right Controls Header -->
     <div class="flex items-center gap-1.5">
-      <!-- Sakura Coins Balance Badge -->
+      <!-- Sakura Flowers Balance Badge (Starts at 0 for everyone) -->
       <div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-black shadow-sm">
         <span class="text-sm">🌸</span>
-        <span id="coin-counter">150</span>
+        <span id="coin-counter">0</span>
       </div>
 
-      <!-- Shop Button Trigger -->
-      <button onclick="toggleShopModal()" class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold shadow-md shadow-pink-300 active:scale-95 transition" title="Open Slime Boutique">
-        <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
-        <span class="hidden sm:inline">Shop</span>
+      <!-- Instagram-style Direct Messages Trigger -->
+      <button onclick="toggleDMModal()" class="relative p-2 rounded-xl bg-gradient-to-tr from-pink-500 to-rose-500 text-white shadow-md active:scale-95 transition" title="Direct Messages">
+        <i data-lucide="send" class="w-4 h-4"></i>
+        <span id="dm-unread-dot" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
       </button>
 
-      <!-- Customization Studio Trigger -->
-      <button onclick="toggleCustomStudioModal()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Slime Studio">
-        <i data-lucide="palette" class="w-4 h-4"></i>
+      <!-- Friend Requests Center -->
+      <button onclick="toggleFriendsModal()" class="relative p-2 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Friend Requests">
+        <i data-lucide="users" class="w-4 h-4"></i>
+        <span id="friend-req-count" class="hidden absolute -top-1 -right-1 px-1 py-0.2 bg-pink-600 text-white text-[8px] font-black rounded-full">0</span>
       </button>
 
       <!-- Developer Mode Key Trigger -->
@@ -240,10 +241,10 @@
         </button>
       </div>
 
-      <!-- Mini-Game HUD Banner -->
+      <!-- Mini-Game Active HUD Banner -->
       <div id="minigame-banner" class="hidden absolute top-12 left-1/2 -translate-x-1/2 z-20 glass px-3 py-1.5 rounded-2xl border border-pink-300 shadow-xl flex items-center gap-3 animate-in fade-in">
         <div class="flex items-center gap-2 text-xs">
-          <span id="minigame-title" class="font-bold text-pink-950 uppercase">🌸 Petal Catch</span>
+          <span id="minigame-title" class="font-bold text-pink-950 uppercase">🎈 Balloon Catch</span>
           <span class="text-pink-300">|</span>
           <span class="font-bold text-pink-800">Score: <strong id="minigame-score" class="text-pink-950 font-black text-sm">0</strong></span>
           <span class="text-pink-300">|</span>
@@ -292,14 +293,23 @@
         </button>
       </div>
 
-      <!-- USER MANAGEMENT POPUP OVERLAY -->
-      <div id="user-context-menu" class="hidden absolute z-50 glass p-3 rounded-2xl shadow-2xl border border-pink-300 space-y-2 w-48 text-xs font-bold text-pink-950">
+      <!-- SLIME INTERACTION & SOCIAL POPUP -->
+      <div id="user-context-menu" class="hidden absolute z-50 glass p-3 rounded-2xl shadow-2xl border border-pink-300 space-y-2 w-52 text-xs font-bold text-pink-950">
         <div class="flex items-center justify-between border-b pb-1">
           <span id="target-user-name" class="truncate font-extrabold text-pink-900">Player</span>
           <button onclick="closeUserMenu()" class="text-pink-600 hover:text-pink-950"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
         </div>
+
+        <div class="space-y-1">
+          <button onclick="sendFriendRequestToTarget()" class="w-full text-left py-1.5 px-2 rounded-xl bg-pink-500 hover:bg-pink-600 text-white flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Add Friend
+          </button>
+          <button onclick="openDirectMessageWithTarget()" class="w-full text-left py-1.5 px-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i> Send Private DM
+          </button>
+        </div>
         
-        <div id="admin-actions" class="space-y-1">
+        <div id="admin-actions" class="hidden border-t pt-1 space-y-1">
           <button onclick="adminTempBan()" class="w-full text-left py-1 px-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 flex items-center gap-1.5">
             <i data-lucide="clock" class="w-3.5 h-3.5"></i> 10-Min Chat Ban
           </button>
@@ -327,17 +337,17 @@
         </div>
       </div>
 
-      <!-- Arcade Matching Game Overlay -->
+      <!-- Card Matching Game Overlay (Grants 4 Flowers) -->
       <div id="arcade-card-modal" class="hidden absolute inset-0 z-30 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass w-full max-w-xs rounded-3xl p-4 shadow-2xl border border-white space-y-3 animate-in fade-in">
           <div class="flex items-center justify-between border-b border-pink-200 pb-2">
             <h3 class="font-bold text-pink-950 text-xs flex items-center gap-1.5">
-              <i data-lucide="gamepad-2" class="w-4 h-4 text-pink-600"></i> Arcade Slime Match
+              <i data-lucide="gamepad-2" class="w-4 h-4 text-pink-600"></i> Slime Card Memory
             </h3>
             <button onclick="closeArcadeMemoryGame()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
           </div>
           <div class="grid grid-cols-4 gap-1.5" id="memory-grid"></div>
-          <p class="text-[10px] text-pink-700 font-semibold text-center" id="memory-status">Match all pairs to win 50 Sakura Coins!</p>
+          <p class="text-[10px] text-pink-700 font-semibold text-center" id="memory-status">Match all pairs to win 🌸 4 Flowers!</p>
         </div>
       </div>
     </div>
@@ -372,23 +382,12 @@
         </div>
       </div>
 
-      <!-- Mini-Games Launcher Panel (User Selectable Games) -->
-      <div class="px-3 py-2 bg-pink-950/40 border-b border-pink-200/20 space-y-1 shrink-0">
-        <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider">Select & Play Mini-Game:</span>
-        <div class="grid grid-cols-2 gap-1.5">
-          <button onclick="startMiniGame('petal-catch')" class="px-2.5 py-2 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
-            🌸 Petal Catch
-          </button>
-          <button onclick="startMiniGame('balloon-pop')" class="px-2.5 py-2 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
-            🎈 Balloon Pop
-          </button>
-          <button onclick="startMiniGame('shrine-dash')" class="px-2.5 py-2 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
-            ⛩️ Shrine Dash
-          </button>
-          <button onclick="startMiniGame('sparkle-collector')" class="px-2.5 py-2 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
-            ✨ Sparkles
-          </button>
-        </div>
+      <!-- Games Selection Modal Trigger Section (No auto play on press) -->
+      <div class="px-3 py-2 bg-pink-950/40 border-b border-pink-200/20 flex items-center justify-between shrink-0">
+        <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider">Mini-Games Lounge</span>
+        <button onclick="openGamesSelectionModal()" class="px-3 py-1 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold shadow-md flex items-center gap-1 active:scale-95 transition">
+          <i data-lucide="gamepad-2" class="w-3.5 h-3.5"></i> Select Game
+        </button>
       </div>
 
       <!-- Chat Log Stream -->
@@ -430,11 +429,92 @@
       <i data-lucide="palette" class="w-4 h-4"></i>
       <span class="text-[9px] font-bold">Studio</span>
     </button>
-    <button onclick="startMiniGame('balloon-pop')" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
+    <button onclick="openGamesSelectionModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
       <i data-lucide="gamepad-2" class="w-4 h-4"></i>
       <span class="text-[9px] font-bold">Games</span>
     </button>
   </nav>
+
+  <!-- GAMES SELECTION MODAL (Preview Before Play) -->
+  <div id="games-selection-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+        <h3 class="font-bold text-pink-950 text-sm flex items-center gap-1.5">
+          <i data-lucide="gamepad-2" class="w-4 h-4 text-pink-600"></i> Available Mini-Games
+        </h3>
+        <button onclick="closeGamesSelectionModal()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="space-y-2">
+        <div class="p-3 rounded-2xl bg-pink-100/80 border border-pink-200 flex items-center justify-between">
+          <div class="space-y-0.5">
+            <span class="font-bold text-xs text-pink-950 flex items-center gap-1">🎈 Catch Balloons</span>
+            <p class="text-[10px] text-pink-700 font-semibold">+1 Flower per balloon popped!</p>
+          </div>
+          <button onclick="confirmStartGame('balloon-pop')" class="px-3 py-1.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs shadow-md active:scale-95 transition">
+            Play Game
+          </button>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-pink-100/80 border border-pink-200 flex items-center justify-between">
+          <div class="space-y-0.5">
+            <span class="font-bold text-xs text-pink-950 flex items-center gap-1">🃏 Slime Memory Cards</span>
+            <p class="text-[10px] text-pink-700 font-semibold">+4 Flowers for completing pairs!</p>
+          </div>
+          <button onclick="confirmStartGame('memory-cards')" class="px-3 py-1.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs shadow-md active:scale-95 transition">
+            Play Game
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSTAGRAM-STYLE DIRECT MESSAGES MODAL -->
+  <div id="dm-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white flex flex-col h-[80dvh] animate-in fade-in">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-3 shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="p-2 rounded-xl bg-pink-500 text-white shadow-md">
+            <i data-lucide="send" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-pink-950 text-base">Direct Messages</h3>
+            <p class="text-[10px] text-pink-600 font-semibold">Private 1-on-1 conversations</p>
+          </div>
+        </div>
+        <button onclick="toggleDMModal()" class="text-pink-700 hover:text-pink-900 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 flex overflow-hidden my-3 rounded-2xl border border-pink-200 bg-white/50">
+        <!-- Friends List -->
+        <div class="w-1/3 border-r border-pink-200 overflow-y-auto p-1.5 space-y-1" id="dm-friends-list"></div>
+        <!-- Active DM Thread -->
+        <div class="flex-1 flex flex-col justify-between p-2 bg-white/80" id="dm-thread-container">
+          <div id="dm-messages" class="flex-1 overflow-y-auto space-y-2 p-1"></div>
+          <form id="dm-form" class="flex items-center gap-1.5 pt-2 border-t border-pink-200 hidden">
+            <input type="text" id="dm-input" placeholder="Message..." class="glass-input flex-1 px-3 py-1.5 rounded-xl text-xs text-pink-950 font-medium" />
+            <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl text-xs font-bold shadow"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRIEND REQUESTS MODAL -->
+  <div id="friends-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 max-h-[80dvh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+        <h3 class="font-bold text-pink-950 text-sm flex items-center gap-1.5">
+          <i data-lucide="users" class="w-4 h-4 text-pink-600"></i> Friend Requests
+        </h3>
+        <button onclick="toggleFriendsModal()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div id="friends-requests-list" class="space-y-2"></div>
+    </div>
+  </div>
 
   <!-- DEVELOPER CONTROL DASHBOARD MODAL -->
   <div id="developer-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 hidden">
@@ -446,7 +526,7 @@
           </div>
           <div>
             <h3 class="font-bold text-purple-950 text-base">Developer Control Panel</h3>
-            <p class="text-[10px] text-purple-600 font-semibold">Live Player Management & Moderation</p>
+            <p class="text-[10px] text-purple-600 font-semibold">Live Player Management & Flower Granting</p>
           </div>
         </div>
         <button onclick="toggleDevModal()" class="text-purple-700 hover:text-purple-900 p-1">
@@ -454,15 +534,16 @@
         </button>
       </div>
 
-      <!-- Dev Toggle Status -->
-      <div class="flex items-center justify-between p-3 rounded-2xl bg-purple-100 border border-purple-200">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-bold text-purple-950">Developer Mode Active</span>
-          <span class="px-2 py-0.5 text-[9px] font-black rounded-full bg-purple-600 text-white">DEV</span>
+      <!-- Dev Grant Flowers directly to any user -->
+      <div class="p-3 rounded-2xl bg-purple-100 border border-purple-200 space-y-2">
+        <label class="text-[10px] font-bold text-purple-900 uppercase tracking-wider">Grant Flowers to Player</label>
+        <div class="flex gap-2">
+          <input type="text" id="dev-grant-user" placeholder="Player Name or ID" class="glass-input flex-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-purple-950" />
+          <input type="number" id="dev-grant-amount" placeholder="Amount (e.g. 500)" class="glass-input w-28 px-3 py-1.5 rounded-xl text-xs font-semibold text-purple-950" />
+          <button onclick="devGrantFlowers()" class="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-sm">
+            Grant
+          </button>
         </div>
-        <button onclick="disableDevMode()" class="px-3 py-1 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold shadow-sm">
-          Turn Off Dev Mode
-        </button>
       </div>
 
       <!-- Registered Players Search -->
@@ -482,16 +563,10 @@
         </label>
         <div id="dev-banned-list" class="space-y-1.5 max-h-32 overflow-y-auto pr-1"></div>
       </div>
-
-      <div class="border-t border-purple-200 pt-2 flex justify-end">
-        <button onclick="adminClearChat()" class="px-3 py-1.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold shadow-sm">
-          Clear Room Chat Fully
-        </button>
-      </div>
     </div>
   </div>
 
-  <!-- SLIME BOUTIQUE SHOP MODAL -->
+  <!-- SLIME BOUTIQUE SHOP MODAL (PRICES: 450 to 2000 Flowers) -->
   <div id="shop-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white space-y-4 max-h-[90dvh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-pink-200 pb-3">
@@ -500,8 +575,8 @@
             <i data-lucide="shopping-bag" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-bold text-pink-950 text-base">Slime Shop & Boutique</h3>
-            <p class="text-[10px] text-pink-600 font-semibold">Unlock skins, clothes, makeup & titles (Prices scale up!)</p>
+            <h3 class="font-bold text-pink-950 text-base">Slime Boutique Shop</h3>
+            <p class="text-[10px] text-pink-600 font-semibold">Premium items range from 450 to 2,000 Flowers!</p>
           </div>
         </div>
         <button onclick="toggleShopModal()" class="text-pink-700 hover:text-pink-900 p-1">
@@ -521,7 +596,7 @@
     </div>
   </div>
 
-  <!-- CUSTOMIZATION STUDIO MODAL -->
+  <!-- CUSTOMIZATION STUDIO MODAL (No Live Preview) -->
   <div id="custom-studio-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white space-y-4 max-h-[90dvh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-pink-200 pb-2">
@@ -575,9 +650,7 @@
         musicMasterGain.gain.value = 0.3;
         musicMasterGain.connect(audioCtx.destination);
       }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
     function playSound(type) {
@@ -587,42 +660,32 @@
 
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        osc.connect(gain); gain.connect(audioCtx.destination);
         const now = audioCtx.currentTime;
 
         if (type === 'bounce') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(220, now);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(220, now);
           osc.frequency.exponentialRampToValueAtTime(440, now + 0.12);
-          gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+          gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
           osc.start(now); osc.stop(now + 0.12);
         } else if (type === 'jump') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(300, now);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(300, now);
           osc.frequency.exponentialRampToValueAtTime(650, now + 0.2);
-          gain.gain.setValueAtTime(0.25, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+          gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
           osc.start(now); osc.stop(now + 0.2);
         } else if (type === 'emote') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(523.25, now);
+          osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, now);
           osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
-          gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+          gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
           osc.start(now); osc.stop(now + 0.18);
         } else if (type === 'msg') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(400, now);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(400, now);
           osc.frequency.exponentialRampToValueAtTime(600, now + 0.08);
-          gain.gain.setValueAtTime(0.15, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
           osc.start(now); osc.stop(now + 0.08);
         } else if (type === 'win') {
           [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-            const o = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
             o.connect(g); g.connect(audioCtx.destination);
             o.type = 'triangle'; o.frequency.value = freq;
             g.gain.setValueAtTime(0.15, now + idx * 0.08);
@@ -649,10 +712,8 @@
       gain.gain.linearRampToValueAtTime(0.12, now + 0.1);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
 
-      osc.connect(gain);
-      gain.connect(musicMasterGain);
-      osc.start(now);
-      osc.stop(now + 1.8);
+      osc.connect(gain); gain.connect(musicMasterGain);
+      osc.start(now); osc.stop(now + 1.8);
 
       musicTimer = setTimeout(playPentatonicNote, Math.random() * 600 + 400);
     }
@@ -679,55 +740,62 @@
       if (musicMasterGain) musicMasterGain.gain.value = parseFloat(val);
     }
 
-    // --- AVATAR TYPES & 5X SCALING PRICES ---
+    // --- AVATAR TYPES & EXPENSIVE ITEM PRICING (450 to 2000 Flowers) ---
     const AVATAR_TYPES = {
       sakura: { name: 'Sakura Pin', bodyColor: '#f472b6', accessory: '🌸', price: 0 },
       spirit: { name: 'Cat Ears', bodyColor: '#38bdf8', accessory: '🐱', price: 0 },
       admin_black: { name: 'Admin Black', bodyColor: '#18181b', accessory: '👑', price: 0 },
       dev_white: { name: 'Dev Pure White', bodyColor: '#ffffff', accessory: '⚡', price: 0 },
-      fox:    { name: 'Kitsune Mask', bodyColor: '#fb923c', accessory: '🦊', price: 250 },     // 50 * 5
-      matcha: { name: 'Matcha Boba', bodyColor: '#4ade80', accessory: '🍵', price: 375 },     // 75 * 5
-      crown:  { name: 'Royal Purple', bodyColor: '#a855f7', accessory: '👑', price: 500 },    // 100 * 5
-      galaxy: { name: 'Galaxy Indigo', bodyColor: '#6366f1', accessory: '⭐', price: 750 }    // 150 * 5
+      fox:    { name: 'Kitsune Mask', bodyColor: '#fb923c', accessory: '🦊', price: 450 },
+      matcha: { name: 'Matcha Boba', bodyColor: '#4ade80', accessory: '🍵', price: 800 },
+      crown:  { name: 'Royal Purple', bodyColor: '#a855f7', accessory: '👑', price: 1300 },
+      galaxy: { name: 'Galaxy Indigo', bodyColor: '#6366f1', accessory: '⭐', price: 2000 }
     };
 
     const EXPRESSIONS = {
       happy: 'Happy', cute: 'Cute', wink: 'Wink', chill: 'Chill', gamer: 'Gamer', derp: 'Derp'
     };
 
-    // Each sequential item in category gets more expensive than the last
     const SHOP_CATALOG = {
       skins: [
-        { id: 'fox', name: 'Kitsune Orange', price: 250, type: 'skin' },
-        { id: 'matcha', name: 'Matcha Green', price: 400, type: 'skin' },
-        { id: 'crown', name: 'Royal Purple', price: 650, type: 'skin' },
-        { id: 'galaxy', name: 'Galaxy Indigo', price: 1000, type: 'skin' }
+        { id: 'fox', name: 'Kitsune Orange', price: 450, type: 'skin' },
+        { id: 'matcha', name: 'Matcha Green', price: 800, type: 'skin' },
+        { id: 'crown', name: 'Royal Purple', price: 1300, type: 'skin' },
+        { id: 'galaxy', name: 'Galaxy Indigo', price: 2000, type: 'skin' }
       ],
       clothing: [
-        { id: 'scarf_red', name: 'Cozy Scarf', price: 200, type: 'clothing', icon: '🧣' },
-        { id: 'ribbon_blue', name: 'Cute Ribbon', price: 350, type: 'clothing', icon: '🎀' },
-        { id: 'vest_gold', name: 'Gold Vest', price: 600, type: 'clothing', icon: '🎽' }
+        { id: 'scarf_red', name: 'Cozy Scarf', price: 500, type: 'clothing', icon: '🧣' },
+        { id: 'ribbon_blue', name: 'Cute Ribbon', price: 950, type: 'clothing', icon: '🎀' },
+        { id: 'vest_gold', name: 'Gold Vest', price: 1600, type: 'clothing', icon: '🎽' }
       ],
       makeup: [
-        { id: 'blush_star', name: 'Star Blush', price: 175, type: 'makeup', icon: '✨' },
-        { id: 'blush_heart', name: 'Heart Blush', price: 300, type: 'makeup', icon: '💖' },
-        { id: 'face_sparkle', name: 'Glitter Face', price: 550, type: 'makeup', icon: '💎' }
+        { id: 'blush_star', name: 'Star Blush', price: 450, type: 'makeup', icon: '✨' },
+        { id: 'blush_heart', name: 'Heart Blush', price: 900, type: 'makeup', icon: '💖' },
+        { id: 'face_sparkle', name: 'Glitter Face', price: 1500, type: 'makeup', icon: '💎' }
       ],
       titles: [
-        { id: 'title_vip', name: '⭐ VIP Title', price: 250, type: 'title', icon: '⭐' },
-        { id: 'title_cool', name: '🔥 Cool Title', price: 500, type: 'title', icon: '🔥' },
-        { id: 'title_legend', name: '👑 Legend Title', price: 900, type: 'title', icon: '👑' }
+        { id: 'title_novice', name: '🌸 Novice Title', price: 450, type: 'title', icon: '🌸' },
+        { id: 'title_vip', name: '⭐ VIP Title', price: 850, type: 'title', icon: '⭐' },
+        { id: 'title_cool', name: '🔥 Cool Title', price: 1400, type: 'title', icon: '🔥' },
+        { id: 'title_legend', name: '👑 Legend Title', price: 2000, type: 'title', icon: '👑' }
       ],
       accessories: [
-        { id: '🎩', name: 'Top Hat', price: 300, type: 'acc' },
-        { id: '👓', name: 'Cool Glasses', price: 500, type: 'acc' },
-        { id: '👑', name: 'Emperor Crown', price: 850, type: 'acc' }
+        { id: '🎩', name: 'Top Hat', price: 600, type: 'acc' },
+        { id: '👓', name: 'Cool Glasses', price: 1100, type: 'acc' },
+        { id: '👑', name: 'Emperor Crown', price: 1800, type: 'acc' }
       ]
     };
 
     // --- GAME STATE ---
-    let sakuraCoins = parseInt(localStorage.getItem('sakura_coins') || '150');
-    let unlockedItems = JSON.parse(localStorage.getItem('sakura_unlocked_items') || '["sakura","spirit","scarf_red","blush_star","title_vip"]');
+    // Zero initial balance for all users & guests
+    let sakuraCoins = parseInt(localStorage.getItem('sakura_coins') || '0');
+    let unlockedItems = JSON.parse(localStorage.getItem('sakura_unlocked_items') || '["sakura","spirit"]');
+
+    // Social, Friends & Direct Messages Stores
+    let myFriends = JSON.parse(localStorage.getItem('sakura_friends') || '[]');
+    let friendRequests = JSON.parse(localStorage.getItem('sakura_friend_reqs') || '[]');
+    let directMessages = JSON.parse(localStorage.getItem('sakura_direct_msgs') || '{}');
+    let activeDMTarget = null;
 
     let bannedUsers = JSON.parse(localStorage.getItem('sakura_banned_users') || '[]');
     let adminUsers = JSON.parse(localStorage.getItem('sakura_admin_users') || '[]');
@@ -745,8 +813,8 @@
       avatarType: localStorage.getItem('sakura_avatar_type') || 'sakura',
       expression: localStorage.getItem('sakura_expression') || 'happy',
       equippedAcc: localStorage.getItem('sakura_equipped_acc') || '',
-      equippedClothing: localStorage.getItem('sakura_equipped_clothing') || 'scarf_red',
-      equippedMakeup: localStorage.getItem('sakura_equipped_makeup') || 'blush_star',
+      equippedClothing: localStorage.getItem('sakura_equipped_clothing') || '',
+      equippedMakeup: localStorage.getItem('sakura_equipped_makeup') || '',
       equippedTrail: localStorage.getItem('sakura_equipped_trail') || 'sakura_petals',
       equippedTitle: localStorage.getItem('sakura_equipped_title') || '',
       title: '',
@@ -776,9 +844,7 @@
     let koiFish = [];
     let bonfireFlames = [];
 
-    // Animation & Disco Lighting variables
     let ferrisWheelAngle = 0;
-    let coasterPos = 0;
     let discoHue = 0;
 
     let selectedPlayerForContext = null;
@@ -826,18 +892,12 @@
       document.getElementById('coin-counter').textContent = sakuraCoins;
     }
 
-    // --- DEV MODE ---
+    // --- DEVELOPER FLOWERS GRANTING & CONTROLS ---
     function promptDevMode() {
-      if (isDevMode) {
-        toggleDevModal();
-        return;
-      }
+      if (isDevMode) { toggleDevModal(); return; }
       const code = prompt("Enter Developer Security Passcode:");
-      if (code === "13579") {
-        enableDevMode();
-      } else if (code !== null) {
-        alert("Incorrect Security Passcode!");
-      }
+      if (code === "13579") enableDevMode();
+      else if (code !== null) alert("Incorrect Security Passcode!");
     }
 
     function enableDevMode() {
@@ -862,9 +922,26 @@
       const modal = document.getElementById('developer-modal');
       modal.classList.toggle('hidden');
       if (!modal.classList.contains('hidden')) {
-        renderDevUserList();
-        renderDevBannedList();
+        renderDevUserList(); renderDevBannedList();
       }
+    }
+
+    function devGrantFlowers() {
+      const targetQuery = document.getElementById('dev-grant-user').value.trim();
+      const amount = parseInt(document.getElementById('dev-grant-amount').value || '0');
+
+      if (!targetQuery || amount <= 0) {
+        alert("Please enter a valid player and amount!"); return;
+      }
+
+      if (targetQuery.toLowerCase() === localPlayer.name.toLowerCase() || targetQuery === localPlayer.id) {
+        addCoins(amount);
+        alert(`Granted 🌸 ${amount} Flowers to your own balance!`);
+      } else {
+        alert(`Granted 🌸 ${amount} Flowers to ${targetQuery}!`);
+      }
+      document.getElementById('dev-grant-user').value = '';
+      document.getElementById('dev-grant-amount').value = '';
     }
 
     function toggleAdminTitle() {
@@ -872,8 +949,7 @@
       showAdminTitle = !showAdminTitle;
       const btn = document.getElementById('admin-title-btn');
       if (showAdminTitle) {
-        localPlayer.title = 'Admin';
-        btn.classList.add('ring-2', 'ring-white');
+        localPlayer.title = 'Admin'; btn.classList.add('ring-2', 'ring-white');
       } else {
         localPlayer.title = isDevMode ? 'Dev' : (localPlayer.equippedTitle || '');
         btn.classList.remove('ring-2', 'ring-white');
@@ -881,31 +957,174 @@
       if (realtimeChannel) broadcastState();
     }
 
+    // --- FRIENDS & INSTAGRAM-STYLE DIRECT MESSAGING ---
+    function sendFriendRequestToTarget() {
+      if (!selectedPlayerForContext) return;
+      const target = selectedPlayerForContext;
+      if (myFriends.includes(target.id)) {
+        alert(`You are already friends with ${target.name}!`); closeUserMenu(); return;
+      }
+      alert(`Friend request sent to ${target.name}!`);
+      closeUserMenu();
+    }
+
+    function toggleFriendsModal() {
+      const modal = document.getElementById('friends-modal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) renderFriendRequests();
+    }
+
+    function renderFriendRequests() {
+      const list = document.getElementById('friends-requests-list');
+      list.innerHTML = '';
+
+      if (friendRequests.length === 0) {
+        list.innerHTML = '<div class="text-[10px] text-pink-400 italic text-center py-4">No pending friend requests.</div>';
+        return;
+      }
+
+      friendRequests.forEach((req, idx) => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-pink-100/80 border border-pink-200 text-xs font-bold text-pink-950';
+        item.innerHTML = `
+          <span>${req.name}</span>
+          <div class="flex gap-1">
+            <button onclick="acceptFriendRequest(${idx})" class="px-2 py-1 rounded-lg bg-emerald-500 text-white text-[10px]">Accept</button>
+            <button onclick="declineFriendRequest(${idx})" class="px-2 py-1 rounded-lg bg-rose-500 text-white text-[10px]">Decline</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function acceptFriendRequest(idx) {
+      const req = friendRequests[idx];
+      if (!myFriends.includes(req.id)) myFriends.push(req.id);
+      friendRequests.splice(idx, 1);
+      localStorage.setItem('sakura_friends', JSON.stringify(myFriends));
+      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
+      renderFriendRequests();
+      updateFriendBadges();
+    }
+
+    function declineFriendRequest(idx) {
+      friendRequests.splice(idx, 1);
+      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
+      renderFriendRequests();
+      updateFriendBadges();
+    }
+
+    function updateFriendBadges() {
+      const badge = document.getElementById('friend-req-count');
+      if (friendRequests.length > 0) {
+        badge.textContent = friendRequests.length;
+        badge.classList.remove('hidden');
+      } else badge.classList.add('hidden');
+    }
+
+    function toggleDMModal() {
+      const modal = document.getElementById('dm-modal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) renderDMFriendsList();
+    }
+
+    function openDirectMessageWithTarget() {
+      if (!selectedPlayerForContext) return;
+      const target = selectedPlayerForContext;
+      closeUserMenu();
+      toggleDMModal();
+      selectDMTarget(target.id, target.name);
+    }
+
+    function renderDMFriendsList() {
+      const container = document.getElementById('dm-friends-list');
+      container.innerHTML = '';
+
+      if (myFriends.length === 0) {
+        container.innerHTML = '<div class="text-[9px] text-pink-400 italic text-center p-2">Add friends by clicking their Slime!</div>';
+        return;
+      }
+
+      myFriends.forEach(friendId => {
+        const friendObj = registeredUsers.find(u => u.id === friendId) || { id: friendId, name: friendId };
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-2 rounded-xl text-xs font-bold text-pink-950 hover:bg-pink-100 transition truncate flex items-center gap-1.5';
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> ${friendObj.name}`;
+        btn.onclick = () => selectDMTarget(friendObj.id, friendObj.name);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectDMTarget(id, name) {
+      activeDMTarget = { id, name };
+      document.getElementById('dm-form').classList.remove('hidden');
+      renderDMThread();
+    }
+
+    function renderDMThread() {
+      const container = document.getElementById('dm-messages');
+      container.innerHTML = '';
+      if (!activeDMTarget) return;
+
+      const threadKey = [localPlayer.id, activeDMTarget.id].sort().join('_');
+      const messages = directMessages[threadKey] || [];
+
+      if (messages.length === 0) {
+        container.innerHTML = `<div class="text-center text-[10px] text-pink-400 italic py-4">Direct Message chat with ${activeDMTarget.name}</div>`;
+        return;
+      }
+
+      messages.forEach(m => {
+        const isSelf = m.senderId === localPlayer.id;
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `flex flex-col ${isSelf ? 'items-end' : 'items-start'} space-y-0.5`;
+        msgDiv.innerHTML = `
+          <div class="px-2.5 py-1 rounded-2xl text-[11px] max-w-[85%] shadow-sm ${
+            isSelf ? 'bg-pink-500 text-white rounded-tr-none' : 'bg-pink-100 text-pink-950 rounded-tl-none font-medium'
+          }">
+            ${escapeHtml(m.content)}
+          </div>
+        `;
+        container.appendChild(msgDiv);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    document.getElementById('dm-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!activeDMTarget) return;
+      const input = document.getElementById('dm-input');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      const threadKey = [localPlayer.id, activeDMTarget.id].sort().join('_');
+      if (!directMessages[threadKey]) directMessages[threadKey] = [];
+
+      directMessages[threadKey].push({ senderId: localPlayer.id, content: text, time: Date.now() });
+      localStorage.setItem('sakura_direct_msgs', JSON.stringify(directMessages));
+      renderDMThread();
+    });
+
     // --- MODERATION ---
     function openUserContextMenu(player, clickX, clickY) {
       selectedPlayerForContext = player;
       const menu = document.getElementById('user-context-menu');
       document.getElementById('target-user-name').textContent = player.name;
 
-      menu.style.left = Math.min(window.innerWidth - 200, clickX) + 'px';
+      menu.style.left = Math.min(window.innerWidth - 220, clickX) + 'px';
       menu.style.top = Math.min(window.innerHeight - 200, clickY) + 'px';
 
+      const adminActions = document.getElementById('admin-actions');
       const devActions = document.getElementById('dev-actions');
-      const revokeBtn = document.getElementById('revoke-ban-btn');
-      const toggleAdminBtn = document.getElementById('toggle-admin-role-btn');
+
+      if (isAdminRole) adminActions.classList.remove('hidden');
+      else adminActions.classList.add('hidden');
 
       if (isDevMode) {
         devActions.classList.remove('hidden');
-        const isBanned = bannedUsers.includes(player.id);
-        revokeBtn.classList.toggle('hidden', !isBanned);
-
-        const targetIsAdmin = adminUsers.includes(player.id);
-        toggleAdminBtn.innerHTML = targetIsAdmin ? 
-          `<i data-lucide="shield-off" class="w-3.5 h-3.5"></i> Revoke Admin` :
-          `<i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Make Admin`;
-      } else {
-        devActions.classList.add('hidden');
-      }
+        document.getElementById('revoke-ban-btn').classList.toggle('hidden', !bannedUsers.includes(player.id));
+      } else devActions.classList.add('hidden');
 
       menu.classList.remove('hidden');
       lucide.createIcons();
@@ -919,7 +1138,7 @@
     function adminTempBan() {
       if (!selectedPlayerForContext) return;
       userBanEndTimes[selectedPlayerForContext.id] = Date.now() + 10 * 60 * 1000;
-      alert(`${selectedPlayerForContext.name} has been temporarily chat banned for 10 minutes.`);
+      alert(`${selectedPlayerForContext.name} temporary chat banned for 10 min.`);
       closeUserMenu();
     }
 
@@ -927,7 +1146,7 @@
       if (!selectedPlayerForContext) return;
       kickedPlayers[selectedPlayerForContext.id] = Date.now() + 3 * 24 * 60 * 60 * 1000;
       localStorage.setItem('sakura_kicked_players', JSON.stringify(kickedPlayers));
-      alert(`${selectedPlayerForContext.name} was kicked! Red dots badge assigned for 3 days.`);
+      alert(`${selectedPlayerForContext.name} kicked! Assigned red dots for 3 days.`);
       closeUserMenu();
     }
 
@@ -935,7 +1154,7 @@
       chatMemory[currentChannel] = [];
       localStorage.setItem(`chat_${currentChannel}`, '[]');
       renderChatLogForChannel(currentChannel);
-      alert(`Chat log cleared fully for #${currentChannel}!`);
+      alert(`Chat log cleared!`);
       closeUserMenu();
     }
 
@@ -943,24 +1162,16 @@
       if (!selectedPlayerForContext || !isDevMode) return;
       const targetId = selectedPlayerForContext.id;
       const idx = adminUsers.indexOf(targetId);
-
-      if (idx > -1) {
-        adminUsers.splice(idx, 1);
-        alert(`Revoked Admin status from ${selectedPlayerForContext.name}. Skin and title removed.`);
-      } else {
-        adminUsers.push(targetId);
-        alert(`Granted Admin status to ${selectedPlayerForContext.name}! Black skin and Admin title awarded.`);
-      }
-
+      if (idx > -1) adminUsers.splice(idx, 1);
+      else adminUsers.push(targetId);
       localStorage.setItem('sakura_admin_users', JSON.stringify(adminUsers));
       closeUserMenu();
     }
 
     function devPermanentBan() {
       if (!selectedPlayerForContext || !isDevMode) return;
-      const targetId = selectedPlayerForContext.id;
-      if (!bannedUsers.includes(targetId)) {
-        bannedUsers.push(targetId);
+      if (!bannedUsers.includes(selectedPlayerForContext.id)) {
+        bannedUsers.push(selectedPlayerForContext.id);
         localStorage.setItem('sakura_banned_users', JSON.stringify(bannedUsers));
       }
       alert(`${selectedPlayerForContext.name} permanently banned!`);
@@ -971,26 +1182,17 @@
     function devRevokeBan(targetId = null) {
       const idToUnban = targetId || (selectedPlayerForContext ? selectedPlayerForContext.id : null);
       if (!idToUnban || !isDevMode) return;
-
       const idx = bannedUsers.indexOf(idToUnban);
-      if (idx > -1) {
-        bannedUsers.splice(idx, 1);
-        localStorage.setItem('sakura_banned_users', JSON.stringify(bannedUsers));
-        alert(`Permanent ban lifted successfully.`);
-      }
-      closeUserMenu();
-      renderDevBannedList();
+      if (idx > -1) bannedUsers.splice(idx, 1);
+      localStorage.setItem('sakura_banned_users', JSON.stringify(bannedUsers));
+      closeUserMenu(); renderDevBannedList();
     }
 
     function devDeleteAccount() {
       if (!selectedPlayerForContext || !isDevMode) return;
-      if (confirm(`Permanently delete account ${selectedPlayerForContext.name}?`)) {
-        registeredUsers = registeredUsers.filter(u => u.id !== selectedPlayerForContext.id);
-        localStorage.setItem('sakura_registered_users', JSON.stringify(registeredUsers));
-        alert(`Account ${selectedPlayerForContext.name} deleted.`);
-        closeUserMenu();
-        renderDevUserList();
-      }
+      registeredUsers = registeredUsers.filter(u => u.id !== selectedPlayerForContext.id);
+      localStorage.setItem('sakura_registered_users', JSON.stringify(registeredUsers));
+      closeUserMenu(); renderDevUserList();
     }
 
     function renderDevUserList() {
@@ -998,8 +1200,7 @@
       const searchVal = (document.getElementById('dev-user-search')?.value || '').toLowerCase();
       list.innerHTML = '';
 
-      const filtered = registeredUsers.filter(u => u.name.toLowerCase().includes(searchVal));
-      filtered.forEach(u => {
+      registeredUsers.filter(u => u.name.toLowerCase().includes(searchVal)).forEach(u => {
         const isAdmin = adminUsers.includes(u.id);
         const item = document.createElement('div');
         item.className = 'flex items-center justify-between p-2 rounded-xl bg-purple-50/80 border border-purple-200 text-xs font-bold text-purple-950';
@@ -1015,8 +1216,7 @@
 
     function devToggleAdminForId(id) {
       const idx = adminUsers.indexOf(id);
-      if (idx > -1) adminUsers.splice(idx, 1);
-      else adminUsers.push(id);
+      if (idx > -1) adminUsers.splice(idx, 1); else adminUsers.push(id);
       localStorage.setItem('sakura_admin_users', JSON.stringify(adminUsers));
       renderDevUserList();
     }
@@ -1024,20 +1224,15 @@
     function renderDevBannedList() {
       const list = document.getElementById('dev-banned-list');
       list.innerHTML = '';
-
       if (bannedUsers.length === 0) {
-        list.innerHTML = '<div class="text-[10px] text-rose-500 italic">No permanently banned players.</div>';
-        return;
+        list.innerHTML = '<div class="text-[10px] text-rose-500 italic">No permanently banned players.</div>'; return;
       }
-
       bannedUsers.forEach(id => {
         const item = document.createElement('div');
         item.className = 'flex items-center justify-between p-2 rounded-xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-950';
         item.innerHTML = `
           <span>ID: ${id}</span>
-          <button onclick="devRevokeBan('${id}')" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white text-[10px]">
-            Revoke Ban
-          </button>
+          <button onclick="devRevokeBan('${id}')" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white text-[10px]">Revoke Ban</button>
         `;
         list.appendChild(item);
       });
@@ -1045,7 +1240,7 @@
 
     function filterDevUserList() { renderDevUserList(); }
 
-    // --- AUTH ---
+    // --- AUTHENTICATION ---
     let authMode = 'signin';
 
     function switchAuthTab(mode) {
@@ -1157,21 +1352,11 @@
     function updateAndDrawPetals() {
       ctx.fillStyle = 'rgba(251, 207, 232, 0.85)';
       petals.forEach(p => {
-        p.y += p.speedY;
-        p.x += p.speedX + Math.sin(p.y * 0.015) * 0.4;
+        p.y += p.speedY; p.x += p.speedX + Math.sin(p.y * 0.015) * 0.4;
         p.rotation += p.rotSpeed;
-
-        if (p.y > canvas.height + 15) {
-          p.y = -15;
-          p.x = Math.random() * canvas.width;
-        }
-
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rotation);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2);
-        ctx.fill();
+        if (p.y > canvas.height + 15) { p.y = -15; p.x = Math.random() * canvas.width; }
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation);
+        ctx.beginPath(); ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       });
     }
@@ -1179,13 +1364,9 @@
     function addFloatingParticle(x, y, text) {
       for (let i = 0; i < 3; i++) {
         floatingParticles.push({
-          x: x + (Math.random() - 0.5) * 20,
-          y: y - 20,
-          vx: (Math.random() - 0.5) * 1.5,
-          vy: -Math.random() * 2 - 1.2,
-          alpha: 1,
-          size: Math.random() * 6 + 14,
-          text: text
+          x: x + (Math.random() - 0.5) * 20, y: y - 20,
+          vx: (Math.random() - 0.5) * 1.5, vy: -Math.random() * 2 - 1.2,
+          alpha: 1, size: Math.random() * 6 + 14, text: text
         });
       }
     }
@@ -1193,20 +1374,10 @@
     function updateAndDrawParticles() {
       for (let i = floatingParticles.length - 1; i >= 0; i--) {
         const p = floatingParticles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= 0.02;
-
-        if (p.alpha <= 0) {
-          floatingParticles.splice(i, 1);
-          continue;
-        }
-
-        ctx.save();
-        ctx.globalAlpha = p.alpha;
-        ctx.font = `${p.size}px sans-serif`;
-        ctx.fillText(p.text, p.x, p.y);
-        ctx.restore();
+        p.x += p.vx; p.y += p.vy; p.alpha -= 0.02;
+        if (p.alpha <= 0) { floatingParticles.splice(i, 1); continue; }
+        ctx.save(); ctx.globalAlpha = p.alpha; ctx.font = `${p.size}px sans-serif`;
+        ctx.fillText(p.text, p.x, p.y); ctx.restore();
       }
     }
 
@@ -1214,49 +1385,30 @@
       if (!trailType) return;
       const symbol = trailType === 'sparkles' ? '✨' : trailType === 'hearts' ? '❤️' : '🌸';
       trailParticles.push({
-        x: x + (Math.random() - 0.5) * 10,
-        y: y + 10,
-        alpha: 0.8,
-        symbol: symbol,
-        scale: Math.random() * 0.4 + 0.6
+        x: x + (Math.random() - 0.5) * 10, y: y + 10, alpha: 0.8, symbol: symbol, scale: Math.random() * 0.4 + 0.6
       });
     }
 
     function updateAndDrawTrails() {
       for (let i = trailParticles.length - 1; i >= 0; i--) {
-        const t = trailParticles[i];
-        t.alpha -= 0.03;
-        if (t.alpha <= 0) {
-          trailParticles.splice(i, 1);
-          continue;
-        }
-        ctx.save();
-        ctx.globalAlpha = t.alpha;
-        ctx.font = '12px sans-serif';
-        ctx.fillText(t.symbol, t.x, t.y);
-        ctx.restore();
+        const t = trailParticles[i]; t.alpha -= 0.03;
+        if (t.alpha <= 0) { trailParticles.splice(i, 1); continue; }
+        ctx.save(); ctx.globalAlpha = t.alpha; ctx.font = '12px sans-serif';
+        ctx.fillText(t.symbol, t.x, t.y); ctx.restore();
       }
     }
 
-    // --- ENVIRONMENT RENDERING WITH IMPROVED SAKURA FAIR & NEON ARCADE ---
+    // --- ENVIRONMENT RENDERING (Removed orange/red shape from Sakura Fair) ---
     function drawEnvironment() {
       const w = canvas.width;
       const h = canvas.height;
 
       if (currentChannel === 'sakura-lounge') {
-        // Room 1: 🌸 Zen Garden (Increased Pink Trees, Removed Green Things)
-        ctx.fillStyle = '#fce7f3';
-        ctx.fillRect(0, 0, w, h);
+        // Room 1: 🌸 Zen Garden
+        ctx.fillStyle = '#fce7f3'; ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = 'rgba(244, 114, 182, 0.2)'; ctx.lineWidth = 2;
+        for (let x = 0; x < w; x += 70) { for (let y = 0; y < h; y += 70) ctx.strokeRect(x, y, 70, 70); }
 
-        ctx.strokeStyle = 'rgba(244, 114, 182, 0.2)';
-        ctx.lineWidth = 2;
-        for (let x = 0; x < w; x += 70) {
-          for (let y = 0; y < h; y += 70) {
-            ctx.strokeRect(x, y, 70, 70);
-          }
-        }
-
-        // Stepping Stones
         ctx.fillStyle = '#cbd5e1';
         [ {x: w*0.2, y: h*0.3}, {x: w*0.35, y: h*0.4}, {x: w*0.5, y: h*0.45}, {x: w*0.65, y: h*0.4} ].forEach(s => {
           ctx.beginPath(); ctx.ellipse(s.x, s.y, 18, 10, 0, 0, Math.PI * 2); ctx.fill();
@@ -1266,7 +1418,6 @@
         drawWoodenBridge(w * 0.75, h * 0.65, 80, 30);
         drawToriiGate(w * 0.5, h * 0.22);
 
-        // MANY PINK TREES (No green bushes/willows)
         drawSakuraTree(w * 0.08, h * 0.18, 60);
         drawSakuraTree(w * 0.25, h * 0.12, 50);
         drawSakuraTree(w * 0.5, h * 0.1, 55);
@@ -1275,30 +1426,22 @@
         drawSakuraTree(w * 0.1, h * 0.7, 55);
         drawSakuraTree(w * 0.9, h * 0.7, 55);
 
-        drawLantern(w * 0.35, h * 0.25);
-        drawLantern(w * 0.65, h * 0.25);
+        drawLantern(w * 0.35, h * 0.25); drawLantern(w * 0.65, h * 0.25);
 
       } else if (currentChannel === 'bonfire-park') {
-        // Room 2: 🔥 Bonfire Camp (Separate Area)
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 0, w, h);
-
-        ctx.fillStyle = '#1e293b';
-        ctx.beginPath(); ctx.arc(w / 2, h / 2, 180, 0, Math.PI * 2); ctx.fill();
+        // Room 2: 🔥 Bonfire Night Camp
+        ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(w / 2, h / 2, 180, 0, Math.PI * 2); ctx.fill();
 
         drawCampTent(w * 0.25, h * 0.35, '#f43f5e');
         drawCampTent(w * 0.75, h * 0.35, '#38bdf8');
-        drawWoodenLog(w * 0.35, h * 0.55);
-        drawWoodenLog(w * 0.65, h * 0.55);
-
+        drawWoodenLog(w * 0.35, h * 0.55); drawWoodenLog(w * 0.65, h * 0.55);
         drawBonfireWithParticles(w * 0.5, h * 0.5);
 
       } else if (currentChannel === 'amusement-park') {
-        // Room 3: 🎡 Enhanced Sakura Fair with Park Theme Decorations
-        ctx.fillStyle = '#fce7f3';
-        ctx.fillRect(0, 0, w, h);
+        // Room 3: 🎡 Sakura Fair (Clean Park Fair Decor - Removed orange/red shape)
+        ctx.fillStyle = '#fce7f3'; ctx.fillRect(0, 0, w, h);
 
-        // Park Flag Bunting across top
         ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(0, 40); ctx.quadraticCurveTo(w/2, 80, w, 40); ctx.stroke();
         ['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#10b981', '#ec4899'].forEach((col, idx, arr) => {
@@ -1309,59 +1452,40 @@
         });
 
         drawFerrisWheel(w * 0.25, h * 0.38, 85);
-        drawCarouselRide(w * 0.75, h * 0.38, 70);
-
         drawFestivalBooth(w * 0.15, h * 0.75, '🎪 BALLOON POP', '#f43f5e');
         drawFestivalBooth(w * 0.42, h * 0.75, '🍿 COTTON CANDY', '#ec4899');
         drawFestivalBooth(w * 0.78, h * 0.75, '🎯 RING TOSS', '#8b5cf6');
 
-        drawSakuraTree(w * 0.1, h * 0.2, 50);
-        drawSakuraTree(w * 0.9, h * 0.2, 50);
+        drawSakuraTree(w * 0.1, h * 0.2, 50); drawSakuraTree(w * 0.9, h * 0.2, 50);
 
       } else if (currentChannel === 'arcade-lounge') {
-        // Room 4: 🕹️ Enhanced Neon Arcade with Disco Floor & Arcade Machines
-        ctx.fillStyle = '#090514';
-        ctx.fillRect(0, 0, w, h);
+        // Room 4: 🕹️ Neon Arcade
+        ctx.fillStyle = '#090514'; ctx.fillRect(0, 0, w, h);
 
         discoHue = (discoHue + 2) % 360;
-        const discoColor = `hsl(${discoHue}, 100%, 60%)`;
+        drawDiscoFloor(w * 0.5, h * 0.65, 220, 110, `hsl(${discoHue}, 100%, 60%)`);
 
-        // Disco Floor Grid with pulsing neon colors
-        drawDiscoFloor(w * 0.5, h * 0.65, 220, 110, discoColor);
-
-        // Arcade Machines Lineup
         drawArcadeCabinet(w * 0.15, h * 0.28, '#ec4899', 'SLIME MATCH');
         drawArcadeCabinet(w * 0.35, h * 0.28, '#8b5cf6', 'NEON DASH');
         drawArcadeCabinet(w * 0.65, h * 0.28, '#06b6d4', 'BOBA HERO');
         drawArcadeCabinet(w * 0.85, h * 0.28, '#f59e0b', 'CHIBI KOI');
 
-        // DJ Booth & Neon Sign
-        drawDJBooth(w * 0.5, h * 0.22);
         drawNeonSign(w * 0.5, h * 0.09, 'DISCO ARCADE LOUNGE');
       }
 
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = 'rgba(244, 114, 182, 0.4)';
-      ctx.strokeRect(0, 0, w, h);
+      ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(244, 114, 182, 0.4)'; ctx.strokeRect(0, 0, w, h);
     }
 
-    // DRAWING HELPERS
     function drawSakuraTree(x, y, radius) {
       ctx.fillStyle = 'rgba(0,0,0,0.15)';
       ctx.beginPath(); ctx.ellipse(x, y + radius * 0.7, radius, radius * 0.3, 0, 0, Math.PI * 2); ctx.fill();
-
-      ctx.strokeStyle = '#582f0e';
-      ctx.lineWidth = 10;
+      ctx.strokeStyle = '#582f0e'; ctx.lineWidth = 10;
       ctx.beginPath(); ctx.moveTo(x, y + radius * 0.6); ctx.quadraticCurveTo(x - 5, y, x, y - radius * 0.2); ctx.stroke();
 
-      const clusters = [
-        { dx: 0, dy: -radius * 0.4, r: radius * 0.6, color: '#f472b6' },
-        { dx: -radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#ec4899' },
-        { dx: radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#fb7185' }
-      ];
-      clusters.forEach(c => {
-        ctx.fillStyle = c.color;
-        ctx.beginPath(); ctx.arc(x + c.dx, y + c.dy, c.r, 0, Math.PI * 2); ctx.fill();
+      [{ dx: 0, dy: -radius * 0.4, r: radius * 0.6, color: '#f472b6' },
+       { dx: -radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#ec4899' },
+       { dx: radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#fb7185' }].forEach(c => {
+        ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(x + c.dx, y + c.dy, c.r, 0, Math.PI * 2); ctx.fill();
       });
     }
 
@@ -1371,29 +1495,22 @@
       ctx.beginPath(); ctx.moveTo(x - 25, y - 5); ctx.lineTo(x + 25, y + 15); ctx.stroke();
 
       const glow = ctx.createRadialGradient(x, y, 5, x, y, 70);
-      glow.addColorStop(0, 'rgba(249, 115, 22, 0.8)');
-      glow.addColorStop(1, 'rgba(249, 115, 22, 0)');
+      glow.addColorStop(0, 'rgba(249, 115, 22, 0.8)'); glow.addColorStop(1, 'rgba(249, 115, 22, 0)');
       ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 70, 0, Math.PI * 2); ctx.fill();
 
       bonfireFlames.forEach(p => {
         p.x += p.vx; p.y += p.vy; p.life -= 0.03;
         if (p.life <= 0) {
-          p.x = x + (Math.random() - 0.5) * 15;
-          p.y = y + 5;
-          p.vx = (Math.random() - 0.5) * 1.5;
-          p.vy = -Math.random() * 2.5 - 1.5;
-          p.life = 1.0;
+          p.x = x + (Math.random() - 0.5) * 15; p.y = y + 5;
+          p.vx = (Math.random() - 0.5) * 1.5; p.vy = -Math.random() * 2.5 - 1.5; p.life = 1.0;
         }
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.life;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = 1.0;
+        ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1.0;
       });
     }
 
     function drawCampTent(x, y, color) {
-      ctx.fillStyle = color;
-      ctx.beginPath(); ctx.moveTo(x, y - 30); ctx.lineTo(x - 30, y + 20); ctx.lineTo(x + 30, y + 20); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(x, y - 30); ctx.lineTo(x - 30, y + 20); ctx.lineTo(x + 30, y + 20); ctx.closePath(); ctx.fill();
     }
 
     function drawWoodenLog(x, y) {
@@ -1411,16 +1528,8 @@
 
       for (let i = 0; i < 6; i++) {
         const a = ferrisWheelAngle + (i * Math.PI * 2) / 6;
-        const cx = x + Math.cos(a) * radius;
-        const cy = y + Math.sin(a) * radius;
-        ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(x + Math.cos(a) * radius, y + Math.sin(a) * radius, 8, 0, Math.PI * 2); ctx.fill();
       }
-    }
-
-    function drawCarouselRide(x, y, radius) {
-      ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#dc2626';
-      ctx.beginPath(); ctx.moveTo(x, y - radius - 25); ctx.lineTo(x - radius - 10, y); ctx.lineTo(x + radius + 10, y); ctx.closePath(); ctx.fill();
     }
 
     function drawFestivalBooth(x, y, title, color) {
@@ -1465,24 +1574,11 @@
     }
 
     function drawDiscoFloor(x, y, w, h, activeColor) {
-      ctx.fillStyle = activeColor;
-      ctx.shadowColor = activeColor;
-      ctx.shadowBlur = 15;
-      ctx.fillRect(x - w / 2, y - h / 2, w, h);
-      ctx.shadowBlur = 0;
-
+      ctx.fillStyle = activeColor; ctx.shadowColor = activeColor; ctx.shadowBlur = 15;
+      ctx.fillRect(x - w / 2, y - h / 2, w, h); ctx.shadowBlur = 0;
       ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
-      for (let dx = x - w / 2; dx < x + w / 2; dx += 25) {
-        ctx.beginPath(); ctx.moveTo(dx, y - h / 2); ctx.lineTo(dx, y + h / 2); ctx.stroke();
-      }
-      for (let dy = y - h / 2; dy < y + h / 2; dy += 25) {
-        ctx.beginPath(); ctx.moveTo(x - w / 2, dy); ctx.lineTo(x + w / 2, dy); ctx.stroke();
-      }
-    }
-
-    function drawDJBooth(x, y) {
-      ctx.fillStyle = '#334155'; ctx.fillRect(x - 30, y - 12, 60, 24);
-      ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(x - 14, y, 8, 0, Math.PI * 2); ctx.arc(x + 14, y, 8, 0, Math.PI * 2); ctx.fill();
+      for (let dx = x - w / 2; dx < x + w / 2; dx += 25) { ctx.beginPath(); ctx.moveTo(dx, y - h / 2); ctx.lineTo(dx, y + h / 2); ctx.stroke(); }
+      for (let dy = y - h / 2; dy < y + h / 2; dy += 25) { ctx.beginPath(); ctx.moveTo(x - w / 2, dy); ctx.lineTo(x + w / 2, dy); ctx.stroke(); }
     }
 
     function drawNeonSign(x, y, text) {
@@ -1490,18 +1586,15 @@
       ctx.shadowColor = '#ec4899'; ctx.shadowBlur = 12; ctx.fillText(text, x, y); ctx.shadowBlur = 0;
     }
 
-    // --- BOUNCY SLIME RENDERING ---
+    // --- SLIME RENDERING ---
     function drawSlime(player, isSelf = false) {
       let { id, x, y, name, avatarType, expression, equippedAcc, equippedClothing, equippedMakeup, equippedTrail, equippedTitle, title, isMoving, isJumping, isDancing, jumpOffset, speechBubble, activeEmote } = player;
 
       const isTargetAdmin = adminUsers.includes(id);
-      if (isDevMode && isSelf) {
-        avatarType = 'dev_white';
-        title = 'Dev';
-      } else if (isTargetAdmin) {
-        avatarType = 'admin_black';
-        title = 'Admin';
-      } else if (!title && equippedTitle) {
+      if (isDevMode && isSelf) { avatarType = 'dev_white'; title = 'Dev'; }
+      else if (isTargetAdmin) { avatarType = 'admin_black'; title = 'Admin'; }
+      else if (!title && equippedTitle) {
+        if (equippedTitle === 'title_novice') title = 'Novice';
         if (equippedTitle === 'title_vip') title = 'VIP';
         if (equippedTitle === 'title_cool') title = 'Cool';
         if (equippedTitle === 'title_legend') title = 'Legend';
@@ -1510,7 +1603,6 @@
       const type = AVATAR_TYPES[avatarType] || AVATAR_TYPES.sakura;
 
       ctx.save();
-
       player.bouncePhase = (player.bouncePhase || 0) + (isMoving ? 0.22 : 0.05);
       player.dancePhase = (player.dancePhase || 0) + 0.15;
 
@@ -1532,40 +1624,24 @@
 
       ctx.translate(drawX, drawY);
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-      ctx.beginPath();
-      const shadowSize = Math.max(5, 16 - (jumpOffset || 0) * 0.2);
-      ctx.ellipse(0, y - drawY + 14, shadowSize, 5, 0, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; ctx.beginPath();
+      ctx.ellipse(0, y - drawY + 14, Math.max(5, 16 - (jumpOffset || 0) * 0.2), 5, 0, 0, Math.PI * 2); ctx.fill();
 
       ctx.scale(scaleX, scaleY);
 
-      ctx.fillStyle = type.bodyColor;
-      ctx.beginPath();
-      ctx.arc(0, 0, 18, Math.PI * 0.82, Math.PI * 2.18);
-      ctx.quadraticCurveTo(0, 20, -18, 0);
-      ctx.fill();
+      ctx.fillStyle = type.bodyColor; ctx.beginPath();
+      ctx.arc(0, 0, 18, Math.PI * 0.82, Math.PI * 2.18); ctx.quadraticCurveTo(0, 20, -18, 0); ctx.fill();
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.beginPath(); ctx.ellipse(-5, -8, 6, 3, -Math.PI / 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; ctx.beginPath(); ctx.ellipse(-5, -8, 6, 3, -Math.PI / 4, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; ctx.lineWidth = 2; ctx.stroke();
 
-      if (equippedClothing === 'scarf_red') {
-        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.roundRect(-12, 6, 24, 6, 3); ctx.fill();
-      } else if (equippedClothing === 'ribbon_blue') {
-        ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(0, 8, 4, 0, Math.PI * 2); ctx.fill();
-      }
+      if (equippedClothing === 'scarf_red') { ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.roundRect(-12, 6, 24, 6, 3); ctx.fill(); }
+      else if (equippedClothing === 'ribbon_blue') { ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(0, 8, 4, 0, Math.PI * 2); ctx.fill(); }
 
       drawSlimeExpression(expression || 'happy', 0);
 
-      if (equippedMakeup === 'blush_star') {
-        ctx.font = '8px sans-serif'; ctx.fillText('✨', -12, 4); ctx.fillText('✨', 6, 4);
-      }
-
       const accToDraw = equippedAcc || type.accessory;
-      if (accToDraw) {
-        ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(accToDraw, 0, -18);
-      }
+      if (accToDraw) { ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(accToDraw, 0, -18); }
 
       ctx.restore();
 
@@ -1576,12 +1652,10 @@
         ctx.beginPath(); ctx.arc(drawX + 8, drawY - 32, 3, 0, Math.PI * 2); ctx.fill();
       }
 
-      // Prominent Title on Head
       if (title) {
         ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
         ctx.fillStyle = title === 'Dev' ? '#a855f7' : (title === 'Admin' ? '#f59e0b' : '#38bdf8');
-        ctx.textAlign = 'center';
-        ctx.fillText(`[ ${title.toUpperCase()} ]`, drawX, drawY - 26);
+        ctx.textAlign = 'center'; ctx.fillText(`[ ${title.toUpperCase()} ]`, drawX, drawY - 26);
       }
 
       ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
@@ -1618,32 +1692,26 @@
       ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
       ctx.beginPath(); ctx.roundRect(x - bubbleWidth / 2, y - bubbleHeight, bubbleWidth, bubbleHeight, 10); ctx.fill();
       ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.fillStyle = '#831843'; ctx.textAlign = 'center';
-      ctx.fillText(text, x, y - bubbleHeight + 15);
+      ctx.fillStyle = '#831843'; ctx.textAlign = 'center'; ctx.fillText(text, x, y - bubbleHeight + 15);
     }
 
-    // --- CONTROLS & DANCE ---
+    // --- CONTROLS ---
     function triggerJump() {
       if (!localPlayer.isJumping) {
-        localPlayer.isJumping = true;
-        localPlayer.jumpVelocity = 11;
-        playSound('jump');
+        localPlayer.isJumping = true; localPlayer.jumpVelocity = 11; playSound('jump');
       }
     }
 
     function triggerDance() {
-      localPlayer.isDancing = !localPlayer.isDancing;
-      playSound('emote');
+      localPlayer.isDancing = !localPlayer.isDancing; playSound('emote');
       if (localPlayer.isDancing) triggerEmote('💃');
       if (realtimeChannel) broadcastState();
     }
 
     function updatePlayerMovement() {
       let dx = 0; let dy = 0;
-      if (keys.up) dy -= 1;
-      if (keys.down) dy += 1;
-      if (keys.left) dx -= 1;
-      if (keys.right) dx += 1;
+      if (keys.up) dy -= 1; if (keys.down) dy += 1;
+      if (keys.left) dx -= 1; if (keys.right) dx += 1;
       if (joystick.active) { dx = joystick.dx; dy = joystick.dy; }
 
       if (dx !== 0 || dy !== 0) localPlayer.isDancing = false;
@@ -1652,9 +1720,7 @@
         localPlayer.jumpOffset = (localPlayer.jumpOffset || 0) + localPlayer.jumpVelocity;
         localPlayer.jumpVelocity -= 0.8;
         if (localPlayer.jumpOffset <= 0) {
-          localPlayer.jumpOffset = 0;
-          localPlayer.isJumping = false;
-          playSound('bounce');
+          localPlayer.jumpOffset = 0; localPlayer.isJumping = false; playSound('bounce');
         }
       }
 
@@ -1682,43 +1748,44 @@
       if ((localPlayer.isMoving || localPlayer.isJumping) && realtimeChannel) broadcastState();
     }
 
-    // --- MINI-GAMES ---
+    // --- GAME SELECTION & REWARD FLOWERS ---
+    function openGamesSelectionModal() {
+      document.getElementById('games-selection-modal').classList.remove('hidden');
+    }
+
+    function closeGamesSelectionModal() {
+      document.getElementById('games-selection-modal').classList.add('hidden');
+    }
+
+    function confirmStartGame(type) {
+      closeGamesSelectionModal();
+      if (type === 'balloon-pop') startMiniGame('balloon-pop');
+      if (type === 'memory-cards') openArcadeMemoryGame();
+    }
+
     function startMiniGame(type) {
       activeMiniGame = type;
-      miniGameScore = 0;
-      miniGameTimeLeft = 30;
+      miniGameScore = 0; miniGameTimeLeft = 30;
 
       document.getElementById('minigame-banner').classList.remove('hidden');
       document.getElementById('minigame-score').textContent = miniGameScore;
       document.getElementById('minigame-timer').textContent = miniGameTimeLeft + 's';
 
-      if (type === 'petal-catch') {
-        document.getElementById('minigame-title').textContent = '🌸 Petal Catch';
-        spawnMiniGameCollectibles('🌸');
-      } else if (type === 'balloon-pop') {
-        document.getElementById('minigame-title').textContent = '🎈 Balloon Pop';
-        switchChannel('amusement-park');
-        spawnMiniGameCollectibles('🎈');
-      } else if (type === 'shrine-dash') {
-        document.getElementById('minigame-title').textContent = '⛩️ Shrine Dash';
-        switchChannel('sakura-lounge');
-        spawnMiniGameCollectibles('⭐');
-      } else if (type === 'sparkle-collector') {
-        document.getElementById('minigame-title').textContent = '✨ Sparkle Collector';
-        switchChannel('bonfire-park');
-        spawnMiniGameCollectibles('✨');
+      if (type === 'balloon-pop') {
+        document.getElementById('minigame-title').textContent = '🎈 Balloon Catch';
+        switchChannel('amusement-park'); spawnMiniGameCollectibles('🎈');
       }
 
       clearInterval(miniGameInterval);
       miniGameInterval = setInterval(() => {
         miniGameTimeLeft--;
         document.getElementById('minigame-timer').textContent = miniGameTimeLeft + 's';
-        if (gameCollectibles.length < 8) spawnMiniGameCollectibles('🌸', 1);
+        if (gameCollectibles.length < 8) spawnMiniGameCollectibles('🎈', 1);
         if (miniGameTimeLeft <= 0) endMiniGame(false);
       }, 1000);
     }
 
-    function spawnMiniGameCollectibles(defaultSymbol = '🌸', count = 6) {
+    function spawnMiniGameCollectibles(defaultSymbol = '🎈', count = 6) {
       for (let i = 0; i < count; i++) {
         gameCollectibles.push({
           x: Math.random() * (canvas.width - 60) + 30,
@@ -1733,9 +1800,9 @@
         const item = gameCollectibles[i];
         if (Math.hypot(localPlayer.x - item.x, localPlayer.y - item.y) < 28) {
           playSound('win');
-          addCoins(5);
-          addFloatingParticle(item.x, item.y, `+10`);
-          miniGameScore += 10;
+          addCoins(1); // 1 Flower per Balloon
+          addFloatingParticle(item.x, item.y, `+1 🌸`);
+          miniGameScore += 1;
           document.getElementById('minigame-score').textContent = miniGameScore;
           gameCollectibles.splice(i, 1);
         }
@@ -1751,13 +1818,8 @@
     function endMiniGame(manualQuit = false) {
       clearInterval(miniGameInterval);
       document.getElementById('minigame-banner').classList.add('hidden');
-      if (!manualQuit) {
-        playSound('win');
-        triggerEmote('🎉');
-        addCoins(Math.floor(miniGameScore / 2));
-      }
-      activeMiniGame = null;
-      gameCollectibles = [];
+      if (!manualQuit) { playSound('win'); triggerEmote('🎉'); }
+      activeMiniGame = null; gameCollectibles = [];
     }
 
     function openArcadeMemoryGame() {
@@ -1779,8 +1841,8 @@
             if (firstCard.icon === icon) {
               playSound('win'); matchedCount += 2; firstCard = null;
               if (matchedCount === icons.length) {
-                document.getElementById('memory-status').textContent = '🎉 Winner! +50 Sakura Coins!';
-                addCoins(50);
+                document.getElementById('memory-status').textContent = '🎉 Winner! +4 Flowers!';
+                addCoins(4); // Card Game gives 4 Flowers
               }
             } else {
               setTimeout(() => {
@@ -1810,10 +1872,8 @@
 
       if (activeMiniGame) drawMiniGameCollectibles();
 
-      // Remote Players
       Object.values(remotePlayers).forEach(p => drawSlime(p, false));
 
-      // Local Player
       updatePlayerMovement();
       drawSlime(localPlayer, true);
 
@@ -1822,7 +1882,7 @@
       requestAnimationFrame(render);
     }
 
-    // --- REALTIME SUPABASE (FIXED DESKTOP / MOBILE VISIBILITY SYNC) ---
+    // --- REALTIME SUPABASE ---
     async function initSupabaseChannel(channelName) {
       if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
 
@@ -1840,24 +1900,20 @@
           let count = 1;
           Object.keys(state).forEach(key => {
             if (key !== localPlayer.id && state[key][0]) {
-              remotePlayers[key] = state[key][0];
-              count++;
+              remotePlayers[key] = state[key][0]; count++;
             }
           });
           document.getElementById('player-count').textContent = count;
         })
         .on('broadcast', { event: 'player-move' }, payload => {
           const p = payload.payload;
-          if (p.id !== localPlayer.id) {
-            remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
-          }
+          if (p.id !== localPlayer.id) remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
         })
         .on('broadcast', { event: 'chat-message' }, payload => {
           const msg = payload.payload;
           saveChatMessageToMemory(msg.channel || currentChannel, msg);
           if ((msg.channel || currentChannel) === currentChannel) {
-            displayChatMessage(msg);
-            playSound('msg');
+            displayChatMessage(msg); playSound('msg');
           }
           if (msg.playerId === localPlayer.id) {
             localPlayer.speechBubble = { text: msg.content, expiresAt: Date.now() + 6000 };
@@ -1875,16 +1931,11 @@
         .subscribe(async status => {
           if (status === 'SUBSCRIBED') {
             await realtimeChannel.track({
-              id: localPlayer.id,
-              name: localPlayer.name,
-              avatarType: localPlayer.avatarType,
-              expression: localPlayer.expression,
-              equippedAcc: localPlayer.equippedAcc,
-              equippedClothing: localPlayer.equippedClothing,
-              equippedMakeup: localPlayer.equippedMakeup,
-              equippedTrail: localPlayer.equippedTrail,
-              equippedTitle: localPlayer.equippedTitle,
-              title: localPlayer.title,
+              id: localPlayer.id, name: localPlayer.name,
+              avatarType: localPlayer.avatarType, expression: localPlayer.expression,
+              equippedAcc: localPlayer.equippedAcc, equippedClothing: localPlayer.equippedClothing,
+              equippedMakeup: localPlayer.equippedMakeup, equippedTrail: localPlayer.equippedTrail,
+              equippedTitle: localPlayer.equippedTitle, title: localPlayer.title,
               x: localPlayer.x, y: localPlayer.y
             });
             broadcastState();
@@ -1915,48 +1966,30 @@
     function broadcastState() {
       if (!realtimeChannel) return;
       realtimeChannel.send({
-        type: 'broadcast',
-        event: 'player-move',
+        type: 'broadcast', event: 'player-move',
         payload: {
-          id: localPlayer.id,
-          name: localPlayer.name,
-          avatarType: localPlayer.avatarType,
-          expression: localPlayer.expression,
-          equippedAcc: localPlayer.equippedAcc,
-          equippedClothing: localPlayer.equippedClothing,
-          equippedMakeup: localPlayer.equippedMakeup,
-          equippedTrail: localPlayer.equippedTrail,
-          equippedTitle: localPlayer.equippedTitle,
-          title: localPlayer.title,
-          x: localPlayer.x, y: localPlayer.y,
-          isMoving: localPlayer.isMoving,
-          isDancing: localPlayer.isDancing
+          id: localPlayer.id, name: localPlayer.name, avatarType: localPlayer.avatarType,
+          expression: localPlayer.expression, equippedAcc: localPlayer.equippedAcc,
+          equippedClothing: localPlayer.equippedClothing, equippedMakeup: localPlayer.equippedMakeup,
+          equippedTrail: localPlayer.equippedTrail, equippedTitle: localPlayer.equippedTitle,
+          title: localPlayer.title, x: localPlayer.x, y: localPlayer.y,
+          isMoving: localPlayer.isMoving, isDancing: localPlayer.isDancing
         }
       });
     }
 
     function triggerEmote(emoji) {
-      playSound('emote');
-      localPlayer.activeEmote = { emoji: emoji, expiresAt: Date.now() + 3000 };
+      playSound('emote'); localPlayer.activeEmote = { emoji: emoji, expiresAt: Date.now() + 3000 };
       addFloatingParticle(localPlayer.x, localPlayer.y, emoji);
-      if (realtimeChannel) {
-        realtimeChannel.send({
-          type: 'broadcast', event: 'player-emote', payload: { playerId: localPlayer.id, emoji: emoji }
-        });
-      }
+      if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'player-emote', payload: { playerId: localPlayer.id, emoji: emoji } });
     }
 
     document.getElementById('chat-form').addEventListener('submit', (e) => {
       e.preventDefault();
-
-      if (bannedUsers.includes(localPlayer.id)) {
-        alert("You are permanently banned from sending chat messages.");
-        return;
-      }
+      if (bannedUsers.includes(localPlayer.id)) { alert("You are permanently banned."); return; }
       if (userBanEndTimes[localPlayer.id] && userBanEndTimes[localPlayer.id] > Date.now()) {
         const remaining = Math.ceil((userBanEndTimes[localPlayer.id] - Date.now()) / 60000);
-        alert(`You are under a 10-minute temporary chat ban (${remaining} min remaining).`);
-        return;
+        alert(`10-minute temporary chat ban (${remaining} min remaining).`); return;
       }
 
       const input = document.getElementById('chat-input');
@@ -1965,18 +1998,12 @@
       input.value = '';
 
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const msgObj = {
-        playerId: localPlayer.id, sender: localPlayer.name, content: text, time: timeStr, channel: currentChannel
-      };
+      const msgObj = { playerId: localPlayer.id, sender: localPlayer.name, content: text, time: timeStr, channel: currentChannel };
 
-      playSound('msg');
-      localPlayer.speechBubble = { text: text, expiresAt: Date.now() + 6000 };
-      saveChatMessageToMemory(currentChannel, msgObj);
-      displayChatMessage(msgObj);
+      playSound('msg'); localPlayer.speechBubble = { text: text, expiresAt: Date.now() + 6000 };
+      saveChatMessageToMemory(currentChannel, msgObj); displayChatMessage(msgObj);
 
-      if (realtimeChannel) {
-        realtimeChannel.send({ type: 'broadcast', event: 'chat-message', payload: msgObj });
-      }
+      if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'chat-message', payload: msgObj });
     });
 
     function displayChatMessage(msg) {
@@ -1996,8 +2023,7 @@
           ${escapeHtml(msg.content)}
         </div>
       `;
-      container.appendChild(msgDiv);
-      container.scrollTop = container.scrollHeight;
+      container.appendChild(msgDiv); container.scrollTop = container.scrollHeight;
     }
 
     function escapeHtml(text) {
@@ -2033,14 +2059,13 @@
       const rect = joystickBase.getBoundingClientRect();
       let dx = touch.clientX - (rect.left + rect.width / 2);
       let dy = touch.clientY - (rect.top + rect.height / 2);
-      const dist = Math.hypot(dx, dy);
-      const maxDist = rect.width / 2 - 8;
-
+      const dist = Math.hypot(dx, dy); const maxDist = rect.width / 2 - 8;
       if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
       joystickStick.style.transform = `translate(${dx}px, ${dy}px)`;
       joystick.dx = dx / maxDist; joystick.dy = dy / maxDist;
     }
 
+    // CANVAS CLICK FOR MOVEMENT & SLIME INTERACTION
     canvas.addEventListener('pointerdown', e => {
       if (e.target !== canvas) return;
       const rect = canvas.getBoundingClientRect();
@@ -2052,7 +2077,7 @@
         if (Math.hypot(p.x - clickX, p.y - clickY) < 30) clickedUser = p;
       });
 
-      if (clickedUser && (isDevMode || isAdminRole)) {
+      if (clickedUser) {
         openUserContextMenu(clickedUser, e.clientX, e.clientY);
         return;
       }
@@ -2133,11 +2158,8 @@
         localStorage.setItem('sakura_coins', sakuraCoins);
         localStorage.setItem('sakura_unlocked_items', JSON.stringify(unlockedItems));
         document.getElementById('coin-counter').textContent = sakuraCoins;
-        playSound('win');
-        renderShopItems();
-      } else {
-        alert('Not enough Sakura Coins! Play mini-games to earn more.');
-      }
+        playSound('win'); renderShopItems();
+      } else alert('Not enough Flowers! Play games to earn Flowers.');
     }
 
     function equipShopItem(id, type) {
@@ -2146,13 +2168,13 @@
       if (type === 'makeup') localPlayer.equippedMakeup = id;
       if (type === 'title') {
         localPlayer.equippedTitle = id;
+        if (id === 'title_novice') localPlayer.title = 'Novice';
         if (id === 'title_vip') localPlayer.title = 'VIP';
         if (id === 'title_cool') localPlayer.title = 'Cool';
         if (id === 'title_legend') localPlayer.title = 'Legend';
       }
       if (type === 'acc') localPlayer.equippedAcc = id;
-      playSound('emote');
-      saveStudioSettings();
+      playSound('emote'); saveStudioSettings();
     }
 
     function toggleCustomStudioModal() {
@@ -2201,15 +2223,8 @@
       }).join('');
     }
 
-    function selectAvatarType(key) {
-      localPlayer.avatarType = key;
-      renderStudioPickers();
-    }
-
-    function selectExpression(key) {
-      localPlayer.expression = key;
-      renderStudioPickers();
-    }
+    function selectAvatarType(key) { localPlayer.avatarType = key; renderStudioPickers(); }
+    function selectExpression(key) { localPlayer.expression = key; renderStudioPickers(); }
 
     function saveStudioSettings() {
       const newName = document.getElementById('setting-username').value.trim();
@@ -2240,6 +2255,7 @@
       initEnvironmentElements();
 
       document.getElementById('coin-counter').textContent = sakuraCoins;
+      updateFriendBadges();
 
       localPlayer.x = canvas.width / 2;
       localPlayer.y = canvas.height / 2 + 30;
