@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Sakura Slime World 🌸 - Virtual Lounge & Social Fair</title>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -12,6 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Yuji+Mai&display=swap" rel="stylesheet" />
+
   <style>
     html, body {
       height: 100%;
@@ -27,31 +29,37 @@
       background: #180914;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
+
     .font-sakura {
       font-family: 'Yuji Mai', serif;
     }
+
     .glass {
-      background: rgba(255, 255, 255, 0.90);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.9);
     }
+
     .glass-dark {
-      background: rgba(26, 12, 24, 0.94);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(26, 12, 24, 0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       border: 1px solid rgba(244, 114, 182, 0.25);
     }
+
     .glass-input {
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(244, 114, 182, 0.4);
     }
+
     .glass-input:focus {
       border-color: #ec4899;
       outline: none;
       box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25);
     }
+
     ::-webkit-scrollbar {
       width: 4px;
       height: 4px;
@@ -63,6 +71,7 @@
       background: rgba(244, 114, 182, 0.5);
       border-radius: 10px;
     }
+
     .joystick-base {
       width: 80px;
       height: 80px;
@@ -85,6 +94,7 @@
       pointer-events: none;
       transition: transform 0.04s ease-out;
     }
+
     .action-btn {
       background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(244, 114, 182, 0.5);
@@ -96,6 +106,7 @@
       background: #ec4899;
       color: white;
     }
+
     .tab-active {
       background: #ec4899 !important;
       color: #ffffff !important;
@@ -105,18 +116,18 @@
 </head>
 <body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
 
-  <!-- AUTH MODAL OVERLAY (Sign In / Sign Up) -->
-  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/80 backdrop-blur-md flex items-center justify-center p-4">
+  <!-- AUTH MODAL OVERLAY (Distinct Sign In & Sign Up Pages/Tabs) -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/75 backdrop-blur-md flex items-center justify-center p-4">
     <div class="glass w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90dvh] overflow-y-auto">
       <div class="text-center space-y-1">
         <div class="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 text-white shadow-lg shadow-pink-300 mb-1">
           <i data-lucide="sparkles" class="w-6 h-6"></i>
         </div>
-        <h2 class="font-sakura text-2xl font-bold text-pink-950">Sakura Slime World</h2>
-        <p class="text-xs text-pink-600 font-medium">Zen Parks, Live Music, Friends & Chat!</p>
+        <h2 id="auth-page-title" class="font-sakura text-2xl font-bold text-pink-950">Sign In to Sakura Slime</h2>
+        <p class="text-xs text-pink-600 font-medium" id="auth-page-subtitle">Enter your account credentials to join the lobby.</p>
       </div>
 
-      <!-- Auth Tabs: Sign In vs Sign Up -->
+      <!-- Sign In / Sign Up Mode Switcher Tabs -->
       <div class="grid grid-cols-2 gap-1 p-1 bg-pink-100/80 rounded-2xl text-xs font-bold text-pink-800">
         <button id="tab-signin" onclick="switchAuthTab('signin')" class="py-2 rounded-xl bg-white shadow text-pink-900 transition">Sign In</button>
         <button id="tab-signup" onclick="switchAuthTab('signup')" class="py-2 rounded-xl transition text-pink-600 hover:text-pink-900">Sign Up</button>
@@ -139,7 +150,7 @@
         </div>
 
         <button type="submit" id="auth-submit-btn" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs mt-2">
-          <span>Sign In</span>
+          <span id="auth-btn-text">Sign In</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </button>
       </form>
@@ -157,58 +168,46 @@
 
   <!-- TOP NAVIGATION HEADER BAR -->
   <header class="h-14 sm:h-16 glass px-3 sm:px-5 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm gap-2">
-    <!-- Left Section: Title & RBAC Music Engine -->
+    <!-- Left Section: Title & Looping Music Control System (Role restricted to Admin & Developer) -->
     <div class="flex items-center gap-3 shrink-0">
       <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-2 rounded-2xl shadow-md shadow-pink-300 shrink-0">
         <i data-lucide="flower-2" class="w-5 h-5 sm:w-6 sm:h-6 animate-spin" style="animation-duration: 12s;"></i>
       </div>
       <div class="flex flex-col justify-center">
-        <h1 class="font-sakura text-sm sm:text-base text-pink-950 font-bold tracking-wider leading-tight whitespace-nowrap">Sakura Slime World 🌸</h1>
+        <h1 class="font-sakura text-sm sm:text-lg text-pink-950 font-bold tracking-wider leading-tight whitespace-nowrap">Sakura Slime World 🌸</h1>
         <p class="text-[10px] text-pink-600 font-bold uppercase tracking-wider" id="room-indicator">#sakura-lounge</p>
       </div>
 
-      <!-- Background Music Engine & Track Selector -->
-      <div class="hidden md:flex items-center bg-pink-100/90 rounded-2xl px-2.5 py-1 border border-pink-200 gap-2 ml-2 shadow-sm">
-        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Play / Pause Lo-Fi Music">
-          <i data-lucide="music" id="music-icon" class="w-4 h-4 text-pink-600"></i>
+      <!-- Music Bar placed right after title: Restricted controls for loop track selection -->
+      <div class="hidden md:flex items-center bg-pink-100/90 rounded-xl px-2 py-1 border border-pink-200 gap-1.5 ml-2">
+        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Looping Music">
+          <i data-lucide="music" id="music-icon" class="w-3.5 h-3.5 text-pink-600"></i>
         </button>
-
-        <!-- Track Selection (Restricted to Admin / Developer) -->
-        <div class="flex items-center gap-1">
-          <select id="music-track-select" onchange="onAdminSelectTrack(this.value)" class="text-[11px] font-bold bg-white text-pink-900 rounded-lg px-2 py-0.5 border border-pink-200 outline-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
-            <option value="track-zen">🌸 Zen Sakura Bloom</option>
-            <option value="track-bonfire">🔥 Bonfire Lo-Fi</option>
-            <option value="track-fair">🎠 Fairground Carousel</option>
-            <option value="track-arcade">🕹️ Cyber Neon Synth</option>
-          </select>
-          <span id="music-admin-badge" class="hidden text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-pink-600 text-white" title="Admin/Dev track selector">Host</span>
-        </div>
-
-        <input type="range" id="bg-volume" min="0" max="1" step="0.05" value="0.3" oninput="updateMusicVolume(this.value)" class="w-14 h-1 accent-pink-500 cursor-pointer" title="Volume" />
+        <span id="music-track-name" class="text-[10px] font-bold text-pink-900 truncate max-w-[90px]" title="Current Loop Track">Sakura Lo-Fi Loop</span>
+        <!-- Admin/Developer Track Selector (Restricted Access) -->
+        <select id="admin-music-selector" onchange="adminSelectMusicTrack(this.value)" class="hidden text-[10px] bg-white border border-pink-300 rounded px-1 py-0.5 font-bold text-pink-950" title="Admin Song Selector">
+          <option value="lofi">🌸 Sakura Lo-Fi</option>
+          <option value="disco">🕺 Disco Beat</option>
+          <option value="zen">🍵 Zen Flute</option>
+          <option value="epic">👑 Epic Anthem</option>
+        </select>
+        <input type="range" id="bg-volume" min="0" max="1" step="0.05" value="0.3" oninput="updateMusicVolume(this.value)" class="w-14 h-1 accent-pink-500 cursor-pointer mx-1" />
       </div>
     </div>
 
-    <!-- Right Controls Header: Search, Flowers, DM, Friends & Menu -->
+    <!-- Right Controls Header: Flower Count, Message Corner, Right Drawer Trigger -->
     <div class="flex items-center gap-2 shrink-0">
-      <!-- Sakura Flowers Balance Badge -->
       <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-black shadow-sm">
         <span class="text-sm">🌸</span>
         <span id="coin-counter">0</span>
       </div>
 
-      <!-- Quick User Search Trigger -->
-      <button onclick="openSocialDrawer('search')" class="p-2.5 rounded-2xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 transition" title="Search Users">
-        <i data-lucide="search" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-      </button>
-
-      <!-- Instagram-style Direct Messages Trigger -->
       <button onclick="toggleDMModal()" class="relative p-2.5 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-500 text-white shadow-md active:scale-95 transition" title="Direct Messages">
         <i data-lucide="send" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         <span id="dm-unread-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
       </button>
 
-      <!-- Right Drawer Trigger: Profile & Friends Social Center -->
-      <button onclick="toggleRightDrawer()" class="relative p-2.5 rounded-2xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1.5" title="Menu & Social">
+      <button onclick="toggleRightDrawer()" class="relative p-2.5 rounded-2xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1.5" title="Menu & Profile">
         <i data-lucide="menu" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         <span id="drawer-req-badge" class="hidden absolute -top-1 -right-1 px-1.5 py-0.5 bg-pink-600 text-white text-[9px] font-black rounded-full">0</span>
       </button>
@@ -217,6 +216,7 @@
 
   <!-- MAIN VIEWPORT CONTAINER -->
   <div class="flex-1 relative flex overflow-hidden w-full h-full">
+
     <!-- CANVAS VIEWPORT -->
     <div class="flex-1 relative bg-pink-950/20 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
       <canvas id="gameCanvas" class="block w-full h-full cursor-pointer touch-none"></canvas>
@@ -259,11 +259,14 @@
           <i data-lucide="music-2" class="w-3.5 h-3.5 text-purple-600"></i>
           <span class="hidden sm:inline">Dance</span>
         </button>
+
         <span class="text-pink-300">|</span>
+
         <!-- Admin Title Toggle -->
         <button id="admin-title-btn" onclick="toggleAdminTitle()" class="hidden px-2 py-0.5 rounded-xl text-[10px] font-black bg-yellow-400 text-black border border-yellow-500 shadow-sm shrink-0">
           👑 Admin Tag
         </button>
+
         <button onclick="triggerEmote('🌸')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg">🌸</button>
         <button onclick="triggerEmote('❤️')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg">❤️</button>
         <button onclick="triggerEmote('✨')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg">✨</button>
@@ -286,35 +289,31 @@
         </button>
       </div>
 
-      <!-- SLIME INTERACTION & SOCIAL POPUP -->
-      <div id="user-context-menu" class="hidden absolute z-50 glass p-3 rounded-2xl shadow-2xl border border-pink-300 space-y-2 w-56 text-xs font-bold text-pink-950">
+      <!-- SLIME INTERACTION & SOCIAL POPUP (Includes Unfriend & Add Friend Buttons) -->
+      <div id="user-context-menu" class="hidden absolute z-50 glass p-3 rounded-2xl shadow-2xl border border-pink-300 space-y-2 w-52 text-xs font-bold text-pink-950">
         <div class="flex items-center justify-between border-b pb-1">
-          <div class="flex items-center gap-2 truncate">
-            <div id="target-user-pfp-wrap" class="w-6 h-6 rounded-full overflow-hidden bg-pink-100 flex items-center justify-center shrink-0">
-              <span id="target-user-avatar-icon">🌸</span>
-            </div>
-            <span id="target-user-name" class="truncate font-extrabold text-pink-900">Player</span>
-          </div>
+          <span id="target-user-name" class="truncate font-extrabold text-pink-900">Player</span>
           <button onclick="closeUserMenu()" class="text-pink-600 hover:text-pink-950"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
         </div>
 
         <div class="space-y-1">
-          <!-- Dynamically switches between Add Friend and Unfriend -->
-          <button id="target-friend-toggle-btn" onclick="toggleFriendWithTarget()" class="w-full text-left py-1.5 px-2 rounded-xl bg-pink-500 hover:bg-pink-600 text-white flex items-center gap-1.5 shadow-sm">
-            <i data-lucide="user-plus" id="target-friend-icon" class="w-3.5 h-3.5"></i>
-            <span id="target-friend-text">Add Friend</span>
+          <button id="ctx-add-friend-btn" onclick="sendFriendRequestToTarget()" class="w-full text-left py-1.5 px-2 rounded-xl bg-pink-500 hover:bg-pink-600 text-white flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Add Friend
+          </button>
+          <button id="ctx-unfriend-btn" onclick="unfriendTargetFromContext()" class="hidden w-full text-left py-1.5 px-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="user-minus" class="w-3.5 h-3.5"></i> Unfriend
           </button>
           <button onclick="openDirectMessageWithTarget()" class="w-full text-left py-1.5 px-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-1.5 shadow-sm">
             <i data-lucide="send" class="w-3.5 h-3.5"></i> Send Private DM
           </button>
         </div>
-
+        
         <div id="admin-actions" class="hidden border-t pt-1 space-y-1">
           <button onclick="adminTempBan()" class="w-full text-left py-1 px-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 flex items-center gap-1.5">
             <i data-lucide="clock" class="w-3.5 h-3.5"></i> 10-Min Chat Ban
           </button>
           <button onclick="adminKickUser()" class="w-full text-left py-1 px-2 rounded-xl bg-orange-100 hover:bg-orange-200 text-orange-900 flex items-center gap-1.5">
-            <i data-lucide="user-x" class="w-3.5 h-3.5"></i> Kick Player (3D Dots)
+            <i data-lucide="user-x" class="w-3.5 h-3.5"></i> Kick Player
           </button>
           <button onclick="adminClearChat()" class="w-full text-left py-1 px-2 rounded-xl bg-pink-100 hover:bg-pink-200 text-pink-900 flex items-center gap-1.5">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear Chat Log
@@ -354,6 +353,7 @@
 
     <!-- CHAT DRAWER -->
     <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-r md:border-r-0 md:border-l border-pink-200/80 flex flex-col justify-between absolute md:relative left-0 md:left-auto right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
+      
       <!-- Drawer Room Selector -->
       <div class="p-3 border-b border-pink-200/30 bg-white/10 flex flex-col gap-2 shrink-0">
         <div class="flex items-center justify-between">
@@ -364,7 +364,7 @@
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
-
+        
         <div class="grid grid-cols-2 gap-1">
           <button onclick="switchChannel('sakura-lounge')" id="chan-btn-sakura-lounge" class="chan-btn px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition">
             🌸 Zen Garden
@@ -376,128 +376,117 @@
             🎡 Sakura Fair
           </button>
           <button onclick="switchChannel('arcade-lounge')" id="chan-btn-arcade-lounge" class="chan-btn px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-medium text-pink-200 hover:bg-pink-900/50 transition">
-            🕹️ Neon Arcade
+            🕹️ Arcade
           </button>
         </div>
       </div>
 
-      <!-- Chat Log Stream with Profile Pictures -->
+      <!-- Chat Log Stream -->
       <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2.5"></div>
 
       <!-- Chat Input Form -->
       <div class="p-2.5 bg-pink-950/80 border-t border-pink-200/30 shrink-0">
         <form id="chat-form" class="flex items-center gap-2">
-          <input type="text" id="chat-input" placeholder="Type a message..." maxlength="120" autocomplete="off" class="glass-input flex-1 px-3 py-2 rounded-xl text-xs text-pink-950 placeholder-pink-400 font-medium" />
-          <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl shadow-md transition shrink-0 active:scale-95">
+          <input 
+            type="text" 
+            id="chat-input" 
+            placeholder="Type a message..." 
+            maxlength="120"
+            autocomplete="off"
+            class="glass-input flex-1 px-3 py-2 rounded-xl text-xs text-pink-950 placeholder-pink-400 font-medium"
+          />
+          <button 
+            type="submit" 
+            class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl shadow-md transition shrink-0 active:scale-95"
+          >
             <i data-lucide="send" class="w-4 h-4"></i>
           </button>
         </form>
       </div>
     </aside>
 
-    <!-- RIGHT DRAWER: Multi-Tab Social & Profile Center -->
+    <!-- RIGHT DRAWER: Profile card with custom image upload, friend search & list with unfriend, dev controls, and Sign Out -->
     <aside id="right-drawer" class="w-80 sm:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute right-0 top-0 bottom-0 z-50 transition-transform duration-300 transform translate-x-full shadow-2xl h-full">
-      <!-- Drawer Header & Tabs -->
-      <div class="p-3 border-b border-pink-200/30 bg-white/5 space-y-2 shrink-0">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <div class="p-1.5 rounded-xl bg-pink-500 text-white shadow-md">
-              <i data-lucide="users" class="w-4 h-4"></i>
-            </div>
-            <h3 class="font-bold text-pink-100 text-sm">Social & Profile Hub</h3>
+      <!-- Drawer Header -->
+      <div class="p-4 border-b border-pink-200/30 flex items-center justify-between bg-white/5">
+        <div class="flex items-center gap-2">
+          <div class="p-2 rounded-xl bg-pink-500 text-white shadow-md">
+            <i data-lucide="user-cog" class="w-4 h-4"></i>
           </div>
-          <button onclick="toggleRightDrawer()" class="text-pink-300 hover:text-white p-1">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
+          <h3 class="font-bold text-pink-100 text-sm">Profile & Social Center</h3>
         </div>
-
-        <!-- Segmented Tab Switcher: Profile, Friends, Requests, Search -->
-        <div class="grid grid-cols-4 gap-1 p-1 bg-pink-950/60 rounded-xl text-[10px] font-bold text-pink-300 border border-pink-500/20">
-          <button onclick="switchSocialTab('profile')" id="stab-profile" class="py-1 rounded-lg transition tab-active">Profile</button>
-          <button onclick="switchSocialTab('friends')" id="stab-friends" class="py-1 rounded-lg transition">Friends</button>
-          <button onclick="switchSocialTab('requests')" id="stab-requests" class="py-1 rounded-lg transition relative">
-            Reqs
-            <span id="requests-badge-pill" class="hidden absolute -top-1 -right-1 px-1 bg-pink-600 text-white text-[8px] rounded-full">0</span>
-          </button>
-          <button onclick="switchSocialTab('search')" id="stab-search" class="py-1 rounded-lg transition">Search</button>
-        </div>
+        <button onclick="toggleRightDrawer()" class="text-pink-300 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
 
-      <!-- Drawer Body: Dynamic Tabs Container -->
+      <!-- Drawer Body Content -->
       <div class="flex-1 overflow-y-auto p-4 space-y-4">
-
-        <!-- 1. PROFILE TAB -->
-        <div id="social-panel-profile" class="space-y-4">
-          <div class="p-4 rounded-3xl glass border border-pink-300/60 shadow-lg space-y-3">
-            <div class="flex items-center gap-3">
-              <!-- Profile Picture Container with Upload Trigger -->
-              <div class="relative group cursor-pointer" onclick="document.getElementById('pfp-file-input').click()">
-                <div id="profile-card-pfp-img" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white text-2xl shadow-md overflow-hidden border-2 border-white">
-                  <span id="profile-avatar-icon">🌸</span>
-                </div>
-                <div class="absolute inset-0 bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[9px] font-bold">
-                  <i data-lucide="camera" class="w-4 h-4"></i>
-                </div>
-                <!-- Hidden file input for PFP upload -->
-                <input type="file" id="pfp-file-input" accept="image/*" class="hidden" onchange="handlePfpUpload(event)" />
+        <!-- Profile Card (Custom Picture Upload, Username, Email) -->
+        <div class="p-4 rounded-3xl glass border border-pink-300/60 shadow-lg space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="relative group cursor-pointer" onclick="document.getElementById('profile-img-upload').click()">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white text-xl shadow-md overflow-hidden" id="profile-avatar-container">
+                <span id="profile-avatar-emoji">🌸</span>
+                <img id="profile-avatar-img" class="hidden w-full h-full object-cover" />
               </div>
-
-              <div class="flex-1 truncate">
-                <div class="flex items-center gap-1.5">
-                  <h4 id="profile-card-username" class="font-bold text-pink-950 text-sm truncate">Slime User</h4>
-                  <span id="profile-role-tag" class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-pink-200 text-pink-800">Player</span>
-                </div>
-                <p id="profile-card-email" class="text-[11px] text-pink-600 font-medium truncate">slime@sakura.com</p>
-                <button onclick="document.getElementById('pfp-file-input').click()" class="text-[10px] text-pink-500 hover:text-pink-700 font-bold underline mt-0.5">
-                  Upload Photo
-                </button>
+              <div class="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-white text-[9px] font-bold">
+                Upload
               </div>
             </div>
-
-            <button onclick="toggleCustomStudioModal(); toggleRightDrawer();" class="w-full py-1.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5">
-              <i data-lucide="palette" class="w-3.5 h-3.5"></i> Open Slime Studio
-            </button>
+            <input type="file" id="profile-img-upload" accept="image/*" class="hidden" onchange="handleProfileImageUpload(event)" />
+            <div class="overflow-hidden">
+              <h4 id="profile-card-username" class="font-bold text-pink-950 text-sm truncate">Slime User</h4>
+              <p id="profile-card-email" class="text-[11px] text-pink-600 font-medium truncate">slime@sakura.com</p>
+            </div>
           </div>
-
-          <!-- Developer Mode Controls Trigger -->
-          <div class="pt-2">
-            <button onclick="promptDevMode();" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2">
-              <i data-lucide="code" class="w-4 h-4"></i> Developer Controls
-            </button>
-          </div>
+          <button onclick="toggleCustomStudioModal(); toggleRightDrawer();" class="w-full py-1.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5">
+            <i data-lucide="palette" class="w-3.5 h-3.5"></i> Open Slime Studio
+          </button>
         </div>
 
-        <!-- 2. FRIENDS LIST TAB (With Live Search Filter & Unfriend) -->
-        <div id="social-panel-friends" class="space-y-3 hidden">
-          <div class="relative">
-            <input type="text" id="friends-filter-search" oninput="renderFriendsSideDrawer()" placeholder="Filter friends by name..." class="glass-input w-full pl-8 pr-3 py-1.5 rounded-xl text-xs font-semibold text-pink-950" />
-            <i data-lucide="search" class="w-3.5 h-3.5 text-pink-400 absolute left-2.5 top-2.5"></i>
+        <!-- Friend Search & Add Section -->
+        <div class="space-y-2">
+          <label class="text-xs font-bold text-pink-200 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="user-search" class="w-3.5 h-3.5 text-pink-400"></i> Find & Add Friends
+          </label>
+          <div class="flex gap-2">
+            <input type="text" id="friend-search-input" oninput="filterSearchableUsers(this.value)" placeholder="Search by username..." class="glass-input flex-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-pink-950" />
           </div>
-          <div id="friends-side-drawer-list" class="space-y-2"></div>
+          <div id="friend-search-results" class="space-y-1.5 max-h-32 overflow-y-auto pr-1"></div>
         </div>
 
-        <!-- 3. FRIEND REQUESTS TAB -->
-        <div id="social-panel-requests" class="space-y-3 hidden">
+        <!-- Friend Requests Area -->
+        <div class="space-y-2">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-pink-200 uppercase tracking-wider">Pending Requests</span>
-            <span id="drawer-req-count-badge" class="px-2 py-0.5 bg-pink-600 text-white text-[10px] font-black rounded-full">0</span>
+            <span class="text-xs font-bold text-pink-200 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="users" class="w-3.5 h-3.5 text-pink-400"></i> Friend Requests
+            </span>
+            <span id="drawer-req-count-badge" class="px-1.5 py-0.5 bg-pink-600 text-white text-[9px] font-black rounded-full hidden">0</span>
           </div>
           <div id="drawer-friends-requests-list" class="space-y-2"></div>
         </div>
 
-        <!-- 4. USER SEARCH TAB (Lookup players, Add Friend, Unfriend) -->
-        <div id="social-panel-search" class="space-y-3 hidden">
-          <div class="relative">
-            <input type="text" id="user-lookup-search" oninput="renderUserLookupResults()" placeholder="Search players by name..." class="glass-input w-full pl-8 pr-3 py-1.5 rounded-xl text-xs font-semibold text-pink-950" />
-            <i data-lucide="search" class="w-3.5 h-3.5 text-pink-400 absolute left-2.5 top-2.5"></i>
+        <!-- Friend List with Unfriend Button & Quick Search Query -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-pink-200 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="heart" class="w-3.5 h-3.5 text-pink-400"></i> My Friends List
+            </span>
           </div>
-          <p class="text-[10px] text-pink-300 italic">Lookup online & registered players in Sakura World:</p>
-          <div id="user-lookup-results-list" class="space-y-2"></div>
+          <input type="text" id="my-friends-filter" oninput="renderDrawerMyFriends()" placeholder="Quick search friends..." class="glass-input w-full px-3 py-1.5 rounded-xl text-xs font-semibold text-pink-950" />
+          <div id="drawer-my-friends-list" class="space-y-1.5 max-h-40 overflow-y-auto pr-1"></div>
         </div>
 
+        <!-- Developer Controls Button -->
+        <div class="pt-2">
+          <button onclick="promptDevMode(); toggleRightDrawer();" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2">
+            <i data-lucide="code" class="w-4 h-4"></i> Developer Controls
+          </button>
+        </div>
       </div>
 
-      <!-- Drawer Footer: Sign Out Button -->
+      <!-- Drawer Footer: Sign Out Button at the very end -->
       <div class="p-4 border-t border-pink-200/20 bg-pink-950/60 shrink-0">
         <button onclick="handleSignOut()" class="w-full py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-lg shadow-rose-900/40 transition active:scale-95 flex items-center justify-center gap-2">
           <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
@@ -506,20 +495,24 @@
     </aside>
   </div>
 
-  <!-- BOTTOM NAVIGATION BAR -->
+  <!-- BOTTOM NAVIGATION BAR (Strict order: Games, Chat, Shop, Slime Studio) -->
   <nav class="h-14 bg-pink-950/95 border-t border-pink-200/20 backdrop-blur-md flex items-center justify-around px-2 z-30 shrink-0">
+    <!-- 1. Games -->
     <button onclick="openGamesSelectionModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
       <i data-lucide="gamepad-2" class="w-5 h-5"></i>
       <span class="text-[10px] font-bold">Games</span>
     </button>
+    <!-- 2. Chat -->
     <button onclick="toggleChatSidebar()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
       <i data-lucide="message-square" class="w-5 h-5"></i>
       <span class="text-[10px] font-bold">Chat</span>
     </button>
+    <!-- 3. Shop -->
     <button onclick="toggleShopModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
       <i data-lucide="shopping-bag" class="w-5 h-5"></i>
       <span class="text-[10px] font-bold">Shop</span>
     </button>
+    <!-- 4. Slime Studio -->
     <button onclick="toggleCustomStudioModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
       <i data-lucide="palette" class="w-5 h-5"></i>
       <span class="text-[10px] font-bold">Studio</span>
@@ -535,6 +528,7 @@
         </h3>
         <button onclick="closeGamesSelectionModal()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
+
       <div class="space-y-2">
         <div class="p-3 rounded-2xl bg-pink-100/80 border border-pink-200 flex items-center justify-between">
           <div class="space-y-0.5">
@@ -545,6 +539,7 @@
             Play Game
           </button>
         </div>
+
         <div class="p-3 rounded-2xl bg-pink-100/80 border border-pink-200 flex items-center justify-between">
           <div class="space-y-0.5">
             <span class="font-bold text-xs text-pink-950 flex items-center gap-1">🃏 Slime Memory Cards</span>
@@ -558,9 +553,9 @@
     </div>
   </div>
 
-  <!-- DIRECT MESSAGES MODAL (With real-time sync, unread badge & PFP) -->
+  <!-- INSTAGRAM-STYLE DIRECT MESSAGES MODAL (With profile pictures & unfriend) -->
   <div id="dm-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass w-full max-w-lg rounded-3xl p-5 shadow-2xl border border-white flex flex-col h-[80dvh] animate-in fade-in">
+    <div class="glass w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white flex flex-col h-[80dvh] animate-in fade-in">
       <div class="flex items-center justify-between border-b border-pink-200 pb-3 shrink-0">
         <div class="flex items-center gap-2">
           <div class="p-2 rounded-xl bg-pink-500 text-white shadow-md">
@@ -568,7 +563,7 @@
           </div>
           <div>
             <h3 class="font-bold text-pink-950 text-base">Direct Messages</h3>
-            <p class="text-[10px] text-pink-600 font-semibold" id="dm-recipient-subtitle">Private 1-on-1 conversations</p>
+            <p class="text-[10px] text-pink-600 font-semibold">Private 1-on-1 conversations</p>
           </div>
         </div>
         <button onclick="toggleDMModal()" class="text-pink-700 hover:text-pink-900 p-1">
@@ -579,15 +574,12 @@
       <div class="flex-1 flex overflow-hidden my-3 rounded-2xl border border-pink-200 bg-white/50">
         <!-- Friends List -->
         <div class="w-1/3 border-r border-pink-200 overflow-y-auto p-1.5 space-y-1" id="dm-friends-list"></div>
-
         <!-- Active DM Thread -->
         <div class="flex-1 flex flex-col justify-between p-2 bg-white/80" id="dm-thread-container">
           <div id="dm-messages" class="flex-1 overflow-y-auto space-y-2 p-1"></div>
-          <form id="dm-form" onsubmit="handleSendDM(event)" class="flex items-center gap-1.5 pt-2 border-t border-pink-200 hidden">
+          <form id="dm-form" class="flex items-center gap-1.5 pt-2 border-t border-pink-200 hidden">
             <input type="text" id="dm-input" placeholder="Message..." class="glass-input flex-1 px-3 py-1.5 rounded-xl text-xs text-pink-950 font-medium" />
-            <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl text-xs font-bold shadow">
-              <i data-lucide="send" class="w-3.5 h-3.5"></i>
-            </button>
+            <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl text-xs font-bold shadow"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
           </form>
         </div>
       </div>
@@ -604,7 +596,7 @@
           </div>
           <div>
             <h3 class="font-bold text-purple-950 text-base">Developer Control Panel</h3>
-            <p class="text-[10px] text-purple-600 font-semibold">Live Player Management & Music Control</p>
+            <p class="text-[10px] text-purple-600 font-semibold">Live Player Management & Flower Granting</p>
           </div>
         </div>
         <button onclick="toggleDevModal()" class="text-purple-700 hover:text-purple-900 p-1">
@@ -612,23 +604,7 @@
         </button>
       </div>
 
-      <!-- Dev Music Controller -->
-      <div class="p-3 rounded-2xl bg-purple-100 border border-purple-200 space-y-2">
-        <label class="text-[10px] font-bold text-purple-900 uppercase tracking-wider">Lounge Music Engine (Syncs to all)</label>
-        <div class="flex gap-2">
-          <select id="dev-music-select" class="glass-input flex-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-purple-950">
-            <option value="track-zen">🌸 Zen Sakura Bloom</option>
-            <option value="track-bonfire">🔥 Bonfire Lo-Fi</option>
-            <option value="track-fair">🎠 Fairground Carousel</option>
-            <option value="track-arcade">🕹️ Cyber Neon Synth</option>
-          </select>
-          <button onclick="onDevBroadcastTrack()" class="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-sm">
-            Set Track
-          </button>
-        </div>
-      </div>
-
-      <!-- Dev Grant Flowers directly to any user -->
+      <!-- Dev Grant Flowers -->
       <div class="p-3 rounded-2xl bg-purple-100 border border-purple-200 space-y-2">
         <label class="text-[10px] font-bold text-purple-900 uppercase tracking-wider">Grant Flowers to Player</label>
         <div class="flex gap-2">
@@ -642,9 +618,9 @@
 
       <!-- Registered Players Search -->
       <div class="space-y-2">
-        <label class="text-[10px] font-bold text-purple-800 uppercase tracking-wider">Registered Players List</label>
+        <label class="text-[10px] font-bold text-purple-800 uppercase tracking-wider">Registered Players Search</label>
         <div class="relative">
-          <input type="text" id="dev-user-search" oninput="renderDevUserList()" placeholder="Search player by name..." class="glass-input w-full pl-9 pr-3.5 py-2 rounded-xl text-xs font-semibold text-purple-950" />
+          <input type="text" id="dev-user-search" oninput="filterDevUserList()" placeholder="Search player by name..." class="glass-input w-full pl-9 pr-3.5 py-2 rounded-xl text-xs font-semibold text-purple-950" />
           <i data-lucide="search" class="w-4 h-4 text-purple-400 absolute left-3 top-2.5"></i>
         </div>
         <div id="dev-user-list" class="space-y-1.5 max-h-40 overflow-y-auto pr-1"></div>
@@ -653,7 +629,7 @@
       <!-- Permanent Bans List -->
       <div class="space-y-1.5 border-t border-purple-200 pt-2">
         <label class="text-[10px] font-bold text-rose-800 uppercase tracking-wider flex items-center gap-1">
-          <i data-lucide="ban" class="w-3.5 h-3.5 text-rose-600"></i> Permanently Banned Players
+          <i data-lucide="slash" class="w-3.5 h-3.5 text-rose-600"></i> Permanently Banned Players
         </label>
         <div id="dev-banned-list" class="space-y-1.5 max-h-32 overflow-y-auto pr-1"></div>
       </div>
@@ -685,11 +661,12 @@
         <button onclick="switchShopTab('titles')" id="shoptab-titles" class="py-1.5 rounded-xl transition">Titles</button>
         <button onclick="switchShopTab('accessories')" id="shoptab-accessories" class="py-1.5 rounded-xl transition">Hats</button>
       </div>
+
       <div id="shop-items-grid" class="grid grid-cols-2 gap-2.5 max-h-72 overflow-y-auto p-1"></div>
     </div>
   </div>
 
-  <!-- CUSTOMIZATION STUDIO MODAL -->
+  <!-- CUSTOMIZATION STUDIO MODAL (Profile picture upload & settings) -->
   <div id="custom-studio-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white space-y-4 max-h-[90dvh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-pink-200 pb-2">
@@ -705,6 +682,11 @@
       <div class="space-y-1">
         <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Display Name</label>
         <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs font-semibold text-pink-950" placeholder="Your Slime Name..." />
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Profile Picture Upload</label>
+        <input type="file" accept="image/*" onchange="handleProfileImageUpload(event)" class="glass-input w-full px-3 py-1.5 rounded-xl text-xs text-pink-950 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-pink-500 file:text-white file:font-bold file:text-[10px]" />
       </div>
 
       <div class="space-y-1">
@@ -726,47 +708,22 @@
   <script>
     // --- SUPABASE CONFIGURATION ---
     const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg1NDg1NDksImV4cCI6MjA1NDEyNDU0OX0.5eLpT6m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- AUDIO & MUSIC ENGINE (Continuous Looping Procedural Synthesizer) ---
+    // --- LOOPING MUSIC & ROLE-BASED AUDIO SYSTEM ---
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     let musicPlaying = false;
     let musicMasterGain = null;
-    let musicTimer = null;
-    let currentMusicTrack = 'track-zen';
+    let musicLoopInterval = null;
+    let currentSongKey = 'lofi';
 
-    // Track Presets
-    const TRACK_CONFIGS = {
-      'track-zen': {
-        name: '🌸 Zen Sakura Bloom',
-        scale: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25], // Pentatonic Major
-        oscType: 'sine',
-        speedMin: 500, speedMax: 1100,
-        decay: 1.6
-      },
-      'track-bonfire': {
-        name: '🔥 Bonfire Lo-Fi',
-        scale: [220.00, 246.94, 261.63, 329.63, 349.23, 440.00, 523.25], // Minor Chill
-        oscType: 'triangle',
-        speedMin: 600, speedMax: 1300,
-        decay: 2.0
-      },
-      'track-fair': {
-        name: '🎠 Fairground Carousel',
-        scale: [392.00, 440.00, 493.88, 523.25, 587.33, 659.25, 783.99], // Lydian / Bright
-        oscType: 'sine',
-        speedMin: 300, speedMax: 650,
-        decay: 0.9
-      },
-      'track-arcade': {
-        name: '🕹️ Cyber Neon Synth',
-        scale: [146.83, 174.61, 220.00, 261.63, 293.66, 349.23, 440.00, 587.33], // Synthwave Minor
-        oscType: 'sawtooth',
-        speedMin: 220, speedMax: 480,
-        decay: 0.7
-      }
+    const SONGS_DB = {
+      lofi: { name: '🌸 Sakura Lo-Fi', scale: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25] },
+      disco: { name: '🕺 Disco Beat', scale: [329.63, 392.00, 440.00, 493.88, 587.33, 659.25] },
+      zen: { name: '🍵 Zen Flute', scale: [220.00, 246.94, 293.66, 329.63, 392.00, 440.00] },
+      epic: { name: '👑 Epic Anthem', scale: [392.00, 440.00, 523.25, 587.33, 659.25, 783.99] }
     };
 
     function initAudio() {
@@ -776,9 +733,7 @@
         musicMasterGain.gain.value = 0.3;
         musicMasterGain.connect(audioCtx.destination);
       }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
     function playSound(type) {
@@ -787,8 +742,7 @@
         if (!audioCtx) return;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        osc.connect(gain); gain.connect(audioCtx.destination);
         const now = audioCtx.currentTime;
 
         if (type === 'bounce') {
@@ -813,8 +767,7 @@
           osc.start(now); osc.stop(now + 0.08);
         } else if (type === 'win') {
           [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-            const o = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
             o.connect(g); g.connect(audioCtx.destination);
             o.type = 'triangle'; o.frequency.value = freq;
             g.gain.setValueAtTime(0.15, now + idx * 0.08);
@@ -825,28 +778,25 @@
       } catch (e) {}
     }
 
-    function playContinuousMusicNote() {
+    function playLoopingNote() {
       if (!musicPlaying || !audioCtx) return;
-      const config = TRACK_CONFIGS[currentMusicTrack] || TRACK_CONFIGS['track-zen'];
       const now = audioCtx.currentTime;
-      const freq = config.scale[Math.floor(Math.random() * config.scale.length)];
+      const scale = SONGS_DB[currentSongKey]?.scale || SONGS_DB.lofi.scale;
+      const freq = scale[Math.floor(Math.random() * scale.length)];
 
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = config.oscType;
+      osc.type = currentSongKey === 'disco' ? 'sawtooth' : 'sine';
       osc.frequency.setValueAtTime(freq, now);
 
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(config.oscType === 'sawtooth' ? 0.05 : 0.12, now + 0.08);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + config.decay);
+      gain.gain.linearRampToValueAtTime(0.1, now + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
 
-      osc.connect(gain);
-      gain.connect(musicMasterGain);
-      osc.start(now);
-      osc.stop(now + config.decay);
+      osc.connect(gain); gain.connect(musicMasterGain);
+      osc.start(now); osc.stop(now + 1.5);
 
-      const delay = Math.random() * (config.speedMax - config.speedMin) + config.speedMin;
-      musicTimer = setTimeout(playContinuousMusicNote, delay);
+      musicLoopInterval = setTimeout(playLoopingNote, Math.random() * 500 + 450);
     }
 
     function toggleBackgroundMusic() {
@@ -854,14 +804,15 @@
       musicPlaying = !musicPlaying;
       const icon = document.getElementById('music-icon');
       const btn = document.getElementById('music-toggle-btn');
+
       if (musicPlaying) {
         icon.setAttribute('data-lucide', 'volume-2');
         btn.classList.add('bg-pink-200', 'text-pink-900');
-        playContinuousMusicNote();
+        playLoopingNote();
       } else {
         icon.setAttribute('data-lucide', 'music');
         btn.classList.remove('bg-pink-200', 'text-pink-900');
-        clearTimeout(musicTimer);
+        clearTimeout(musicLoopInterval);
       }
       lucide.createIcons();
     }
@@ -870,40 +821,26 @@
       if (musicMasterGain) musicMasterGain.gain.value = parseFloat(val);
     }
 
-    // Role-Based Access Control (RBAC) Music Track Switching
-    function setMusicTrack(trackId, isRemoteBroadcast = false) {
-      if (!TRACK_CONFIGS[trackId]) return;
-      currentMusicTrack = trackId;
-      document.getElementById('music-track-select').value = trackId;
-      const devSelect = document.getElementById('dev-music-select');
-      if (devSelect) devSelect.value = trackId;
-
-      if (musicPlaying) {
-        clearTimeout(musicTimer);
-        playContinuousMusicNote();
-      }
-    }
-
-    function onAdminSelectTrack(trackId) {
+    // Role-restricted music song selection (Only Admin & Developer)
+    function adminSelectMusicTrack(trackKey) {
       if (!isAdminRole && !isDevMode) {
-        alert("🔒 Restricted: Only Admins and Developers can change the Lounge Music Track!");
-        document.getElementById('music-track-select').value = currentMusicTrack;
+        alert("Music control settings are restricted to Admins and Developers only!");
         return;
       }
-      setMusicTrack(trackId);
-      // Broadcast dynamically to all connected room slimes
-      if (socialChannel) {
-        socialChannel.send({
-          type: 'broadcast',
-          event: 'music-change',
-          payload: { trackId: trackId, changedBy: localPlayer.name }
-        });
+      currentSongKey = trackKey;
+      document.getElementById('music-track-name').textContent = SONGS_DB[trackKey]?.name || 'Custom Song';
+      if (realtimeChannel) {
+        realtimeChannel.send({ type: 'broadcast', event: 'music-change', payload: { trackKey } });
       }
     }
 
-    function onDevBroadcastTrack() {
-      const track = document.getElementById('dev-music-select').value;
-      onAdminSelectTrack(track);
+    function updateMusicUIForRole() {
+      const selector = document.getElementById('admin-music-selector');
+      if (isAdminRole || isDevMode) {
+        selector.classList.remove('hidden');
+      } else {
+        selector.classList.add('hidden');
+      }
     }
 
     // --- AVATAR TYPES & SHOP PRICING ---
@@ -912,9 +849,9 @@
       spirit: { name: 'Cat Ears', bodyColor: '#38bdf8', accessory: '🐱', price: 0 },
       admin_black: { name: 'Admin Black', bodyColor: '#18181b', accessory: '👑', price: 0 },
       dev_white: { name: 'Dev Pure White', bodyColor: '#ffffff', accessory: '⚡', price: 0 },
-      fox: { name: 'Kitsune Mask', bodyColor: '#fb923c', accessory: '🦊', price: 450 },
+      fox:    { name: 'Kitsune Mask', bodyColor: '#fb923c', accessory: '🦊', price: 450 },
       matcha: { name: 'Matcha Boba', bodyColor: '#4ade80', accessory: '🍵', price: 800 },
-      crown: { name: 'Royal Purple', bodyColor: '#a855f7', accessory: '👑', price: 1300 },
+      crown:  { name: 'Royal Purple', bodyColor: '#a855f7', accessory: '👑', price: 1300 },
       galaxy: { name: 'Galaxy Indigo', bodyColor: '#6366f1', accessory: '⭐', price: 2000 }
     };
 
@@ -952,13 +889,15 @@
       ]
     };
 
-    // --- GAME & USER STATE ---
-    let sakuraCoins = parseInt(localStorage.getItem('sakura_coins') || '100');
+    // --- GAME STATE ---
+    let sakuraCoins = parseInt(localStorage.getItem('sakura_coins') || '0');
     let unlockedItems = JSON.parse(localStorage.getItem('sakura_unlocked_items') || '["sakura","spirit"]');
+
     let myFriends = JSON.parse(localStorage.getItem('sakura_friends') || '[]');
     let friendRequests = JSON.parse(localStorage.getItem('sakura_friend_reqs') || '[]');
     let directMessages = JSON.parse(localStorage.getItem('sakura_direct_msgs') || '{}');
     let activeDMTarget = null;
+
     let bannedUsers = JSON.parse(localStorage.getItem('sakura_banned_users') || '[]');
     let adminUsers = JSON.parse(localStorage.getItem('sakura_admin_users') || '[]');
     let userBanEndTimes = {};
@@ -967,12 +906,12 @@
     let isDevMode = false;
     let isAdminRole = false;
     let showAdminTitle = false;
-    let currentUser = null;
 
+    let currentUser = null;
     let localPlayer = {
-      id: localStorage.getItem('sakura_user_id') || ('usr_' + Math.random().toString(36).substring(2, 9)),
-      name: localStorage.getItem('sakura_avatar_name') || ('Slime_' + Math.floor(100 + Math.random() * 900)),
-      pfp: localStorage.getItem('sakura_avatar_pfp') || '',
+      id: 'usr_' + Math.random().toString(36).substring(2, 9),
+      name: localStorage.getItem('sakura_avatar_name') || 'Slime_' + Math.floor(100 + Math.random() * 900),
+      profilePic: localStorage.getItem('sakura_profile_pic') || '',
       avatarType: localStorage.getItem('sakura_avatar_type') || 'sakura',
       expression: localStorage.getItem('sakura_expression') || 'happy',
       equippedAcc: localStorage.getItem('sakura_equipped_acc') || '',
@@ -997,33 +936,30 @@
       speechBubble: null,
       activeEmote: null
     };
-    localStorage.setItem('sakura_user_id', localPlayer.id);
 
     let remotePlayers = {};
     let floatingParticles = [];
     let trailParticles = [];
     let currentChannel = 'sakura-lounge';
     let realtimeChannel = null;
-    let socialChannel = null;
 
-    // Environment specific animation variables
     let petals = [];
     let fireflies = [];
     let discoLights = [];
     let koiFish = [];
     let bonfireFlames = [];
+
     let ferrisWheelAngle = 0;
     let discoHue = 0;
+
     let selectedPlayerForContext = null;
 
-    // Mini-Game State
     let activeMiniGame = null;
     let miniGameScore = 0;
     let miniGameTimeLeft = 0;
     let miniGameInterval = null;
     let gameCollectibles = [];
 
-    // Persistent Chat Memory
     const chatMemory = {
       'sakura-lounge': JSON.parse(localStorage.getItem('chat_sakura-lounge') || '[]'),
       'bonfire-park': JSON.parse(localStorage.getItem('chat_bonfire-park') || '[]'),
@@ -1034,16 +970,16 @@
     let registeredUsers = JSON.parse(localStorage.getItem('sakura_registered_users') || '[]');
     if (registeredUsers.length === 0) {
       registeredUsers = [
-        { id: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp },
-        { id: 'usr_mika', name: 'MikaSlime', pfp: '' },
-        { id: 'usr_taro', name: 'TaroBoba', pfp: '' },
-        { id: 'usr_sakura', name: 'SakuraQueen', pfp: '' }
+        { id: localPlayer.id, name: localPlayer.name, profilePic: localPlayer.profilePic },
+        { id: 'usr_mika', name: 'MikaSlime', profilePic: '' },
+        { id: 'usr_taro', name: 'TaroBoba', profilePic: '' }
       ];
       localStorage.setItem('sakura_registered_users', JSON.stringify(registeredUsers));
     }
 
     const keys = { up: false, down: false, left: false, right: false };
     const joystick = { active: false, dx: 0, dy: 0 };
+
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -1059,682 +995,47 @@
       document.getElementById('coin-counter').textContent = sakuraCoins;
     }
 
-    // --- PROFILE & PICTURE UPLOAD ---
-    function handlePfpUpload(event) {
+    // --- PROFILE PICTURE UPLOAD HANDLER ---
+    function handleProfileImageUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          // Compress to clean 96x96 avatar thumbnail to save localStorage space
-          const oc = document.createElement('canvas');
-          oc.width = 96; oc.height = 96;
-          const octx = oc.getContext('2d');
-          octx.drawImage(img, 0, 0, 96, 96);
-          const dataURL = oc.toDataURL('image/jpeg', 0.85);
-
-          localPlayer.pfp = dataURL;
-          localStorage.setItem('sakura_avatar_pfp', dataURL);
-
-          // Update local player in registered users list
-          const meInReg = registeredUsers.find(u => u.id === localPlayer.id);
-          if (meInReg) meInReg.pfp = dataURL;
-          localStorage.setItem('sakura_registered_users', JSON.stringify(registeredUsers));
-
-          updateProfileCardUI();
-          if (realtimeChannel) broadcastState();
-          alert("🌸 Profile picture updated successfully!");
-        };
-        img.src = e.target.result;
+        localPlayer.profilePic = e.target.result;
+        localStorage.setItem('sakura_profile_pic', localPlayer.profilePic);
+        updateProfileCardUI();
+        if (realtimeChannel) broadcastState();
+        alert('Profile picture uploaded successfully!');
       };
       reader.readAsDataURL(file);
     }
 
-    function updateProfileCardUI() {
-      const nameEl = document.getElementById('profile-card-username');
-      const emailEl = document.getElementById('profile-card-email');
-      const pfpWrap = document.getElementById('profile-card-pfp-img');
-      const avatarIcon = document.getElementById('profile-avatar-icon');
-      const roleTag = document.getElementById('profile-role-tag');
-
-      nameEl.textContent = localPlayer.name;
-      emailEl.textContent = currentUser?.email || (isDevMode ? 'developer@sakura.world' : 'guest@sakura.world');
-
-      if (isDevMode) {
-        roleTag.textContent = 'Developer';
-        roleTag.className = 'text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-purple-600 text-white';
-      } else if (isAdminRole) {
-        roleTag.textContent = 'Admin';
-        roleTag.className = 'text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500 text-white';
-      } else {
-        roleTag.textContent = 'Player';
-        roleTag.className = 'text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-pink-200 text-pink-800';
-      }
-
-      // Render PFP image or Fallback Icon
-      if (localPlayer.pfp) {
-        pfpWrap.innerHTML = `<img src="${localPlayer.pfp}" class="w-full h-full object-cover rounded-2xl" alt="PFP" />`;
-      } else {
-        const type = AVATAR_TYPES[localPlayer.avatarType] || AVATAR_TYPES.sakura;
-        pfpWrap.innerHTML = `<span id="profile-avatar-icon">${type.accessory}</span>`;
-        pfpWrap.style.backgroundColor = type.bodyColor;
-      }
-
-      // Check RBAC for top-bar music selection dropdown
-      const musicSelect = document.getElementById('music-track-select');
-      const musicAdminBadge = document.getElementById('music-admin-badge');
-      if (isAdminRole || isDevMode) {
-        musicSelect.disabled = false;
-        musicAdminBadge.classList.remove('hidden');
-      } else {
-        musicSelect.disabled = true;
-        musicAdminBadge.classList.add('hidden');
-      }
-    }
-
-    // --- RIGHT DRAWER & SOCIAL MANAGEMENT ---
-    function toggleRightDrawer() {
-      const drawer = document.getElementById('right-drawer');
-      drawer.classList.toggle('translate-x-full');
-      if (!drawer.classList.contains('translate-x-full')) {
-        updateProfileCardUI();
-        renderFriendsSideDrawer();
-        renderDrawerFriendRequests();
-        renderUserLookupResults();
-      }
-    }
-
-    function openSocialDrawer(tab = 'friends') {
-      const drawer = document.getElementById('right-drawer');
-      drawer.classList.remove('translate-x-full');
-      switchSocialTab(tab);
-    }
-
-    function switchSocialTab(tab) {
-      ['profile', 'friends', 'requests', 'search'].forEach(t => {
-        document.getElementById(`stab-${t}`).classList.remove('tab-active');
-        document.getElementById(`social-panel-${t}`).classList.add('hidden');
-      });
-      document.getElementById(`stab-${tab}`).classList.add('tab-active');
-      document.getElementById(`social-panel-${tab}`).classList.remove('hidden');
-
-      if (tab === 'friends') renderFriendsSideDrawer();
-      if (tab === 'requests') renderDrawerFriendRequests();
-      if (tab === 'search') renderUserLookupResults();
-      if (tab === 'profile') updateProfileCardUI();
-    }
-
-    // --- FRIEND MANAGEMENT SYSTEM ---
-    function renderFriendsSideDrawer() {
-      const container = document.getElementById('friends-side-drawer-list');
-      const filter = (document.getElementById('friends-filter-search')?.value || '').toLowerCase().trim();
-      container.innerHTML = '';
-
-      if (myFriends.length === 0) {
-        container.innerHTML = `<div class="text-[11px] text-pink-300 italic text-center py-6">You don't have any friends yet.<br/>Search users or click slimes to add!</div>`;
-        return;
-      }
-
-      const activeOnlineIds = Object.keys(remotePlayers);
-
-      const filtered = myFriends.filter(fId => {
-        const u = registeredUsers.find(x => x.id === fId);
-        const name = u ? u.name : fId;
-        return name.toLowerCase().includes(filter);
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="text-[10px] text-pink-400 italic text-center py-3">No matching friends found.</div>`;
-        return;
-      }
-
-      filtered.forEach(friendId => {
-        const friendObj = registeredUsers.find(u => u.id === friendId) || { id: friendId, name: friendId, pfp: '' };
-        const isOnline = activeOnlineIds.includes(friendId);
-
-        const card = document.createElement('div');
-        card.className = 'glass p-2 rounded-2xl flex items-center justify-between border border-pink-200/80 shadow-sm gap-2';
-        card.innerHTML = `
-          <div class="flex items-center gap-2 truncate">
-            <div class="relative w-8 h-8 rounded-full overflow-hidden bg-pink-100 flex items-center justify-center border border-pink-300 shrink-0">
-              ${friendObj.pfp ? `<img src="${friendObj.pfp}" class="w-full h-full object-cover" />` : `<span class="text-xs">🌸</span>`}
-              <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border border-white ${isOnline ? 'bg-emerald-500' : 'bg-gray-400'}"></span>
-            </div>
-            <div class="truncate">
-              <span class="text-xs font-bold text-pink-950 truncate block">${escapeHtml(friendObj.name)}</span>
-              <span class="text-[9px] text-pink-500 font-semibold">${isOnline ? 'Online now' : 'Offline'}</span>
-            </div>
-          </div>
-          <div class="flex items-center gap-1 shrink-0">
-            <button onclick="openDirectMessageWithId('${friendObj.id}', '${escapeHtml(friendObj.name)}')" class="p-1.5 rounded-xl bg-purple-500 hover:bg-purple-600 text-white" title="Message">
-              <i data-lucide="send" class="w-3.5 h-3.5"></i>
-            </button>
-            <button onclick="unfriendUser('${friendObj.id}', '${escapeHtml(friendObj.name)}')" class="p-1.5 rounded-xl bg-rose-100 hover:bg-rose-500 text-rose-700 hover:text-white transition" title="Unfriend">
-              <i data-lucide="user-minus" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-      lucide.createIcons();
-    }
-
-    function unfriendUser(userId, userName) {
-      if (!confirm(`Are you sure you want to unfriend ${userName || 'this user'}?`)) return;
-      myFriends = myFriends.filter(id => id !== userId);
-      localStorage.setItem('sakura_friends', JSON.stringify(myFriends));
-      renderFriendsSideDrawer();
-      renderUserLookupResults();
-      renderDMFriendsList();
-      alert(`Unfriended ${userName || 'user'}.`);
-    }
-
-    // --- USER SEARCH & LOOKUP SYSTEM ---
-    function renderUserLookupResults() {
-      const container = document.getElementById('user-lookup-results-list');
-      const query = (document.getElementById('user-lookup-search')?.value || '').toLowerCase().trim();
-      container.innerHTML = '';
-
-      // Merge registered users with current live remote players to have full directory
-      const directoryMap = new Map();
-      registeredUsers.forEach(u => directoryMap.set(u.id, u));
-      Object.values(remotePlayers).forEach(p => {
-        if (!directoryMap.has(p.id)) directoryMap.set(p.id, { id: p.id, name: p.name, pfp: p.pfp || '' });
-      });
-
-      const list = Array.from(directoryMap.values()).filter(u => u.id !== localPlayer.id && u.name.toLowerCase().includes(query));
-
-      if (list.length === 0) {
-        container.innerHTML = `<div class="text-[10px] text-pink-400 italic text-center py-4">No players found matching "${query}".</div>`;
-        return;
-      }
-
-      list.forEach(u => {
-        const isFriend = myFriends.includes(u.id);
-        const isPending = friendRequests.some(r => r.id === u.id);
-
-        const card = document.createElement('div');
-        card.className = 'p-2 rounded-2xl bg-white/70 border border-pink-200/80 flex items-center justify-between shadow-sm gap-2';
-        card.innerHTML = `
-          <div class="flex items-center gap-2 truncate">
-            <div class="w-7 h-7 rounded-full overflow-hidden bg-pink-100 flex items-center justify-center border border-pink-300 shrink-0">
-              ${u.pfp ? `<img src="${u.pfp}" class="w-full h-full object-cover" />` : `<span class="text-xs">🌸</span>`}
-            </div>
-            <span class="text-xs font-bold text-pink-950 truncate">${escapeHtml(u.name)}</span>
-          </div>
-          <div class="flex items-center gap-1 shrink-0">
-            ${isFriend ? `
-              <button onclick="openDirectMessageWithId('${u.id}', '${escapeHtml(u.name)}')" class="px-2 py-1 rounded-lg bg-purple-500 text-white text-[10px] font-bold">DM</button>
-              <button onclick="unfriendUser('${u.id}', '${escapeHtml(u.name)}')" class="px-2 py-1 rounded-lg bg-rose-500 text-white text-[10px] font-bold">Unfriend</button>
-            ` : isPending ? `
-              <span class="text-[10px] font-semibold text-pink-500 px-2 py-1">Pending</span>
-            ` : `
-              <button onclick="sendFriendRequestToId('${u.id}', '${escapeHtml(u.name)}')" class="px-2.5 py-1 rounded-lg bg-pink-500 hover:bg-pink-600 text-white text-[10px] font-bold flex items-center gap-1">
-                <i data-lucide="user-plus" class="w-3 h-3"></i> Add
-              </button>
-            `}
-          </div>
-        `;
-        container.appendChild(card);
-      });
-      lucide.createIcons();
-    }
-
-    // --- FRIEND REQUEST WORKFLOW ---
-    function sendFriendRequestToId(targetId, targetName) {
-      if (myFriends.includes(targetId)) {
-        alert(`You are already friends with ${targetName}!`);
-        return;
-      }
-
-      // Broadcast the real request over global social channel
-      if (socialChannel) {
-        socialChannel.send({
-          type: 'broadcast',
-          event: 'friend-request',
-          payload: {
-            fromId: localPlayer.id,
-            fromName: localPlayer.name,
-            fromPfp: localPlayer.pfp,
-            toId: targetId
-          }
-        });
-      }
-      alert(`🌸 Friend request sent to ${targetName}!`);
-      renderUserLookupResults();
-    }
-
-    function toggleFriendWithTarget() {
-      if (!selectedPlayerForContext) return;
-      const target = selectedPlayerForContext;
-      if (myFriends.includes(target.id)) {
-        unfriendUser(target.id, target.name);
-      } else {
-        sendFriendRequestToId(target.id, target.name);
-      }
-      closeUserMenu();
-    }
-
-    function renderDrawerFriendRequests() {
-      const list = document.getElementById('drawer-friends-requests-list');
-      const badge = document.getElementById('drawer-req-count-badge');
-      const headerBadge = document.getElementById('drawer-req-badge');
-      const pillBadge = document.getElementById('requests-badge-pill');
-
-      const count = friendRequests.length;
-      [badge, headerBadge, pillBadge].forEach(b => {
-        if (b) {
-          b.textContent = count;
-          b.classList.toggle('hidden', count === 0);
-        }
-      });
-
-      list.innerHTML = '';
-      if (count === 0) {
-        list.innerHTML = '<div class="text-[10px] text-pink-400 italic text-center py-4">No pending friend requests.</div>';
-        return;
-      }
-
-      friendRequests.forEach((req, idx) => {
-        const item = document.createElement('div');
-        item.className = 'flex items-center justify-between p-2 rounded-2xl bg-pink-100/90 border border-pink-200 text-xs font-bold text-pink-950 gap-2';
-        item.innerHTML = `
-          <div class="flex items-center gap-2 truncate">
-            <div class="w-7 h-7 rounded-full overflow-hidden bg-white border border-pink-300 flex items-center justify-center shrink-0">
-              ${req.pfp ? `<img src="${req.pfp}" class="w-full h-full object-cover"/>` : `<span>🌸</span>`}
-            </div>
-            <span class="truncate">${escapeHtml(req.name)}</span>
-          </div>
-          <div class="flex gap-1 shrink-0">
-            <button onclick="acceptFriendRequest(${idx})" class="px-2 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-[10px]">Accept</button>
-            <button onclick="declineFriendRequest(${idx})" class="px-2 py-1 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-[10px]">Decline</button>
-          </div>
-        `;
-        list.appendChild(item);
-      });
-    }
-
-    function acceptFriendRequest(idx) {
-      const req = friendRequests[idx];
-      if (!myFriends.includes(req.id)) myFriends.push(req.id);
-      friendRequests.splice(idx, 1);
-      localStorage.setItem('sakura_friends', JSON.stringify(myFriends));
-      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
-
-      // Broadcast reciprocation
-      if (socialChannel) {
-        socialChannel.send({
-          type: 'broadcast',
-          event: 'friend-accepted',
-          payload: { fromId: localPlayer.id, fromName: localPlayer.name, toId: req.id }
-        });
-      }
-
-      renderDrawerFriendRequests();
-      renderFriendsSideDrawer();
-      renderDMFriendsList();
-      alert(`🎉 You and ${req.name} are now friends!`);
-    }
-
-    function declineFriendRequest(idx) {
-      friendRequests.splice(idx, 1);
-      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
-      renderDrawerFriendRequests();
-    }
-
-    // --- DIRECT MESSAGING SYSTEM (With Real-Time Sync & PFP) ---
-    function toggleDMModal() {
-      const modal = document.getElementById('dm-modal');
-      modal.classList.toggle('hidden');
-      if (!modal.classList.contains('hidden')) {
-        document.getElementById('dm-unread-dot').classList.add('hidden');
-        renderDMFriendsList();
-      }
-    }
-
-    function openDirectMessageWithId(id, name) {
-      toggleDMModal();
-      selectDMTarget(id, name);
-    }
-
-    function openDirectMessageWithTarget() {
-      if (!selectedPlayerForContext) return;
-      const target = selectedPlayerForContext;
-      closeUserMenu();
-      openDirectMessageWithId(target.id, target.name);
-    }
-
-    function renderDMFriendsList() {
-      const container = document.getElementById('dm-friends-list');
-      container.innerHTML = '';
-      if (myFriends.length === 0) {
-        container.innerHTML = '<div class="text-[9px] text-pink-400 italic text-center p-2">Add friends to chat!</div>';
-        return;
-      }
-
-      myFriends.forEach(friendId => {
-        const friendObj = registeredUsers.find(u => u.id === friendId) || { id: friendId, name: friendId, pfp: '' };
-        const isOnline = Object.keys(remotePlayers).includes(friendId);
-        const isSelected = activeDMTarget && activeDMTarget.id === friendId;
-
-        const btn = document.createElement('button');
-        btn.className = `w-full text-left p-2 rounded-xl text-xs font-bold transition truncate flex items-center gap-2 ${isSelected ? 'bg-pink-500 text-white' : 'text-pink-950 hover:bg-pink-100'}`;
-        btn.innerHTML = `
-          <div class="relative w-6 h-6 rounded-full overflow-hidden bg-pink-200 border border-white shrink-0">
-            ${friendObj.pfp ? `<img src="${friendObj.pfp}" class="w-full h-full object-cover" />` : `<span class="text-[10px]">🌸</span>`}
-            <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400' : 'bg-gray-400'}"></span>
-          </div>
-          <span class="truncate">${escapeHtml(friendObj.name)}</span>
-        `;
-        btn.onclick = () => selectDMTarget(friendObj.id, friendObj.name);
-        container.appendChild(btn);
-      });
-    }
-
-    function selectDMTarget(id, name) {
-      activeDMTarget = { id, name };
-      document.getElementById('dm-form').classList.remove('hidden');
-      document.getElementById('dm-recipient-subtitle').textContent = `Chatting with ${name}`;
-      renderDMFriendsList();
-      renderDMThread();
-    }
-
-    function renderDMThread() {
-      const container = document.getElementById('dm-messages');
-      container.innerHTML = '';
-      if (!activeDMTarget) return;
-
-      const threadKey = [localPlayer.id, activeDMTarget.id].sort().join('_');
-      const messages = directMessages[threadKey] || [];
-
-      if (messages.length === 0) {
-        container.innerHTML = `<div class="text-center text-[10px] text-pink-400 italic py-6">Direct Message chat with ${escapeHtml(activeDMTarget.name)}.<br/>Say hello! 🌸</div>`;
-        return;
-      }
-
-      messages.forEach(m => {
-        const isSelf = m.senderId === localPlayer.id;
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `flex gap-1.5 ${isSelf ? 'flex-row-reverse' : 'flex-row'} items-end`;
-
-        const pfpUrl = isSelf ? localPlayer.pfp : (registeredUsers.find(u => u.id === m.senderId)?.pfp || '');
-        const pfpMarkup = pfpUrl
-          ? `<img src="${pfpUrl}" class="w-6 h-6 rounded-full object-cover border border-pink-300" />`
-          : `<div class="w-6 h-6 rounded-full bg-pink-200 flex items-center justify-center text-[10px]">🌸</div>`;
-
-        msgDiv.innerHTML = `
-          ${pfpMarkup}
-          <div class="flex flex-col ${isSelf ? 'items-end' : 'items-start'} max-w-[80%]">
-            <span class="text-[8px] text-pink-400 mb-0.5">${m.time || ''}</span>
-            <div class="px-3 py-1.5 rounded-2xl text-[11px] shadow-sm ${
-              isSelf ? 'bg-pink-500 text-white rounded-br-none' : 'bg-pink-100 text-pink-950 rounded-bl-none font-medium'
-            }">
-              ${escapeHtml(m.content)}
-            </div>
-          </div>
-        `;
-        container.appendChild(msgDiv);
-      });
-      container.scrollTop = container.scrollHeight;
-    }
-
-    function handleSendDM(e) {
-      e.preventDefault();
-      if (!activeDMTarget) return;
-      const input = document.getElementById('dm-input');
-      const text = input.value.trim();
-      if (!text) return;
-      input.value = '';
-
-      const threadKey = [localPlayer.id, activeDMTarget.id].sort().join('_');
-      if (!directMessages[threadKey]) directMessages[threadKey] = [];
-
-      const msgObj = {
-        senderId: localPlayer.id,
-        senderName: localPlayer.name,
-        recipientId: activeDMTarget.id,
-        content: text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      directMessages[threadKey].push(msgObj);
-      localStorage.setItem('sakura_direct_msgs', JSON.stringify(directMessages));
-      renderDMThread();
-
-      // Realtime broadcast to global social channel
-      if (socialChannel) {
-        socialChannel.send({
-          type: 'broadcast',
-          event: 'direct-message',
-          payload: { threadKey, ...msgObj }
-        });
-      }
-    }
-
-    // --- MODERATION & DEV TOOLS ---
-    function openUserContextMenu(player, clickX, clickY) {
-      selectedPlayerForContext = player;
-      const menu = document.getElementById('user-context-menu');
-      document.getElementById('target-user-name').textContent = player.name;
-
-      const pfpWrap = document.getElementById('target-user-pfp-wrap');
-      if (player.pfp) {
-        pfpWrap.innerHTML = `<img src="${player.pfp}" class="w-full h-full object-cover"/>`;
-      } else {
-        const type = AVATAR_TYPES[player.avatarType] || AVATAR_TYPES.sakura;
-        pfpWrap.innerHTML = `<span>${type.accessory}</span>`;
-      }
-
-      // Update Add / Unfriend button label
-      const isFriend = myFriends.includes(player.id);
-      document.getElementById('target-friend-text').textContent = isFriend ? 'Unfriend' : 'Add Friend';
-      document.getElementById('target-friend-icon').setAttribute('data-lucide', isFriend ? 'user-minus' : 'user-plus');
-
-      menu.style.left = Math.min(window.innerWidth - 240, clickX) + 'px';
-      menu.style.top = Math.min(window.innerHeight - 240, clickY) + 'px';
-
-      const adminActions = document.getElementById('admin-actions');
-      const devActions = document.getElementById('dev-actions');
-      if (isAdminRole) adminActions.classList.remove('hidden'); else adminActions.classList.add('hidden');
-      if (isDevMode) {
-        devActions.classList.remove('hidden');
-        document.getElementById('revoke-ban-btn').classList.toggle('hidden', !bannedUsers.includes(player.id));
-      } else devActions.classList.add('hidden');
-
-      menu.classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    function closeUserMenu() {
-      document.getElementById('user-context-menu').classList.add('hidden');
-      selectedPlayerForContext = null;
-    }
-
-    function adminTempBan() {
-      if (!selectedPlayerForContext) return;
-      userBanEndTimes[selectedPlayerForContext.id] = Date.now() + 10 * 60 * 1000;
-      alert(`${selectedPlayerForContext.name} temporary chat banned for 10 min.`);
-      closeUserMenu();
-    }
-
-    function adminKickUser() {
-      if (!selectedPlayerForContext) return;
-      kickedPlayers[selectedPlayerForContext.id] = Date.now() + 3 * 24 * 60 * 60 * 1000;
-      localStorage.setItem('sakura_kicked_players', JSON.stringify(kickedPlayers));
-      alert(`${selectedPlayerForContext.name} kicked! Assigned red dots for 3 days.`);
-      closeUserMenu();
-    }
-
-    function adminClearChat() {
-      chatMemory[currentChannel] = [];
-      localStorage.setItem(`chat_${currentChannel}`, '[]');
-      renderChatLogForChannel(currentChannel);
-      alert(`Chat log cleared!`);
-      closeUserMenu();
-    }
-
-    function devToggleAdminRole() {
-      if (!selectedPlayerForContext || !isDevMode) return;
-      const targetId = selectedPlayerForContext.id;
-      const idx = adminUsers.indexOf(targetId);
-      if (idx > -1) adminUsers.splice(idx, 1);
-      else adminUsers.push(targetId);
-      localStorage.setItem('sakura_admin_users', JSON.stringify(adminUsers));
-      closeUserMenu();
-      renderDevUserList();
-    }
-
-    function devPermanentBan() {
-      if (!selectedPlayerForContext || !isDevMode) return;
-      if (!bannedUsers.includes(selectedPlayerForContext.id)) {
-        bannedUsers.push(selectedPlayerForContext.id);
-        localStorage.setItem('sakura_banned_users', JSON.stringify(bannedUsers));
-      }
-      alert(`${selectedPlayerForContext.name} permanently banned!`);
-      closeUserMenu();
-      renderDevBannedList();
-    }
-
-    function devRevokeBan(targetId = null) {
-      const idToUnban = targetId || (selectedPlayerForContext ? selectedPlayerForContext.id : null);
-      if (!idToUnban || !isDevMode) return;
-      const idx = bannedUsers.indexOf(idToUnban);
-      if (idx > -1) bannedUsers.splice(idx, 1);
-      localStorage.setItem('sakura_banned_users', JSON.stringify(bannedUsers));
-      closeUserMenu();
-      renderDevBannedList();
-    }
-
-    function devDeleteAccount() {
-      if (!selectedPlayerForContext || !isDevMode) return;
-      registeredUsers = registeredUsers.filter(u => u.id !== selectedPlayerForContext.id);
-      localStorage.setItem('sakura_registered_users', JSON.stringify(registeredUsers));
-      closeUserMenu();
-      renderDevUserList();
-    }
-
-    function renderDevUserList() {
-      const list = document.getElementById('dev-user-list');
-      const searchVal = (document.getElementById('dev-user-search')?.value || '').toLowerCase();
-      list.innerHTML = '';
-      registeredUsers.filter(u => u.name.toLowerCase().includes(searchVal)).forEach(u => {
-        const isAdmin = adminUsers.includes(u.id);
-        const item = document.createElement('div');
-        item.className = 'flex items-center justify-between p-2 rounded-xl bg-purple-50/80 border border-purple-200 text-xs font-bold text-purple-950';
-        item.innerHTML = `
-          <span>${u.name} ${isAdmin ? '👑' : ''}</span>
-          <button onclick="devToggleAdminForId('${u.id}')" class="px-2 py-0.5 rounded-lg text-[10px] ${isAdmin ? 'bg-rose-500 text-white' : 'bg-purple-600 text-white'}">
-            ${isAdmin ? 'Revoke Admin' : 'Make Admin'}
-          </button>
-        `;
-        list.appendChild(item);
-      });
-    }
-
-    function devToggleAdminForId(id) {
-      const idx = adminUsers.indexOf(id);
-      if (idx > -1) adminUsers.splice(idx, 1);
-      else adminUsers.push(id);
-      localStorage.setItem('sakura_admin_users', JSON.stringify(adminUsers));
-      renderDevUserList();
-    }
-
-    function renderDevBannedList() {
-      const list = document.getElementById('dev-banned-list');
-      list.innerHTML = '';
-      if (bannedUsers.length === 0) {
-        list.innerHTML = '<div class="text-[10px] text-rose-500 italic">No permanently banned players.</div>';
-        return;
-      }
-      bannedUsers.forEach(id => {
-        const item = document.createElement('div');
-        item.className = 'flex items-center justify-between p-2 rounded-xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-950';
-        item.innerHTML = `
-          <span>ID: ${id}</span>
-          <button onclick="devRevokeBan('${id}')" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white text-[10px]">Revoke Ban</button>
-        `;
-        list.appendChild(item);
-      });
-    }
-
-    function promptDevMode() {
-      if (isDevMode) { toggleDevModal(); return; }
-      const code = prompt("Enter Developer Security Passcode:");
-      if (code === "13579") enableDevMode();
-      else if (code !== null) alert("Incorrect Security Passcode!");
-    }
-
-    function enableDevMode() {
-      isDevMode = true;
-      isAdminRole = true;
-      localPlayer.title = 'Dev';
-      localPlayer.avatarType = 'dev_white';
-      alert("Developer Mode Activated!");
-      updateProfileCardUI();
-      toggleDevModal();
-      if (realtimeChannel) broadcastState();
-    }
-
-    function toggleDevModal() {
-      const modal = document.getElementById('developer-modal');
-      modal.classList.toggle('hidden');
-      if (!modal.classList.contains('hidden')) {
-        renderDevUserList();
-        renderDevBannedList();
-      }
-    }
-
-    function devGrantFlowers() {
-      const targetQuery = document.getElementById('dev-grant-user').value.trim();
-      const amount = parseInt(document.getElementById('dev-grant-amount').value || '0');
-      if (!targetQuery || amount <= 0) {
-        alert("Please enter a valid player and amount!"); return;
-      }
-      if (targetQuery.toLowerCase() === localPlayer.name.toLowerCase() || targetQuery === localPlayer.id) {
-        addCoins(amount);
-        alert(`Granted 🌸 ${amount} Flowers to your own balance!`);
-      } else {
-        alert(`Granted 🌸 ${amount} Flowers to ${targetQuery}!`);
-      }
-      document.getElementById('dev-grant-user').value = '';
-      document.getElementById('dev-grant-amount').value = '';
-    }
-
-    function toggleAdminTitle() {
-      if (!isAdminRole && !isDevMode) return;
-      showAdminTitle = !showAdminTitle;
-      const btn = document.getElementById('admin-title-btn');
-      if (showAdminTitle) {
-        localPlayer.title = 'Admin';
-        btn.classList.add('ring-2', 'ring-white');
-      } else {
-        localPlayer.title = isDevMode ? 'Dev' : (localPlayer.equippedTitle || '');
-        btn.classList.remove('ring-2', 'ring-white');
-      }
-      if (realtimeChannel) broadcastState();
-    }
-
-    // --- AUTHENTICATION FLOW ---
+    // --- AUTHENTICATION PAGES & TABS ---
     let authMode = 'signin';
+
     function switchAuthTab(mode) {
       authMode = mode;
       const tabSignIn = document.getElementById('tab-signin');
       const tabSignUp = document.getElementById('tab-signup');
       const usernameField = document.getElementById('username-field');
-      const submitBtn = document.getElementById('auth-submit-btn');
+      const submitBtnText = document.getElementById('auth-btn-text');
+      const pageTitle = document.getElementById('auth-page-title');
+      const pageSubtitle = document.getElementById('auth-page-subtitle');
 
       if (mode === 'signin') {
         tabSignIn.className = "py-2 rounded-xl bg-white shadow text-pink-900 transition";
         tabSignUp.className = "py-2 rounded-xl transition text-pink-600 hover:text-pink-900";
         usernameField.classList.add('hidden');
-        submitBtn.querySelector('span').textContent = 'Sign In';
+        submitBtnText.textContent = 'Sign In';
+        pageTitle.textContent = 'Sign In to Sakura Slime';
+        pageSubtitle.textContent = 'Enter your account credentials to join the lobby.';
       } else {
         tabSignUp.className = "py-2 rounded-xl bg-white shadow text-pink-900 transition";
         tabSignIn.className = "py-2 rounded-xl transition text-pink-600 hover:text-pink-900";
         usernameField.classList.remove('hidden');
-        submitBtn.querySelector('span').textContent = 'Create Account';
+        submitBtnText.textContent = 'Create Account';
+        pageTitle.textContent = 'Create Slime Account';
+        pageSubtitle.textContent = 'Sign up to register your slime and unlock social features.';
       }
     }
 
@@ -1754,9 +1055,7 @@
       try {
         if (authMode === 'signup') {
           const { data, error } = await supabaseClient.auth.signUp({
-            email,
-            password,
-            options: { data: { display_name: username || 'Slime' } }
+            email, password, options: { data: { display_name: username || 'Slime' } }
           });
           if (error) throw error;
           showAuthAlert('Account created! Logging in...', false);
@@ -1784,14 +1083,46 @@
       if (user) localPlayer.id = user.id;
 
       if (!registeredUsers.some(u => u.id === localPlayer.id)) {
-        registeredUsers.push({ id: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp });
+        registeredUsers.push({ id: localPlayer.id, name: localPlayer.name, profilePic: localPlayer.profilePic });
         localStorage.setItem('sakura_registered_users', JSON.stringify(registeredUsers));
       }
+
       localStorage.setItem('sakura_avatar_name', displayName);
       document.getElementById('auth-modal').classList.add('hidden');
-
       initSupabaseChannel(currentChannel);
-      initSocialChannel();
+    }
+
+    // --- RIGHT DRAWER & PROFILE MANAGEMENT ---
+    function toggleRightDrawer() {
+      const drawer = document.getElementById('right-drawer');
+      drawer.classList.toggle('translate-x-full');
+      if (!drawer.classList.contains('translate-x-full')) {
+        updateProfileCardUI();
+        renderDrawerFriendRequests();
+        renderDrawerMyFriends();
+        filterSearchableUsers('');
+      }
+    }
+
+    function updateProfileCardUI() {
+      const nameEl = document.getElementById('profile-card-username');
+      const emailEl = document.getElementById('profile-card-email');
+      const avatarEmoji = document.getElementById('profile-avatar-emoji');
+      const avatarImg = document.getElementById('profile-avatar-img');
+
+      nameEl.textContent = localPlayer.name;
+      emailEl.textContent = currentUser?.email || (isDevMode ? 'developer@sakura.world' : 'guest@sakura.world');
+      
+      if (localPlayer.profilePic) {
+        avatarImg.src = localPlayer.profilePic;
+        avatarImg.classList.remove('hidden');
+        avatarEmoji.classList.add('hidden');
+      } else {
+        avatarImg.classList.add('hidden');
+        avatarEmoji.classList.remove('hidden');
+        const type = AVATAR_TYPES[localPlayer.avatarType] || AVATAR_TYPES.sakura;
+        avatarEmoji.textContent = type.accessory;
+      }
     }
 
     function handleSignOut() {
@@ -1803,10 +1134,440 @@
       location.reload();
     }
 
-    // --- ENVIRONMENT & PARTICLES ENGINE ---
+    // --- FRIEND SEARCH, ADD, & UNFRIEND SYSTEMS ---
+    function filterSearchableUsers(query) {
+      const resultsContainer = document.getElementById('friend-search-results');
+      resultsContainer.innerHTML = '';
+      const q = (query || '').toLowerCase().trim();
+      if (!q) return;
+
+      const matches = registeredUsers.filter(u => u.id !== localPlayer.id && u.name.toLowerCase().includes(q));
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = '<div class="text-[10px] text-pink-400 italic">No slimes found.</div>';
+        return;
+      }
+
+      matches.forEach(u => {
+        const isAlreadyFriend = myFriends.includes(u.id);
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-pink-100/80 border border-pink-200 text-xs font-bold text-pink-950';
+        item.innerHTML = `
+          <div class="flex items-center gap-2 truncate">
+            <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+            <span class="truncate">${u.name}</span>
+          </div>
+          ${isAlreadyFriend ? '<span class="text-[10px] text-pink-600 font-semibold">Friends</span>' : `
+            <button onclick="sendFriendRequestToUserId('${u.id}', '${u.name}')" class="px-2.5 py-1 rounded-lg bg-pink-500 text-white text-[10px]">Add</button>
+          `}
+        `;
+        resultsContainer.appendChild(item);
+      });
+    }
+
+    function sendFriendRequestToUserId(id, name) {
+      if (myFriends.includes(id)) {
+        alert(`You are already friends with ${name}!`);
+        return;
+      }
+      alert(`Friend request sent successfully to ${name}!`);
+      // Simulate incoming/pending for demo robustness or add to request store
+    }
+
+    function sendFriendRequestToTarget() {
+      if (!selectedPlayerForContext) return;
+      sendFriendRequestToUserId(selectedPlayerForContext.id, selectedPlayerForContext.name);
+      closeUserMenu();
+    }
+
+    function unfriendUser(id) {
+      myFriends = myFriends.filter(fId => fId !== id);
+      localStorage.setItem('sakura_friends', JSON.stringify(myFriends));
+      renderDrawerMyFriends();
+      alert("Successfully unfriended player.");
+    }
+
+    function unfriendTargetFromContext() {
+      if (!selectedPlayerForContext) return;
+      unfriendUser(selectedPlayerForContext.id);
+      closeUserMenu();
+    }
+
+    function renderDrawerMyFriends() {
+      const container = document.getElementById('drawer-my-friends-list');
+      const filterVal = (document.getElementById('my-friends-filter')?.value || '').toLowerCase().trim();
+      container.innerHTML = '';
+
+      const friendObjects = myFriends.map(id => registeredUsers.find(u => u.id === id) || { id, name: id, profilePic: '' })
+        .filter(u => u.name.toLowerCase().includes(filterVal));
+
+      if (friendObjects.length === 0) {
+        container.innerHTML = '<div class="text-[10px] text-pink-400 italic text-center py-2">No friends found. Search and add friends above!</div>';
+        return;
+      }
+
+      friendObjects.forEach(friend => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-pink-100/90 border border-pink-200 text-xs font-bold text-pink-950';
+        item.innerHTML = `
+          <div class="flex items-center gap-2 truncate">
+            <div class="w-6 h-6 rounded-full bg-pink-400 flex items-center justify-center text-white text-[10px] overflow-hidden">
+              ${friend.profilePic ? `<img src="${friend.profilePic}" class="w-full h-full object-cover"/>` : '🌸'}
+            </div>
+            <span class="truncate">${friend.name}</span>
+          </div>
+          <div class="flex gap-1 shrink-0">
+            <button onclick="selectDMTarget('${friend.id}', '${friend.name}'); toggleRightDrawer(); toggleDMModal();" class="px-2 py-1 rounded-lg bg-purple-600 text-white text-[10px]" title="Direct Message">DM</button>
+            <button onclick="unfriendUser('${friend.id}')" class="px-2 py-1 rounded-lg bg-rose-500 text-white text-[10px]" title="Unfriend">Unfriend</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderDrawerFriendRequests() {
+      const list = document.getElementById('drawer-friends-requests-list');
+      const badge = document.getElementById('drawer-req-count-badge');
+      const headerBadge = document.getElementById('drawer-req-badge');
+      list.innerHTML = '';
+
+      if (friendRequests.length > 0) {
+        badge.textContent = friendRequests.length;
+        badge.classList.remove('hidden');
+        headerBadge.textContent = friendRequests.length;
+        headerBadge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+        headerBadge.classList.add('hidden');
+      }
+
+      if (friendRequests.length === 0) {
+        list.innerHTML = '<div class="text-[10px] text-pink-400 italic text-center py-2">No pending friend requests.</div>';
+        return;
+      }
+
+      friendRequests.forEach((req, idx) => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-pink-100/80 border border-pink-200 text-xs font-bold text-pink-950';
+        item.innerHTML = `
+          <span>${req.name}</span>
+          <div class="flex gap-1">
+            <button onclick="acceptFriendRequest(${idx})" class="px-2 py-1 rounded-lg bg-emerald-500 text-white text-[10px]">Accept</button>
+            <button onclick="declineFriendRequest(${idx})" class="px-2 py-1 rounded-lg bg-rose-500 text-white text-[10px]">Decline</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function acceptFriendRequest(idx) {
+      const req = friendRequests[idx];
+      if (!myFriends.includes(req.id)) myFriends.push(req.id);
+      friendRequests.splice(idx, 1);
+      localStorage.setItem('sakura_friends', JSON.stringify(myFriends));
+      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
+      renderDrawerFriendRequests();
+      renderDrawerMyFriends();
+    }
+
+    function declineFriendRequest(idx) {
+      friendRequests.splice(idx, 1);
+      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
+      renderDrawerFriendRequests();
+    }
+
+    function toggleDMModal() {
+      const modal = document.getElementById('dm-modal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) renderDMFriendsList();
+    }
+
+    function openDirectMessageWithTarget() {
+      if (!selectedPlayerForContext) return;
+      const target = selectedPlayerForContext;
+      closeUserMenu();
+      toggleDMModal();
+      selectDMTarget(target.id, target.name);
+    }
+
+    function renderDMFriendsList() {
+      const container = document.getElementById('dm-friends-list');
+      container.innerHTML = '';
+
+      if (myFriends.length === 0) {
+        container.innerHTML = '<div class="text-[9px] text-pink-400 italic text-center p-2">Add friends from profile or search to chat!</div>';
+        return;
+      }
+
+      myFriends.forEach(friendId => {
+        const friendObj = registeredUsers.find(u => u.id === friendId) || { id: friendId, name: friendId };
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-2 rounded-xl text-xs font-bold text-pink-950 hover:bg-pink-100 transition truncate flex items-center gap-1.5';
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> ${friendObj.name}`;
+        btn.onclick = () => selectDMTarget(friendObj.id, friendObj.name);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectDMTarget(id, name) {
+      activeDMTarget = { id, name };
+      document.getElementById('dm-form').classList.remove('hidden');
+      renderDMThread();
+    }
+
+    function renderDMThread() {
+      const container = document.getElementById('dm-messages');
+      container.innerHTML = '';
+      if (!activeDMTarget) return;
+
+      const threadKey = [localPlayer.id, activeDMTarget.id].sort().join('_');
+      const messages = directMessages[threadKey] || [];
+
+      if (messages.length === 0) {
+        container.innerHTML = `<div class="text-center text-[10px] text-pink-400 italic py-4">Direct Message chat with ${activeDMTarget.name}</div>`;
+        return;
+      }
+
+      messages.forEach(m => {
+        const isSelf = m.senderId === localPlayer.id;
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `flex flex-col ${isSelf ? 'items-end' : 'items-start'} space-y-0.5`;
+        msgDiv.innerHTML = `
+          <div class="px-2.5 py-1 rounded-2xl text-[11px] max-w-[85%] shadow-sm ${
+            isSelf ? 'bg-pink-500 text-white rounded-tr-none' : 'bg-pink-100 text-pink-950 rounded-tl-none font-medium'
+          }">
+            ${escapeHtml(m.content)}
+          </div>
+        `;
+        container.appendChild(msgDiv);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    document.getElementById('dm-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!activeDMTarget) return;
+      const input = document.getElementById('dm-input');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      const threadKey = [localPlayer.id, activeDMTarget.id].sort().join('_');
+      if (!directMessages[threadKey]) directMessages[threadKey] = [];
+
+      directMessages[threadKey].push({ senderId: localPlayer.id, content: text, time: Date.now() });
+      localStorage.setItem('sakura_direct_msgs', JSON.stringify(directMessages));
+      renderDMThread();
+    });
+
+    // --- DEVELOPER FLOWERS GRANTING & CONTROLS ---
+    function promptDevMode() {
+      if (isDevMode) { toggleDevModal(); return; }
+      const code = prompt("Enter Developer Security Passcode:");
+      if (code === "13579") enableDevMode();
+      else if (code !== null) alert("Incorrect Security Passcode!");
+    }
+
+    function enableDevMode() {
+      isDevMode = true;
+      localPlayer.title = 'Dev';
+      localPlayer.avatarType = 'dev_white';
+      updateMusicUIForRole();
+      alert("Developer Mode Activated!");
+      toggleDevModal();
+      if (realtimeChannel) broadcastState();
+    }
+
+    function toggleDevModal() {
+      const modal = document.getElementById('developer-modal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) {
+        renderDevUserList(); renderDevBannedList();
+      }
+    }
+
+    function devGrantFlowers() {
+      const targetQuery = document.getElementById('dev-grant-user').value.trim();
+      const amount = parseInt(document.getElementById('dev-grant-amount').value || '0');
+
+      if (!targetQuery || amount <= 0) {
+        alert("Please enter a valid player and amount!"); return;
+      }
+
+      if (targetQuery.toLowerCase() === localPlayer.name.toLowerCase() || targetQuery === localPlayer.id) {
+        addCoins(amount);
+        alert(`Granted 🌸 ${amount} Flowers to your own balance!`);
+      } else {
+        alert(`Granted 🌸 ${amount} Flowers to ${targetQuery}!`);
+      }
+      document.getElementById('dev-grant-user').value = '';
+      document.getElementById('dev-grant-amount').value = '';
+    }
+
+    function toggleAdminTitle() {
+      if (!isAdminRole && !isDevMode) return;
+      showAdminTitle = !showAdminTitle;
+      const btn = document.getElementById('admin-title-btn');
+      if (showAdminTitle) {
+        localPlayer.title = 'Admin'; btn.classList.add('ring-2', 'ring-white');
+      } else {
+        localPlayer.title = isDevMode ? 'Dev' : (localPlayer.equippedTitle || '');
+        btn.classList.remove('ring-2', 'ring-white');
+      }
+      if (realtimeChannel) broadcastState();
+    }
+
+    // --- MODERATION ---
+    function openUserContextMenu(player, clickX, clickY) {
+      selectedPlayerForContext = player;
+      const menu = document.getElementById('user-context-menu');
+      document.getElementById('target-user-name').textContent = player.name;
+
+      menu.style.left = Math.min(window.innerWidth - 220, clickX) + 'px';
+      menu.style.top = Math.min(window.innerHeight - 200, clickY) + 'px';
+
+      const addBtn = document.getElementById('ctx-add-friend-btn');
+      const unfriendBtn = document.getElementById('ctx-unfriend-btn');
+      if (myFriends.includes(player.id)) {
+        addBtn.classList.add('hidden');
+        unfriendBtn.classList.remove('hidden');
+      } else {
+        addBtn.classList.remove('hidden');
+        unfriendBtn.classList.add('hidden');
+      }
+
+      const adminActions = document.getElementById('admin-actions');
+      const devActions = document.getElementById('dev-actions');
+
+      if (isAdminRole) adminActions.classList.remove('hidden');
+      else adminActions.classList.add('hidden');
+
+      if (isDevMode) {
+        devActions.classList.remove('hidden');
+        document.getElementById('revoke-ban-btn').classList.toggle('hidden', !bannedUsers.includes(player.id));
+      } else devActions.classList.add('hidden');
+
+      menu.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeUserMenu() {
+      document.getElementById('user-context-menu').classList.add('hidden');
+      selectedPlayerForContext = null;
+    }
+
+    function adminTempBan() {
+      if (!selectedPlayerForContext) return;
+      userBanEndTimes[selectedPlayerForContext.id] = Date.now() + 10 * 60 * 1000;
+      alert(`${selectedPlayerForContext.name} temporary chat banned for 10 min.`);
+      closeUserMenu();
+    }
+
+    function adminKickUser() {
+      if (!selectedPlayerForContext) return;
+      kickedPlayers[selectedPlayerForContext.id] = Date.now() + 3 * 24 * 60 * 60 * 1000;
+      localStorage.setItem('sakura_kicked_players', JSON.stringify(kickedPlayers));
+      alert(`${selectedPlayerForContext.name} kicked.`);
+      closeUserMenu();
+    }
+
+    function adminClearChat() {
+      chatMemory[currentChannel] = [];
+      localStorage.setItem(`chat_${currentChannel}`, '[]');
+      renderChatLogForChannel(currentChannel);
+      alert(`Chat log cleared!`);
+      closeUserMenu();
+    }
+
+    function devToggleAdminRole() {
+      if (!selectedPlayerForContext || !isDevMode) return;
+      const targetId = selectedPlayerForContext.id;
+      const idx = adminUsers.indexOf(targetId);
+      if (idx > -1) adminUsers.splice(idx, 1);
+      else adminUsers.push(targetId);
+      localStorage.setItem('sakura_admin_users', JSON.stringify(adminUsers));
+      isAdminRole = adminUsers.includes(localPlayer.id);
+      updateMusicUIForRole();
+      closeUserMenu();
+    }
+
+    function devPermanentBan() {
+      if (!selectedPlayerForContext || !isDevMode) return;
+      if (!bannedUsers.includes(selectedPlayerForContext.id)) {
+        bannedUsers.push(selectedPlayerForContext.id);
+        localStorage.setItem('sakura_banned_users', JSON.stringify(bannedUsers));
+      }
+      alert(`${selectedPlayerForContext.name} permanently banned!`);
+      closeUserMenu();
+      renderDevBannedList();
+    }
+
+    function devRevokeBan(targetId = null) {
+      const idToUnban = targetId || (selectedPlayerForContext ? selectedPlayerForContext.id : null);
+      if (!idToUnban || !isDevMode) return;
+      const idx = bannedUsers.indexOf(idToUnban);
+      if (idx > -1) bannedUsers.splice(idx, 1);
+      localStorage.setItem('sakura_banned_users', JSON.stringify(bannedUsers));
+      closeUserMenu(); renderDevBannedList();
+    }
+
+    function devDeleteAccount() {
+      if (!selectedPlayerForContext || !isDevMode) return;
+      registeredUsers = registeredUsers.filter(u => u.id !== selectedPlayerForContext.id);
+      localStorage.setItem('sakura_registered_users', JSON.stringify(registeredUsers));
+      closeUserMenu(); renderDevUserList();
+    }
+
+    function renderDevUserList() {
+      const list = document.getElementById('dev-user-list');
+      const searchVal = (document.getElementById('dev-user-search')?.value || '').toLowerCase();
+      list.innerHTML = '';
+
+      registeredUsers.filter(u => u.name.toLowerCase().includes(searchVal)).forEach(u => {
+        const isAdmin = adminUsers.includes(u.id);
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-purple-50/80 border border-purple-200 text-xs font-bold text-purple-950';
+        item.innerHTML = `
+          <span>${u.name} ${isAdmin ? '👑' : ''}</span>
+          <button onclick="devToggleAdminForId('${u.id}')" class="px-2 py-0.5 rounded-lg text-[10px] ${isAdmin ? 'bg-rose-500 text-white' : 'bg-purple-600 text-white'}">
+            ${isAdmin ? 'Revoke Admin' : 'Make Admin'}
+          </button>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function devToggleAdminForId(id) {
+      const idx = adminUsers.indexOf(id);
+      if (idx > -1) adminUsers.splice(idx, 1); else adminUsers.push(id);
+      localStorage.setItem('sakura_admin_users', JSON.stringify(adminUsers));
+      isAdminRole = adminUsers.includes(localPlayer.id);
+      updateMusicUIForRole();
+      renderDevUserList();
+    }
+
+    function renderDevBannedList() {
+      const list = document.getElementById('dev-banned-list');
+      list.innerHTML = '';
+      if (bannedUsers.length === 0) {
+        list.innerHTML = '<div class="text-[10px] text-rose-500 italic">No permanently banned players.</div>'; return;
+      }
+      bannedUsers.forEach(id => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-950';
+        item.innerHTML = `
+          <span>ID: ${id}</span>
+          <button onclick="devRevokeBan('${id}')" class="px-2 py-0.5 rounded-lg bg-emerald-600 text-white text-[10px]">Revoke Ban</button>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function filterDevUserList() { renderDevUserList(); }
+
+    // --- ENVIRONMENT & IMPROVED PARK VISUALS ---
     function initEnvironmentElements() {
       petals = [];
-      for (let i = 0; i < 65; i++) {
+      for (let i = 0; i < 70; i++) {
         petals.push({
           x: Math.random() * window.innerWidth,
           y: Math.random() * window.innerHeight,
@@ -1819,7 +1580,7 @@
       }
 
       fireflies = [];
-      for (let i = 0; i < 45; i++) {
+      for (let i = 0; i < 50; i++) {
         fireflies.push({
           x: Math.random() * window.innerWidth,
           y: Math.random() * window.innerHeight,
@@ -1832,12 +1593,12 @@
 
       discoLights = [];
       const colors = ['#ec4899', '#38bdf8', '#fbbf24', '#a855f7', '#10b981', '#f43f5e'];
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 60; i++) {
         discoLights.push({
           x: Math.random() * window.innerWidth,
           y: Math.random() * window.innerHeight,
           size: Math.random() * 4 + 2,
-          speedY: Math.random() * 2 + 1,
+          speedY: Math.random() * 2.2 + 1.2,
           color: colors[Math.floor(Math.random() * colors.length)]
         });
       }
@@ -1845,7 +1606,7 @@
       koiFish = [
         { x: 200, y: 200, angle: 0, color: '#f97316' },
         { x: 240, y: 220, angle: Math.PI / 2, color: '#ef4444' },
-        { x: 180, y: 240, angle: Math.PI, color: '#fbbf24' }
+        { x: 180, y: 250, angle: Math.PI, color: '#fbbf24' }
       ];
 
       bonfireFlames = [];
@@ -1853,8 +1614,8 @@
         bonfireFlames.push({
           x: 0, y: 0,
           vx: (Math.random() - 0.5) * 1.5,
-          vy: -Math.random() * 2.5 - 1.5,
-          size: Math.random() * 8 + 4,
+          vy: -Math.random() * 2.8 - 1.5,
+          size: Math.random() * 9 + 4,
           life: 1.0,
           color: Math.random() > 0.3 ? '#f97316' : '#ef4444'
         });
@@ -1865,48 +1626,41 @@
       const w = canvas.width;
       const h = canvas.height;
 
-      if (currentChannel === 'sakura-lounge' || currentChannel === 'amusement-park') {
+      if (currentChannel === 'sakura-lounge') {
         ctx.fillStyle = 'rgba(251, 207, 232, 0.85)';
         petals.forEach(p => {
-          p.y += p.speedY;
-          p.x += p.speedX + Math.sin(p.y * 0.015) * 0.4;
+          p.y += p.speedY; p.x += p.speedX + Math.sin(p.y * 0.015) * 0.4;
           p.rotation += p.rotSpeed;
           if (p.y > h + 15) { p.y = -15; p.x = Math.random() * w; }
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rotation);
-          ctx.beginPath();
-          ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rotation);
+          ctx.beginPath(); ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2); ctx.fill();
           ctx.restore();
         });
       } else if (currentChannel === 'bonfire-park') {
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.95)';
         fireflies.forEach(f => {
-          f.y += f.speedY;
-          f.x += f.speedX + Math.sin(f.y * 0.02) * 0.5;
+          f.y += f.speedY; f.x += f.speedX + Math.sin(f.y * 0.02) * 0.5;
           if (f.y < 0) f.y = h; if (f.y > h) f.y = 0;
           if (f.x < 0) f.x = w; if (f.x > w) f.x = 0;
-          ctx.save();
-          ctx.globalAlpha = f.alpha;
-          ctx.fillStyle = '#fef08a';
-          ctx.shadowColor = '#facc15';
-          ctx.shadowBlur = 8;
-          ctx.beginPath();
-          ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.save(); ctx.globalAlpha = f.alpha;
+          ctx.beginPath(); ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
+        });
+      } else if (currentChannel === 'amusement-park') {
+        ctx.fillStyle = 'rgba(244, 114, 182, 0.9)';
+        petals.forEach(p => {
+          p.y += p.speedY * 1.2; p.x += p.speedX;
+          if (p.y > h + 15) { p.y = -15; p.x = Math.random() * w; }
+          ctx.save(); ctx.translate(p.x, p.y);
+          ctx.beginPath(); ctx.arc(0, 0, p.size * 0.8, 0, Math.PI * 2); ctx.fill();
           ctx.restore();
         });
       } else if (currentChannel === 'arcade-lounge') {
         discoLights.forEach(d => {
           d.y += d.speedY;
           if (d.y > h + 10) { d.y = -10; d.x = Math.random() * w; }
-          ctx.save();
-          ctx.fillStyle = d.color;
-          ctx.shadowColor = d.color;
-          ctx.shadowBlur = 8;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.save(); ctx.fillStyle = d.color; ctx.shadowColor = d.color; ctx.shadowBlur = 10;
+          ctx.beginPath(); ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2); ctx.fill();
           ctx.restore();
         });
       }
@@ -1915,13 +1669,9 @@
     function addFloatingParticle(x, y, text) {
       for (let i = 0; i < 3; i++) {
         floatingParticles.push({
-          x: x + (Math.random() - 0.5) * 20,
-          y: y - 20,
-          vx: (Math.random() - 0.5) * 1.5,
-          vy: -Math.random() * 2 - 1.2,
-          alpha: 1,
-          size: Math.random() * 6 + 14,
-          text: text
+          x: x + (Math.random() - 0.5) * 20, y: y - 20,
+          vx: (Math.random() - 0.5) * 1.5, vy: -Math.random() * 2 - 1.2,
+          alpha: 1, size: Math.random() * 6 + 14, text: text
         });
       }
     }
@@ -1931,11 +1681,8 @@
         const p = floatingParticles[i];
         p.x += p.vx; p.y += p.vy; p.alpha -= 0.02;
         if (p.alpha <= 0) { floatingParticles.splice(i, 1); continue; }
-        ctx.save();
-        ctx.globalAlpha = p.alpha;
-        ctx.font = `${p.size}px sans-serif`;
-        ctx.fillText(p.text, p.x, p.y);
-        ctx.restore();
+        ctx.save(); ctx.globalAlpha = p.alpha; ctx.font = `${p.size}px sans-serif`;
+        ctx.fillText(p.text, p.x, p.y); ctx.restore();
       }
     }
 
@@ -1943,291 +1690,129 @@
       if (!trailType) return;
       const symbol = trailType === 'sparkles' ? '✨' : trailType === 'hearts' ? '❤️' : '🌸';
       trailParticles.push({
-        x: x + (Math.random() - 0.5) * 10,
-        y: y + 10,
-        alpha: 0.8,
-        symbol: symbol,
-        scale: Math.random() * 0.4 + 0.6
+        x: x + (Math.random() - 0.5) * 10, y: y + 10, alpha: 0.8, symbol: symbol, scale: Math.random() * 0.4 + 0.6
       });
     }
 
     function updateAndDrawTrails() {
       for (let i = trailParticles.length - 1; i >= 0; i--) {
-        const t = trailParticles[i];
-        t.alpha -= 0.03;
+        const t = trailParticles[i]; t.alpha -= 0.03;
         if (t.alpha <= 0) { trailParticles.splice(i, 1); continue; }
-        ctx.save();
-        ctx.globalAlpha = t.alpha;
-        ctx.font = '12px sans-serif';
-        ctx.fillText(t.symbol, t.x, t.y);
-        ctx.restore();
+        ctx.save(); ctx.globalAlpha = t.alpha; ctx.font = '12px sans-serif';
+        ctx.fillText(t.symbol, t.x, t.y); ctx.restore();
       }
     }
 
-    // --- OVERHAULED & REDESIGNED 4 PARK ENVIRONMENTS ---
+    // --- IMPROVED 4 PARKS VISUALS RENDERER ---
     function drawEnvironment() {
       const w = canvas.width;
       const h = canvas.height;
 
-      // 1. ZEN GARDEN (Sakura Lounge)
       if (currentChannel === 'sakura-lounge') {
-        // Lush Zen Grass & Sand ripples
-        const grad = ctx.createLinearGradient(0, 0, w, h);
-        grad.addColorStop(0, '#fdf2f8');
-        grad.addColorStop(0.5, '#fce7f3');
-        grad.addColorStop(1, '#fbcfe8');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, w, h);
+        // Park 1: 🌸 Zen Garden (Enhanced lush garden styling)
+        ctx.fillStyle = '#fce7f3'; ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = 'rgba(244, 114, 182, 0.25)'; ctx.lineWidth = 2;
+        for (let x = 0; x < w; x += 70) { for (let y = 0; y < h; y += 70) ctx.strokeRect(x, y, 70, 70); }
 
-        // Zen stone path ripples
-        ctx.strokeStyle = 'rgba(244, 114, 182, 0.25)';
-        ctx.lineWidth = 1.5;
-        for (let x = 0; x < w; x += 60) {
-          ctx.beginPath();
-          ctx.arc(x, h * 0.5, 45, 0, Math.PI);
-          ctx.stroke();
-        }
-
-        // Stepping stones
-        ctx.fillStyle = '#cbd5e1';
-        [{ x: w * 0.2, y: h * 0.35 }, { x: w * 0.35, y: h * 0.45 }, { x: w * 0.5, y: h * 0.5 }, { x: w * 0.65, y: h * 0.45 }].forEach(s => {
-          ctx.beginPath();
-          ctx.ellipse(s.x, s.y, 20, 12, 0, 0, Math.PI * 2);
-          ctx.fill();
-        });
-
-        drawPond(w * 0.8, h * 0.65, 130, 80);
-        drawWoodenBridge(w * 0.8, h * 0.65, 95, 36);
+        drawPond(w * 0.75, h * 0.65, 120, 70);
+        drawWoodenBridge(w * 0.75, h * 0.65, 90, 32);
         drawToriiGate(w * 0.5, h * 0.22);
 
-        // Rich Sakura trees
-        drawSakuraTree(w * 0.08, h * 0.22, 65);
-        drawSakuraTree(w * 0.26, h * 0.15, 55);
-        drawSakuraTree(w * 0.74, h * 0.15, 55);
-        drawSakuraTree(w * 0.92, h * 0.22, 65);
-        drawSakuraTree(w * 0.1, h * 0.78, 60);
-        drawSakuraTree(w * 0.9, h * 0.78, 60);
+        drawSakuraTree(w * 0.08, h * 0.18, 65);
+        drawSakuraTree(w * 0.28, h * 0.12, 55);
+        drawSakuraTree(w * 0.5, h * 0.1, 60);
+        drawSakuraTree(w * 0.72, h * 0.12, 55);
+        drawSakuraTree(w * 0.92, h * 0.18, 65);
 
-        drawLantern(w * 0.36, h * 0.28);
-        drawLantern(w * 0.64, h * 0.28);
-      }
-      // 2. BONFIRE CAMP
-      else if (currentChannel === 'bonfire-park') {
-        // Deep night starry gradient
-        const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-        bgGrad.addColorStop(0, '#060a14');
-        bgGrad.addColorStop(0.6, '#0f172a');
-        bgGrad.addColorStop(1, '#1e1b4b');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, w, h);
+        drawLantern(w * 0.35, h * 0.25); drawLantern(w * 0.65, h * 0.25);
 
-        // Crescent glowing moon
-        ctx.fillStyle = '#fef08a';
-        ctx.shadowColor = '#fef08a';
-        ctx.shadowBlur = 15;
-        ctx.beginPath();
-        ctx.arc(w * 0.85, h * 0.15, 26, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#060a14';
-        ctx.beginPath();
-        ctx.arc(w * 0.83, h * 0.13, 22, 0, Math.PI * 2);
-        ctx.fill();
+      } else if (currentChannel === 'bonfire-park') {
+        // Park 2: 🔥 Bonfire Camp (Enhanced night forest with buglights & glowing embers)
+        ctx.fillStyle = '#0a0f1d'; ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = '#172033'; ctx.beginPath(); ctx.arc(w / 2, h / 2, 200, 0, Math.PI * 2); ctx.fill();
 
-        // Pine trees in silhouette
-        for (let tx = 30; tx < w; tx += 90) {
-          drawPineTree(tx, h * 0.28, 40);
-        }
+        drawCampTent(w * 0.22, h * 0.35, '#f43f5e');
+        drawCampTent(w * 0.78, h * 0.35, '#38bdf8');
+        drawWoodenLog(w * 0.35, h * 0.58); drawWoodenLog(w * 0.65, h * 0.58);
+        drawBonfireWithParticles(w * 0.5, h * 0.5);
 
-        // Clearing ring
-        ctx.fillStyle = '#1e293b';
-        ctx.beginPath();
-        ctx.ellipse(w / 2, h * 0.55, 220, 130, 0, 0, Math.PI * 2);
-        ctx.fill();
+      } else if (currentChannel === 'amusement-park') {
+        // Park 3: 🎡 Sakura Fair (Enhanced festival booths, ferris wheel & falling sakura petals)
+        ctx.fillStyle = '#fae8ff'; ctx.fillRect(0, 0, w, h);
 
-        drawCampTent(w * 0.22, h * 0.42, '#f43f5e');
-        drawCampTent(w * 0.78, h * 0.42, '#38bdf8');
-        drawWoodenLog(w * 0.32, h * 0.62);
-        drawWoodenLog(w * 0.68, h * 0.62);
-        drawBonfireWithParticles(w * 0.5, h * 0.55);
-      }
-      // 3. SAKURA FAIR (Amusement Park)
-      else if (currentChannel === 'amusement-park') {
-        const fairGrad = ctx.createLinearGradient(0, 0, 0, h);
-        fairGrad.addColorStop(0, '#fff1f2');
-        fairGrad.addColorStop(1, '#ffe4e6');
-        ctx.fillStyle = fairGrad;
-        ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(0, 45); ctx.quadraticCurveTo(w/2, 90, w, 45); ctx.stroke();
+        ['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#10b981', '#ec4899'].forEach((col, idx, arr) => {
+          ctx.fillStyle = col;
+          const px = (w / (arr.length + 1)) * (idx + 1);
+          const py = 55 + Math.sin((idx + 1) * 0.5) * 15;
+          ctx.beginPath(); ctx.moveTo(px - 12, py); ctx.lineTo(px + 12, py); ctx.lineTo(px, py + 22); ctx.fill();
+        });
 
-        // Bunting / carnival garlands
-        ctx.strokeStyle = '#ec4899';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(0, 45);
-        ctx.quadraticCurveTo(w / 2, 90, w, 45);
-        ctx.stroke();
+        drawFerrisWheel(w * 0.25, h * 0.4, 95);
+        drawFestivalBooth(w * 0.15, h * 0.78, '🎪 BALLOON POP', '#f43f5e');
+        drawFestivalBooth(w * 0.42, h * 0.78, '🍿 COTTON CANDY', '#ec4899');
+        drawFestivalBooth(w * 0.78, h * 0.78, '🎯 RING TOSS', '#8b5cf6');
 
-        const flagColors = ['#f43f5e', '#38bdf8', '#fbbf24', '#a855f7', '#10b981', '#ec4899'];
-        for (let i = 0; i < 14; i++) {
-          const ratio = (i + 1) / 15;
-          const px = w * ratio;
-          const py = 45 + Math.sin(ratio * Math.PI) * 45;
-          ctx.fillStyle = flagColors[i % flagColors.length];
-          ctx.beginPath();
-          ctx.moveTo(px - 10, py);
-          ctx.lineTo(px + 10, py);
-          ctx.lineTo(px, py + 18);
-          ctx.fill();
-        }
+        drawSakuraTree(w * 0.1, h * 0.22, 55); drawSakuraTree(w * 0.9, h * 0.22, 55);
 
-        drawFerrisWheel(w * 0.22, h * 0.38, 90);
-        drawFestivalBooth(w * 0.15, h * 0.75, '🎪 BALLOON POP', '#f43f5e');
-        drawFestivalBooth(w * 0.45, h * 0.75, '🍿 COTTON CANDY', '#ec4899');
-        drawFestivalBooth(w * 0.78, h * 0.75, '🎯 RING TOSS', '#8b5cf6');
+      } else if (currentChannel === 'arcade-lounge') {
+        // Park 4: 🕹️ Neon Arcade (Enhanced retro neon theme with glowing disco floor & arcade cabinets)
+        ctx.fillStyle = '#06020e'; ctx.fillRect(0, 0, w, h);
 
-        drawSakuraTree(w * 0.08, h * 0.22, 55);
-        drawSakuraTree(w * 0.92, h * 0.22, 55);
-      }
-      // 4. NEON ARCADE
-      else if (currentChannel === 'arcade-lounge') {
-        ctx.fillStyle = '#070314';
-        ctx.fillRect(0, 0, w, h);
+        discoHue = (discoHue + 2) % 360;
+        drawDiscoFloor(w * 0.5, h * 0.68, 250, 130, `hsl(${discoHue}, 100%, 60%)`);
 
-        // Synthwave perspective floor
-        ctx.strokeStyle = '#a855f7';
-        ctx.lineWidth = 1;
-        for (let x = -w * 0.2; x <= w * 1.2; x += 40) {
-          ctx.beginPath();
-          ctx.moveTo(w / 2, h * 0.35);
-          ctx.lineTo(x, h);
-          ctx.stroke();
-        }
-        for (let y = h * 0.4; y < h; y += 25) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(w, y);
-          ctx.stroke();
-        }
+        drawArcadeCabinet(w * 0.15, h * 0.28, '#ec4899', 'SLIME MATCH');
+        drawArcadeCabinet(w * 0.35, h * 0.28, '#8b5cf6', 'NEON DASH');
+        drawArcadeCabinet(w * 0.65, h * 0.28, '#06b6d4', 'BOBA HERO');
+        drawArcadeCabinet(w * 0.85, h * 0.28, '#f59e0b', 'CHIBI KOI');
 
-        discoHue = (discoHue + 1.5) % 360;
-        drawDiscoFloor(w * 0.5, h * 0.68, 260, 130, `hsl(${discoHue}, 100%, 65%)`);
-
-        // Arcade Cabinets with glowing CRT screens
-        drawArcadeCabinet(w * 0.12, h * 0.30, '#ec4899', 'SLIME MATCH');
-        drawArcadeCabinet(w * 0.32, h * 0.30, '#8b5cf6', 'NEON DASH');
-        drawArcadeCabinet(w * 0.68, h * 0.30, '#06b6d4', 'BOBA HERO');
-        drawArcadeCabinet(w * 0.88, h * 0.30, '#f59e0b', 'CHIBI KOI');
-
-        drawNeonSign(w * 0.5, h * 0.10, '★ CYBER DISCO ARCADE ★');
+        drawNeonSign(w * 0.5, h * 0.09, 'DISCO ARCADE LOUNGE');
       }
 
-      // Border glow
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = 'rgba(244, 114, 182, 0.4)';
-      ctx.strokeRect(0, 0, w, h);
+      ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(244, 114, 182, 0.4)'; ctx.strokeRect(0, 0, w, h);
     }
 
-    // Canvas environment helpers
     function drawSakuraTree(x, y, radius) {
-      ctx.fillStyle = 'rgba(0,0,0,0.12)';
-      ctx.beginPath();
-      ctx.ellipse(x, y + radius * 0.7, radius, radius * 0.3, 0, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      ctx.beginPath(); ctx.ellipse(x, y + radius * 0.7, radius, radius * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#582f0e'; ctx.lineWidth = 10;
+      ctx.beginPath(); ctx.moveTo(x, y + radius * 0.6); ctx.quadraticCurveTo(x - 5, y, x, y - radius * 0.2); ctx.stroke();
 
-      // Trunk
-      ctx.strokeStyle = '#582f0e';
-      ctx.lineWidth = 11;
-      ctx.beginPath();
-      ctx.moveTo(x, y + radius * 0.6);
-      ctx.quadraticCurveTo(x - 5, y, x, y - radius * 0.2);
-      ctx.stroke();
-
-      // Foliage layers
-      [
-        { dx: 0, dy: -radius * 0.4, r: radius * 0.65, color: '#f472b6' },
-        { dx: -radius * 0.4, dy: -radius * 0.1, r: radius * 0.55, color: '#ec4899' },
-        { dx: radius * 0.4, dy: -radius * 0.1, r: radius * 0.55, color: '#fb7185' },
-        { dx: 0, dy: -radius * 0.15, r: radius * 0.5, color: '#fed7aa' }
-      ].forEach(c => {
-        ctx.fillStyle = c.color;
-        ctx.beginPath();
-        ctx.arc(x + c.dx, y + c.dy, c.r, 0, Math.PI * 2);
-        ctx.fill();
+      [{ dx: 0, dy: -radius * 0.4, r: radius * 0.6, color: '#f472b6' },
+       { dx: -radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#ec4899' },
+       { dx: radius * 0.4, dy: -radius * 0.1, r: radius * 0.5, color: '#fb7185' }].forEach(c => {
+        ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(x + c.dx, y + c.dy, c.r, 0, Math.PI * 2); ctx.fill();
       });
     }
 
-    function drawPineTree(x, y, radius) {
-      ctx.fillStyle = '#064e3b';
-      ctx.beginPath();
-      ctx.moveTo(x, y - radius);
-      ctx.lineTo(x - radius * 0.6, y);
-      ctx.lineTo(x + radius * 0.6, y);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.moveTo(x, y - radius * 0.5);
-      ctx.lineTo(x - radius * 0.8, y + radius * 0.6);
-      ctx.lineTo(x + radius * 0.8, y + radius * 0.6);
-      ctx.closePath();
-      ctx.fill();
-    }
-
     function drawBonfireWithParticles(x, y) {
-      ctx.strokeStyle = '#78350f'; ctx.lineWidth = 8;
-      ctx.beginPath(); ctx.moveTo(x - 25, y + 15); ctx.lineTo(x + 25, y - 5); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x - 25, y - 5); ctx.lineTo(x + 25, y + 15); ctx.stroke();
+      ctx.strokeStyle = '#78350f'; ctx.lineWidth = 9;
+      ctx.beginPath(); ctx.moveTo(x - 30, y + 18); ctx.lineTo(x + 30, y - 6); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x - 30, y - 6); ctx.lineTo(x + 30, y + 18); ctx.stroke();
 
-      const glow = ctx.createRadialGradient(x, y, 5, x, y, 75);
-      glow.addColorStop(0, 'rgba(249, 115, 22, 0.85)');
-      glow.addColorStop(1, 'rgba(249, 115, 22, 0)');
-      ctx.fillStyle = glow;
-      ctx.beginPath();
-      ctx.arc(x, y, 75, 0, Math.PI * 2);
-      ctx.fill();
+      const glow = ctx.createRadialGradient(x, y, 5, x, y, 80);
+      glow.addColorStop(0, 'rgba(249, 115, 22, 0.85)'); glow.addColorStop(1, 'rgba(249, 115, 22, 0)');
+      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 80, 0, Math.PI * 2); ctx.fill();
 
       bonfireFlames.forEach(p => {
         p.x += p.vx; p.y += p.vy; p.life -= 0.03;
         if (p.life <= 0) {
-          p.x = x + (Math.random() - 0.5) * 15;
-          p.y = y + 5;
-          p.vx = (Math.random() - 0.5) * 1.5;
-          p.vy = -Math.random() * 2.5 - 1.5;
-          p.life = 1.0;
+          p.x = x + (Math.random() - 0.5) * 18; p.y = y + 8;
+          p.vx = (Math.random() - 0.5) * 1.5; p.vy = -Math.random() * 2.8 - 1.5; p.life = 1.0;
         }
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.life;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1.0;
+        ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1.0;
       });
     }
 
     function drawCampTent(x, y, color) {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.moveTo(x, y - 35);
-      ctx.lineTo(x - 35, y + 25);
-      ctx.lineTo(x + 35, y + 25);
-      ctx.closePath();
-      ctx.fill();
-
-      // Tent entrance flap
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.beginPath();
-      ctx.moveTo(x, y - 35);
-      ctx.lineTo(x, y + 25);
-      ctx.lineTo(x - 12, y + 25);
-      ctx.closePath();
-      ctx.fill();
+      ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(x, y - 35); ctx.lineTo(x - 35, y + 25); ctx.lineTo(x + 35, y + 25); ctx.closePath(); ctx.fill();
     }
 
     function drawWoodenLog(x, y) {
-      ctx.fillStyle = '#78350f';
-      ctx.beginPath();
-      ctx.roundRect(x - 28, y - 9, 56, 18, 6);
-      ctx.fill();
+      ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.roundRect(x - 30, y - 9, 60, 18, 6); ctx.fill();
     }
 
     function drawFerrisWheel(x, y, radius) {
@@ -2239,119 +1824,89 @@
       ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 4;
       ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.stroke();
 
-      for (let i = 0; i < 8; i++) {
-        const a = ferrisWheelAngle + (i * Math.PI * 2) / 8;
-        ctx.strokeStyle = 'rgba(236, 72, 153, 0.6)';
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(a) * radius, y + Math.sin(a) * radius); ctx.stroke();
-
-        ctx.fillStyle = '#f43f5e';
-        ctx.beginPath();
-        ctx.arc(x + Math.cos(a) * radius, y + Math.sin(a) * radius, 9, 0, Math.PI * 2);
-        ctx.fill();
+      for (let i = 0; i < 6; i++) {
+        const a = ferrisWheelAngle + (i * Math.PI * 2) / 6;
+        ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(x + Math.cos(a) * radius, y + Math.sin(a) * radius, 9, 0, Math.PI * 2); ctx.fill();
       }
     }
 
     function drawFestivalBooth(x, y, title, color) {
-      ctx.fillStyle = color;
-      ctx.fillRect(x - 40, y - 28, 80, 52);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(x - 35, y - 22, 70, 20);
-      ctx.fillStyle = '#831843';
-      ctx.font = 'bold 7px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(title, x, y - 10);
+      ctx.fillStyle = color; ctx.fillRect(x - 40, y - 28, 80, 50);
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 34, y - 22, 68, 20);
+      ctx.fillStyle = '#831843'; ctx.font = 'bold 7.5px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(title, x, y - 9);
     }
 
     function drawPond(x, y, rx, ry) {
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.55)';
-      ctx.beginPath();
-      ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.6)';
+      ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; ctx.lineWidth = 3; ctx.stroke();
 
       koiFish.forEach(fish => {
         fish.angle += 0.02;
         fish.x = x + Math.cos(fish.angle) * (rx * 0.5);
         fish.y = y + Math.sin(fish.angle) * (ry * 0.5);
         ctx.fillStyle = fish.color;
-        ctx.beginPath();
-        ctx.ellipse(fish.x, fish.y, 8, 3.5, fish.angle, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.ellipse(fish.x, fish.y, 8, 3.5, fish.angle, 0, Math.PI * 2); ctx.fill();
       });
     }
 
     function drawWoodenBridge(x, y, w, h) {
-      ctx.fillStyle = '#78350f';
-      ctx.fillRect(x - w / 2, y - h / 2, w, h);
+      ctx.fillStyle = '#78350f'; ctx.fillRect(x - w / 2, y - h / 2, w, h);
     }
 
     function drawToriiGate(x, y) {
       ctx.fillStyle = '#dc2626';
-      ctx.fillRect(x - 55, y - 55, 12, 75);
-      ctx.fillRect(x + 43, y - 55, 12, 75);
-      ctx.fillRect(x - 70, y - 55, 140, 14);
-      ctx.fillRect(x - 60, y - 35, 120, 9);
+      ctx.fillRect(x - 55, y - 55, 11, 75); ctx.fillRect(x + 44, y - 55, 11, 75);
+      ctx.fillRect(x - 70, y - 55, 140, 13);
     }
 
     function drawLantern(x, y) {
-      ctx.fillStyle = '#f97316';
-      ctx.beginPath();
-      ctx.roundRect(x - 9, y - 11, 18, 22, 5);
-      ctx.fill();
+      ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.roundRect(x - 9, y - 11, 18, 22, 4); ctx.fill();
     }
 
     function drawArcadeCabinet(x, y, color, title) {
-      ctx.fillStyle = '#0f172a'; ctx.fillRect(x - 24, y - 42, 48, 72);
-      ctx.fillStyle = color; ctx.fillRect(x - 20, y - 38, 40, 16);
-      ctx.fillStyle = '#38bdf8'; ctx.fillRect(x - 18, y - 18, 36, 26);
-      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 6px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(title, x, y - 5);
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(x - 24, y - 40, 48, 70);
+      ctx.fillStyle = color; ctx.fillRect(x - 21, y - 37, 42, 15);
+      ctx.fillStyle = '#38bdf8'; ctx.fillRect(x - 19, y - 19, 38, 26);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 6.5px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(title, x, y - 5);
     }
 
     function drawDiscoFloor(x, y, w, h, activeColor) {
-      ctx.fillStyle = activeColor;
-      ctx.shadowColor = activeColor;
-      ctx.shadowBlur = 18;
-      ctx.fillRect(x - w / 2, y - h / 2, w, h);
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 2;
-      for (let dx = x - w / 2; dx < x + w / 2; dx += 28) {
-        ctx.beginPath(); ctx.moveTo(dx, y - h / 2); ctx.lineTo(dx, y + h / 2); ctx.stroke();
-      }
-      for (let dy = y - h / 2; dy < y + h / 2; dy += 28) {
-        ctx.beginPath(); ctx.moveTo(x - w / 2, dy); ctx.lineTo(x + w / 2, dy); ctx.stroke();
-      }
+      ctx.fillStyle = activeColor; ctx.shadowColor = activeColor; ctx.shadowBlur = 18;
+      ctx.fillRect(x - w / 2, y - h / 2, w, h); ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
+      for (let dx = x - w / 2; dx < x + w / 2; dx += 28) { ctx.beginPath(); ctx.moveTo(dx, y - h / 2); ctx.lineTo(dx, y + h / 2); ctx.stroke(); }
+      for (let dy = y - h / 2; dy < y + h / 2; dy += 28) { ctx.beginPath(); ctx.moveTo(x - w / 2, dy); ctx.lineTo(x + w / 2, dy); ctx.stroke(); }
     }
 
     function drawNeonSign(x, y, text) {
-      ctx.font = 'bold 16px "Yuji Mai", serif';
-      ctx.fillStyle = '#f472b6';
-      ctx.textAlign = 'center';
-      ctx.shadowColor = '#ec4899';
-      ctx.shadowBlur = 14;
-      ctx.fillText(text, x, y);
-      ctx.shadowBlur = 0;
+      ctx.font = 'bold 16px "Yuji Mai", serif'; ctx.fillStyle = '#f472b6'; ctx.textAlign = 'center';
+      ctx.shadowColor = '#ec4899'; ctx.shadowBlur = 14; ctx.fillText(text, x, y); ctx.shadowBlur = 0;
     }
 
-    // --- SLIME RENDERING ---
+    // --- SLIME RENDERING (Supports custom profile picture badges) ---
     function drawSlime(player, isSelf = false) {
-      let { id, x, y, name, avatarType, expression, equippedAcc, equippedClothing, equippedTrail, title, isMoving, isJumping, isDancing, jumpOffset, speechBubble, activeEmote } = player;
+      let { id, x, y, name, profilePic, avatarType, expression, equippedAcc, equippedClothing, equippedMakeup, equippedTrail, equippedTitle, title, isMoving, isJumping, isDancing, jumpOffset, speechBubble, activeEmote } = player;
 
       const isTargetAdmin = adminUsers.includes(id);
       if (isDevMode && isSelf) { avatarType = 'dev_white'; title = 'Dev'; }
       else if (isTargetAdmin) { avatarType = 'admin_black'; title = 'Admin'; }
+      else if (!title && equippedTitle) {
+        if (equippedTitle === 'title_novice') title = 'Novice';
+        if (equippedTitle === 'title_vip') title = 'VIP';
+        if (equippedTitle === 'title_cool') title = 'Cool';
+        if (equippedTitle === 'title_legend') title = 'Legend';
+      }
 
       const type = AVATAR_TYPES[avatarType] || AVATAR_TYPES.sakura;
+
       ctx.save();
       player.bouncePhase = (player.bouncePhase || 0) + (isMoving ? 0.22 : 0.05);
       player.dancePhase = (player.dancePhase || 0) + 0.15;
 
       let danceXOffset = isDancing ? Math.sin(player.dancePhase) * 12 : 0;
       let danceYOffset = isDancing ? Math.abs(Math.cos(player.dancePhase)) * -8 : 0;
+
       const groundBounce = isMoving ? Math.abs(Math.sin(player.bouncePhase)) * 8 : Math.sin(player.bouncePhase) * 2;
       const drawY = y - groundBounce - (jumpOffset || 0) + danceYOffset;
       const drawX = x + danceXOffset;
@@ -2367,125 +1922,86 @@
 
       ctx.translate(drawX, drawY);
 
-      // Shadow
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-      ctx.beginPath();
-      ctx.ellipse(0, y - drawY + 14, Math.max(5, 16 - (jumpOffset || 0) * 0.2), 5, 0, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; ctx.beginPath();
+      ctx.ellipse(0, y - drawY + 14, Math.max(5, 16 - (jumpOffset || 0) * 0.2), 5, 0, 0, Math.PI * 2); ctx.fill();
 
       ctx.scale(scaleX, scaleY);
 
-      // Slime Body
-      ctx.fillStyle = type.bodyColor;
-      ctx.beginPath();
-      ctx.arc(0, 0, 18, Math.PI * 0.82, Math.PI * 2.18);
-      ctx.quadraticCurveTo(0, 20, -18, 0);
-      ctx.fill();
+      ctx.fillStyle = type.bodyColor; ctx.beginPath();
+      ctx.arc(0, 0, 18, Math.PI * 0.82, Math.PI * 2.18); ctx.quadraticCurveTo(0, 20, -18, 0); ctx.fill();
 
-      // Slime Gloss Highlight
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
-      ctx.beginPath();
-      ctx.ellipse(-5, -8, 6, 3, -Math.PI / 4, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; ctx.beginPath(); ctx.ellipse(-5, -8, 6, 3, -Math.PI / 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; ctx.lineWidth = 2; ctx.stroke();
 
-      // Clothing
-      if (equippedClothing === 'scarf_red') {
-        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.roundRect(-12, 6, 24, 6, 3); ctx.fill();
-      } else if (equippedClothing === 'ribbon_blue') {
-        ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(0, 8, 4, 0, Math.PI * 2); ctx.fill();
-      }
+      if (equippedClothing === 'scarf_red') { ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.roundRect(-12, 6, 24, 6, 3); ctx.fill(); }
+      else if (equippedClothing === 'ribbon_blue') { ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(0, 8, 4, 0, Math.PI * 2); ctx.fill(); }
 
       drawSlimeExpression(expression || 'happy', 0);
 
       const accToDraw = equippedAcc || type.accessory;
-      if (accToDraw) {
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(accToDraw, 0, -18);
-      }
+      if (accToDraw) { ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(accToDraw, 0, -18); }
+
       ctx.restore();
 
-      // Kicked Players 3-Dots
       if (kickedPlayers[id] && kickedPlayers[id] > Date.now()) {
         ctx.fillStyle = '#ef4444';
-        [-8, 0, 8].forEach(offset => {
-          ctx.beginPath(); ctx.arc(drawX + offset, drawY - 34, 3, 0, Math.PI * 2); ctx.fill();
-        });
+        ctx.beginPath(); ctx.arc(drawX - 8, drawY - 32, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(drawX, drawY - 35, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(drawX + 8, drawY - 32, 3, 0, Math.PI * 2); ctx.fill();
       }
 
-      // Title Tag
       if (title) {
         ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
         ctx.fillStyle = title === 'Dev' ? '#a855f7' : (title === 'Admin' ? '#f59e0b' : '#38bdf8');
-        ctx.textAlign = 'center';
-        ctx.fillText(`[ ${title.toUpperCase()} ]`, drawX, drawY - 26);
+        ctx.textAlign = 'center'; ctx.fillText(`[ ${title.toUpperCase()} ]`, drawX, drawY - 26);
       }
 
-      // Username Tag
       ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
-      const nameWidth = ctx.measureText(name).width + 14;
+      const nameWidth = ctx.measureText(name).width + 12;
       ctx.fillStyle = isSelf ? '#ec4899' : 'rgba(255, 255, 255, 0.95)';
-      ctx.beginPath();
-      ctx.roundRect(drawX - nameWidth / 2, drawY + 20, nameWidth, 16, 8);
-      ctx.fill();
-      ctx.fillStyle = isSelf ? '#ffffff' : '#831843';
-      ctx.textAlign = 'center';
+      ctx.beginPath(); ctx.roundRect(drawX - nameWidth / 2, drawY + 20, nameWidth, 16, 8); ctx.fill();
+
+      ctx.fillStyle = isSelf ? '#ffffff' : '#831843'; ctx.textAlign = 'center';
       ctx.fillText(name, drawX, drawY + 31);
 
-      // Emotes & Speech
       if (activeEmote && activeEmote.expiresAt > Date.now()) {
-        ctx.font = '22px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(activeEmote.emoji, drawX, drawY - 44);
+        ctx.font = '20px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(activeEmote.emoji, drawX, drawY - 42);
       }
+
       if (speechBubble && speechBubble.expiresAt > Date.now()) {
-        drawSpeechBubble(drawX, drawY - 34, speechBubble.text);
+        drawSpeechBubble(drawX, drawY - 32, speechBubble.text);
       }
     }
 
     function drawSlimeExpression(expr, eyeOffsetX) {
       ctx.fillStyle = '#0f172a';
-      ctx.beginPath();
-      ctx.ellipse(-5 + eyeOffsetX, -2, 2, 2.5, 0, 0, Math.PI * 2);
-      ctx.ellipse(5 + eyeOffsetX, -2, 2, 2.5, 0, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.ellipse(-5 + eyeOffsetX, -2, 2, 2.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(5 + eyeOffsetX, -2, 2, 2.5, 0, 0, Math.PI * 2); ctx.fill();
 
-      // Cheeks
       ctx.fillStyle = 'rgba(244, 114, 182, 0.7)';
-      ctx.beginPath();
-      ctx.ellipse(-8 + eyeOffsetX, 2, 3, 1.5, 0, 0, Math.PI * 2);
-      ctx.ellipse(8 + eyeOffsetX, 2, 3, 1.5, 0, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.ellipse(-8 + eyeOffsetX, 2, 3, 1.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(8 + eyeOffsetX, 2, 3, 1.5, 0, 0, Math.PI * 2); ctx.fill();
     }
 
     function drawSpeechBubble(x, y, text) {
       ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
-      const bubbleWidth = Math.min(150, ctx.measureText(text).width + 18);
+      const bubbleWidth = Math.min(140, ctx.measureText(text).width + 16);
       const bubbleHeight = 22;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
-      ctx.beginPath();
-      ctx.roundRect(x - bubbleWidth / 2, y - bubbleHeight, bubbleWidth, bubbleHeight, 10);
-      ctx.fill();
-      ctx.strokeStyle = '#ec4899';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.fillStyle = '#831843';
-      ctx.textAlign = 'center';
-      ctx.fillText(text, x, y - bubbleHeight + 15);
+      ctx.beginPath(); ctx.roundRect(x - bubbleWidth / 2, y - bubbleHeight, bubbleWidth, bubbleHeight, 10); ctx.fill();
+      ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = '#831843'; ctx.textAlign = 'center'; ctx.fillText(text, x, y - bubbleHeight + 15);
     }
 
-    // --- CONTROLS & MOVEMENT ---
+    // --- CONTROLS ---
     function triggerJump() {
       if (!localPlayer.isJumping) {
-        localPlayer.isJumping = true;
-        localPlayer.jumpVelocity = 11;
-        playSound('jump');
+        localPlayer.isJumping = true; localPlayer.jumpVelocity = 11; playSound('jump');
       }
     }
 
     function triggerDance() {
-      localPlayer.isDancing = !localPlayer.isDancing;
-      playSound('emote');
+      localPlayer.isDancing = !localPlayer.isDancing; playSound('emote');
       if (localPlayer.isDancing) triggerEmote('💃');
       if (realtimeChannel) broadcastState();
     }
@@ -2495,15 +2011,14 @@
       if (keys.up) dy -= 1; if (keys.down) dy += 1;
       if (keys.left) dx -= 1; if (keys.right) dx += 1;
       if (joystick.active) { dx = joystick.dx; dy = joystick.dy; }
+
       if (dx !== 0 || dy !== 0) localPlayer.isDancing = false;
 
       if (localPlayer.isJumping) {
         localPlayer.jumpOffset = (localPlayer.jumpOffset || 0) + localPlayer.jumpVelocity;
         localPlayer.jumpVelocity -= 0.8;
         if (localPlayer.jumpOffset <= 0) {
-          localPlayer.jumpOffset = 0;
-          localPlayer.isJumping = false;
-          playSound('bounce');
+          localPlayer.jumpOffset = 0; localPlayer.isJumping = false; playSound('bounce');
         }
       }
 
@@ -2511,8 +2026,7 @@
         const len = Math.hypot(dx, dy);
         localPlayer.x += (dx / len) * localPlayer.speed;
         localPlayer.y += (dy / len) * localPlayer.speed;
-        localPlayer.targetX = localPlayer.x;
-        localPlayer.targetY = localPlayer.y;
+        localPlayer.targetX = localPlayer.x; localPlayer.targetY = localPlayer.y;
         localPlayer.isMoving = true;
       } else {
         const distX = localPlayer.targetX - localPlayer.x;
@@ -2522,9 +2036,7 @@
           localPlayer.x += (distX / distance) * localPlayer.speed;
           localPlayer.y += (distY / distance) * localPlayer.speed;
           localPlayer.isMoving = true;
-        } else {
-          localPlayer.isMoving = false;
-        }
+        } else localPlayer.isMoving = false;
       }
 
       localPlayer.x = Math.max(20, Math.min(canvas.width - 20, localPlayer.x));
@@ -2538,6 +2050,7 @@
     function openGamesSelectionModal() {
       document.getElementById('games-selection-modal').classList.remove('hidden');
     }
+
     function closeGamesSelectionModal() {
       document.getElementById('games-selection-modal').classList.add('hidden');
     }
@@ -2550,16 +2063,15 @@
 
     function startMiniGame(type) {
       activeMiniGame = type;
-      miniGameScore = 0;
-      miniGameTimeLeft = 30;
+      miniGameScore = 0; miniGameTimeLeft = 30;
+
       document.getElementById('minigame-banner').classList.remove('hidden');
       document.getElementById('minigame-score').textContent = miniGameScore;
       document.getElementById('minigame-timer').textContent = miniGameTimeLeft + 's';
 
       if (type === 'balloon-pop') {
         document.getElementById('minigame-title').textContent = '🎈 Balloon Catch';
-        switchChannel('amusement-park');
-        spawnMiniGameCollectibles('🎈');
+        switchChannel('amusement-park'); spawnMiniGameCollectibles('🎈');
       }
 
       clearInterval(miniGameInterval);
@@ -2595,12 +2107,17 @@
       }
     }
 
+    function drawMiniGameCollectibles() {
+      gameCollectibles.forEach(item => {
+        ctx.font = '20px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(item.type, item.x, item.y);
+      });
+    }
+
     function endMiniGame(manualQuit = false) {
       clearInterval(miniGameInterval);
       document.getElementById('minigame-banner').classList.add('hidden');
       if (!manualQuit) { playSound('win'); triggerEmote('🎉'); }
-      activeMiniGame = null;
-      gameCollectibles = [];
+      activeMiniGame = null; gameCollectibles = [];
     }
 
     function openArcadeMemoryGame() {
@@ -2608,8 +2125,7 @@
       grid.innerHTML = '';
       const icons = ['🌸', '🍵', '👑', '🐱', '🌸', '🍵', '👑', '🐱'];
       icons.sort(() => Math.random() - 0.5);
-      let firstCard = null;
-      let matchedCount = 0;
+      let firstCard = null; let matchedCount = 0;
 
       icons.forEach(icon => {
         const btn = document.createElement('button');
@@ -2618,13 +2134,10 @@
         btn.onclick = () => {
           if (btn.classList.contains('bg-white')) return;
           btn.className = 'h-12 rounded-xl bg-white text-lg font-bold transition flex items-center justify-center border-2 border-pink-500 shadow-sm';
-          if (!firstCard) {
-            firstCard = { btn, icon };
-          } else {
+          if (!firstCard) firstCard = { btn, icon };
+          else {
             if (firstCard.icon === icon) {
-              playSound('win');
-              matchedCount += 2;
-              firstCard = null;
+              playSound('win'); matchedCount += 2; firstCard = null;
               if (matchedCount === icons.length) {
                 document.getElementById('memory-status').textContent = '🎉 Winner! +4 Flowers!';
                 addCoins(4);
@@ -2647,32 +2160,33 @@
       document.getElementById('arcade-card-modal').classList.add('hidden');
     }
 
-    // --- MAIN RENDER LOOP ---
+    // MAIN RENDER LOOP
     function render() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       drawEnvironment();
       updateAndDrawEnvironmentParticles();
       updateAndDrawTrails();
-      if (activeMiniGame) {
-        gameCollectibles.forEach(item => {
-          ctx.font = '22px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(item.type, item.x, item.y);
-        });
-      }
+
+      if (activeMiniGame) drawMiniGameCollectibles();
+
       Object.values(remotePlayers).forEach(p => drawSlime(p, false));
+
       updatePlayerMovement();
       drawSlime(localPlayer, true);
+
       updateAndDrawParticles();
+
       requestAnimationFrame(render);
     }
 
-    // --- SUPABASE REALTIME (Room Broadcast & Global Social Network) ---
+    // --- SUPABASE REALTIME & LOBBY SYNCHRONIZATION ---
     async function initSupabaseChannel(channelName) {
       if (realtimeChannel) {
         await supabaseClient.removeChannel(realtimeChannel);
         realtimeChannel = null;
       }
+
       currentChannel = channelName;
       document.getElementById('room-indicator').textContent = '#' + channelName;
 
@@ -2695,8 +2209,6 @@
               }
             }
           });
-          renderFriendsSideDrawer();
-          renderDMFriendsList();
         })
         .on('broadcast', { event: 'player-move' }, payload => {
           const p = payload.payload;
@@ -2709,8 +2221,7 @@
           if (!msg) return;
           saveChatMessageToMemory(msg.channel || currentChannel, msg);
           if ((msg.channel || currentChannel) === currentChannel) {
-            displayChatMessage(msg);
-            playSound('msg');
+            displayChatMessage(msg); playSound('msg');
           }
           if (msg.playerId === localPlayer.id) {
             localPlayer.speechBubble = { text: msg.content, expiresAt: Date.now() + 6000 };
@@ -2725,83 +2236,27 @@
             addFloatingParticle(remotePlayers[data.playerId].x, remotePlayers[data.playerId].y, data.emoji);
           }
         })
+        .on('broadcast', { event: 'music-change' }, payload => {
+          if (payload.payload && payload.payload.trackKey) {
+            currentSongKey = payload.payload.trackKey;
+            document.getElementById('music-track-name').textContent = SONGS_DB[currentSongKey]?.name || 'Song';
+          }
+        })
         .subscribe(async status => {
           if (status === 'SUBSCRIBED') {
             await realtimeChannel.track({
-              id: localPlayer.id,
-              name: localPlayer.name,
-              pfp: localPlayer.pfp,
-              avatarType: localPlayer.avatarType,
-              expression: localPlayer.expression,
-              equippedAcc: localPlayer.equippedAcc,
-              equippedClothing: localPlayer.equippedClothing,
-              equippedMakeup: localPlayer.equippedMakeup,
-              equippedTrail: localPlayer.equippedTrail,
-              equippedTitle: localPlayer.equippedTitle,
-              title: localPlayer.title,
-              x: localPlayer.x,
-              y: localPlayer.y
+              id: localPlayer.id, name: localPlayer.name, profilePic: localPlayer.profilePic,
+              avatarType: localPlayer.avatarType, expression: localPlayer.expression,
+              equippedAcc: localPlayer.equippedAcc, equippedClothing: localPlayer.equippedClothing,
+              equippedMakeup: localPlayer.equippedMakeup, equippedTrail: localPlayer.equippedTrail,
+              equippedTitle: localPlayer.equippedTitle, title: localPlayer.title,
+              x: localPlayer.x, y: localPlayer.y
             });
             broadcastState();
           }
         });
 
       renderChatLogForChannel(channelName);
-    }
-
-    // Dedicated Global Social Channel for Friend Requests, DMs & Music Control Sync
-    function initSocialChannel() {
-      if (socialChannel) return;
-      socialChannel = supabaseClient.channel('sakura_global_social', {
-        config: { broadcast: { self: false } }
-      });
-
-      socialChannel
-        .on('broadcast', { event: 'friend-request' }, payload => {
-          const data = payload.payload;
-          if (data.toId === localPlayer.id) {
-            if (!friendRequests.some(r => r.id === data.fromId)) {
-              friendRequests.push({ id: data.fromId, name: data.fromName, pfp: data.fromPfp || '' });
-              localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
-              renderDrawerFriendRequests();
-              alert(`🌸 New friend request from ${data.fromName}!`);
-            }
-          }
-        })
-        .on('broadcast', { event: 'friend-accepted' }, payload => {
-          const data = payload.payload;
-          if (data.toId === localPlayer.id) {
-            if (!myFriends.includes(data.fromId)) {
-              myFriends.push(data.fromId);
-              localStorage.setItem('sakura_friends', JSON.stringify(myFriends));
-              renderFriendsSideDrawer();
-              renderDMFriendsList();
-              renderUserLookupResults();
-              alert(`🎉 ${data.fromName} accepted your friend request!`);
-            }
-          }
-        })
-        .on('broadcast', { event: 'direct-message' }, payload => {
-          const msg = payload.payload;
-          if (msg.recipientId === localPlayer.id) {
-            const threadKey = msg.threadKey;
-            if (!directMessages[threadKey]) directMessages[threadKey] = [];
-            directMessages[threadKey].push(msg);
-            localStorage.setItem('sakura_direct_msgs', JSON.stringify(directMessages));
-
-            playSound('msg');
-            if (activeDMTarget && activeDMTarget.id === msg.senderId) {
-              renderDMThread();
-            } else {
-              document.getElementById('dm-unread-dot').classList.remove('hidden');
-            }
-          }
-        })
-        .on('broadcast', { event: 'music-change' }, payload => {
-          const { trackId, changedBy } = payload.payload;
-          setMusicTrack(trackId, true);
-        })
-        .subscribe();
     }
 
     function saveChatMessageToMemory(channel, msg) {
@@ -2825,39 +2280,22 @@
     function broadcastState() {
       if (!realtimeChannel) return;
       realtimeChannel.send({
-        type: 'broadcast',
-        event: 'player-move',
+        type: 'broadcast', event: 'player-move',
         payload: {
-          id: localPlayer.id,
-          name: localPlayer.name,
-          pfp: localPlayer.pfp,
-          avatarType: localPlayer.avatarType,
-          expression: localPlayer.expression,
-          equippedAcc: localPlayer.equippedAcc,
-          equippedClothing: localPlayer.equippedClothing,
-          equippedMakeup: localPlayer.equippedMakeup,
-          equippedTrail: localPlayer.equippedTrail,
-          equippedTitle: localPlayer.equippedTitle,
-          title: localPlayer.title,
-          x: localPlayer.x,
-          y: localPlayer.y,
-          isMoving: localPlayer.isMoving,
-          isDancing: localPlayer.isDancing
+          id: localPlayer.id, name: localPlayer.name, profilePic: localPlayer.profilePic,
+          avatarType: localPlayer.avatarType, expression: localPlayer.expression,
+          equippedAcc: localPlayer.equippedAcc, equippedClothing: localPlayer.equippedClothing,
+          equippedMakeup: localPlayer.equippedMakeup, equippedTrail: localPlayer.equippedTrail,
+          equippedTitle: localPlayer.equippedTitle, title: localPlayer.title,
+          x: localPlayer.x, y: localPlayer.y, isMoving: localPlayer.isMoving, isDancing: localPlayer.isDancing
         }
       });
     }
 
     function triggerEmote(emoji) {
-      playSound('emote');
-      localPlayer.activeEmote = { emoji: emoji, expiresAt: Date.now() + 3000 };
+      playSound('emote'); localPlayer.activeEmote = { emoji: emoji, expiresAt: Date.now() + 3000 };
       addFloatingParticle(localPlayer.x, localPlayer.y, emoji);
-      if (realtimeChannel) {
-        realtimeChannel.send({
-          type: 'broadcast',
-          event: 'player-emote',
-          payload: { playerId: localPlayer.id, emoji: emoji }
-        });
-      }
+      if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'player-emote', payload: { playerId: localPlayer.id, emoji: emoji } });
     }
 
     document.getElementById('chat-form').addEventListener('submit', (e) => {
@@ -2865,69 +2303,51 @@
       if (bannedUsers.includes(localPlayer.id)) { alert("You are permanently banned."); return; }
       if (userBanEndTimes[localPlayer.id] && userBanEndTimes[localPlayer.id] > Date.now()) {
         const remaining = Math.ceil((userBanEndTimes[localPlayer.id] - Date.now()) / 60000);
-        alert(`10-minute temporary chat ban (${remaining} min remaining).`);
-        return;
+        alert(`10-minute temporary chat ban (${remaining} min remaining).`); return;
       }
+
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
       if (!text) return;
       input.value = '';
 
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const msgObj = {
-        playerId: localPlayer.id,
-        sender: localPlayer.name,
-        pfp: localPlayer.pfp,
-        content: text,
-        time: timeStr,
-        channel: currentChannel
-      };
+      const msgObj = { playerId: localPlayer.id, sender: localPlayer.name, profilePic: localPlayer.profilePic, content: text, time: timeStr, channel: currentChannel };
 
-      playSound('msg');
-      localPlayer.speechBubble = { text: text, expiresAt: Date.now() + 6000 };
-      saveChatMessageToMemory(currentChannel, msgObj);
-      displayChatMessage(msgObj);
+      playSound('msg'); localPlayer.speechBubble = { text: text, expiresAt: Date.now() + 6000 };
+      saveChatMessageToMemory(currentChannel, msgObj); displayChatMessage(msgObj);
 
       if (realtimeChannel) realtimeChannel.send({ type: 'broadcast', event: 'chat-message', payload: msgObj });
     });
 
-    // Display message with user Profile Picture
     function displayChatMessage(msg) {
       const container = document.getElementById('chat-messages');
       const isSelf = msg.sender === localPlayer.name;
+
       const msgDiv = document.createElement('div');
-      msgDiv.className = `flex gap-2 ${isSelf ? 'flex-row-reverse' : 'flex-row'} items-end animate-in fade-in`;
-
-      const pfpUrl = msg.pfp || (isSelf ? localPlayer.pfp : '');
-      const pfpMarkup = pfpUrl
-        ? `<img src="${pfpUrl}" class="w-6 h-6 rounded-full object-cover border border-pink-300" />`
-        : `<div class="w-6 h-6 rounded-full bg-pink-200 flex items-center justify-center text-[10px]">🌸</div>`;
-
+      msgDiv.className = `flex flex-col ${isSelf ? 'items-end' : 'items-start'} space-y-0.5 animate-in fade-in`;
       msgDiv.innerHTML = `
-        ${pfpMarkup}
-        <div class="flex flex-col ${isSelf ? 'items-end' : 'items-start'} max-w-[85%]">
-          <div class="flex items-center gap-1 px-1">
-            <span class="text-[10px] font-bold text-pink-200">${escapeHtml(msg.sender)}</span>
-            <span class="text-[8px] text-pink-400">${msg.time || ''}</span>
+        <div class="flex items-center gap-1.5 px-1">
+          <div class="w-4 h-4 rounded-full bg-pink-400 flex items-center justify-center text-white text-[8px] overflow-hidden">
+            ${msg.profilePic ? `<img src="${msg.profilePic}" class="w-full h-full object-cover"/>` : '🌸'}
           </div>
-          <div class="px-3 py-1.5 rounded-2xl text-xs shadow-sm ${
-            isSelf ? 'bg-pink-500 text-white rounded-br-none' : 'bg-white/95 text-pink-950 rounded-bl-none font-medium'
-          }">
-            ${escapeHtml(msg.content)}
-          </div>
+          <span class="text-[10px] font-bold text-pink-200">${escapeHtml(msg.sender)}</span>
+          <span class="text-[8px] text-pink-400">${msg.time || ''}</span>
+        </div>
+        <div class="px-3 py-1.5 rounded-2xl text-xs max-w-[88%] shadow-sm ${
+          isSelf ? 'bg-pink-500 text-white rounded-tr-none' : 'bg-white/95 text-pink-950 rounded-tl-none font-medium'
+        }">
+          ${escapeHtml(msg.content)}
         </div>
       `;
-      container.appendChild(msgDiv);
-      container.scrollTop = container.scrollHeight;
+      container.appendChild(msgDiv); container.scrollTop = container.scrollHeight;
     }
 
     function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.innerText = text;
-      return div.innerHTML;
+      const div = document.createElement('div'); div.innerText = text; return div.innerHTML;
     }
 
-    // --- KEYBOARD & JOYSTICK LISTENERS ---
+    // --- INTERACTION & LISTENERS ---
     window.addEventListener('keydown', e => {
       if (document.activeElement.tagName === 'INPUT') return;
       if (e.key === ' ' || e.key === 'Spacebar') { triggerJump(); return; }
@@ -2949,18 +2369,14 @@
     if (joystickBase) {
       joystickBase.addEventListener('touchstart', e => { e.preventDefault(); joystick.active = true; updateJoystickPos(e.touches[0]); }, { passive: false });
       joystickBase.addEventListener('touchmove', e => { e.preventDefault(); if (joystick.active) updateJoystickPos(e.touches[0]); }, { passive: false });
-      joystickBase.addEventListener('touchend', e => {
-        e.preventDefault(); joystick.active = false; joystick.dx = 0; joystick.dy = 0;
-        joystickStick.style.transform = `translate(0px, 0px)`;
-      }, { passive: false });
+      joystickBase.addEventListener('touchend', e => { e.preventDefault(); joystick.active = false; joystick.dx = 0; joystick.dy = 0; joystickStick.style.transform = `translate(0px, 0px)`; }, { passive: false });
     }
 
     function updateJoystickPos(touch) {
       const rect = joystickBase.getBoundingClientRect();
       let dx = touch.clientX - (rect.left + rect.width / 2);
       let dy = touch.clientY - (rect.top + rect.height / 2);
-      const dist = Math.hypot(dx, dy);
-      const maxDist = rect.width / 2 - 8;
+      const dist = Math.hypot(dx, dy); const maxDist = rect.width / 2 - 8;
       if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
       joystickStick.style.transform = `translate(${dx}px, ${dy}px)`;
       joystick.dx = dx / maxDist; joystick.dy = dy / maxDist;
@@ -2993,13 +2409,15 @@
 
     function switchChannel(channelName) {
       if (currentChannel === channelName) return;
+
       document.querySelectorAll('.chan-btn, .quick-chan-btn').forEach(btn => {
         btn.classList.remove('bg-pink-500', 'text-white', 'shadow-sm');
-        btn.classList.add('text-pink-800');
+        btn.classList.add('text-pink-200', 'text-pink-800');
       });
 
       const activeBtn = document.getElementById(`chan-btn-${channelName}`);
       const quickBtn = document.getElementById(`quick-btn-${channelName}`);
+      
       if (activeBtn) activeBtn.classList.add('bg-pink-500', 'text-white', 'shadow-sm');
       if (quickBtn) quickBtn.classList.add('bg-pink-500', 'text-white', 'shadow-sm');
 
@@ -3008,6 +2426,7 @@
 
     // --- SHOP & STUDIO ---
     let currentShopTab = 'skins';
+
     function toggleShopModal() {
       const modal = document.getElementById('shop-modal');
       modal.classList.toggle('hidden');
@@ -3030,6 +2449,7 @@
         const isUnlocked = unlockedItems.includes(item.id);
         const card = document.createElement('div');
         card.className = 'glass p-3 rounded-2xl flex flex-col items-center justify-between border border-pink-200 shadow-sm space-y-1.5';
+
         card.innerHTML = `
           <div class="text-2xl">${item.icon || (item.type === 'skin' ? AVATAR_TYPES[item.id]?.accessory || '🌸' : item.id)}</div>
           <span class="text-xs font-bold text-pink-950 text-center">${item.name}</span>
@@ -3054,11 +2474,8 @@
         localStorage.setItem('sakura_coins', sakuraCoins);
         localStorage.setItem('sakura_unlocked_items', JSON.stringify(unlockedItems));
         document.getElementById('coin-counter').textContent = sakuraCoins;
-        playSound('win');
-        renderShopItems();
-      } else {
-        alert('Not enough Flowers! Play games to earn Flowers.');
-      }
+        playSound('win'); renderShopItems();
+      } else alert('Not enough Flowers! Play games to earn Flowers.');
     }
 
     function equipShopItem(id, type) {
@@ -3073,8 +2490,7 @@
         if (id === 'title_legend') localPlayer.title = 'Legend';
       }
       if (type === 'acc') localPlayer.equippedAcc = id;
-      playSound('emote');
-      saveStudioSettings();
+      playSound('emote'); saveStudioSettings();
     }
 
     function toggleCustomStudioModal() {
@@ -3093,9 +2509,12 @@
         const isUnlocked = unlockedItems.includes(key);
         const isSelected = localPlayer.avatarType === key;
         return `
-          <div onclick="${isUnlocked ? `selectAvatarType('${key}')` : ''}" class="p-2 rounded-2xl border flex items-center gap-2 ${
-            isSelected ? 'border-pink-500 bg-pink-100 shadow-sm' : 'border-pink-200'
-          } ${!isUnlocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}">
+          <div 
+            onclick="${isUnlocked ? `selectAvatarType('${key}')` : ''}"
+            class="p-2 rounded-2xl border flex items-center gap-2 ${
+              isSelected ? 'border-pink-500 bg-pink-100 shadow-sm' : 'border-pink-200'
+            } ${!isUnlocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}"
+          >
             <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0" style="background-color: ${type.bodyColor}">
               ${type.accessory}
             </div>
@@ -3108,9 +2527,12 @@
       exprGrid.innerHTML = Object.keys(EXPRESSIONS).map(key => {
         const isSelected = localPlayer.expression === key;
         return `
-          <button onclick="selectExpression('${key}')" class="py-1 px-2 rounded-xl text-[10px] font-bold border transition ${
-            isSelected ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-pink-900 border-pink-200'
-          }">
+          <button 
+            onclick="selectExpression('${key}')"
+            class="py-1 px-2 rounded-xl text-[10px] font-bold border transition ${
+              isSelected ? 'bg-pink-500 text-white border-pink-500' : 'bg-white text-pink-900 border-pink-200'
+            }"
+          >
             ${EXPRESSIONS[key]}
           </button>
         `;
@@ -3123,19 +2545,12 @@
     function saveStudioSettings() {
       const newName = document.getElementById('setting-username').value.trim();
       if (newName) localPlayer.name = newName;
+
       localStorage.setItem('sakura_avatar_name', localPlayer.name);
       localStorage.setItem('sakura_avatar_type', localPlayer.avatarType);
       localStorage.setItem('sakura_expression', localPlayer.expression);
-      localStorage.setItem('sakura_equipped_acc', localPlayer.equippedAcc);
-      localStorage.setItem('sakura_equipped_clothing', localPlayer.equippedClothing);
-      localStorage.setItem('sakura_equipped_makeup', localPlayer.equippedMakeup);
-      localStorage.setItem('sakura_equipped_title', localPlayer.equippedTitle);
+      localStorage.setItem('sakura_profile_pic', localPlayer.profilePic);
 
-      const me = registeredUsers.find(u => u.id === localPlayer.id);
-      if (me) { me.name = localPlayer.name; }
-      localStorage.setItem('sakura_registered_users', JSON.stringify(registeredUsers));
-
-      updateProfileCardUI();
       if (realtimeChannel) broadcastState();
       document.getElementById('custom-studio-modal').classList.add('hidden');
     }
@@ -3144,14 +2559,17 @@
       document.getElementById('chat-sidebar').classList.toggle('-translate-x-full');
     }
 
-    // --- INITIALIZATION ---
+    // INITIALIZATION
     window.addEventListener('resize', resizeCanvas);
+
     window.addEventListener('load', async () => {
       lucide.createIcons();
       resizeCanvas();
       initEnvironmentElements();
+
       document.getElementById('coin-counter').textContent = sakuraCoins;
       renderDrawerFriendRequests();
+      renderDrawerMyFriends();
 
       localPlayer.x = canvas.width / 2;
       localPlayer.y = canvas.height / 2 + 30;
@@ -3162,10 +2580,11 @@
       if (data?.session?.user) {
         const user = data.session.user;
         const dispName = user.user_metadata?.display_name || user.email.split('@')[0];
+        isAdminRole = adminUsers.includes(user.id);
+        updateMusicUIForRole();
         completeUserLogin(user, dispName);
       } else {
-        // Show auth modal initially
-        document.getElementById('auth-modal').classList.remove('hidden');
+        loginAsGuest();
       }
 
       requestAnimationFrame(render);
