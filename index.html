@@ -2,7 +2,7 @@
 <html lang="en" class="h-full w-full overflow-hidden">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Sakura Slime World 🌸 - Virtual Lounge & Social Fair</title>
 
   <!-- Tailwind CSS CDN -->
@@ -23,7 +23,7 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      touch-action: manipulation;
+      touch-action: none;
       -webkit-user-select: none;
       user-select: none;
       background: #180914;
@@ -116,8 +116,8 @@
 </head>
 <body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
 
-  <!-- AUTH MODAL OVERLAY (Shown on sign out or first visit) -->
-  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/85 backdrop-blur-md flex items-center justify-center p-4">
+  <!-- AUTH MODAL OVERLAY -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/75 backdrop-blur-md flex items-center justify-center p-4">
     <div class="glass w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90dvh] overflow-y-auto">
       <div class="text-center space-y-1">
         <div class="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 text-white shadow-lg shadow-pink-300 mb-1">
@@ -166,49 +166,50 @@
     </div>
   </div>
 
-  <!-- TOP NAVIGATION HEADER BAR (Cleaned up: removed top search bar, responsive layout fix for mobile & desktop) -->
-  <header class="h-14 sm:h-16 glass px-2 sm:px-5 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm gap-1 sm:gap-2 overflow-x-hidden">
-    <!-- Left Section: Title & Admin/Dev-Controlled Music Picker -->
-    <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
-      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 sm:p-2 rounded-2xl shadow-md shadow-pink-300 shrink-0">
-        <i data-lucide="flower-2" class="w-4 h-4 sm:w-6 sm:h-6 animate-spin" style="animation-duration: 12s;"></i>
+  <!-- TOP NAVIGATION HEADER BAR -->
+  <header class="h-14 sm:h-16 glass px-3 sm:px-5 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm gap-2">
+    <!-- Left Section: Title & Simple Toggle Audio Button -->
+    <div class="flex items-center gap-3 shrink-0">
+      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-2 rounded-2xl shadow-md shadow-pink-300 shrink-0">
+        <i data-lucide="flower-2" class="w-5 h-5 sm:w-6 sm:h-6 animate-spin" style="animation-duration: 12s;"></i>
       </div>
       <div class="flex flex-col justify-center">
-        <h1 class="font-sakura text-xs sm:text-lg text-pink-950 font-bold tracking-wider leading-tight whitespace-nowrap">Sakura Slime World 🌸</h1>
-        <p class="text-[9px] sm:text-[10px] text-pink-600 font-bold uppercase tracking-wider" id="room-indicator">#sakura-lounge</p>
+        <h1 class="font-sakura text-sm sm:text-lg text-pink-950 font-bold tracking-wider leading-tight whitespace-nowrap">Sakura Slime World 🌸</h1>
+        <p class="text-[10px] text-pink-600 font-bold uppercase tracking-wider" id="room-indicator">#sakura-lounge</p>
       </div>
 
-      <!-- Music Selector Dropdown (Admin & Dev controlled, available to all for selection when unlocked or defaulted) -->
-      <div class="flex items-center bg-pink-100/90 rounded-xl px-1.5 sm:px-2 py-1 border border-pink-200 gap-1 ml-1">
-        <button onclick="toggleMusicPlayback()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Play/Pause Music">
-          <i data-lucide="volume-x" id="music-icon" class="w-3.5 h-3.5 text-pink-600"></i>
+      <!-- Hassle-Free Basic Audio Toggle Button -->
+      <div class="flex items-center bg-pink-100/90 rounded-xl px-2 py-1 border border-pink-200 gap-1.5 ml-2">
+        <button onclick="toggleSimpleAudio()" id="simple-audio-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Music">
+          <i data-lucide="volume-x" id="simple-audio-icon" class="w-3.5 h-3.5 text-pink-600"></i>
         </button>
-        <select id="bg-music-selector" onchange="changeBackgroundMusic(this.value)" class="bg-transparent text-[10px] sm:text-xs font-bold text-pink-900 outline-none cursor-pointer">
-          <option value="zen">🌸 Zen Garden Lullaby</option>
-          <option value="arcade">🕹️ Retro Arcade Synth</option>
-          <option value="fair">🎡 Sakura Fair Waltz</option>
-          <option value="campfire">🔥 Cozy Campfire Chords</option>
-        </select>
-        <span id="music-control-badge" class="hidden text-[8px] px-1 bg-purple-600 text-white rounded font-black">PRO</span>
+        <span class="text-[10px] font-bold text-pink-900">Lobby Music</span>
       </div>
     </div>
 
-    <!-- Right Controls Header (Flowers, DM, Menu) -->
-    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+    <!-- Right Controls Header -->
+    <div class="flex items-center gap-2 shrink-0">
+      <!-- Quick Search Bar -->
+      <div class="relative hidden sm:block">
+        <input type="text" id="top-quick-search" oninput="handleTopQuickSearch(this.value)" placeholder="Search friend..." class="glass-input w-28 md:w-36 pl-7 pr-2.5 py-1.5 rounded-2xl text-xs font-semibold text-pink-950" />
+        <i data-lucide="search" class="w-3.5 h-3.5 text-pink-500 absolute left-2.5 top-2"></i>
+        <div id="top-search-dropdown" class="hidden absolute right-0 mt-1 w-48 glass rounded-2xl p-2 shadow-xl border border-pink-300 z-50 space-y-1 max-h-40 overflow-y-auto"></div>
+      </div>
+
       <!-- Flowers Balance Badge -->
-      <div class="flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-2xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-black shadow-sm shrink-0">
-        <span class="text-xs sm:text-sm">🌸</span>
+      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-black shadow-sm">
+        <span class="text-sm">🌸</span>
         <span id="coin-counter">0</span>
       </div>
 
       <!-- Direct Messages Trigger -->
-      <button onclick="toggleDMModal()" class="relative p-2 sm:p-2.5 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-500 text-white shadow-md active:scale-95 transition shrink-0" title="Direct Messages">
+      <button onclick="toggleDMModal()" class="relative p-2.5 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-500 text-white shadow-md active:scale-95 transition" title="Direct Messages">
         <i data-lucide="send" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         <span id="dm-unread-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
       </button>
 
       <!-- Right Drawer Trigger -->
-      <button onclick="toggleRightDrawer()" class="relative p-2 sm:p-2.5 rounded-2xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1 shrink-0" title="Menu & Profile">
+      <button onclick="toggleRightDrawer()" class="relative p-2.5 rounded-2xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1.5" title="Menu & Profile">
         <i data-lucide="menu" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         <span id="drawer-req-badge" class="hidden absolute -top-1 -right-1 px-1.5 py-0.5 bg-pink-600 text-white text-[9px] font-black rounded-full">0</span>
       </button>
@@ -218,9 +219,9 @@
   <!-- MAIN VIEWPORT CONTAINER -->
   <div class="flex-1 relative flex overflow-hidden w-full h-full">
 
-    <!-- CANVAS VIEWPORT (Fixed Virtual Map Bounds: 1200x800 for identical size on mobile & desktop with Pinch-to-Zoom / Zoom buttons) -->
+    <!-- CANVAS VIEWPORT (Fixed Virtual Map Bounds: 1200x800 for identical size on mobile & desktop) -->
     <div class="flex-1 relative bg-pink-950/20 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
-      <canvas id="gameCanvas" class="block cursor-pointer touch-none origin-center transition-transform duration-75" width="1200" height="800"></canvas>
+      <canvas id="gameCanvas" class="block cursor-pointer touch-none" width="1200" height="800"></canvas>
 
       <!-- Room Switcher Top Overlay -->
       <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[96vw] overflow-x-auto">
@@ -236,13 +237,6 @@
         <button onclick="switchChannel('arcade-lounge')" id="quick-btn-arcade-lounge" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
           🕹️ Neon Arcade
         </button>
-      </div>
-
-      <!-- Map Zoom In / Out Controls (For better mobile & desktop visibility) -->
-      <div class="absolute top-14 right-3 z-20 flex flex-col gap-1 glass p-1 rounded-2xl border border-pink-200 shadow-md">
-        <button onclick="adjustMapZoom(0.15)" class="w-8 h-8 rounded-xl bg-white hover:bg-pink-100 text-pink-900 font-bold flex items-center justify-center text-sm shadow-sm active:scale-90" title="Zoom In">➕</button>
-        <button onclick="resetMapZoom()" class="w-8 h-8 rounded-xl bg-white hover:bg-pink-100 text-pink-900 font-bold flex items-center justify-center text-[10px] shadow-sm active:scale-90" title="Reset Zoom">1:1</button>
-        <button onclick="adjustMapZoom(-0.15)" class="w-8 h-8 rounded-xl bg-white hover:bg-pink-100 text-pink-900 font-bold flex items-center justify-center text-sm shadow-sm active:scale-90" title="Zoom Out">➖</button>
       </div>
 
       <!-- Mini-Game Active HUD Banner -->
@@ -359,7 +353,7 @@
       </div>
     </div>
 
-    <!-- CHAT DRAWER (Unified across mobile & desktop) -->
+    <!-- CHAT DRAWER -->
     <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-r md:border-r-0 md:border-l border-pink-200/80 flex flex-col justify-between absolute md:relative left-0 md:left-auto right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
       
       <!-- Drawer Room Selector -->
@@ -413,8 +407,8 @@
       </div>
     </aside>
 
-    <!-- RIGHT DRAWER: Profile Card, Friend Search, Requests, Friends List, and Sign Out (Responsive fix for mobile layout overflow) -->
-    <aside id="right-drawer" class="w-full sm:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute right-0 top-0 bottom-0 z-50 transition-transform duration-300 transform translate-x-full shadow-2xl h-full">
+    <!-- RIGHT DRAWER: Profile Card, Friend Search, Requests, Friends List, and Sign Out -->
+    <aside id="right-drawer" class="w-80 sm:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute right-0 top-0 bottom-0 z-50 transition-transform duration-300 transform translate-x-full shadow-2xl h-full">
       <!-- Drawer Header -->
       <div class="p-4 border-b border-pink-200/30 flex items-center justify-between bg-white/5">
         <div class="flex items-center gap-2">
@@ -557,9 +551,9 @@
     </div>
   </div>
 
-  <!-- DIRECT MESSAGES MODAL (Responsive fix for mobile layout overflow) -->
-  <div id="dm-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 hidden">
-    <div class="glass w-full max-w-md rounded-3xl p-3 sm:p-5 shadow-2xl border border-white flex flex-col h-[85dvh] sm:h-[80dvh] animate-in fade-in">
+  <!-- DIRECT MESSAGES MODAL (Fixed live message receiving) -->
+  <div id="dm-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white flex flex-col h-[80dvh] animate-in fade-in">
       <div class="flex items-center justify-between border-b border-pink-200 pb-3 shrink-0">
         <div class="flex items-center gap-2">
           <div class="p-2 rounded-xl bg-pink-500 text-white shadow-md">
@@ -710,12 +704,11 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- ENHANCED HASSLE-FREE MULTI-TRACK AUDIO SYSTEM ---
+    // --- HASSLE-FREE AUDIO SYSTEM ---
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     let musicPlaying = false;
-    let musicType = 'zen';
-    let musicInterval = null;
+    let simpleAudioInterval = null;
 
     function initAudio() {
       if (!audioCtx) {
@@ -724,67 +717,43 @@
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    function playMusicStep() {
+    function playSimpleNote() {
       if (!musicPlaying || !audioCtx) return;
       try {
         const now = audioCtx.currentTime;
-        let scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
-        let waveType = 'sine';
-        let tempo = 600;
-
-        if (musicType === 'arcade') {
-          scale = [220, 277.18, 329.63, 440, 554.37, 659.25];
-          waveType = 'square';
-          tempo = 250;
-        } else if (musicType === 'fair') {
-          scale = [329.63, 392.00, 440.00, 493.88, 523.25, 659.25];
-          waveType = 'triangle';
-          tempo = 450;
-        } else if (musicType === 'campfire') {
-          scale = [196.00, 220.00, 246.94, 293.66, 329.63];
-          waveType = 'sine';
-          tempo = 800;
-        }
-
+        const scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
         const freq = scale[Math.floor(Math.random() * scale.length)];
+
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = waveType;
+        osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, now);
 
         gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(musicType === 'arcade' ? 0.04 : 0.07, now + 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + (tempo / 1000) * 1.5);
+        gain.gain.linearRampToValueAtTime(0.08, now + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
 
         osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(now); osc.stop(now + (tempo / 1000) * 1.5);
+        osc.start(now); osc.stop(now + 1.2);
 
-        musicInterval = setTimeout(playMusicStep, tempo);
+        simpleAudioInterval = setTimeout(playSimpleNote, 600);
       } catch (e) {}
     }
 
-    function changeBackgroundMusic(type) {
-      musicType = type;
-      if (musicPlaying) {
-        clearTimeout(musicInterval);
-        playMusicStep();
-      }
-    }
-
-    function toggleMusicPlayback() {
+    function toggleSimpleAudio() {
       initAudio();
       musicPlaying = !musicPlaying;
-      const icon = document.getElementById('music-icon');
-      const btn = document.getElementById('music-toggle-btn');
+      const icon = document.getElementById('simple-audio-icon');
+      const btn = document.getElementById('simple-audio-btn');
 
       if (musicPlaying) {
         icon.setAttribute('data-lucide', 'volume-2');
         btn.classList.add('bg-pink-200', 'text-pink-900');
-        playMusicStep();
+        playSimpleNote();
       } else {
         icon.setAttribute('data-lucide', 'volume-x');
         btn.classList.remove('bg-pink-200', 'text-pink-900');
-        clearTimeout(musicInterval);
+        clearTimeout(simpleAudioInterval);
       }
       lucide.createIcons();
     }
@@ -882,8 +851,6 @@
     let showAdminTitle = false;
     let currentUser = null;
 
-    let mapZoomScale = 1.0;
-
     let storedLocalId = localStorage.getItem('sakura_local_uid');
     if (!storedLocalId) {
       storedLocalId = 'usr_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
@@ -963,6 +930,7 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
+    // Canvas scaling to ensure identical map sizing across mobile & desktop (Fixed 1200x800 internal virtual coordinate space)
     function resizeCanvas() {
       const container = document.getElementById('canvas-container');
       const containerWidth = container.clientWidth;
@@ -977,18 +945,8 @@
         renderWidth = containerHeight * targetAspect;
       }
 
-      canvas.style.width = (renderWidth * mapZoomScale) + 'px';
-      canvas.style.height = (renderHeight * mapZoomScale) + 'px';
-    }
-
-    function adjustMapZoom(delta) {
-      mapZoomScale = Math.max(0.6, Math.min(2.5, mapZoomScale + delta));
-      resizeCanvas();
-    }
-
-    function resetMapZoom() {
-      mapZoomScale = 1.0;
-      resizeCanvas();
+      canvas.style.width = renderWidth + 'px';
+      canvas.style.height = renderHeight + 'px';
     }
 
     function addCoins(amount) {
@@ -1139,10 +1097,34 @@
       if (currentUser) supabaseClient.auth.signOut();
       localStorage.removeItem('sakura_avatar_name');
       localStorage.removeItem('sakura_avatar_type');
-      
-      // Re-show the auth modal with Sign In / Sign Up / Guest page options
-      document.getElementById('right-drawer').classList.add('translate-x-full');
-      document.getElementById('auth-modal').classList.remove('hidden');
+      location.reload();
+    }
+
+    function handleTopQuickSearch(query) {
+      const dropdown = document.getElementById('top-search-dropdown');
+      const q = (query || '').toLowerCase().trim();
+      if (!q) {
+        dropdown.classList.add('hidden');
+        return;
+      }
+
+      const matches = registeredUsers.filter(u => u.id !== localPlayer.id && u.name.toLowerCase().includes(q));
+      dropdown.innerHTML = '';
+      if (matches.length === 0) {
+        dropdown.innerHTML = '<div class="text-[10px] text-pink-500 italic p-1">No users found.</div>';
+      } else {
+        matches.forEach(u => {
+          const isFriend = myFriends.includes(u.id);
+          const div = document.createElement('div');
+          div.className = 'flex items-center justify-between p-1.5 rounded-xl hover:bg-pink-100 text-xs font-bold text-pink-950 cursor-pointer';
+          div.innerHTML = `
+            <span class="truncate">${u.name}</span>
+            ${isFriend ? '<span class="text-[9px] text-pink-600">Friend</span>' : `<button onclick="sendFriendRequestToUserId('${u.id}', '${u.name}')" class="px-2 py-0.5 bg-pink-500 text-white text-[9px] rounded-lg">Add</button>`}
+          `;
+          dropdown.appendChild(div);
+        });
+      }
+      dropdown.classList.remove('hidden');
     }
 
     function filterSearchableUsers(query) {
@@ -1450,7 +1432,7 @@
 
       const adminActions = document.getElementById('admin-actions');
       const devActions = document.getElementById('dev-actions');
-      if (isAdminRole || isDevMode) adminActions.classList.remove('hidden'); else adminActions.classList.add('hidden');
+      if (isAdminRole) adminActions.classList.remove('hidden'); else adminActions.classList.add('hidden');
       if (isDevMode) {
         devActions.classList.remove('hidden');
         document.getElementById('revoke-ban-btn').classList.toggle('hidden', !bannedUsers.includes(player.id));
@@ -1568,7 +1550,7 @@
 
     function filterDevUserList() { renderDevUserList(); }
 
-    // --- ORGANIZED SCENERY & MAP ROOMS ---
+    // --- ORGANIZED SCENERY & MAP ROOMS (Clear doors/gates) ---
     function initEnvironmentElements() {
       petals = [];
       for (let i = 0; i < 60; i++) {
@@ -1701,20 +1683,22 @@
       }
     }
 
-    // --- ORGANIZED ROOM SCENERY ---
+    // --- ORGANIZED ROOM SCENERY (Trees positioned away from gates/doors) ---
     function drawEnvironment() {
       const w = 1200;
       const h = 800;
 
       if (currentChannel === 'sakura-lounge') {
+        // Zen Garden: Trees placed safely on side borders away from center gate/path
         ctx.fillStyle = '#fce7f3'; ctx.fillRect(0, 0, w, h);
         ctx.strokeStyle = 'rgba(244, 114, 182, 0.25)'; ctx.lineWidth = 2;
         for (let x = 0; x < w; x += 80) { for (let y = 0; y < h; y += 80) ctx.strokeRect(x, y, 80, 80); }
 
         drawPond(950, 650, 140, 80);
         drawWoodenBridge(950, 650, 110, 36);
-        drawToriiGate(600, 140);
+        drawToriiGate(600, 140); // Center gate clear of trees
 
+        // Side trees
         drawSakuraTree(120, 180, 75);
         drawSakuraTree(280, 120, 65);
         drawSakuraTree(920, 120, 65);
@@ -1724,6 +1708,7 @@
         drawLantern(420, 200); drawLantern(780, 200);
 
       } else if (currentChannel === 'bonfire-park') {
+        // Bonfire Camp: Tents & logs organized cleanly
         ctx.fillStyle = '#080d1a'; ctx.fillRect(0, 0, w, h);
         ctx.fillStyle = '#131b2e'; ctx.beginPath(); ctx.arc(w / 2, h / 2, 280, 0, Math.PI * 2); ctx.fill();
 
@@ -1734,6 +1719,7 @@
         drawBonfireWithParticles(600, 500);
 
       } else if (currentChannel === 'amusement-park') {
+        // Sakura Fair: Ferris wheel & booths with side trees
         ctx.fillStyle = '#fae8ff'; ctx.fillRect(0, 0, w, h);
 
         ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 3;
@@ -1755,6 +1741,7 @@
         drawSakuraTree(1060, 220, 70);
 
       } else if (currentChannel === 'arcade-lounge') {
+        // Neon Arcade
         ctx.fillStyle = '#05020c'; ctx.fillRect(0, 0, w, h);
 
         discoHue = (discoHue + 2) % 360;
@@ -1884,6 +1871,7 @@
 
     // --- SMOOTH SLIME RENDERING & LERP INTERPOLATION ---
     function drawSlime(player, isSelf = false) {
+      // Smooth interpolation for remote players to prevent clunky animations
       if (!isSelf) {
         if (player.targetX !== undefined && player.targetY !== undefined) {
           player.x += (player.targetX - player.x) * 0.18;
@@ -2185,7 +2173,7 @@
       requestAnimationFrame(render);
     }
 
-    // --- SUPABASE REALTIME & SYNC ---
+    // --- SUPABASE REALTIME & SYNC (Fixed message receiving in DM & chat) ---
     async function initSupabaseChannel(channelName) {
       if (realtimeChannel) {
         await supabaseClient.removeChannel(realtimeChannel);
@@ -2610,7 +2598,7 @@
         const dispName = user.user_metadata?.display_name || user.email.split('@')[0];
         completeUserLogin(user, dispName);
       } else {
-        // Leave the auth modal visible so user can Sign In, Sign Up, or continue as Guest
+        loginAsGuest();
       }
 
       requestAnimationFrame(render);
