@@ -25,6 +25,7 @@
       --dev-cyan: #00f0ff;
       --text-main: #ffffff;
       --text-muted: #b5a6cc;
+      --notif-red: #ff2a5f;
     }
 
     * {
@@ -178,6 +179,7 @@
     }
 
     .btn-circle {
+      position: relative;
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -199,14 +201,32 @@
       box-shadow: 0 0 10px var(--sakura-glow);
     }
 
-    /* LEFT-SIDE CHAT DRAWER (DOCKED UNDER USER CARD) */
+    /* RED NOTIFICATION BADGE */
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 14px;
+      height: 14px;
+      background-color: var(--notif-red);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      display: none;
+      box-shadow: 0 0 8px var(--notif-red);
+    }
+
+    .notif-badge.active {
+      display: block;
+    }
+
+    /* LEFT-SIDE CHAT DRAWER */
     .chat-drawer {
       position: absolute;
       top: 86px;
       left: 10px;
       width: 320px;
       max-width: calc(100% - 20px);
-      height: 330px;
+      height: 360px;
       z-index: 20;
       display: flex;
       flex-direction: column;
@@ -233,6 +253,7 @@
     }
 
     .chat-tab-btn {
+      position: relative;
       background: transparent;
       border: none;
       color: var(--text-muted);
@@ -249,11 +270,50 @@
       color: #110b1f;
     }
 
+    .chat-tab-btn .tab-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 10px;
+      height: 10px;
+      background-color: var(--notif-red);
+      border-radius: 50%;
+      display: none;
+    }
+
+    .chat-tab-btn .tab-badge.active {
+      display: block;
+    }
+
     .chat-drawer-toggle-btn {
       cursor: pointer;
       color: var(--text-muted);
       padding: 4px;
       font-size: 0.9rem;
+    }
+
+    /* QUICK EMOJI BAR */
+    .quick-emoji-bar {
+      display: flex;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--panel-border);
+      overflow-x: auto;
+    }
+
+    .quick-emoji-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 2px 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .quick-emoji-btn:hover {
+      transform: scale(1.2);
     }
 
     /* DM FRIEND SEARCH & SELECTION */
@@ -323,6 +383,7 @@
       border: 1px solid var(--sakura-pink);
       object-fit: cover;
       flex-shrink: 0;
+      cursor: pointer;
     }
 
     .chat-bubble-content {
@@ -341,6 +402,7 @@
       align-items: center;
       gap: 4px;
       margin-bottom: 2px;
+      cursor: pointer;
     }
 
     .chat-drawer-input-area {
@@ -600,6 +662,78 @@
       margin-top: 8px;
     }
 
+    /* FRIENDS PANEL TABS & LISTS */
+    .friends-nav-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .friends-tab-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--panel-border);
+      color: var(--text-muted);
+      border-radius: 10px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .friends-tab-btn.active {
+      background: var(--sakura-pink);
+      color: #0e0a1a;
+      border-color: var(--sakura-pink);
+    }
+
+    .friends-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .friend-item-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+    }
+
+    .friend-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .friend-item-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--sakura-pink);
+      object-fit: cover;
+    }
+
+    .friend-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-sm-action {
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+    }
+
     /* MARKETPLACE & PREVIEW SYSTEM */
     .market-split-layout {
       display: grid;
@@ -790,7 +924,7 @@
       }
       .chat-drawer {
         width: 250px;
-        height: 240px;
+        height: 270px;
         top: 76px;
       }
       .chat-drawer.collapsed {
@@ -828,7 +962,7 @@
       <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Sakura" id="hudAvatarImg" class="hud-avatar" />
       <div class="hud-info">
         <div class="hud-name-row">
-          <span class="hud-display-name" id="hudDisplayName">Blossom Slime</span>
+          <span class="hud-display-name" id="hudDisplayName">slime_0000</span>
           <span id="hudRoleBadge"></span>
         </div>
         <div style="display: flex; gap: 6px; margin-top: 3px;">
@@ -840,6 +974,10 @@
 
     <!-- Top Right Nav Buttons -->
     <div class="hud-action-buttons">
+      <button class="btn-circle" id="btnOpenFriends" title="Friends & Direct Messages">
+        <i class="fa-solid fa-user-group"></i>
+        <div class="notif-badge" id="dmGlobalNotifBadge"></div>
+      </button>
       <button class="btn-circle" id="btnOpenMarket" title="Marketplace"><i class="fa-solid fa-store"></i></button>
       <button class="btn-circle" id="btnOpenGames" title="Minigames"><i class="fa-solid fa-gamepad"></i></button>
       <button class="btn-circle" id="btnOpenMusic" title="Blossom Music Player"><i class="fa-solid fa-music"></i></button>
@@ -848,21 +986,34 @@
     </div>
   </div>
 
-  <!-- LEFT-SIDE CHAT DRAWER (DOCKED UNDER USER CARD) -->
+  <!-- LEFT-SIDE CHAT DRAWER -->
   <div class="chat-drawer glass" id="chatDrawer">
     <div class="chat-drawer-header">
       <div class="chat-nav-tabs">
         <button class="chat-tab-btn active" id="tabGlobalChat">🌸 Global</button>
-        <button class="chat-tab-btn" id="tabDmChat">💬 Direct DMs</button>
+        <button class="chat-tab-btn" id="tabDmChat">
+          💬 Direct DMs
+          <div class="tab-badge" id="dmTabNotifBadge"></div>
+        </button>
       </div>
       <div class="chat-drawer-toggle-btn" id="btnToggleChatDrawer" title="Collapse / Expand">
         <i class="fa-solid fa-chevron-left" id="chatToggleIcon"></i>
       </div>
     </div>
 
+    <!-- Quick Ready-Made Popup Emoji Bar -->
+    <div class="quick-emoji-bar">
+      <button class="quick-emoji-btn" onclick="sendQuickEmoji('❤️')">❤️</button>
+      <button class="quick-emoji-btn" onclick="sendQuickEmoji('❓')">❓</button>
+      <button class="quick-emoji-btn" onclick="sendQuickEmoji('🌸')">🌸</button>
+      <button class="quick-emoji-btn" onclick="sendQuickEmoji('✨')">✨</button>
+      <button class="quick-emoji-btn" onclick="sendQuickEmoji('😂')">😂</button>
+      <button class="quick-emoji-btn" onclick="sendQuickEmoji('👍')">👍</button>
+    </div>
+
     <!-- Direct DM Filter / Search Sub-Bar -->
     <div class="dm-filter-wrapper" id="dmFilterWrapper">
-      <input type="text" class="dm-search-input" id="dmFriendSearchInput" placeholder="Search friends to text..." />
+      <input type="text" class="dm-search-input" id="dmFriendSearchInput" placeholder="Search direct message conversation..." />
       <div class="dm-friends-chips" id="dmFriendsChips"></div>
     </div>
 
@@ -904,7 +1055,7 @@
     </div>
   </div>
 
-  <!-- MODAL: AUTHENTICATION (0 STARTING POINTS) -->
+  <!-- MODAL: AUTHENTICATION (EMAIL & PASSWORD) -->
   <div class="modal-overlay active" id="modalAuth">
     <div class="modal-dialog glass" style="width: 380px;">
       <div class="modal-body" style="text-align: center;">
@@ -912,13 +1063,8 @@
         <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px;">Join the Blossom Slime Community</p>
 
         <div class="form-group">
-          <label>Display Name</label>
-          <input type="text" id="authDisplayName" class="input-field" placeholder="Sakura Princess" maxlength="24" />
-        </div>
-
-        <div class="form-group">
-          <label>Username (Login ID)</label>
-          <input type="text" id="authUsername" class="input-field" placeholder="sakura_bloom" maxlength="20" />
+          <label>Email Address</label>
+          <input type="email" id="authEmail" class="input-field" placeholder="slime@sakura.park" />
         </div>
 
         <div class="form-group">
@@ -929,8 +1075,33 @@
         <button class="btn-main" id="btnAuthSignIn">Sign In</button>
         <button class="btn-secondary" id="btnAuthSignUp">Create New Account</button>
         <button class="btn-secondary" id="btnAuthGuest" style="border-style: dashed; border-color: var(--sakura-pink);">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> Play as Guest (0 Pts)
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Play as Guest
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FRIENDS & DM MANAGEMENT -->
+  <div class="modal-overlay" id="modalFriends">
+    <div class="modal-dialog glass" style="width: 520px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-group"></i> Friends & Direct Messages</h3>
+        <i class="fa-solid fa-xmark modal-close-btn" data-close="modalFriends"></i>
+      </div>
+      <div class="modal-body">
+        <div class="friends-nav-tabs">
+          <button class="friends-tab-btn active" id="btnTabFriendsList">My Friends</button>
+          <button class="friends-tab-btn" id="btnTabFriendRequests">
+            Received Requests
+            <span id="friendReqBadge" style="background:var(--notif-red); color:#fff; font-size:0.65rem; padding:1px 5px; border-radius:8px; display:none;">0</span>
+          </button>
+        </div>
+
+        <div class="form-group">
+          <input type="text" id="friendSearchInput" class="input-field" placeholder="Search friends or requests..." />
+        </div>
+
+        <div class="friends-list-container" id="friendsListContainer"></div>
       </div>
     </div>
   </div>
@@ -956,8 +1127,8 @@
         </div>
 
         <div class="form-group">
-          <label>Account ID</label>
-          <input type="text" id="profileStaticUsername" class="input-field" disabled style="opacity: 0.6;" />
+          <label>Account Email</label>
+          <input type="text" id="profileStaticEmail" class="input-field" disabled style="opacity: 0.6;" />
         </div>
 
         <button class="btn-main" id="btnSaveProfile">Save Profile Changes</button>
@@ -965,7 +1136,7 @@
     </div>
   </div>
 
-  <!-- MODAL: BLOSSOM MUSIC PLAYER (ADMIN/DEV CONTROLLED TRACKS) -->
+  <!-- MODAL: BLOSSOM MUSIC PLAYER -->
   <div class="modal-overlay" id="modalMusic">
     <div class="modal-dialog glass" style="width: 480px;">
       <div class="modal-header">
@@ -977,13 +1148,13 @@
           Sakura Park features synchronized background music synthesized in real-time.
         </p>
 
-        <!-- Local Volume Control for Everyone -->
+        <!-- Local Volume Control -->
         <div class="form-group">
           <label>Local Volume</label>
           <input type="range" id="musicLocalVolume" min="0" max="1" step="0.05" value="0.5" style="width: 100%; accent-color: var(--sakura-pink);" />
         </div>
 
-        <!-- Admin / Dev Exclusive Track Controller -->
+        <!-- Admin / Dev Track Controller -->
         <div id="adminMusicSection" style="padding: 12px; background: rgba(255, 51, 102, 0.08); border: 1px solid var(--admin-red); border-radius: 12px; margin-top: 14px; display: none;">
           <h4 style="color: var(--admin-red); font-size: 0.88rem; margin-bottom: 8px;">
             <i class="fa-solid fa-shield-halved"></i> Global Music Broadcast (Admin / Dev Only)
@@ -1072,7 +1243,7 @@
     </div>
   </div>
 
-  <!-- MODAL: DEVELOPER & ADMIN SYSTEM (DEV PASSCODE `1357` HIDDEN) -->
+  <!-- MODAL: DEVELOPER & ADMIN SYSTEM -->
   <div class="modal-overlay" id="modalDevAdmin">
     <div class="modal-dialog glass" style="width: 620px;">
       <div class="modal-header">
@@ -1080,7 +1251,7 @@
         <i class="fa-solid fa-xmark modal-close-btn" data-close="modalDevAdmin"></i>
       </div>
       <div class="modal-body">
-        <!-- Dev Mode Pure White Toggle (Dev Only) -->
+        <!-- Dev Mode Pure White Toggle -->
         <div id="devModeToggleCard" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0, 240, 255, 0.08); border: 1px solid var(--dev-cyan); border-radius: 12px; margin-bottom: 14px;">
           <div>
             <div style="font-weight: 800; color: var(--dev-cyan);">Pure White Dev Mode</div>
@@ -1093,7 +1264,7 @@
         <div id="devPointGrantCard" style="padding: 12px; background: rgba(255, 209, 102, 0.08); border: 1px solid var(--gold); border-radius: 12px; margin-bottom: 14px;">
           <h4 style="color: var(--gold); font-size: 0.88rem; margin-bottom: 6px;"><i class="fa-solid fa-coins"></i> Send Blossom Points (Dev Exclusive)</h4>
           <div style="display: flex; gap: 6px;">
-            <input type="text" id="inputGrantTarget" class="input-field" placeholder="Username" />
+            <input type="text" id="inputGrantTarget" class="input-field" placeholder="Email / Username" />
             <input type="number" id="inputGrantAmount" class="input-field" placeholder="Points" style="width: 100px;" />
             <button class="btn-main" id="btnGrantPoints" style="width: 90px; margin-top: 0;">Send</button>
           </div>
@@ -1103,7 +1274,7 @@
         <div id="devAdminRoleCard" style="padding: 12px; background: rgba(255, 51, 102, 0.08); border: 1px solid var(--admin-red); border-radius: 12px; margin-bottom: 14px;">
           <h4 style="color: var(--admin-red); font-size: 0.88rem; margin-bottom: 6px;"><i class="fa-solid fa-user-shield"></i> Admin Promotion & Demotion</h4>
           <div style="display: flex; gap: 6px;">
-            <input type="text" id="inputAdminTarget" class="input-field" placeholder="Username" />
+            <input type="text" id="inputAdminTarget" class="input-field" placeholder="Email / Username" />
             <button class="btn-main" id="btnPromoteAdmin" style="width: 100px; margin-top: 0;">Promote</button>
             <button class="btn-secondary" id="btnRevokeAdmin" style="width: 100px; margin-top: 0;">Revoke</button>
           </div>
@@ -1113,8 +1284,8 @@
         <div style="padding: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--panel-border); border-radius: 12px;">
           <h4 style="font-size: 0.88rem; margin-bottom: 6px;"><i class="fa-solid fa-gavel"></i> Player Moderation</h4>
           <div class="form-group">
-            <label>Target Username</label>
-            <input type="text" id="inputModTarget" class="input-field" placeholder="Username" />
+            <label>Target Account Email</label>
+            <input type="text" id="inputModTarget" class="input-field" placeholder="Target Email" />
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
@@ -1149,19 +1320,28 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // UNIFIED COMMUNITY PLAZA SPAWN: Every user lands at (1200, 800) in the central park!
+    // WORLD MAP DIMENSIONS & SPAWN LOCATIONS
     const WORLD_W = 2400;
     const WORLD_H = 1600;
-    const SPAWN_X = 1200;
-    const SPAWN_Y = 800;
+
+    // Multiple Spawn Points across Central Plaza to prevent players landing in the exact same lobby spot
+    const SPAWN_POINTS = [
+      { x: 1200, y: 800 },
+      { x: 1120, y: 760 },
+      { x: 1280, y: 840 },
+      { x: 1150, y: 850 },
+      { x: 1250, y: 750 }
+    ];
 
     // --- 2. GAME STATE ---
     let currentUser = null;
     let isDevModeActive = false;
     let activeChatTab = 'global'; // 'global' or 'dm'
+    let activeFriendsTab = 'friends'; // 'friends' or 'requests'
     let activeDmPartner = '';
     let globalChatLog = [];
-    let dmChatLogs = {}; // { [username]: [messages] }
+    let dmChatLogs = {}; // { [email/username]: [messages] }
+    let unreadDmCount = 0;
     let chatMutedUntil = 0;
     let passiveRewardSeconds = 20 * 60;
     let otherPlayers = new Map();
@@ -1169,12 +1349,12 @@
 
     // Local Storage Helpers
     const Storage = {
-      getUsers: () => JSON.parse(localStorage.getItem('sakura_users_v3') || '{}'),
-      saveUsers: (u) => localStorage.setItem('sakura_users_v3', JSON.stringify(u)),
-      getBanned: () => JSON.parse(localStorage.getItem('sakura_banned_v3') || '[]'),
-      saveBanned: (b) => localStorage.setItem('sakura_banned_v3', JSON.stringify(b)),
-      getAdmins: () => JSON.parse(localStorage.getItem('sakura_admins_v3') || '[]'),
-      saveAdmins: (a) => localStorage.setItem('sakura_admins_v3', JSON.stringify(a))
+      getUsers: () => JSON.parse(localStorage.getItem('sakura_users_v4') || '{}'),
+      saveUsers: (u) => localStorage.setItem('sakura_users_v4', JSON.stringify(u)),
+      getBanned: () => JSON.parse(localStorage.getItem('sakura_banned_v4') || '[]'),
+      saveBanned: (b) => localStorage.setItem('sakura_banned_v4', JSON.stringify(b)),
+      getAdmins: () => JSON.parse(localStorage.getItem('sakura_admins_v4') || '[]'),
+      saveAdmins: (a) => localStorage.setItem('sakura_admins_v4', JSON.stringify(a))
     };
 
     // EXPANDED MARKETPLACE (Accessories priced > 500 points escalating)
@@ -1222,18 +1402,21 @@
       }, duration);
     }
 
-    // --- 3. AUTHENTICATION & ZERO STARTING POINTS ---
-    function createInitialUser(displayName, username, isGuest = false) {
+    // --- 3. AUTHENTICATION (EMAIL & PASSWORD + AUTOMATIC DISPLAY NAME) ---
+    function createInitialUser(email, isGuest = false) {
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      const defaultDisplayName = `slime_${randomNum}`;
       return {
         id: 'u_' + Math.random().toString(36).substring(2, 9),
-        displayName: displayName || username,
-        username: username,
-        points: 0, // Starts at zero points
+        email: email,
+        displayName: defaultDisplayName,
+        points: 0,
         skin: 'skin_blossom',
         accessory: null,
         title: 'NOVICE',
-        pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`,
-        friends: [],
+        pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${email || defaultDisplayName}`,
+        friends: [], // Approved friend emails/usernames
+        friendRequests: [], // Pending incoming requests
         inventory: ['skin_blossom', 'title_novice'],
         isGuest: isGuest,
         role: 'user'
@@ -1241,57 +1424,56 @@
     }
 
     document.getElementById('btnAuthSignIn').addEventListener('click', () => {
-      const u = document.getElementById('authUsername').value.trim().toLowerCase();
+      const email = document.getElementById('authEmail').value.trim().toLowerCase();
       const p = document.getElementById('authPassword').value.trim();
-      if (!u || !p) return showToast('Please enter both username and password!');
-      if (Storage.getBanned().includes(u)) return alert('This account has been banned from Sakura Park.');
+      if (!email || !p) return showToast('Please enter both email and password!');
+      if (Storage.getBanned().includes(email)) return alert('This account has been banned from Sakura Park.');
 
       const users = Storage.getUsers();
-      if (users[u]) {
-        currentUser = users[u];
+      if (users[email]) {
+        currentUser = users[email];
         finishLogin();
       } else {
-        const d = document.getElementById('authDisplayName').value.trim() || u;
-        currentUser = createInitialUser(d, u);
-        users[u] = currentUser;
+        currentUser = createInitialUser(email);
+        users[email] = currentUser;
         Storage.saveUsers(users);
         finishLogin();
       }
     });
 
     document.getElementById('btnAuthSignUp').addEventListener('click', () => {
-      const d = document.getElementById('authDisplayName').value.trim();
-      const u = document.getElementById('authUsername').value.trim().toLowerCase();
+      const email = document.getElementById('authEmail').value.trim().toLowerCase();
       const p = document.getElementById('authPassword').value.trim();
-      if (!u || !p) return showToast('Please enter both username and password!');
+      if (!email || !p) return showToast('Please enter both email and password!');
       const users = Storage.getUsers();
-      if (users[u]) return showToast('Username already registered!');
+      if (users[email]) return showToast('Email is already registered!');
 
-      currentUser = createInitialUser(d || u, u);
-      users[u] = currentUser;
+      currentUser = createInitialUser(email);
+      users[email] = currentUser;
       Storage.saveUsers(users);
       finishLogin();
     });
 
     document.getElementById('btnAuthGuest').addEventListener('click', () => {
       const r = Math.floor(1000 + Math.random() * 9000);
-      currentUser = createInitialUser(`Guest Slime ${r}`, `guest_${r}`, true);
+      currentUser = createInitialUser(`guest_${r}@sakura.park`, true);
       finishLogin();
     });
 
     document.getElementById('btnLogOut').addEventListener('click', () => location.reload());
 
     function finishLogin() {
-      if (Storage.getAdmins().includes(currentUser.username)) {
+      if (Storage.getAdmins().includes(currentUser.email)) {
         currentUser.role = 'admin';
       }
 
       document.getElementById('modalAuth').classList.remove('active');
       showToast(`🌸 Welcome to Sakura Park, <b>${currentUser.displayName}</b>!`);
 
-      // Spawn at the central Community Plaza ($X=1200, Y=800$)
-      mySlime.x = SPAWN_X + (Math.random() - 0.5) * 60;
-      mySlime.y = SPAWN_Y + (Math.random() - 0.5) * 60;
+      // Choose a distinct random spawn position to prevent identical lobby spawning
+      const sp = SPAWN_POINTS[Math.floor(Math.random() * SPAWN_POINTS.length)];
+      mySlime.x = sp.x + (Math.random() - 0.5) * 80;
+      mySlime.y = sp.y + (Math.random() - 0.5) * 80;
 
       updateHUD();
       initSupabaseNetworking();
@@ -1334,10 +1516,10 @@
       const canControlMusic = isDevModeActive || currentUser.role === 'admin';
       document.getElementById('adminMusicSection').style.display = canControlMusic ? 'block' : 'none';
 
-      // Persist
+      // Persist across sessions
       if (!currentUser.isGuest) {
         const users = Storage.getUsers();
-        users[currentUser.username] = currentUser;
+        users[currentUser.email] = currentUser;
         Storage.saveUsers(users);
       }
     }
@@ -1364,7 +1546,7 @@
       if (!currentUser) return;
       document.getElementById('profileEditAvatar').src = currentUser.pfp;
       document.getElementById('profileEditDisplayName').value = currentUser.displayName;
-      document.getElementById('profileStaticUsername').value = `@${currentUser.username}`;
+      document.getElementById('profileStaticEmail').value = currentUser.email;
       document.getElementById('modalProfile').classList.add('active');
     });
 
@@ -1376,7 +1558,7 @@
           currentUser.pfp = evt.target.result;
           document.getElementById('profileEditAvatar').src = currentUser.pfp;
           updateHUD();
-          showToast('Avatar preview updated!');
+          showToast('Avatar image updated!');
         };
         reader.readAsDataURL(file);
       }
@@ -1392,7 +1574,141 @@
       showToast('🌸 Profile changes saved!');
     });
 
-    // --- 5. GRAPHICS ENGINE & CAMERA ---
+    // --- 5. FRIENDS & REQUESTS SYSTEM SEPARATE SECTION ---
+    document.getElementById('btnOpenFriends').addEventListener('click', () => {
+      if (!currentUser) return;
+      renderFriendsSection();
+      document.getElementById('modalFriends').classList.add('active');
+    });
+
+    document.getElementById('btnTabFriendsList').addEventListener('click', () => switchFriendsTab('friends'));
+    document.getElementById('btnTabFriendRequests').addEventListener('click', () => switchFriendsTab('requests'));
+    document.getElementById('friendSearchInput').addEventListener('input', () => renderFriendsSection());
+
+    function switchFriendsTab(tab) {
+      activeFriendsTab = tab;
+      document.getElementById('btnTabFriendsList').classList.toggle('active', tab === 'friends');
+      document.getElementById('btnTabFriendRequests').classList.toggle('active', tab === 'requests');
+      renderFriendsSection();
+    }
+
+    function renderFriendsSection() {
+      const container = document.getElementById('friendsListContainer');
+      const filter = document.getElementById('friendSearchInput').value.trim().toLowerCase();
+      container.innerHTML = '';
+
+      // Update Received Request Badge Count
+      const reqBadge = document.getElementById('friendReqBadge');
+      if (currentUser.friendRequests && currentUser.friendRequests.length > 0) {
+        reqBadge.innerText = currentUser.friendRequests.length;
+        reqBadge.style.display = 'inline-block';
+      } else {
+        reqBadge.style.display = 'none';
+      }
+
+      if (activeFriendsTab === 'friends') {
+        const list = currentUser.friends || [];
+        const filtered = list.filter(f => f.toLowerCase().includes(filter));
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<div style="text-align:center; padding: 20px; color:var(--text-muted);">No added friends found.</div>`;
+          return;
+        }
+
+        filtered.forEach(friendId => {
+          const pObj = otherPlayers.get(friendId) || { displayName: friendId, pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${friendId}` };
+          const card = document.createElement('div');
+          card.className = 'friend-item-card';
+          card.innerHTML = `
+            <div class="friend-item-left">
+              <img src="${pObj.pfp}" class="friend-item-avatar" />
+              <div>
+                <div style="font-weight:800; font-size:0.9rem;">${pObj.displayName}</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">${friendId}</div>
+              </div>
+            </div>
+            <div class="friend-actions">
+              <button class="btn-sm-action" style="background:var(--dev-cyan); color:#000;" onclick="startDmFromFriendsList('${friendId}')"><i class="fa-solid fa-comment"></i> Text DM</button>
+              <button class="btn-sm-action" style="background:rgba(255,51,102,0.2); border:1px solid var(--admin-red); color:var(--admin-red);" onclick="unfriendUser('${friendId}')">Unfriend</button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } else {
+        // Friend Requests Tab
+        const reqs = currentUser.friendRequests || [];
+        const filtered = reqs.filter(r => r.toLowerCase().includes(filter));
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<div style="text-align:center; padding: 20px; color:var(--text-muted);">No pending friend requests.</div>`;
+          return;
+        }
+
+        filtered.forEach(requesterId => {
+          const pObj = otherPlayers.get(requesterId) || { displayName: requesterId, pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${requesterId}` };
+          const card = document.createElement('div');
+          card.className = 'friend-item-card';
+          card.innerHTML = `
+            <div class="friend-item-left">
+              <img src="${pObj.pfp}" class="friend-item-avatar" />
+              <div>
+                <div style="font-weight:800; font-size:0.9rem;">${pObj.displayName}</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">${requesterId}</div>
+              </div>
+            </div>
+            <div class="friend-actions">
+              <button class="btn-sm-action" style="background:var(--sakura-pink); color:#0e0a1a;" onclick="acceptFriendRequest('${requesterId}')">Accept</button>
+              <button class="btn-sm-action" style="background:rgba(255,255,255,0.1); color:#fff;" onclick="rejectFriendRequest('${requesterId}')">Reject</button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+    }
+
+    window.unfriendUser = function(friendId) {
+      currentUser.friends = currentUser.friends.filter(f => f !== friendId);
+      updateHUD();
+      renderFriendsSection();
+      refreshDmFriendList();
+      showToast(`Removed from friends list.`);
+    };
+
+    window.sendFriendRequest = function(targetId) {
+      if (!currentUser || targetId === currentUser.email) return;
+
+      if (currentUser.friends.includes(targetId)) {
+        return showToast('Already on your friends list!');
+      }
+
+      broadcastAuthority({ type: 'friend_request', target: targetId, sender: currentUser.email });
+      showToast(`🌸 Sent friend request to <b>${targetId}</b>!`);
+    };
+
+    window.acceptFriendRequest = function(requesterId) {
+      if (!currentUser.friends.includes(requesterId)) {
+        currentUser.friends.push(requesterId);
+      }
+      currentUser.friendRequests = currentUser.friendRequests.filter(r => r !== requesterId);
+      updateHUD();
+      renderFriendsSection();
+      refreshDmFriendList();
+      showToast(`Accepted friend request!`);
+    };
+
+    window.rejectFriendRequest = function(requesterId) {
+      currentUser.friendRequests = currentUser.friendRequests.filter(r => r !== requesterId);
+      updateHUD();
+      renderFriendsSection();
+      showToast(`Request rejected.`);
+    };
+
+    window.startDmFromFriendsList = function(friendId) {
+      document.getElementById('modalFriends').classList.remove('active');
+      startDmWithPlayer(friendId);
+    };
+
+    // --- 6. GRAPHICS ENGINE & SHINY POLISHED SLIME RENDERING ---
     const canvas = document.getElementById('worldCanvas');
     const ctx = canvas.getContext('2d');
     let viewW, viewH;
@@ -1407,12 +1723,12 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    const camera = { x: SPAWN_X, y: SPAWN_Y };
+    const camera = { x: 1200, y: 800 };
 
     // Player Slime Entity
     const mySlime = {
-      x: SPAWN_X,
-      y: SPAWN_Y,
+      x: 1200,
+      y: 800,
       speed: 4.5,
       radius: 28,
       jumpOffset: 0,
@@ -1438,26 +1754,20 @@
       });
     }
 
-    // --- 6. CONTROLS: SPACEBAR JUMP & CHAT INPUT FIX ---
+    // Controls
     const keyState = {};
     window.addEventListener('keydown', (e) => {
-      // CRITICAL FIX: If typing inside any text input or textarea, allow spaces and DO NOT trigger slime jump!
       const activeTag = document.activeElement ? document.activeElement.tagName : '';
       const isTyping = activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT';
 
-      if (isTyping) {
-        // Allow the space character to be typed normally
-        return;
-      }
+      if (isTyping) return;
 
       keyState[e.key.toLowerCase()] = true;
 
-      // Spacebar Jump
       if (e.code === 'Space') {
         e.preventDefault();
         triggerJump();
       }
-      // E Dance
       if (e.key.toLowerCase() === 'e') {
         triggerDance();
       }
@@ -1522,52 +1832,40 @@
       joyDelta = { x: kx / 36, y: ky / 36 };
     }
 
-    // --- 7. WORLD DRAWING (SHARED COMMUNITY PLAZA) ---
+    // --- 7. WORLD DRAWING ---
     function drawWorld() {
       // Grass Ground
       ctx.fillStyle = '#17221c';
       ctx.fillRect(0, 0, WORLD_W, WORLD_H);
 
-      // Central Plaza (Spawn Hub for Everyone)
+      // Central Plaza
       ctx.save();
       ctx.fillStyle = '#2c323a';
       ctx.beginPath();
-      ctx.arc(SPAWN_X, SPAWN_Y, 260, 0, Math.PI * 2);
+      ctx.arc(1200, 800, 260, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#3d4652';
       ctx.lineWidth = 8;
       ctx.stroke();
 
-      // Plaza Stone Rings
       for (let r = 50; r < 240; r += 45) {
         ctx.beginPath();
-        ctx.arc(SPAWN_X, SPAWN_Y, r, 0, Math.PI * 2);
+        ctx.arc(1200, 800, r, 0, Math.PI * 2);
         ctx.strokeStyle = '#222830';
         ctx.lineWidth = 3;
         ctx.stroke();
       }
       ctx.restore();
 
-      // Grand Torii Gate
-      drawTorii(SPAWN_X, SPAWN_Y - 260);
-
-      // Koi Ponds
+      // Torii Gate & Scenery
+      drawTorii(1200, 540);
       drawKoiPond(600, 1050, 200, 130);
       drawKoiPond(1800, 500, 180, 110);
 
-      // Sakura Trees
-      drawSakuraTree(SPAWN_X - 340, SPAWN_Y - 140);
-      drawSakuraTree(SPAWN_X + 340, SPAWN_Y - 140);
-      drawSakuraTree(SPAWN_X - 280, SPAWN_Y + 220);
-      drawSakuraTree(SPAWN_X + 280, SPAWN_Y + 220);
-      drawSakuraTree(500, 400);
-      drawSakuraTree(1900, 1100);
-
-      // Stone Lanterns
-      drawLantern(SPAWN_X - 120, SPAWN_Y - 180);
-      drawLantern(SPAWN_X + 120, SPAWN_Y - 180);
-      drawLantern(SPAWN_X - 180, SPAWN_Y + 140);
-      drawLantern(SPAWN_X + 180, SPAWN_Y + 140);
+      drawSakuraTree(860, 660);
+      drawSakuraTree(1540, 660);
+      drawSakuraTree(920, 1020);
+      drawSakuraTree(1480, 1020);
 
       // Ambient Falling Petals
       ctx.fillStyle = '#ffb7c5';
@@ -1620,24 +1918,6 @@
       ctx.restore();
     }
 
-    function drawLantern(x, y) {
-      ctx.save();
-      const halo = ctx.createRadialGradient(x, y, 4, x, y, 45);
-      halo.addColorStop(0, 'rgba(255, 234, 167, 0.45)');
-      halo.addColorStop(1, 'transparent');
-      ctx.fillStyle = halo;
-      ctx.beginPath();
-      ctx.arc(x, y, 45, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#636e72';
-      ctx.fillRect(x - 8, y, 16, 20);
-      ctx.fillRect(x - 12, y - 10, 24, 12);
-      ctx.fillStyle = '#ffeaa7';
-      ctx.fillRect(x - 5, y - 8, 10, 8);
-      ctx.restore();
-    }
-
     function drawSakuraTree(x, y) {
       ctx.save();
       ctx.fillStyle = '#4a2f1c';
@@ -1658,7 +1938,7 @@
       ctx.restore();
     }
 
-    // --- 8. PROCEDURAL SLIME RENDERING ---
+    // --- 8. PROCEDURAL SHINY SLIME RENDERING ---
     function renderSlime(targetCtx, x, y, slimeObj, displayName, tag) {
       targetCtx.save();
       targetCtx.translate(x, y + slimeObj.jumpOffset);
@@ -1675,7 +1955,7 @@
         targetCtx.restore();
       }
 
-      // Dancing
+      // Dancing Animation
       if (slimeObj.isDancing) {
         targetCtx.rotate(Math.sin(Date.now() * 0.015) * 0.18);
         targetCtx.font = '14px sans-serif';
@@ -1683,16 +1963,17 @@
         targetCtx.fillText('♪', 16, -30 + Math.sin(Date.now() * 0.01) * 6);
       }
 
-      // Slime Body
+      // Slime Base Body
       targetCtx.beginPath();
       targetCtx.ellipse(0, 0, slimeObj.radius * slimeObj.squash, (slimeObj.radius - 4) / slimeObj.squash, 0, 0, Math.PI * 2);
 
+      let baseColor = '#ff94b8';
       if (slimeObj.skin === 'dev_pure_white') {
-        targetCtx.fillStyle = '#ffffff';
+        baseColor = '#ffffff';
         targetCtx.shadowColor = '#00f0ff';
         targetCtx.shadowBlur = 25;
       } else if (slimeObj.skin === 'skin_admin_black') {
-        targetCtx.fillStyle = '#100f14';
+        baseColor = '#100f14';
         targetCtx.shadowColor = '#ff3366';
         targetCtx.shadowBlur = 20;
       } else if (slimeObj.skin === 'skin_prismatic') {
@@ -1700,13 +1981,33 @@
         pGrad.addColorStop(0, '#ff7675');
         pGrad.addColorStop(0.5, '#74b9ff');
         pGrad.addColorStop(1, '#55efc4');
-        targetCtx.fillStyle = pGrad;
+        baseColor = pGrad;
       } else {
         const sk = MARKET_CATALOG.skins.find(s => s.id === slimeObj.skin);
-        targetCtx.fillStyle = sk ? sk.color : '#ff94b8';
+        if (sk) baseColor = sk.color;
       }
+
+      targetCtx.fillStyle = baseColor;
       targetCtx.fill();
       targetCtx.shadowBlur = 0;
+
+      // Glossy Radial Shine Reflection Overlay
+      targetCtx.save();
+      const shineGrad = targetCtx.createRadialGradient(-8, -10, 2, 0, 0, slimeObj.radius);
+      shineGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
+      shineGrad.addColorStop(0.35, 'rgba(255, 255, 255, 0.2)');
+      shineGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      targetCtx.fillStyle = shineGrad;
+      targetCtx.beginPath();
+      targetCtx.ellipse(0, 0, slimeObj.radius * slimeObj.squash, (slimeObj.radius - 4) / slimeObj.squash, 0, 0, Math.PI * 2);
+      targetCtx.fill();
+
+      // Top Specular Highlight Bubble
+      targetCtx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+      targetCtx.beginPath();
+      targetCtx.ellipse(-10, -12, 6, 3, -0.4, 0, Math.PI * 2);
+      targetCtx.fill();
+      targetCtx.restore();
 
       // Eyes
       targetCtx.fillStyle = slimeObj.skin === 'skin_admin_black' ? '#ff3366' : '#222f3e';
@@ -1783,7 +2084,6 @@
 
     // --- 9. GAME ENGINE LOOP ---
     function worldLoop() {
-      // Movement
       let vx = 0;
       let vy = 0;
 
@@ -1843,7 +2143,7 @@
         renderSlime(ctx, mySlime.x, mySlime.y, mySlime, currentUser.displayName, currentTag);
       }
 
-      // Floating World Bubbles
+      // Floating Speech Bubbles
       renderFloatingSpeechBubbles();
 
       ctx.restore();
@@ -1857,15 +2157,15 @@
 
       for (let b of floatingBubbles) {
         ctx.save();
-        ctx.font = '700 11px Nunito';
+        ctx.font = '700 12px Nunito';
         const tw = ctx.measureText(b.text).width;
         const bw = tw + 20;
-        const bh = 24;
+        const bh = 26;
 
         ctx.translate(b.x - bw / 2, b.y - 70);
-        ctx.fillStyle = 'rgba(22, 16, 38, 0.92)';
+        ctx.fillStyle = 'rgba(22, 16, 38, 0.95)';
         ctx.strokeStyle = '#ffb7c5';
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.8;
 
         ctx.beginPath();
         ctx.roundRect(0, 0, bw, bh, 8);
@@ -1873,16 +2173,16 @@
         ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
-        ctx.fillText(b.text, 10, 16);
+        ctx.fillText(b.text, 10, 17);
         ctx.restore();
       }
     }
 
     function initCommunityDemoPlayers() {
       const mocks = [
-        { dName: '🌸 Sakura Spirit', uName: 'sakura_spirit', x: SPAWN_X - 60, y: SPAWN_Y - 40, skin: 'skin_ocean', acc: 'acc_sakura_pin', title: 'DANCER' },
-        { dName: '🍵 Matcha Boba', uName: 'matcha_boba', x: SPAWN_X + 70, y: SPAWN_Y + 50, skin: 'skin_matcha', acc: 'acc_cat_ears', title: 'SAGE' },
-        { dName: '✨ Luna Starlight', uName: 'luna_star', x: SPAWN_X + 100, y: SPAWN_Y - 60, skin: 'skin_lavender', acc: 'acc_angel_halo', title: 'MONARCH' }
+        { dName: '🌸 Sakura Spirit', uName: 'sakura_spirit@sakura.park', x: 1140, y: 760, skin: 'skin_ocean', acc: 'acc_sakura_pin', title: 'DANCER' },
+        { dName: '🍵 Matcha Boba', uName: 'matcha_boba@sakura.park', x: 1270, y: 850, skin: 'skin_matcha', acc: 'acc_cat_ears', title: 'SAGE' },
+        { dName: '✨ Luna Starlight', uName: 'luna_star@sakura.park', x: 1300, y: 740, skin: 'skin_lavender', acc: 'acc_angel_halo', title: 'MONARCH' }
       ];
 
       mocks.forEach(m => {
@@ -1894,6 +2194,7 @@
           squash: 1,
           isDancing: false,
           displayName: m.dName,
+          email: m.uName,
           username: m.uName,
           title: m.title,
           pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${m.uName}`,
@@ -1904,7 +2205,7 @@
       refreshDmFriendList();
     }
 
-    // --- 10. CLICK ON SLIMES IN WORLD (ADD FRIEND / TEXT DM) ---
+    // --- 10. CLICK ON WORLD SLIMES ---
     const targetPopup = document.getElementById('playerTargetPopup');
     let targetedSlime = null;
 
@@ -1913,12 +2214,13 @@
       const clickScreenX = e.clientX - rect.left;
       const clickScreenY = e.clientY - rect.top;
 
-      // Transform Screen to World Coordinates
       const worldClickX = clickScreenX - viewW / 2 + camera.x;
       const worldClickY = clickScreenY - viewH / 2 + camera.y;
 
       let hit = null;
       otherPlayers.forEach((p) => {
+        // Exclude self if found
+        if (p.email === currentUser.email) return;
         if (Math.hypot(p.x - worldClickX, p.y - worldClickY) < 42) {
           hit = p;
         }
@@ -1928,7 +2230,7 @@
         targetedSlime = hit;
         document.getElementById('popupAvatar').src = hit.pfp;
         document.getElementById('popupDisplayName').innerText = hit.displayName;
-        document.getElementById('popupUsername').innerText = `@${hit.username}`;
+        document.getElementById('popupUsername').innerText = hit.email;
         targetPopup.style.left = `${clickScreenX}px`;
         targetPopup.style.top = `${clickScreenY}px`;
         targetPopup.style.display = 'block';
@@ -1939,21 +2241,14 @@
 
     document.getElementById('popupAddFriendBtn').addEventListener('click', () => {
       if (targetedSlime && currentUser) {
-        if (!currentUser.friends.includes(targetedSlime.username)) {
-          currentUser.friends.push(targetedSlime.username);
-          updateHUD();
-          refreshDmFriendList();
-          showToast(`🌸 Added <b>${targetedSlime.displayName}</b> as a friend!`);
-        } else {
-          showToast('Already on your friend list.');
-        }
+        sendFriendRequest(targetedSlime.email);
       }
       targetPopup.style.display = 'none';
     });
 
     document.getElementById('popupDirectDmBtn').addEventListener('click', () => {
       if (targetedSlime) {
-        startDmWithPlayer(targetedSlime.username);
+        startDmWithPlayer(targetedSlime.email);
       }
       targetPopup.style.display = 'none';
     });
@@ -1962,8 +2257,8 @@
     let parkChannel = null;
     function initSupabaseNetworking() {
       try {
-        parkChannel = supabaseClient.channel('sakura-community-park', {
-          config: { presence: { key: currentUser.username } }
+        parkChannel = supabaseClient.channel('sakura-community-park-v4', {
+          config: { presence: { key: currentUser.email } }
         });
 
         parkChannel
@@ -1971,17 +2266,18 @@
             const state = parkChannel.presenceState();
             for (let k in state) {
               const p = state[k][0];
-              if (p && p.username !== currentUser.username) {
-                otherPlayers.set(p.username, p);
+              // Don't show self in roaming or chat partner listings
+              if (p && p.email !== currentUser.email) {
+                otherPlayers.set(p.email, p);
               }
             }
             refreshDmFriendList();
           })
           .on('broadcast', { event: 'pos' }, (res) => {
             const p = res.payload;
-            if (p && p.username !== currentUser.username) {
-              const existing = otherPlayers.get(p.username) || {};
-              otherPlayers.set(p.username, { ...existing, ...p });
+            if (p && p.email !== currentUser.email) {
+              const existing = otherPlayers.get(p.email) || {};
+              otherPlayers.set(p.email, { ...existing, ...p });
             }
           })
           .on('broadcast', { event: 'chat' }, (res) => {
@@ -1996,7 +2292,7 @@
           .subscribe(async (status) => {
             if (status === 'SUBSCRIBED') {
               await parkChannel.track({
-                username: currentUser.username,
+                email: currentUser.email,
                 displayName: currentUser.displayName,
                 x: mySlime.x,
                 y: mySlime.y,
@@ -2015,7 +2311,7 @@
               type: 'broadcast',
               event: 'pos',
               payload: {
-                username: currentUser.username,
+                email: currentUser.email,
                 displayName: currentUser.displayName,
                 x: mySlime.x,
                 y: mySlime.y,
@@ -2033,7 +2329,7 @@
       }
     }
 
-    // --- 12. CHAT DRAWER & DIRECT DM FRIEND SEARCH ---
+    // --- 12. CHAT DRAWER & EMOJI OVERLAYS ---
     const chatDrawer = document.getElementById('chatDrawer');
     const chatToggleIcon = document.getElementById('chatToggleIcon');
     const tabGlobalChat = document.getElementById('tabGlobalChat');
@@ -2060,25 +2356,53 @@
       dmFilterWrapper.style.display = tab === 'dm' ? 'flex' : 'none';
 
       if (tab === 'dm') {
+        unreadDmCount = 0;
+        updateNotifBadges();
         refreshDmFriendList();
-        chatInputField.placeholder = activeDmPartner ? `Direct message to @${activeDmPartner}...` : 'Select a friend above...';
+        chatInputField.placeholder = activeDmPartner ? `Direct message to ${activeDmPartner}...` : 'Select a friend above...';
       } else {
         chatInputField.placeholder = 'Chat in Sakura Park...';
       }
       renderChatMessages();
     }
 
-    // Filter DM Friends List
-    dmFriendSearchInput.addEventListener('input', () => {
-      refreshDmFriendList(dmFriendSearchInput.value.trim().toLowerCase());
-    });
+    window.sendQuickEmoji = function(emoji) {
+      floatingBubbles.push({
+        x: mySlime.x,
+        y: mySlime.y + mySlime.jumpOffset,
+        text: emoji,
+        time: Date.now()
+      });
+
+      if (parkChannel) {
+        parkChannel.send({
+          type: 'broadcast',
+          event: 'chat',
+          payload: {
+            id: 'msg_' + Math.random().toString(36).substring(2, 9),
+            senderEmail: currentUser.email,
+            senderDisplayName: currentUser.displayName,
+            pfp: currentUser.pfp,
+            tag: isDevModeActive ? 'DEV' : (currentUser.role === 'admin' ? 'ADMIN' : currentUser.title),
+            text: emoji,
+            isDm: activeChatTab === 'dm',
+            recipientEmail: activeChatTab === 'dm' ? activeDmPartner : null,
+            time: Date.now()
+          }
+        });
+      }
+    };
 
     function refreshDmFriendList(filter = '') {
       dmFriendsChips.innerHTML = '';
       const pool = new Set([...(currentUser ? currentUser.friends : [])]);
-      otherPlayers.forEach(p => pool.add(p.username));
+      otherPlayers.forEach(p => {
+        if (p.email !== currentUser.email) pool.add(p.email);
+      });
 
       pool.forEach(u => {
+        if (u === currentUser.email) return; // Don't show self in list
+
         const pObj = otherPlayers.get(u);
         const dName = pObj ? pObj.displayName : u;
 
@@ -2092,15 +2416,19 @@
         chip.addEventListener('click', () => {
           activeDmPartner = u;
           refreshDmFriendList(dmFriendSearchInput.value.trim().toLowerCase());
-          chatInputField.placeholder = `Direct message to @${u}...`;
+          chatInputField.placeholder = `Direct message to ${dName}...`;
           renderChatMessages();
         });
         dmFriendsChips.appendChild(chip);
       });
     }
 
-    function startDmWithPlayer(username) {
-      activeDmPartner = username;
+    dmFriendSearchInput.addEventListener('input', () => {
+      refreshDmFriendList(dmFriendSearchInput.value.trim().toLowerCase());
+    });
+
+    function startDmWithPlayer(email) {
+      activeDmPartner = email;
       selectChatTab('dm');
       chatDrawer.classList.remove('collapsed');
       chatToggleIcon.className = 'fa-solid fa-chevron-left';
@@ -2122,17 +2450,17 @@
 
       const msg = {
         id: 'msg_' + Math.random().toString(36).substring(2, 9),
-        senderUsername: currentUser.username,
+        senderEmail: currentUser.email,
         senderDisplayName: currentUser.displayName,
         pfp: currentUser.pfp,
         tag: isDevModeActive ? 'DEV' : (currentUser.role === 'admin' ? 'ADMIN' : currentUser.title),
         text: text,
         isDm: activeChatTab === 'dm',
-        recipientUsername: activeChatTab === 'dm' ? activeDmPartner : null,
+        recipientEmail: activeChatTab === 'dm' ? activeDmPartner : null,
         time: Date.now()
       };
 
-      if (msg.isDm && !msg.recipientUsername) {
+      if (msg.isDm && !msg.recipientEmail) {
         return showToast('Please select a friend to text in DM!');
       }
 
@@ -2156,14 +2484,30 @@
     }
 
     function handleIncomingNetworkMessage(msg) {
+      if (msg.isDm && msg.recipientEmail === currentUser.email) {
+        unreadDmCount++;
+        updateNotifBadges();
+      }
       storeMessage(msg);
+    }
+
+    function updateNotifBadges() {
+      const globalBadge = document.getElementById('dmGlobalNotifBadge');
+      const tabBadge = document.getElementById('dmTabNotifBadge');
+      if (unreadDmCount > 0) {
+        globalBadge.classList.add('active');
+        tabBadge.classList.add('active');
+      } else {
+        globalBadge.classList.remove('active');
+        tabBadge.classList.remove('active');
+      }
     }
 
     function storeMessage(msg) {
       if (!msg.isDm) {
         globalChatLog.push(msg);
       } else {
-        const partner = msg.senderUsername === currentUser.username ? msg.recipientUsername : msg.senderUsername;
+        const partner = msg.senderEmail === currentUser.email ? msg.recipientEmail : msg.senderEmail;
         if (!dmChatLogs[partner]) {
           dmChatLogs[partner] = [];
         }
@@ -2187,11 +2531,10 @@
       const row = document.createElement('div');
       row.className = 'chat-bubble-row';
       row.innerHTML = `
-        <img src="${msg.pfp}" class="chat-bubble-avatar" />
+        <img src="${msg.pfp}" class="chat-bubble-avatar" onclick="openProfileFromChat('${msg.senderEmail}', '${msg.senderDisplayName}', '${msg.pfp}')" />
         <div class="chat-bubble-content">
-          <div class="chat-bubble-header">
+          <div class="chat-bubble-header" onclick="openProfileFromChat('${msg.senderEmail}', '${msg.senderDisplayName}', '${msg.pfp}')">
             <span>${msg.senderDisplayName}</span>
-            <span style="font-size:0.65rem; color:var(--text-muted);">@${msg.senderUsername}</span>
             ${msg.tag ? `<span class="badge-tag ${msg.tag === 'DEV' ? 'badge-dev' : (msg.tag === 'ADMIN' ? 'badge-admin' : '')}">${msg.tag}</span>` : ''}
           </div>
           <div>${escapeHTML(msg.text)}</div>
@@ -2200,11 +2543,22 @@
       chatMessagesContainer.appendChild(row);
     }
 
+    window.openProfileFromChat = function(senderEmail, displayName, pfp) {
+      if (senderEmail === currentUser.email) return; // Don't target self
+      targetedSlime = { email: senderEmail, displayName: displayName, pfp: pfp };
+      document.getElementById('popupAvatar').src = pfp;
+      document.getElementById('popupDisplayName').innerText = displayName;
+      document.getElementById('popupUsername').innerText = senderEmail;
+      targetPopup.style.left = `50%`;
+      targetPopup.style.top = `50%`;
+      targetPopup.style.display = 'block';
+    };
+
     function escapeHTML(str) {
       return str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t));
     }
 
-    // --- 13. PROCEDURAL BLOSSOM MUSIC PLAYER (ADMIN/DEV CONTROLLED) ---
+    // --- 13. MUSIC PLAYER ---
     let audioCtx = null;
     let musicInterval = null;
     let masterGain = null;
@@ -2214,7 +2568,6 @@
       document.getElementById('musicLocalVolume').addEventListener('input', (e) => {
         if (masterGain) masterGain.gain.value = parseFloat(e.target.value);
       });
-      // Start audio on first user touch/click
       window.addEventListener('pointerdown', ensureAudioContext, { once: true });
     }
 
@@ -2234,10 +2587,10 @@
       if (!audioCtx) return;
 
       const scales = {
-        sakura_breeze: [293.66, 329.63, 392.00, 440.00, 523.25, 587.33], // Insen pentatonic
-        matsuri_dance: [329.63, 369.99, 440.00, 493.88, 587.33, 659.25], // Festive
-        zen_sanctuary: [220.00, 261.63, 293.66, 329.63, 392.00],        // Deep Zen
-        night_chimes: [440.00, 523.25, 659.25, 783.99, 880.00]           // Night
+        sakura_breeze: [293.66, 329.63, 392.00, 440.00, 523.25, 587.33],
+        matsuri_dance: [329.63, 369.99, 440.00, 493.88, 587.33, 659.25],
+        zen_sanctuary: [220.00, 261.63, 293.66, 329.63, 392.00],
+        night_chimes: [440.00, 523.25, 659.25, 783.99, 880.00]
       };
 
       const notes = scales[trackId] || scales.sakura_breeze;
@@ -2248,7 +2601,6 @@
         const freq = notes[step % notes.length];
         step = (step + 1 + Math.floor(Math.random() * 2)) % notes.length;
 
-        // Gentle synth chime
         const osc = audioCtx.createOscillator();
         const noteGain = audioCtx.createGain();
 
@@ -2283,7 +2635,7 @@
       showToast(`🎵 Park background music changed to <b>${trackId.replace('_', ' ').toUpperCase()}</b>!`);
     };
 
-    // --- 14. MARKETPLACE & LIVE DRESSING ROOM ---
+    // --- 14. MARKETPLACE & DRESSING ROOM ---
     const dressingRoomCanvas = document.getElementById('dressingRoomCanvas');
     const drCtx = dressingRoomCanvas ? dressingRoomCanvas.getContext('2d') : null;
     let dressingRoomSlime = { radius: 36, jumpOffset: 0, squash: 1, skin: 'skin_blossom', accessory: null, isDancing: false };
@@ -2332,7 +2684,6 @@
           btnHTML = `<button class="btn-market-action" style="background:var(--sakura-pink); color:#0e0a1a;" onclick="buyMarketItem('${cat}', '${item.id}', ${item.price})"><i class="fa-solid fa-gem"></i> Buy ${item.price}</button>`;
         }
 
-        // Dressing Room Hover / Click Preview
         card.addEventListener('mouseenter', () => {
           if (cat === 'accessories') dressingRoomSlime.accessory = item.id;
           if (cat === 'skins') dressingRoomSlime.skin = item.id;
@@ -2378,8 +2729,7 @@
       renderMarketGrid(cat);
     };
 
-    // --- 15. MINIGAMES (SLIME MEMORY & CATCH THE PETALS) ---
-    // Game 1: Slime Memory (+3 Points on victory)
+    // --- 15. MINIGAMES ---
     const memorySymbols = ['🌸', '🍡', '🍵', '🏮', '🎏', '🎋', '⛩️', '🐸'];
     let memoryFlipped = [];
     let memoryMatches = 0;
@@ -2434,7 +2784,6 @@
       }
     }
 
-    // Game 2: Catch The Petals (50 Petals, 30s, Scaled 10 Petals = 1 Pt)
     const petalCanvas = document.getElementById('petalDropCanvas');
     const pctx = petalCanvas.getContext('2d');
     let petalLoopId = null;
@@ -2493,13 +2842,11 @@
     function runPetalLoop() {
       pctx.clearRect(0, 0, petalCanvas.width, petalCanvas.height);
 
-      // Basket
       pctx.fillStyle = '#ffb7c5';
       pctx.beginPath();
       pctx.roundRect(catchBasket.x, petalCanvas.height - 24, catchBasket.w, catchBasket.h, 8);
       pctx.fill();
 
-      // Petals
       for (let i = fallingPetals.length - 1; i >= 0; i--) {
         const p = fallingPetals[i];
         p.y += p.vy;
@@ -2510,7 +2857,6 @@
         pctx.ellipse(p.x, p.y, p.r, p.r * 0.6, 0.3, 0, Math.PI * 2);
         pctx.fill();
 
-        // Collision Check
         if (p.y >= petalCanvas.height - 28 && p.x >= catchBasket.x && p.x <= catchBasket.x + catchBasket.w) {
           petalsCaught++;
           document.getElementById('petalGameScore').innerText = petalsCaught;
@@ -2540,12 +2886,11 @@
       }
     }
 
-    // --- 16. DEVELOPER & ADMIN SYSTEM (DEV PASSCODE `1357` HIDDEN) ---
+    // --- 16. DEVELOPER & ADMIN SYSTEM ---
     document.getElementById('btnOpenDev').addEventListener('click', () => {
       if (isDevModeActive || currentUser.role === 'admin') {
         openDevAdminModal();
       } else {
-        // Passcode 1357 is checked without exposing it in labels or prompts
         const entered = prompt('Enter Authority Key:');
         if (entered === '1357') {
           isDevModeActive = true;
@@ -2569,33 +2914,30 @@
       document.getElementById('devAdminTitle').innerHTML = isDev ? `<i class="fa-solid fa-code"></i> Developer Console` : `<i class="fa-solid fa-shield-halved"></i> Admin Control Panel`;
     }
 
-    // Toggle Dev Mode on/off
     document.getElementById('btnToggleDevMode').addEventListener('click', () => {
       isDevModeActive = !isDevModeActive;
       updateHUD();
-      showToast(isDevModeActive ? 'Pure White Dev Mode Enabled' : 'Dev Mode Disabled. Skin and Title reverted.');
+      showToast(isDevModeActive ? 'Pure White Dev Mode Enabled' : 'Dev Mode Disabled.');
     });
 
-    // Dev Only: Send Points
     document.getElementById('btnGrantPoints').addEventListener('click', () => {
       const target = document.getElementById('inputGrantTarget').value.trim().toLowerCase();
       const amount = parseInt(document.getElementById('inputGrantAmount').value, 10);
-      if (!target || isNaN(amount) || amount <= 0) return showToast('Please enter target username and valid point amount!');
+      if (!target || isNaN(amount) || amount <= 0) return showToast('Please enter target email and valid point amount!');
 
       const users = Storage.getUsers();
       if (users[target]) {
         users[target].points += amount;
         Storage.saveUsers(users);
       }
-      if (currentUser.username === target) {
+      if (currentUser.email === target) {
         currentUser.points += amount;
         updateHUD();
       }
       broadcastAuthority({ type: 'gift_points', target: target, amount: amount });
-      showToast(`✨ Sent <b>+${amount} Points</b> to @${target}!`);
+      showToast(`✨ Sent <b>+${amount} Points</b> to ${target}!`);
     });
 
-    // Dev Only: Promote Admin
     document.getElementById('btnPromoteAdmin').addEventListener('click', () => {
       const target = document.getElementById('inputAdminTarget').value.trim().toLowerCase();
       if (!target) return;
@@ -2605,30 +2947,27 @@
         Storage.saveAdmins(admins);
       }
       broadcastAuthority({ type: 'promote_admin', target: target });
-      showToast(`Promoted @${target} to Admin! (Void Black Skin & Red Title unlocked)`);
+      showToast(`Promoted ${target} to Admin!`);
     });
 
-    // Dev Only: Revoke Admin
     document.getElementById('btnRevokeAdmin').addEventListener('click', () => {
       const target = document.getElementById('inputAdminTarget').value.trim().toLowerCase();
       if (!target) return;
       let admins = Storage.getAdmins().filter(a => a !== target);
       Storage.saveAdmins(admins);
       broadcastAuthority({ type: 'revoke_admin', target: target });
-      showToast(`Revoked Admin privileges from @${target}.`);
+      showToast(`Revoked Admin privileges from ${target}.`);
     });
 
-    // Moderation: Mute Chat
     document.getElementById('btnApplyMute').addEventListener('click', () => {
       const target = document.getElementById('inputModTarget').value.trim().toLowerCase();
       const mins = parseInt(document.getElementById('selectMuteDuration').value, 10);
-      if (!target) return showToast('Enter target username!');
+      if (!target) return showToast('Enter target account email!');
 
       broadcastAuthority({ type: 'mute_chat', target: target, minutes: mins });
-      showToast(`Muted @${target} for ${mins} minutes.`);
+      showToast(`Muted ${target} for ${mins} minutes.`);
     });
 
-    // Moderation: Ban Login
     document.getElementById('btnBanPlayer').addEventListener('click', () => {
       const target = document.getElementById('inputModTarget').value.trim().toLowerCase();
       if (!target) return;
@@ -2638,28 +2977,26 @@
         Storage.saveBanned(banned);
       }
       broadcastAuthority({ type: 'ban_player', target: target });
-      showToast(`Banned @${target} from logging in!`);
+      showToast(`Banned ${target} from logging in!`);
     });
 
-    // Moderation: Unban
     document.getElementById('btnUnbanPlayer').addEventListener('click', () => {
       const target = document.getElementById('inputModTarget').value.trim().toLowerCase();
       if (!target) return;
       let banned = Storage.getBanned().filter(b => b !== target);
       Storage.saveBanned(banned);
-      showToast(`Unbanned @${target}.`);
+      showToast(`Unbanned ${target}.`);
     });
 
-    // Moderation: Delete Account
     document.getElementById('btnDeletePlayer').addEventListener('click', () => {
       const target = document.getElementById('inputModTarget').value.trim().toLowerCase();
       if (!target) return;
-      if (!confirm(`Permanently delete account @${target}?`)) return;
+      if (!confirm(`Permanently delete account ${target}?`)) return;
       const users = Storage.getUsers();
       delete users[target];
       Storage.saveUsers(users);
       broadcastAuthority({ type: 'delete_player', target: target });
-      showToast(`Deleted account @${target}.`);
+      showToast(`Deleted account ${target}.`);
     });
 
     function broadcastAuthority(payload) {
@@ -2674,32 +3011,41 @@
 
     function handleAuthorityAction(ev) {
       if (!currentUser) return;
-      const myU = currentUser.username.toLowerCase();
-      const targetU = (ev.target || '').toLowerCase();
+      const myEmail = currentUser.email.toLowerCase();
+      const targetEmail = (ev.target || '').toLowerCase();
 
-      if (ev.type === 'mute_chat' && myU === targetU) {
+      if (ev.type === 'friend_request' && myEmail === targetEmail) {
+        if (!currentUser.friendRequests) currentUser.friendRequests = [];
+        if (!currentUser.friendRequests.includes(ev.sender)) {
+          currentUser.friendRequests.push(ev.sender);
+          updateHUD();
+          renderFriendsSection();
+          showToast(`📩 Received a friend request from <b>${ev.sender}</b>!`);
+        }
+      }
+      if (ev.type === 'mute_chat' && myEmail === targetEmail) {
         chatMutedUntil = Date.now() + ev.minutes * 60 * 1000;
         showToast(`🔒 You have been muted by an Admin for ${ev.minutes} minutes!`);
       }
-      if (ev.type === 'ban_player' && myU === targetU) {
+      if (ev.type === 'ban_player' && myEmail === targetEmail) {
         alert('You have been banned from Sakura Park.');
         location.reload();
       }
-      if (ev.type === 'delete_player' && myU === targetU) {
+      if (ev.type === 'delete_player' && myEmail === targetEmail) {
         alert('Your account was deleted by an administrator.');
         location.reload();
       }
-      if (ev.type === 'promote_admin' && myU === targetU) {
+      if (ev.type === 'promote_admin' && myEmail === targetEmail) {
         currentUser.role = 'admin';
         updateHUD();
         showToast('🛡️ Promoted to ADMIN! Void Black Skin & Red Admin Title unlocked.');
       }
-      if (ev.type === 'revoke_admin' && myU === targetU) {
+      if (ev.type === 'revoke_admin' && myEmail === targetEmail) {
         currentUser.role = 'user';
         updateHUD();
         showToast('Your Admin privileges were revoked.');
       }
-      if (ev.type === 'gift_points' && myU === targetU) {
+      if (ev.type === 'gift_points' && myEmail === targetEmail) {
         currentUser.points += ev.amount;
         updateHUD();
         showToast(`✨ Received a gift of <b>+${ev.amount} Blossom Points</b>!`);
