@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Sakura Blossom Park - Slime MMO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Sakura Blossom MMO - Slime Park</title>
 
   <!-- Supabase JS Client v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,16 +15,16 @@
   <style>
     :root {
       --sakura-pink: #ffb7c5;
-      --sakura-deep: #ff6584;
-      --sakura-glow: rgba(255, 183, 197, 0.6);
-      --bg-dark: #120e1f;
-      --panel-bg: rgba(26, 20, 42, 0.78);
-      --panel-border: rgba(255, 183, 197, 0.28);
+      --sakura-accent: #ff6584;
+      --sakura-glow: rgba(255, 183, 197, 0.5);
+      --bg-dark: #0f0c1b;
+      --panel-bg: rgba(23, 17, 38, 0.88);
+      --panel-border: rgba(255, 183, 197, 0.3);
       --gold: #ffd166;
       --admin-red: #ff3366;
       --dev-cyan: #00f0ff;
-      --text-light: #fefefe;
-      --text-muted: #c9bede;
+      --text-main: #ffffff;
+      --text-muted: #b8a9cf;
     }
 
     * {
@@ -41,10 +41,11 @@
       overflow: hidden;
       font-family: 'Nunito', sans-serif;
       background-color: var(--bg-dark);
-      color: var(--text-light);
+      color: var(--text-main);
+      touch-action: none;
     }
 
-    /* Fullscreen World Canvas */
+    /* Fullscreen Viewport Canvas */
     #worldCanvas {
       position: absolute;
       top: 0;
@@ -55,35 +56,36 @@
       z-index: 1;
     }
 
-    /* Glassmorphism Styles */
     .glass {
       background: var(--panel-bg);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--panel-border);
       border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
 
-    /* Top HUD */
+    /* TOP HUD BAR */
     .top-hud {
       position: absolute;
-      top: 14px;
-      left: 14px;
-      right: 14px;
+      top: 12px;
+      left: 12px;
+      right: 12px;
       z-index: 10;
       display: flex;
       justify-content: space-between;
       align-items: center;
       pointer-events: none;
+      gap: 8px;
     }
 
-    .hud-card {
+    .hud-player-card {
       pointer-events: auto;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 8px 16px;
+      gap: 10px;
+      padding: 6px 14px;
+      max-width: 65%;
     }
 
     .hud-avatar {
@@ -92,20 +94,35 @@
       border-radius: 50%;
       border: 2px solid var(--sakura-pink);
       object-fit: cover;
-      background: #2a1b3d;
+      background: #231938;
+      flex-shrink: 0;
+      cursor: pointer;
     }
 
     .hud-info {
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
-    .hud-name {
-      font-weight: 800;
-      font-size: 0.95rem;
+    .hud-name-row {
       display: flex;
       align-items: center;
       gap: 6px;
+      overflow: hidden;
+    }
+
+    .hud-display-name {
+      font-weight: 900;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hud-username-tag {
+      font-size: 0.72rem;
+      color: var(--text-muted);
     }
 
     .badge-tag {
@@ -118,8 +135,8 @@
     }
 
     .badge-dev {
-      background: linear-gradient(45deg, #00f0ff, #fff);
-      color: #050b14;
+      background: linear-gradient(45deg, #00f0ff, #ffffff);
+      color: #000;
       box-shadow: 0 0 10px var(--dev-cyan);
     }
 
@@ -133,128 +150,153 @@
       background: rgba(255, 209, 102, 0.15);
       border: 1px solid rgba(255, 209, 102, 0.4);
       color: var(--gold);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.85rem;
+      padding: 2px 8px;
+      border-radius: 14px;
+      font-size: 0.78rem;
       font-weight: 800;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
 
     .timer-pill {
-      background: rgba(255, 183, 197, 0.15);
+      background: rgba(255, 183, 197, 0.12);
       border: 1px solid var(--sakura-pink);
       color: var(--sakura-pink);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.78rem;
+      padding: 2px 8px;
+      border-radius: 14px;
+      font-size: 0.74rem;
       font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .hud-actions {
+    .hud-buttons {
       pointer-events: auto;
       display: flex;
-      gap: 8px;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
     .btn-circle {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       color: #fff;
-      font-size: 1.1rem;
-      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-size: 1.05rem;
       border: 1px solid var(--panel-border);
       background: var(--panel-bg);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(8px);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .btn-circle:hover {
-      transform: translateY(-2px) scale(1.08);
+    .btn-circle:hover, .btn-circle:active {
+      transform: scale(1.1);
       border-color: var(--sakura-pink);
-      box-shadow: 0 0 15px var(--sakura-glow);
+      box-shadow: 0 0 12px var(--sakura-glow);
     }
 
-    /* Mobile Joystick & Controls */
-    .mobile-controls {
+    /* ACTION BAR: JUMP & DANCE (PC & MOBILE READY) */
+    .action-controls-bar {
       position: absolute;
       bottom: 24px;
-      left: 24px;
-      z-index: 10;
-      display: none;
-    }
-
-    #joystickZone {
-      width: 120px;
-      height: 120px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 2px dashed rgba(255, 183, 197, 0.4);
-      border-radius: 50%;
-      position: relative;
-      touch-action: none;
-    }
-
-    #joystickKnob {
-      width: 48px;
-      height: 48px;
-      background: radial-gradient(circle, var(--sakura-pink), var(--sakura-deep));
-      border-radius: 50%;
-      position: absolute;
-      top: 36px;
-      left: 36px;
-      box-shadow: 0 0 15px var(--sakura-glow);
-    }
-
-    .mobile-actions {
-      position: absolute;
-      bottom: 28px;
-      right: 24px;
-      z-index: 10;
-      display: none;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .btn-action-mobile {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      border: 2px solid var(--sakura-pink);
-      background: var(--panel-bg);
-      color: #fff;
-      font-size: 1.3rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Floating Chat Drawer */
-    .chat-container {
-      position: absolute;
-      bottom: 24px;
-      right: 24px;
-      width: 380px;
-      max-width: calc(100% - 48px);
-      height: 380px;
+      right: 20px;
       z-index: 15;
       display: flex;
       flex-direction: column;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .btn-game-action {
+      min-width: 54px;
+      height: 54px;
+      padding: 0 14px;
+      border-radius: 27px;
+      background: var(--panel-bg);
+      border: 2px solid var(--sakura-pink);
+      color: #ffffff;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      transition: transform 0.15s ease, background 0.15s;
+    }
+
+    .btn-game-action:active {
+      transform: scale(0.92);
+      background: rgba(255, 183, 197, 0.25);
+    }
+
+    .action-badge-key {
+      font-size: 0.65rem;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 900;
+    }
+
+    /* MOBILE JOYSTICK */
+    .joystick-container {
+      position: absolute;
+      bottom: 24px;
+      left: 20px;
+      z-index: 15;
+      display: none;
+      touch-action: none;
+    }
+
+    #joystickBase {
+      width: 110px;
+      height: 110px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px dashed rgba(255, 183, 197, 0.45);
+      border-radius: 50%;
+      position: relative;
+    }
+
+    #joystickStick {
+      width: 44px;
+      height: 44px;
+      background: radial-gradient(circle, var(--sakura-pink), var(--sakura-accent));
+      border-radius: 50%;
+      position: absolute;
+      top: 33px;
+      left: 33px;
+      box-shadow: 0 0 12px var(--sakura-glow);
+    }
+
+    /* CHAT DOCK (GLOBAL & DIRECT DM SEPARATION) */
+    .chat-dock {
+      position: absolute;
+      bottom: 24px;
+      left: 150px;
+      width: 360px;
+      max-width: calc(100% - 170px);
+      height: 320px;
+      z-index: 12;
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
-      transition: transform 0.3s ease, opacity 0.3s ease;
+      transition: transform 0.3s ease;
     }
 
-    .chat-container.minimized {
-      transform: translateY(330px);
+    .chat-dock.collapsed {
+      transform: translateY(276px);
     }
 
-    .chat-header {
-      padding: 10px 14px;
+    .chat-header-bar {
+      padding: 8px 12px;
       background: rgba(255, 255, 255, 0.04);
       border-bottom: 1px solid var(--panel-border);
       display: flex;
@@ -263,132 +305,155 @@
       cursor: pointer;
     }
 
-    .chat-tabs {
+    .chat-tab-group {
       display: flex;
       gap: 6px;
     }
 
-    .chat-tab {
+    .chat-nav-tab {
       background: transparent;
       border: none;
       color: var(--text-muted);
       padding: 4px 10px;
-      font-size: 0.82rem;
-      font-weight: 700;
+      font-size: 0.8rem;
+      font-weight: 800;
       cursor: pointer;
       border-radius: 12px;
       transition: 0.2s;
     }
 
-    .chat-tab.active {
+    .chat-nav-tab.active {
       background: var(--sakura-pink);
-      color: #1a102f;
+      color: #120c1f;
     }
 
-    .chat-messages {
+    .chat-view-container {
       flex: 1;
       overflow-y: auto;
-      padding: 12px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .chat-msg {
+    .dm-partner-selector {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--panel-border);
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .dm-partner-select {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      color: #fff;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      outline: none;
+    }
+
+    .chat-bubble-row {
       display: flex;
-      gap: 9px;
-      font-size: 0.85rem;
-      animation: fadeIn 0.2s ease;
+      gap: 8px;
+      font-size: 0.83rem;
+      animation: fadeInMsg 0.2s ease;
     }
 
-    .chat-msg-avatar {
-      width: 32px;
-      height: 32px;
+    @keyframes fadeInMsg {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-avatar-thumb {
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       border: 1px solid var(--sakura-pink);
       object-fit: cover;
       flex-shrink: 0;
     }
 
-    .chat-msg-body {
+    .chat-message-content {
       background: rgba(255, 255, 255, 0.06);
-      padding: 6px 12px;
-      border-radius: 4px 14px 14px 14px;
+      padding: 6px 10px;
+      border-radius: 4px 12px 12px 12px;
       max-width: 82%;
       word-break: break-word;
     }
 
-    .chat-msg-author {
-      font-size: 0.75rem;
+    .chat-sender-header {
+      font-size: 0.72rem;
       font-weight: 800;
       color: var(--sakura-pink);
-      margin-bottom: 2px;
       display: flex;
       align-items: center;
       gap: 4px;
+      margin-bottom: 2px;
     }
 
-    .chat-input-area {
-      padding: 8px 12px;
+    .chat-dock-input-bar {
+      padding: 8px;
       border-top: 1px solid var(--panel-border);
       display: flex;
-      gap: 8px;
-      background: rgba(18, 14, 31, 0.9);
+      gap: 6px;
+      background: rgba(15, 12, 27, 0.95);
     }
 
-    .chat-input {
+    .chat-text-input {
       flex: 1;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--panel-border);
-      border-radius: 20px;
-      padding: 8px 14px;
+      border-radius: 16px;
+      padding: 6px 12px;
       color: #fff;
       font-family: inherit;
       outline: none;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
     }
 
-    .chat-input:focus {
+    .chat-text-input:focus {
       border-color: var(--sakura-pink);
     }
 
-    .chat-send-btn {
+    .btn-send-chat {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
       background: var(--sakura-pink);
       border: none;
-      color: #120e1f;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      color: #0f0c1b;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: 0.2s;
+      font-size: 0.85rem;
     }
 
-    .chat-send-btn:hover {
-      transform: scale(1.08);
-    }
-
-    .chat-mute-notice {
-      padding: 6px 12px;
-      background: rgba(255, 51, 102, 0.2);
-      border-top: 1px solid var(--admin-red);
-      color: #ff99b3;
-      font-size: 0.75rem;
+    /* POPUP INTERACTION MENU (CLICKING SLIMES) */
+    .player-popup {
+      position: absolute;
+      z-index: 60;
+      transform: translate(-50%, -100%);
+      pointer-events: auto;
+      min-width: 210px;
       text-align: center;
+      padding: 12px;
       display: none;
     }
 
-    /* Generic Modal Styling */
+    /* MODALS SYSTEM */
     .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(7, 4, 15, 0.75);
-      backdrop-filter: blur(8px);
+      background: rgba(7, 4, 15, 0.8);
+      backdrop-filter: blur(10px);
       z-index: 100;
       display: flex;
       align-items: center;
@@ -396,7 +461,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease;
-      padding: 16px;
+      padding: 14px;
     }
 
     .modal-overlay.active {
@@ -404,18 +469,23 @@
       pointer-events: auto;
     }
 
-    .modal-box {
-      width: 600px;
+    .modal-card {
+      width: 660px;
       max-width: 100%;
       max-height: 90vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      animation: modalSlide 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: modalScale 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes modalScale {
+      from { transform: scale(0.94); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
 
     .modal-header {
-      padding: 16px 20px;
+      padding: 14px 18px;
       border-bottom: 1px solid var(--panel-border);
       display: flex;
       align-items: center;
@@ -424,278 +494,263 @@
 
     .modal-header h3 {
       font-family: 'Fredoka', cursive;
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       color: var(--sakura-pink);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .modal-close {
+    .modal-close-icon {
       cursor: pointer;
       font-size: 1.2rem;
       color: var(--text-muted);
-      transition: 0.2s;
     }
 
-    .modal-close:hover {
+    .modal-close-icon:hover {
       color: #fff;
     }
 
-    .modal-content {
-      padding: 20px;
+    .modal-body {
+      padding: 18px;
       overflow-y: auto;
       flex: 1;
     }
 
-    /* Auth Screens */
+    /* AUTH SCREEN */
     .auth-box {
       width: 380px;
       text-align: center;
     }
 
-    .auth-box h2 {
+    .auth-title {
       font-family: 'Fredoka', cursive;
       color: var(--sakura-pink);
       font-size: 2rem;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
-    .input-group {
-      margin-bottom: 14px;
+    .form-group {
+      margin-bottom: 12px;
       text-align: left;
     }
 
-    .input-group label {
-      font-size: 0.8rem;
-      font-weight: 700;
+    .form-group label {
+      font-size: 0.78rem;
+      font-weight: 800;
       color: var(--text-muted);
       margin-bottom: 4px;
       display: block;
     }
 
-    .input-styled {
+    .input-field {
       width: 100%;
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--panel-border);
       border-radius: 12px;
-      padding: 10px 14px;
+      padding: 9px 12px;
       color: #fff;
       font-family: inherit;
       outline: none;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
 
-    .input-styled:focus {
+    .input-field:focus {
       border-color: var(--sakura-pink);
       box-shadow: 0 0 10px var(--sakura-glow);
     }
 
-    .btn-main {
+    .btn-brand-primary {
       width: 100%;
-      background: linear-gradient(45deg, var(--sakura-pink), var(--sakura-deep));
-      color: #120e1f;
+      background: linear-gradient(45deg, var(--sakura-pink), var(--sakura-accent));
+      color: #0f0c1b;
       border: none;
-      padding: 12px;
-      font-size: 1rem;
+      padding: 11px;
+      font-size: 0.95rem;
       font-weight: 800;
       border-radius: 14px;
       cursor: pointer;
-      margin-top: 8px;
+      margin-top: 6px;
       transition: 0.2s;
-      box-shadow: 0 4px 15px rgba(255, 101, 132, 0.4);
     }
 
-    .btn-main:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 101, 132, 0.6);
+    .btn-brand-primary:active {
+      transform: scale(0.97);
     }
 
-    .btn-secondary {
+    .btn-brand-secondary {
       width: 100%;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--panel-border);
       color: #fff;
-      padding: 10px;
-      font-size: 0.9rem;
+      padding: 9px;
+      font-size: 0.88rem;
       font-weight: 700;
       border-radius: 12px;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
-    /* Shop Grid */
-    .shop-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid var(--panel-border);
-      padding-bottom: 10px;
-    }
-
-    .shop-tab-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--panel-border);
-      color: var(--text-muted);
-      border-radius: 12px;
-      padding: 8px 16px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-
-    .shop-tab-btn.active {
-      background: var(--sakura-pink);
-      color: #120e1f;
-      border-color: var(--sakura-pink);
-    }
-
-    .shop-grid {
+    /* MARKETPLACE & PREVIEW SYSTEM */
+    .market-layout {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 14px;
+      grid-template-columns: 210px 1fr;
+      gap: 16px;
     }
 
-    .shop-card {
-      background: rgba(255, 255, 255, 0.04);
+    .market-preview-box {
+      background: rgba(0, 0, 0, 0.25);
       border: 1px solid var(--panel-border);
       border-radius: 14px;
-      padding: 12px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      position: relative;
     }
 
-    .shop-card.locked-admin {
-      border-color: var(--admin-red);
-      background: rgba(255, 51, 102, 0.06);
+    #shopPreviewCanvas {
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, #2d1f47, #150f26);
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      margin-bottom: 10px;
     }
 
-    .shop-preview {
-      width: 70px;
-      height: 70px;
+    .shop-nav-tabs {
       display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 8px;
+    }
+
+    .shop-category-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--panel-border);
+      color: var(--text-muted);
+      border-radius: 10px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .shop-category-btn.active {
+      background: var(--sakura-pink);
+      color: #0f0c1b;
+      border-color: var(--sakura-pink);
+    }
+
+    .market-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .market-item-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      margin-bottom: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .market-item-card:hover {
+      border-color: var(--sakura-pink);
+      transform: translateY(-2px);
+    }
+
+    .market-item-card.admin-exclusive {
+      border-color: var(--admin-red);
+      background: rgba(255, 51, 102, 0.08);
+    }
+
+    .market-icon-display {
       font-size: 2.2rem;
+      margin-bottom: 6px;
     }
 
-    .shop-title {
+    .market-item-name {
+      font-size: 0.82rem;
       font-weight: 800;
-      font-size: 0.88rem;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
-    .shop-price {
+    .market-item-cost {
+      font-size: 0.76rem;
       font-weight: 800;
       color: var(--gold);
-      font-size: 0.8rem;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .shop-btn {
+    .btn-item-action {
       width: 100%;
-      padding: 6px;
-      border-radius: 10px;
-      font-size: 0.8rem;
+      padding: 5px;
+      border-radius: 8px;
+      font-size: 0.75rem;
       font-weight: 800;
       border: none;
       cursor: pointer;
     }
 
-    .shop-btn-buy {
-      background: var(--sakura-pink);
-      color: #120e1f;
+    /* MINIGAMES CARDS & CANVASES */
+    .minigame-card-deck {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
-    .shop-btn-equip {
-      background: rgba(0, 240, 255, 0.2);
-      border: 1px solid var(--dev-cyan);
-      color: var(--dev-cyan);
-    }
-
-    /* Minigame 1: Memory */
-    .memory-grid {
+    .memory-board {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      max-width: 400px;
-      margin: 0 auto;
+      gap: 8px;
+      max-width: 360px;
+      margin: 12px auto 0;
     }
 
-    .memory-card {
+    .memory-tile {
       aspect-ratio: 1;
       background: rgba(255, 255, 255, 0.08);
       border: 2px solid var(--sakura-pink);
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
-      transition: transform 0.3s ease;
+      font-size: 1.8rem;
+      transition: transform 0.25s ease;
     }
 
-    .memory-card.flipped {
-      background: rgba(255, 183, 197, 0.3);
+    .memory-tile.flipped {
+      background: rgba(255, 183, 197, 0.35);
       transform: rotateY(180deg);
     }
 
-    /* Minigame 2: Catch Petals */
-    #petalGameCanvas {
+    #petalDropCanvas {
       width: 100%;
-      height: 380px;
-      background: linear-gradient(to bottom, #1d1533, #0f0a1c);
-      border-radius: 14px;
+      height: 320px;
+      background: linear-gradient(to bottom, #1d1633, #0f0a1c);
+      border-radius: 12px;
       display: block;
       touch-action: none;
+      margin-top: 10px;
     }
 
-    /* Friend / User Item */
-    .user-list-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 12px;
-      margin-bottom: 8px;
-    }
-
-    .user-list-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .user-list-img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 1px solid var(--sakura-pink);
-      object-fit: cover;
-    }
-
-    /* Clickable Player Pop-up */
-    .player-popup {
-      position: absolute;
-      z-index: 50;
-      transform: translate(-50%, -100%);
-      pointer-events: auto;
-      min-width: 200px;
-      text-align: center;
-      padding: 12px;
-      display: none;
-    }
-
-    /* Notification Toasts */
-    .toast-container {
+    /* NOTIFICATION TOASTS */
+    .toast-box {
       position: fixed;
-      top: 80px;
-      right: 20px;
+      top: 70px;
+      right: 14px;
       z-index: 1000;
       display: flex;
       flex-direction: column;
@@ -703,292 +758,321 @@
       pointer-events: none;
     }
 
-    .toast {
-      background: rgba(26, 20, 42, 0.95);
+    .toast-item {
+      background: rgba(23, 17, 38, 0.95);
       border: 1px solid var(--sakura-pink);
-      padding: 10px 18px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      animation: fadeIn 0.3s ease;
+      padding: 8px 14px;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+      font-size: 0.82rem;
       font-weight: 700;
-      font-size: 0.85rem;
+      animation: fadeInMsg 0.2s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes modalSlide {
-      from { opacity: 0; transform: scale(0.92); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @media (max-width: 768px) {
-      .mobile-controls, .mobile-actions {
-        display: flex;
+    /* MOBILE WEB RESPONSIVE ADAPTATION */
+    @media (max-width: 820px) {
+      .joystick-container {
+        display: block;
       }
-      .chat-container {
-        width: 100%;
-        bottom: 96px;
-        right: 0;
-        left: 0;
-        max-width: 100%;
-        height: 280px;
-        border-radius: 20px 20px 0 0;
+      .chat-dock {
+        left: 12px;
+        right: 12px;
+        bottom: 86px;
+        width: auto;
+        max-width: none;
+        height: 220px;
       }
-      .top-hud {
-        top: 8px;
-        left: 8px;
-        right: 8px;
+      .chat-dock.collapsed {
+        transform: translateY(178px);
+      }
+      .action-controls-bar {
+        bottom: 12px;
+        right: 12px;
+      }
+      .market-layout {
+        grid-template-columns: 1fr;
+      }
+      #shopPreviewCanvas {
+        display: none;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Game Canvas -->
+  <!-- Fullscreen World Canvas -->
   <canvas id="worldCanvas"></canvas>
 
   <!-- Notification Container -->
-  <div class="toast-container" id="toastContainer"></div>
+  <div class="toast-box" id="toastContainer"></div>
 
-  <!-- Top HUD -->
+  <!-- Top HUD Bar -->
   <div class="top-hud">
-    <div class="hud-card glass">
-      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=SakuraSlime" id="hudPfp" class="hud-avatar" alt="Avatar" />
+    <div class="hud-player-card glass">
+      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Sakura" id="hudAvatarImg" class="hud-avatar" title="Click to edit profile" />
       <div class="hud-info">
-        <div class="hud-name">
-          <span id="hudUsername">Wanderer</span>
-          <span id="hudBadge"></span>
+        <div class="hud-name-row">
+          <span class="hud-display-name" id="hudDisplayName">Blossom Slime</span>
+          <span class="hud-username-tag" id="hudUsername">@player</span>
+          <span id="hudRoleBadge"></span>
         </div>
-        <div style="display: flex; gap: 6px; margin-top: 4px;">
+        <div style="display: flex; gap: 6px; margin-top: 3px;">
           <div class="points-pill"><i class="fa-solid fa-gem"></i> <span id="hudPoints">0</span></div>
-          <div class="timer-pill" id="hudTimerPill"><i class="fa-regular fa-clock"></i> <span id="rewardCountdown">20:00</span> (+1)</div>
+          <div class="timer-pill"><i class="fa-regular fa-clock"></i> <span id="hudTimer">20:00</span> (+1)</div>
         </div>
       </div>
     </div>
 
-    <div class="hud-actions">
-      <button class="btn-circle" id="btnShop" title="Marketplace"><i class="fa-solid fa-store"></i></button>
-      <button class="btn-circle" id="btnMinigames" title="Minigames"><i class="fa-solid fa-gamepad"></i></button>
-      <button class="btn-circle" id="btnFriends" title="Friends & Search"><i class="fa-solid fa-user-group"></i></button>
-      <button class="btn-circle" id="btnDevSecret" title="Developer System" style="opacity: 0.35;"><i class="fa-solid fa-code"></i></button>
-      <button class="btn-circle" id="btnSignOut" title="Sign Out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+    <div class="hud-buttons">
+      <button class="btn-circle" id="btnOpenShop" title="Marketplace"><i class="fa-solid fa-store"></i></button>
+      <button class="btn-circle" id="btnOpenGames" title="Minigames Hub"><i class="fa-solid fa-gamepad"></i></button>
+      <button class="btn-circle" id="btnOpenFriends" title="Friends & Search"><i class="fa-solid fa-user-group"></i></button>
+      <button class="btn-circle" id="btnOpenDev" title="Authority Console" style="opacity: 0.3;"><i class="fa-solid fa-key"></i></button>
+      <button class="btn-circle" id="btnExit" title="Sign Out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
     </div>
   </div>
 
-  <!-- Mobile Touch Controls -->
-  <div class="mobile-controls">
-    <div id="joystickZone">
-      <div id="joystickKnob"></div>
-    </div>
+  <!-- Dedicated Jump & Dance Action Buttons (Both PC & Mobile Ready) -->
+  <div class="action-controls-bar">
+    <button class="btn-game-action" id="btnJumpAction">
+      <i class="fa-solid fa-arrow-up"></i> JUMP <span class="action-badge-key">SPACE</span>
+    </button>
+    <button class="btn-game-action" id="btnDanceAction">
+      <i class="fa-solid fa-music"></i> DANCE <span class="action-badge-key">E</span>
+    </button>
   </div>
 
-  <div class="mobile-actions">
-    <button class="btn-action-mobile" id="btnJumpMobile"><i class="fa-solid fa-arrow-up"></i></button>
-    <button class="btn-action-mobile" id="btnDanceMobile"><i class="fa-solid fa-music"></i></button>
+  <!-- Mobile Virtual Joystick -->
+  <div class="joystick-container">
+    <div id="joystickBase">
+      <div id="joystickStick"></div>
+    </div>
   </div>
 
   <!-- Interactive Slime Target Pop-up -->
-  <div class="player-popup glass" id="playerPopup">
-    <img id="popupPfp" src="" style="width: 50px; height: 50px; border-radius: 50%; margin: 0 auto 6px; display: block; border: 2px solid var(--sakura-pink);" />
-    <h4 id="popupName" style="font-size: 0.95rem; margin-bottom: 2px;"></h4>
-    <div id="popupTitle" style="font-size: 0.75rem; color: var(--gold); margin-bottom: 10px;"></div>
+  <div class="player-popup glass" id="playerTargetPopup">
+    <img id="popupAvatar" src="" style="width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 6px; display: block; border: 2px solid var(--sakura-pink);" />
+    <h4 id="popupDisplayName" style="font-size: 0.95rem; margin-bottom: 1px;"></h4>
+    <div id="popupUsername" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;"></div>
     <div style="display: flex; gap: 6px; justify-content: center;">
-      <button class="shop-btn shop-btn-buy" id="popupAddFriendBtn"><i class="fa-solid fa-user-plus"></i> Add Friend</button>
-      <button class="shop-btn shop-btn-equip" id="popupDmBtn"><i class="fa-solid fa-comment-dots"></i> DM</button>
+      <button class="btn-item-action" id="popupBtnAddFriend" style="background: var(--sakura-pink); color: #0f0c1b;"><i class="fa-solid fa-user-plus"></i> Add Friend</button>
+      <button class="btn-item-action" id="popupBtnDirectDm" style="background: rgba(0, 240, 255, 0.2); color: var(--dev-cyan); border: 1px solid var(--dev-cyan);"><i class="fa-solid fa-comment-dots"></i> DM</button>
     </div>
   </div>
 
-  <!-- Chat Floating Box -->
-  <div class="chat-container glass" id="chatBox">
-    <div class="chat-header" id="chatHeader">
-      <div class="chat-tabs">
-        <button class="chat-tab active" id="tabGlobalChat">Global Chat</button>
-        <button class="chat-tab" id="tabDmChat">Direct DMs</button>
+  <!-- CHAT DOCK (GLOBAL & DIRECT DM SEPARATION) -->
+  <div class="chat-dock glass" id="chatDock">
+    <div class="chat-header-bar" id="chatHeaderBar">
+      <div class="chat-tab-group">
+        <button class="chat-nav-tab active" id="tabGlobalBtn">🌸 Global Chat</button>
+        <button class="chat-nav-tab" id="tabDmBtn">💬 Direct DMs</button>
       </div>
       <div>
-        <i class="fa-solid fa-chevron-down" id="chatToggleIcon"></i>
+        <i class="fa-solid fa-chevron-down" id="chatCollapseIcon"></i>
       </div>
     </div>
-    <div class="chat-messages" id="chatMessagesList"></div>
-    <div class="chat-mute-notice" id="chatMuteNotice">
-      <i class="fa-solid fa-lock"></i> You are muted! Remaining: <span id="muteTimerDisplay">00:00</span>
+
+    <!-- DM Sub-selector -->
+    <div class="dm-partner-selector" id="dmPartnerSelector">
+      <span style="font-size: 0.75rem; color: var(--text-muted);">DM With:</span>
+      <select class="dm-partner-select" id="dmSelectPartner"></select>
     </div>
-    <div class="chat-input-area">
-      <input type="text" class="chat-input" id="chatInput" placeholder="Say something in Sakura Park..." maxlength="120" />
-      <button class="chat-send-btn" id="btnSendChat"><i class="fa-solid fa-paper-plane"></i></button>
+
+    <!-- Messages Container -->
+    <div class="chat-view-container" id="chatMessagesBox"></div>
+
+    <div class="chat-dock-input-bar">
+      <input type="text" class="chat-text-input" id="chatInputField" placeholder="Chat in Sakura Park..." maxlength="120" />
+      <button class="btn-send-chat" id="btnSendChatMessage"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </div>
 
-  <!-- Modal: Auth (Sign In / Sign Up / Guest) -->
+  <!-- MODAL: AUTHENTICATION -->
   <div class="modal-overlay active" id="modalAuth">
-    <div class="modal-box glass auth-box">
-      <div class="modal-content">
-        <h2>🌸 Sakura Park</h2>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Enter the Blossom Realm as a Slime</p>
+    <div class="modal-card glass auth-box">
+      <div class="modal-body">
+        <h2 class="auth-title">🌸 Sakura Park</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px;">Join the Blossom Slime Community</p>
 
-        <div class="input-group">
-          <label><i class="fa-solid fa-user"></i> Username</label>
-          <input type="text" id="authUsername" class="input-styled" placeholder="SakuraBloom" />
+        <div class="form-group">
+          <label>Display Name (How others see you)</label>
+          <input type="text" id="authDisplayName" class="input-field" placeholder="Sakura Princess" maxlength="24" />
         </div>
 
-        <div class="input-group">
-          <label><i class="fa-solid fa-lock"></i> Password</label>
-          <input type="password" id="authPassword" class="input-styled" placeholder="••••••••" />
+        <div class="form-group">
+          <label>Username (Unique Login ID)</label>
+          <input type="text" id="authUsername" class="input-field" placeholder="sakura_bloom" maxlength="20" />
         </div>
 
-        <button class="btn-main" id="btnSignIn">Sign In</button>
-        <button class="btn-secondary" id="btnSignUp">Create New Account</button>
-        <button class="btn-secondary" id="btnGuest" style="border-style: dashed; border-color: var(--sakura-pink);">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> Play as Guest
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" class="input-field" placeholder="••••••••" />
+        </div>
+
+        <button class="btn-brand-primary" id="btnAuthSignIn">Sign In</button>
+        <button class="btn-brand-secondary" id="btnAuthSignUp">Create New Account</button>
+        <button class="btn-brand-secondary" id="btnAuthGuest" style="border-style: dashed; border-color: var(--sakura-pink);">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Play as Guest (0 Pts)
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Modal: Marketplace -->
+  <!-- MODAL: MARKETPLACE -->
   <div class="modal-overlay" id="modalShop">
-    <div class="modal-box glass" style="width: 720px;">
+    <div class="modal-card glass" style="width: 740px;">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-store"></i> Sakura Marketplace</h3>
-        <i class="fa-solid fa-xmark modal-close" data-close="modalShop"></i>
+        <h3><i class="fa-solid fa-store"></i> Blossom Marketplace</h3>
+        <i class="fa-solid fa-xmark modal-close-icon" data-modal="modalShop"></i>
       </div>
-      <div class="modal-content">
-        <div class="shop-tabs">
-          <button class="shop-tab-btn active" data-shoptab="accessories">Accessories</button>
-          <button class="shop-tab-btn" data-shoptab="skins">Skins</button>
-          <button class="shop-tab-btn" data-shoptab="titles">Titles</button>
-        </div>
-        <div class="shop-grid" id="shopGridContainer"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal: Minigames Hub -->
-  <div class="modal-overlay" id="modalMinigames">
-    <div class="modal-box glass" style="width: 580px;">
-      <div class="modal-header">
-        <h3><i class="fa-solid fa-gamepad"></i> Blossom Minigames</h3>
-        <i class="fa-solid fa-xmark modal-close" data-close="modalMinigames"></i>
-      </div>
-      <div class="modal-content">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-          <!-- Game 1 -->
-          <div class="shop-card" style="padding: 16px;">
-            <div style="font-size: 2.8rem; margin-bottom: 8px;">🧠</div>
-            <h4 style="font-size: 1.1rem; margin-bottom: 6px;">Slime Memory</h4>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Flip cards to match the sakura pairs. Win: +3 Points!</p>
-            <button class="btn-main" id="btnPlayMemory">Play Game</button>
+      <div class="modal-body">
+        <div class="market-layout">
+          <!-- Live Slime Dressing Room Preview -->
+          <div class="market-preview-box">
+            <h4 style="font-size: 0.82rem; margin-bottom: 8px; color: var(--sakura-pink);">Live Slime Preview</h4>
+            <canvas id="shopPreviewCanvas" width="160" height="160"></canvas>
+            <div id="previewItemName" style="font-weight: 800; font-size: 0.85rem;">Currently Wearing</div>
+            <div id="previewItemCost" style="font-size: 0.75rem; color: var(--gold);">Sakura Edition</div>
           </div>
-          <!-- Game 2 -->
-          <div class="shop-card" style="padding: 16px;">
-            <div style="font-size: 2.8rem; margin-bottom: 8px;">🌸</div>
-            <h4 style="font-size: 1.1rem; margin-bottom: 6px;">Catch Petals</h4>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">50 petals fall in 30 seconds! Every 10 petals caught = +1 Pt!</p>
-            <button class="btn-main" id="btnPlayPetals">Play Game</button>
-          </div>
-        </div>
 
-        <!-- Memory Area -->
-        <div id="memoryGameArea" style="display: none; margin-top: 20px;">
-          <h4 style="text-align: center; margin-bottom: 10px; color: var(--sakura-pink);">Match All Blossom Pairs</h4>
-          <div class="memory-grid" id="memoryGrid"></div>
-        </div>
-
-        <!-- Petals Area -->
-        <div id="petalsGameArea" style="display: none; margin-top: 20px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 800;">
-            <span>Time Left: <span id="petalTimer" style="color: var(--sakura-pink);">30</span>s</span>
-            <span>Caught: <span id="petalScore" style="color: var(--gold);">0</span> / 50</span>
+          <!-- Items Grid & Category Tabs -->
+          <div>
+            <div class="shop-nav-tabs">
+              <button class="shop-category-btn active" data-cat="accessories">Accessories (>500 Pts)</button>
+              <button class="shop-category-btn" data-cat="skins">Skins</button>
+              <button class="shop-category-btn" data-cat="titles">Titles</button>
+            </div>
+            <div class="market-grid" id="marketGridItems"></div>
           </div>
-          <canvas id="petalGameCanvas" width="500" height="340"></canvas>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal: Friends & Player Search -->
+  <!-- MODAL: MINIGAMES -->
+  <div class="modal-overlay" id="modalGames">
+    <div class="modal-card glass" style="width: 580px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-gamepad"></i> Blossom Arcade</h3>
+        <i class="fa-solid fa-xmark modal-close-icon" data-modal="modalGames"></i>
+      </div>
+      <div class="modal-body">
+        <div class="minigame-card-deck">
+          <div class="market-item-card" style="padding: 16px;">
+            <div style="font-size: 2.6rem;">🧠</div>
+            <h4 style="font-size: 1rem; margin: 6px 0;">Slime Memory</h4>
+            <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 10px;">Flip & match the blossom tiles. Win: +3 Points!</p>
+            <button class="btn-brand-primary" id="btnLaunchMemoryGame">Play Memory</button>
+          </div>
+          <div class="market-item-card" style="padding: 16px;">
+            <div style="font-size: 2.6rem;">🌸</div>
+            <h4 style="font-size: 1rem; margin: 6px 0;">Catch Petals</h4>
+            <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 10px;">50 petals fall in 30s. Catch 10 for each +1 Pt!</p>
+            <button class="btn-brand-primary" id="btnLaunchPetalGame">Catch Petals</button>
+          </div>
+        </div>
+
+        <!-- Slime Memory Board Area -->
+        <div id="memoryGameArea" style="display: none; margin-top: 14px;">
+          <h4 style="text-align: center; color: var(--sakura-pink); font-size: 0.9rem;">Match All Sakura Pairs!</h4>
+          <div class="memory-board" id="memoryGameBoard"></div>
+        </div>
+
+        <!-- Catch Petals Area -->
+        <div id="petalGameArea" style="display: none; margin-top: 14px;">
+          <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.85rem;">
+            <span>Time: <span id="petalGameTimer" style="color: var(--sakura-pink);">30</span>s</span>
+            <span>Caught: <span id="petalGameScore" style="color: var(--gold);">0</span> / 50</span>
+          </div>
+          <canvas id="petalDropCanvas" width="480" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FRIENDS & SEARCH BY DISPLAY NAME -->
   <div class="modal-overlay" id="modalFriends">
-    <div class="modal-box glass">
+    <div class="modal-card glass">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-user-group"></i> Friends & Player Search</h3>
-        <i class="fa-solid fa-xmark modal-close" data-close="modalFriends"></i>
+        <h3><i class="fa-solid fa-user-group"></i> Community Directory</h3>
+        <i class="fa-solid fa-xmark modal-close-icon" data-modal="modalFriends"></i>
       </div>
-      <div class="modal-content">
-        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-          <input type="text" id="friendSearchInput" class="input-styled" placeholder="Search player by username..." />
-          <button class="btn-main" id="btnSearchPlayer" style="width: 100px; margin-top: 0;"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+      <div class="modal-body">
+        <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+          <input type="text" id="inputSearchDisplayName" class="input-field" placeholder="Search player by Display Name..." />
+          <button class="btn-brand-primary" id="btnPerformSearch" style="width: 100px; margin-top: 0;"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
         </div>
 
-        <div id="searchResultsArea" style="margin-bottom: 20px; display: none;">
-          <h4 style="font-size: 0.85rem; color: var(--sakura-pink); margin-bottom: 8px;">Search Result:</h4>
-          <div id="searchResultCard"></div>
+        <div id="directorySearchResults" style="display: none; margin-bottom: 16px;">
+          <h4 style="font-size: 0.82rem; color: var(--sakura-pink); margin-bottom: 6px;">Search Results:</h4>
+          <div id="directoryResultsList"></div>
         </div>
 
-        <h4 style="font-size: 0.85rem; color: var(--sakura-pink); margin-bottom: 8px;">My Friends:</h4>
-        <div id="friendsListContainer">
-          <p style="font-size: 0.85rem; color: var(--text-muted);">No friends added yet. Click on any slime in park or search by username to add!</p>
-        </div>
+        <h4 style="font-size: 0.82rem; color: var(--sakura-pink); margin-bottom: 6px;">My Friends:</h4>
+        <div id="friendsListDisplay"></div>
 
-        <div style="margin-top: 20px; border-top: 1px solid var(--panel-border); padding-top: 14px;">
-          <h4 style="font-size: 0.85rem; margin-bottom: 8px;">Update Profile Picture:</h4>
-          <input type="file" id="pfpUploadInput" accept="image/*" class="input-styled" />
+        <div style="margin-top: 18px; border-top: 1px solid var(--panel-border); padding-top: 12px;">
+          <h4 style="font-size: 0.82rem; margin-bottom: 6px;">Edit Profile:</h4>
+          <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <input type="text" id="inputUpdateDisplayName" class="input-field" placeholder="Update Display Name" />
+            <button class="btn-brand-primary" id="btnSaveDisplayName" style="width: 90px; margin-top: 0;">Save</button>
+          </div>
+          <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Upload Profile Picture</label>
+          <input type="file" id="inputFilePfp" accept="image/*" class="input-field" />
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal: Developer & Admin Command Center -->
+  <!-- MODAL: DEVELOPER & ADMIN AUTHORITY SYSTEM -->
   <div class="modal-overlay" id="modalDevAdmin">
-    <div class="modal-box glass" style="width: 640px;">
+    <div class="modal-card glass" style="width: 620px;">
       <div class="modal-header">
-        <h3 id="devAdminModalTitle"><i class="fa-solid fa-shield-halved"></i> Dev / Admin Center</h3>
-        <i class="fa-solid fa-xmark modal-close" data-close="modalDevAdmin"></i>
+        <h3 id="devAdminTitle"><i class="fa-solid fa-shield-halved"></i> Authority Panel</h3>
+        <i class="fa-solid fa-xmark modal-close-icon" data-modal="modalDevAdmin"></i>
       </div>
-      <div class="modal-content">
-        <!-- Dev Mode Toggle (Dev Only) -->
-        <div id="devToggleSection" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0, 240, 255, 0.08); border: 1px solid var(--dev-cyan); border-radius: 12px; margin-bottom: 16px;">
+      <div class="modal-body">
+        <!-- Pure White Dev Mode Toggle (Dev Only) -->
+        <div id="devModeToggleCard" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0, 240, 255, 0.08); border: 1px solid var(--dev-cyan); border-radius: 12px; margin-bottom: 14px;">
           <div>
             <div style="font-weight: 800; color: var(--dev-cyan);">Pure White Dev Mode</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">Makes slime glowing pure white & gives DEV overhead title</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Pure white glowing slime & DEV overhead title</div>
           </div>
-          <button class="shop-btn shop-btn-equip" id="btnToggleDevMode" style="width: 120px;">Toggle</button>
+          <button class="btn-brand-primary" id="btnToggleDevMode" style="width: 100px; margin-top: 0; background: var(--dev-cyan); color: #000;">Toggle</button>
         </div>
 
         <!-- Dev Only: Grant Points Direct -->
-        <div id="devPointSection" style="padding: 12px; background: rgba(255, 209, 102, 0.08); border: 1px solid var(--gold); border-radius: 12px; margin-bottom: 16px;">
-          <h4 style="color: var(--gold); font-size: 0.9rem; margin-bottom: 8px;"><i class="fa-solid fa-coins"></i> Send Blossom Points (Dev Exclusive)</h4>
-          <div style="display: flex; gap: 8px;">
-            <input type="text" id="devPointsTargetUser" class="input-styled" placeholder="Username" />
-            <input type="number" id="devPointsAmount" class="input-styled" placeholder="Amount" style="width: 110px;" />
-            <button class="btn-main" id="btnDevSendPoints" style="width: 120px; margin-top: 0;">Send</button>
+        <div id="devPointGrantCard" style="padding: 12px; background: rgba(255, 209, 102, 0.08); border: 1px solid var(--gold); border-radius: 12px; margin-bottom: 14px;">
+          <h4 style="color: var(--gold); font-size: 0.88rem; margin-bottom: 6px;"><i class="fa-solid fa-coins"></i> Send Blossom Points (Dev Exclusive)</h4>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="inputGrantTarget" class="input-field" placeholder="Username" />
+            <input type="number" id="inputGrantAmount" class="input-field" placeholder="Points" style="width: 100px;" />
+            <button class="btn-brand-primary" id="btnGrantPoints" style="width: 90px; margin-top: 0;">Send</button>
           </div>
         </div>
 
-        <!-- Dev Only: Assign / Revoke Admin -->
-        <div id="devRoleSection" style="padding: 12px; background: rgba(255, 51, 102, 0.08); border: 1px solid var(--admin-red); border-radius: 12px; margin-bottom: 16px;">
-          <h4 style="color: var(--admin-red); font-size: 0.9rem; margin-bottom: 8px;"><i class="fa-solid fa-user-shield"></i> Assign / Revoke Admin</h4>
-          <div style="display: flex; gap: 8px;">
-            <input type="text" id="adminRoleTargetUser" class="input-styled" placeholder="Target Username" />
-            <button class="shop-btn shop-btn-buy" id="btnAssignAdmin" style="width: 110px;">Promote</button>
-            <button class="shop-btn" id="btnRevokeAdmin" style="background: rgba(255,255,255,0.1); width: 110px;">Revoke</button>
+        <!-- Dev Only: Assign/Revoke Admin -->
+        <div id="devAdminRoleCard" style="padding: 12px; background: rgba(255, 51, 102, 0.08); border: 1px solid var(--admin-red); border-radius: 12px; margin-bottom: 14px;">
+          <h4 style="color: var(--admin-red); font-size: 0.88rem; margin-bottom: 6px;"><i class="fa-solid fa-user-shield"></i> Admin Promotion & Demotion</h4>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="inputAdminTarget" class="input-field" placeholder="Username" />
+            <button class="btn-brand-primary" id="btnPromoteAdmin" style="width: 100px; margin-top: 0;">Promote</button>
+            <button class="btn-brand-secondary" id="btnRevokeAdmin" style="width: 100px; margin-top: 0;">Revoke</button>
           </div>
         </div>
 
-        <!-- Moderation: Mute, Ban, Delete -->
+        <!-- Moderation: Mute, Ban, Delete Account -->
         <div style="padding: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--panel-border); border-radius: 12px;">
-          <h4 style="font-size: 0.9rem; margin-bottom: 8px;"><i class="fa-solid fa-gavel"></i> Player Moderation</h4>
-          <div class="input-group">
+          <h4 style="font-size: 0.88rem; margin-bottom: 6px;"><i class="fa-solid fa-gavel"></i> Player Moderation</h4>
+          <div class="form-group">
             <label>Target Username</label>
-            <input type="text" id="modTargetUser" class="input-styled" placeholder="Username" />
+            <input type="text" id="inputModTarget" class="input-field" placeholder="Username" />
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
             <div>
-              <label style="font-size: 0.75rem; color: var(--text-muted);">Mute Duration</label>
-              <select id="modMuteDuration" class="input-styled" style="padding: 8px;">
+              <label style="font-size: 0.72rem; color: var(--text-muted);">Chat Mute Duration</label>
+              <select id="selectMuteDuration" class="input-field" style="padding: 6px;">
                 <option value="10">10 Minutes</option>
                 <option value="20">20 Minutes</option>
                 <option value="30">30 Minutes</option>
@@ -996,178 +1080,187 @@
               </select>
             </div>
             <div style="display: flex; align-items: flex-end;">
-              <button class="btn-main" id="btnApplyMute" style="margin-top: 0; background: #ffaa00; color: #000;">Mute Chat</button>
+              <button class="btn-brand-primary" id="btnApplyMute" style="margin-top: 0; background: #ffaa00; color: #000;">Mute Player</button>
             </div>
           </div>
 
-          <div style="display: flex; gap: 8px;">
-            <button class="shop-btn" id="btnBanUser" style="background: var(--admin-red); color: #fff;">Ban Login</button>
-            <button class="shop-btn" id="btnUnbanUser" style="background: #20bf6b; color: #fff;">Unban</button>
-            <button class="shop-btn" id="btnDeleteUser" style="background: #8b0000; color: #fff;">Delete Account</button>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn-item-action" id="btnBanPlayer" style="background: var(--admin-red); color: #fff;">Ban Login</button>
+            <button class="btn-item-action" id="btnUnbanPlayer" style="background: #20bf6b; color: #fff;">Unban</button>
+            <button class="btn-item-action" id="btnDeletePlayer" style="background: #8b0000; color: #fff;">Delete Account</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- APPLICATION LOGIC & ENGINE -->
+  <!-- JAVASCRIPT MMO CORE LOGIC -->
   <script>
-    // --- 1. SUPABASE CLIENT CONFIGURATION ---
+    // --- 1. SUPABASE CONFIGURATION ---
     const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- 2. GAME STATE & PROFILES ---
-    let currentUser = null;
-    let isDevActive = false;
-    let selectedChatTab = 'global';
-    let targetDmUser = null;
-    let mutedUntil = 0;
-    let rewardTimerSeconds = 20 * 60; // 20 minutes countdown
-    let otherPlayers = new Map();
-    let speechBubbles = [];
+    // --- 2. VIRTUAL WORLD COMMUNITY GEOMETRY ---
+    // Fixed world size (2400 x 1600). Everyone spawns in the exact same plaza community spot!
+    const WORLD_W = 2400;
+    const WORLD_H = 1600;
+    const SPAWN_X = 1200;
+    const SPAWN_Y = 800;
 
-    // Local Storage database fallback to guarantee 100% functionality even on fresh tables
-    const DB = {
-      getUsers: () => JSON.parse(localStorage.getItem('sakura_users') || '{}'),
-      saveUsers: (u) => localStorage.setItem('sakura_users', JSON.stringify(u)),
-      getBanned: () => JSON.parse(localStorage.getItem('sakura_banned') || '[]'),
-      saveBanned: (b) => localStorage.setItem('sakura_banned', JSON.stringify(b)),
-      getAdmins: () => JSON.parse(localStorage.getItem('sakura_admins') || '[]'),
-      saveAdmins: (a) => localStorage.setItem('sakura_admins', JSON.stringify(a))
+    // --- 3. STATE & DATA ---
+    let currentUser = null;
+    let isDevModeActive = false;
+    let currentChatTab = 'global'; // 'global' or 'dm'
+    let currentDmPartner = '';
+    let globalChatLog = [];
+    let dmConversations = {}; // { [partner]: [messages] }
+    let chatMutedUntil = 0;
+    let passiveTimerSeconds = 20 * 60;
+    let otherPlayers = new Map();
+    let floatingBubbles = [];
+
+    // Local Storage Store
+    const Storage = {
+      getUsers: () => JSON.parse(localStorage.getItem('sakura_users_v2') || '{}'),
+      saveUsers: (u) => localStorage.setItem('sakura_users_v2', JSON.stringify(u)),
+      getBanned: () => JSON.parse(localStorage.getItem('sakura_banned_v2') || '[]'),
+      saveBanned: (b) => localStorage.setItem('sakura_banned_v2', JSON.stringify(b)),
+      getAdmins: () => JSON.parse(localStorage.getItem('sakura_admins_v2') || '[]'),
+      saveAdmins: (a) => localStorage.setItem('sakura_admins_v2', JSON.stringify(a))
     };
 
-    // Default Marketplace Data (Accessories priced > 500 points)
-    const MARKET_ITEMS = {
+    // Marketplace Inventory Data (All accessories cost > 500, escalating)
+    const SHOP_CATALOG = {
       accessories: [
-        { id: 'acc_sakura_crown', name: 'Sakura Crown', price: 650, icon: '🌸' },
-        { id: 'acc_golden_halo', name: 'Golden Halo', price: 1200, icon: '✨' },
-        { id: 'acc_wizard_hat', name: 'Wizard Hat', price: 2200, icon: '🧙' },
-        { id: 'acc_cat_ears', name: 'Neko Ears', price: 3500, icon: '🐱' },
-        { id: 'acc_samurai_ribbon', name: 'Samurai Ribbon', price: 5000, icon: '🎀' },
-        { id: 'acc_cyber_visor', name: 'Cyber Visor', price: 8000, icon: '🕶️' }
+        { id: 'acc_flower_pin', name: 'Sakura Pin', price: 550, icon: '🌸' },
+        { id: 'acc_cat_ears', name: 'Neko Ears', price: 950, icon: '🐱' },
+        { id: 'acc_angel_halo', name: 'Angel Halo', price: 1600, icon: '✨' },
+        { id: 'acc_samurai_ribbon', name: 'Kabuto Ribbon', price: 2600, icon: '🎀' },
+        { id: 'acc_kitsune_mask', name: 'Kitsune Mask', price: 4200, icon: '🦊' },
+        { id: 'acc_wizard_hat', name: 'Starlight Hat', price: 6800, icon: '🧙' },
+        { id: 'acc_cyber_visor', name: 'Cyber Visor', price: 11000, icon: '🕶️' },
+        { id: 'acc_dragon_horns', name: 'Dragon Horns', price: 18000, icon: '🐉' }
       ],
       skins: [
-        { id: 'skin_sakura', name: 'Blossom Pink', price: 0, color: '#ff94b8', locked: false },
-        { id: 'skin_matcha', name: 'Matcha Green', price: 600, color: '#55efc4', locked: false },
-        { id: 'skin_ocean', name: 'Ocean Cyan', price: 1500, color: '#00cec9', locked: false },
-        { id: 'skin_amber', name: 'Molten Gold', price: 3200, color: '#fdcb6e', locked: false },
-        { id: 'skin_prismatic', name: 'Rainbow Aura', price: 6500, color: 'rainbow', locked: false },
-        { id: 'skin_admin_black', name: 'Void Black', price: 999999, color: '#100f14', locked: true, adminOnly: true }
+        { id: 'skin_blossom', name: 'Blossom Pink', price: 0, color: '#ff94b8' },
+        { id: 'skin_matcha', name: 'Matcha Green', price: 600, color: '#55efc4' },
+        { id: 'skin_lavender', name: 'Zen Lavender', price: 1300, color: '#a29bfe' },
+        { id: 'skin_ocean', name: 'Ocean Cyan', price: 2800, color: '#00cec9' },
+        { id: 'skin_amber', name: 'Sunset Amber', price: 5200, color: '#fdcb6e' },
+        { id: 'skin_prismatic', name: 'Rainbow Prismatic', price: 9500, color: 'rainbow' },
+        { id: 'skin_admin_black', name: 'Void Black', price: 999999, color: '#100f14', adminOnly: true }
       ],
       titles: [
-        { id: 'title_wanderer', name: 'Park Stroller', price: 500, tag: 'WANDERER' },
-        { id: 'title_whisperer', name: 'Petal Whisperer', price: 1100, tag: 'WHISPERER' },
-        { id: 'title_royalty', name: 'Slime Royalty', price: 2600, tag: 'ROYALTY' },
-        { id: 'title_admin', name: 'RED ADMIN', price: 999999, tag: 'ADMIN', adminOnly: true }
+        { id: 'title_novice', name: '🌸 Sakura Novice', price: 500, tag: 'NOVICE' },
+        { id: 'title_dancer', name: '🍃 Petal Dancer', price: 1200, tag: 'DANCER' },
+        { id: 'title_sage', name: '🌙 Moonlight Sage', price: 2800, tag: 'SAGE' },
+        { id: 'title_monarch', name: '👑 Slime Monarch', price: 7000, tag: 'MONARCH' },
+        { id: 'title_admin', name: '🛡️ RED ADMIN', price: 999999, tag: 'ADMIN', adminOnly: true }
       ]
     };
 
-    // --- 3. TOAST MESSAGES ---
-    function showToast(msg, duration = 3000) {
+    // Notification Toast Helper
+    function showToast(text, duration = 3000) {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.innerHTML = msg;
+      toast.className = 'toast-item';
+      toast.innerHTML = text;
       container.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
+        setTimeout(() => toast.remove(), 250);
       }, duration);
     }
 
-    // --- 4. AUTHENTICATION CONTROLLER ---
-    const authModal = document.getElementById('modalAuth');
-    const authUsernameInput = document.getElementById('authUsername');
-    const authPasswordInput = document.getElementById('authPassword');
-
-    function createDefaultProfile(username, isGuest = false) {
+    // --- 4. AUTHENTICATION & ZERO STARTING POINTS ---
+    function makeNewPlayer(displayName, username, isGuest = false) {
       return {
         id: 'u_' + Math.random().toString(36).substring(2, 9),
+        displayName: displayName || username,
         username: username,
-        points: 600, // starter points for fun
-        skin: 'skin_sakura',
+        points: 0, // Starts strictly at zero points as requested!
+        skin: 'skin_blossom',
         accessory: null,
-        title: 'Park Stroller',
+        title: 'NOVICE',
         pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`,
         friends: [],
-        inventory: ['skin_sakura', 'title_wanderer'],
+        inventory: ['skin_blossom', 'title_novice'],
         isGuest: isGuest,
         role: 'user'
       };
     }
 
-    function checkBanned(username) {
-      const bans = DB.getBanned();
-      return bans.includes(username.toLowerCase());
-    }
+    document.getElementById('btnAuthSignIn').addEventListener('click', () => {
+      const u = document.getElementById('authUsername').value.trim().toLowerCase();
+      const p = document.getElementById('authPassword').value.trim();
+      if (!u || !p) return showToast('Please enter both username and password!');
+      if (Storage.getBanned().includes(u)) return alert('This account has been banned.');
 
-    document.getElementById('btnSignIn').addEventListener('click', () => {
-      const username = authUsernameInput.value.trim();
-      const password = authPasswordInput.value.trim();
-      if (!username || !password) return showToast('Please enter username & password!');
-      if (checkBanned(username)) return alert('This account has been banned from Sakura Park!');
-
-      const users = DB.getUsers();
-      if (users[username.toLowerCase()]) {
-        currentUser = users[username.toLowerCase()];
-        onLoginSuccess();
+      const users = Storage.getUsers();
+      if (users[u]) {
+        currentUser = users[u];
+        loginFinished();
       } else {
-        // Try Supabase Auth or fallback to register
-        currentUser = createDefaultProfile(username);
-        users[username.toLowerCase()] = currentUser;
-        DB.saveUsers(users);
-        onLoginSuccess();
+        const d = document.getElementById('authDisplayName').value.trim() || u;
+        currentUser = makeNewPlayer(d, u);
+        users[u] = currentUser;
+        Storage.saveUsers(users);
+        loginFinished();
       }
     });
 
-    document.getElementById('btnSignUp').addEventListener('click', () => {
-      const username = authUsernameInput.value.trim();
-      const password = authPasswordInput.value.trim();
-      if (!username || !password) return showToast('Please enter username & password!');
-      const users = DB.getUsers();
-      if (users[username.toLowerCase()]) return showToast('Username already taken!');
+    document.getElementById('btnAuthSignUp').addEventListener('click', () => {
+      const d = document.getElementById('authDisplayName').value.trim();
+      const u = document.getElementById('authUsername').value.trim().toLowerCase();
+      const p = document.getElementById('authPassword').value.trim();
+      if (!u || !p) return showToast('Please enter both username and password!');
+      const users = Storage.getUsers();
+      if (users[u]) return showToast('Username is already registered!');
 
-      currentUser = createDefaultProfile(username);
-      users[username.toLowerCase()] = currentUser;
-      DB.saveUsers(users);
-      onLoginSuccess();
+      currentUser = makeNewPlayer(d || u, u);
+      users[u] = currentUser;
+      Storage.saveUsers(users);
+      loginFinished();
     });
 
-    document.getElementById('btnGuest').addEventListener('click', () => {
-      const guestName = 'Guest_' + Math.floor(1000 + Math.random() * 9000);
-      currentUser = createDefaultProfile(guestName, true);
-      onLoginSuccess();
+    document.getElementById('btnAuthGuest').addEventListener('click', () => {
+      const r = Math.floor(1000 + Math.random() * 9000);
+      currentUser = makeNewPlayer(`Guest Slime ${r}`, `guest_${r}`, true);
+      loginFinished();
     });
 
-    document.getElementById('btnSignOut').addEventListener('click', () => {
-      location.reload();
-    });
+    document.getElementById('btnExit').addEventListener('click', () => location.reload());
 
-    function onLoginSuccess() {
-      // Sync Admin Role
-      const admins = DB.getAdmins();
-      if (admins.includes(currentUser.username.toLowerCase())) {
+    function loginFinished() {
+      // Sync Admin Privileges
+      if (Storage.getAdmins().includes(currentUser.username)) {
         currentUser.role = 'admin';
       }
 
-      authModal.classList.remove('active');
-      showToast(`🌸 Welcome to Sakura Park, <b>${currentUser.username}</b>!`);
-      updateHud();
-      initSupabasePresence();
-      initMockPlayers();
-      startRewardTimer();
+      document.getElementById('modalAuth').classList.remove('active');
+      showToast(`🌸 Welcome to Sakura Park, <b>${currentUser.displayName}</b>!`);
+
+      // Spawn in central community plaza with slight random jitter
+      mySlime.x = SPAWN_X + (Math.random() - 0.5) * 80;
+      mySlime.y = SPAWN_Y + (Math.random() - 0.5) * 80;
+
+      updatePlayerHUD();
+      initRealtimeNetwork();
+      initCommunityDemoPlayers();
+      startRewardCountdown();
+      initShopDressingRoom();
     }
 
-    // --- 5. TOP HUD & INVENTORY UI ---
-    function updateHud() {
+    function updatePlayerHUD() {
       if (!currentUser) return;
-      document.getElementById('hudUsername').innerText = currentUser.username;
-      document.getElementById('hudPfp').src = currentUser.pfp;
+      document.getElementById('hudDisplayName').innerText = currentUser.displayName;
+      document.getElementById('hudUsername').innerText = `@${currentUser.username}`;
+      document.getElementById('hudAvatarImg').src = currentUser.pfp;
       document.getElementById('hudPoints').innerText = currentUser.points;
 
-      const badge = document.getElementById('hudBadge');
-      if (isDevActive) {
+      const badge = document.getElementById('hudRoleBadge');
+      if (isDevModeActive) {
         badge.className = 'badge-tag badge-dev';
         badge.innerText = 'DEV';
       } else if (currentUser.role === 'admin') {
@@ -1179,8 +1272,8 @@
         badge.innerText = currentUser.title || '';
       }
 
-      // Auto skin enforcement for Admin / Dev
-      if (isDevActive) {
+      // Enforce Admin / Dev Outfits
+      if (isDevModeActive) {
         mySlime.skin = 'dev_pure_white';
       } else if (currentUser.role === 'admin') {
         mySlime.skin = 'skin_admin_black';
@@ -1189,217 +1282,272 @@
       }
       mySlime.accessory = currentUser.accessory;
 
-      // Save to DB
+      // Persist
       if (!currentUser.isGuest) {
-        const users = DB.getUsers();
-        users[currentUser.username.toLowerCase()] = currentUser;
-        DB.saveUsers(users);
+        const users = Storage.getUsers();
+        users[currentUser.username] = currentUser;
+        Storage.saveUsers(users);
       }
     }
 
-    // Passive 20 Minute Reward Timer
-    function startRewardTimer() {
+    // Passive 20 Min timer (+1 Point)
+    function startRewardCountdown() {
       setInterval(() => {
-        if (rewardTimerSeconds > 0) {
-          rewardTimerSeconds--;
+        if (passiveTimerSeconds > 0) {
+          passiveTimerSeconds--;
         } else {
-          rewardTimerSeconds = 20 * 60; // reset
+          passiveTimerSeconds = 20 * 60;
           currentUser.points += 1;
-          updateHud();
-          showToast(`✨ You earned <b>+1 Blossom Point</b> for exploring the park!`);
+          updatePlayerHUD();
+          showToast('✨ <b>+1 Blossom Point</b> earned for staying in Sakura Park!');
         }
-        const m = Math.floor(rewardTimerSeconds / 60).toString().padStart(2, '0');
-        const s = (rewardTimerSeconds % 60).toString().padStart(2, '0');
-        document.getElementById('rewardCountdown').innerText = `${m}:${s}`;
+        const m = Math.floor(passiveTimerSeconds / 60).toString().padStart(2, '0');
+        const s = (passiveTimerSeconds % 60).toString().padStart(2, '0');
+        document.getElementById('hudTimer').innerText = `${m}:${s}`;
       }, 1000);
     }
 
-    // --- 6. CANVAS WORLD & SLIME GRAPHICS ENGINE ---
+    // --- 5. GRAPHICS ENGINE & CAMERA ---
     const canvas = document.getElementById('worldCanvas');
     const ctx = canvas.getContext('2d');
-    let width, height;
+    let viewW, viewH;
 
-    function resizeCanvas() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width * window.devicePixelRatio;
-      canvas.height = height * window.devicePixelRatio;
+    function resizeViewport() {
+      viewW = window.innerWidth;
+      viewH = window.innerHeight;
+      canvas.width = viewW * window.devicePixelRatio;
+      canvas.height = viewH * window.devicePixelRatio;
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    window.addEventListener('resize', resizeViewport);
+    resizeViewport();
 
-    // Floating Petals Background System
-    const ambientPetals = [];
-    for (let i = 0; i < 60; i++) {
-      ambientPetals.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        size: 5 + Math.random() * 8,
-        speedX: 0.8 + Math.random() * 1.5,
-        speedY: 1 + Math.random() * 1.8,
-        angle: Math.random() * Math.PI * 2,
-        angularSpeed: 0.02 + Math.random() * 0.03
-      });
-    }
+    // Camera Object
+    const camera = { x: SPAWN_X, y: SPAWN_Y };
 
     // Player Slime Entity
     const mySlime = {
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      vx: 0,
-      vy: 0,
-      speed: 4.2,
+      x: SPAWN_X,
+      y: SPAWN_Y,
+      speed: 4.5,
       radius: 28,
       jumpOffset: 0,
       jumpVelocity: 0,
       isJumping: false,
       isDancing: false,
-      danceAngle: 0,
+      danceTimer: 0,
       squash: 1,
-      skin: 'skin_sakura',
+      skin: 'skin_blossom',
       accessory: null
     };
 
-    // Keyboard & Joystick Inputs
-    const keys = {};
+    // Ambient Blossom Wind Petals
+    const ambientPetals = [];
+    for (let i = 0; i < 90; i++) {
+      ambientPetals.push({
+        x: Math.random() * WORLD_W,
+        y: Math.random() * WORLD_H,
+        size: 5 + Math.random() * 8,
+        vx: 1.2 + Math.random() * 1.5,
+        vy: 0.8 + Math.random() * 1.5,
+        rot: Math.random() * Math.PI,
+        vrot: 0.02 + Math.random() * 0.03
+      });
+    }
+
+    // --- 6. CONTROLS: SPACE JUMP, E DANCE & TOUCH JOYSTICK ---
+    const keyState = {};
     window.addEventListener('keydown', (e) => {
-      keys[e.key.toLowerCase()] = true;
-      if (e.code === 'Space') doJump();
-      if (e.key.toLowerCase() === 'e') doDance();
-    });
-    window.addEventListener('keyup', (e) => {
-      keys[e.key.toLowerCase()] = false;
+      keyState[e.key.toLowerCase()] = true;
+
+      // Spacebar Jump without page scrolling
+      if (e.code === 'Space') {
+        e.preventDefault();
+        triggerJump();
+      }
+      // E key Dance
+      if (e.key.toLowerCase() === 'e') {
+        triggerDance();
+      }
     });
 
-    function doJump() {
+    window.addEventListener('keyup', (e) => {
+      keyState[e.key.toLowerCase()] = false;
+    });
+
+    function triggerJump() {
       if (!mySlime.isJumping) {
         mySlime.isJumping = true;
         mySlime.jumpVelocity = -10.5;
       }
     }
 
-    function doDance() {
+    function triggerDance() {
       mySlime.isDancing = !mySlime.isDancing;
       if (mySlime.isDancing) {
-        showToast('🎵 Slime is grooving!');
+        showToast('🎵 Slime is dancing to the sakura breeze!');
       }
     }
 
-    document.getElementById('btnJumpMobile').addEventListener('click', doJump);
-    document.getElementById('btnDanceMobile').addEventListener('click', doDance);
+    document.getElementById('btnJumpAction').addEventListener('click', triggerJump);
+    document.getElementById('btnDanceAction').addEventListener('click', triggerDance);
 
     // Virtual Touch Joystick Implementation
-    const joystickZone = document.getElementById('joystickZone');
-    const joystickKnob = document.getElementById('joystickKnob');
-    let joystickActive = false;
-    let joystickVector = { x: 0, y: 0 };
-    let joyStart = { x: 0, y: 0 };
+    const joystickBase = document.getElementById('joystickBase');
+    const joystickStick = document.getElementById('joystickStick');
+    let isJoyActive = false;
+    let joyDelta = { x: 0, y: 0 };
+    let joyOrigin = { x: 0, y: 0 };
 
-    joystickZone.addEventListener('pointerdown', (e) => {
-      joystickActive = true;
-      const rect = joystickZone.getBoundingClientRect();
-      joyStart = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-      moveKnob(e.clientX, e.clientY);
+    joystickBase.addEventListener('pointerdown', (e) => {
+      isJoyActive = true;
+      const rect = joystickBase.getBoundingClientRect();
+      joyOrigin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      updateJoyKnob(e.clientX, e.clientY);
     });
+
     window.addEventListener('pointermove', (e) => {
-      if (!joystickActive) return;
-      moveKnob(e.clientX, e.clientY);
-    });
-    window.addEventListener('pointerup', () => {
-      joystickActive = false;
-      joystickVector = { x: 0, y: 0 };
-      joystickKnob.style.transform = `translate(0px, 0px)`;
+      if (!isJoyActive) return;
+      updateJoyKnob(e.clientX, e.clientY);
     });
 
-    function moveKnob(clientX, clientY) {
-      const dx = clientX - joyStart.x;
-      const dy = clientY - joyStart.y;
-      const dist = Math.min(45, Math.hypot(dx, dy));
+    window.addEventListener('pointerup', () => {
+      isJoyActive = false;
+      joyDelta = { x: 0, y: 0 };
+      joystickStick.style.transform = `translate(0px, 0px)`;
+    });
+
+    function updateJoyKnob(cx, cy) {
+      const dx = cx - joyOrigin.x;
+      const dy = cy - joyOrigin.y;
+      const dist = Math.min(38, Math.hypot(dx, dy));
       const angle = Math.atan2(dy, dx);
       const kx = Math.cos(angle) * dist;
       const ky = Math.sin(angle) * dist;
-      joystickKnob.style.transform = `translate(${kx}px, ${ky}px)`;
-      joystickVector = { x: kx / 45, y: ky / 45 };
+      joystickStick.style.transform = `translate(${kx}px, ${ky}px)`;
+      joyDelta = { x: kx / 38, y: ky / 38 };
     }
 
-    // World Scenery: Koi Pond, Torii Gate, Stone Lanterns
-    function drawParkEnvironment() {
-      // Lush grass background
-      const grad = ctx.createLinearGradient(0, 0, 0, height);
-      grad.addColorStop(0, '#1c2826');
-      grad.addColorStop(1, '#111b19');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, height);
+    // --- 7. WORLD DRAWING (UNIFIED SAKURA PARK) ---
+    function drawWorldEnvironment() {
+      // Grass Floor
+      ctx.fillStyle = '#18241e';
+      ctx.fillRect(0, 0, WORLD_W, WORLD_H);
 
-      // Stone Stepping Path
-      ctx.fillStyle = '#2d3436';
-      for (let i = 0; i < 8; i++) {
-        ctx.beginPath();
-        ctx.ellipse(width / 2 + Math.sin(i) * 50, 80 + i * 80, 42, 24, 0.2, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Serene Koi Pond with Water Rings
-      const pondX = width * 0.22;
-      const pondY = height * 0.65;
+      // Central Stone Plaza
       ctx.save();
+      ctx.fillStyle = '#2d333b';
       ctx.beginPath();
-      ctx.ellipse(pondX, pondY, 130, 85, -0.2, 0, Math.PI * 2);
-      ctx.fillStyle = '#0984e3';
-      ctx.globalAlpha = 0.45;
+      ctx.arc(SPAWN_X, SPAWN_Y, 260, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#74b9ff';
-      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#3e4854';
+      ctx.lineWidth = 8;
       ctx.stroke();
+
+      // Stone Cobblestones in Plaza
+      ctx.fillStyle = '#39414d';
+      for (let r = 50; r < 240; r += 45) {
+        ctx.beginPath();
+        ctx.arc(SPAWN_X, SPAWN_Y, r, 0, Math.PI * 2);
+        ctx.strokeStyle = '#222831';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
       ctx.restore();
 
-      // Stone Lanterns (Toro)
-      drawLantern(width * 0.15, height * 0.35);
-      drawLantern(width * 0.85, height * 0.35);
-      drawLantern(width * 0.82, height * 0.75);
+      // Grand Torii Gate at Plaza Entrance
+      drawToriiGate(SPAWN_X, SPAWN_Y - 260);
 
-      // Sakura Tree Blossoms
-      drawSakuraTree(width * 0.12, 100);
-      drawSakuraTree(width * 0.88, 120);
+      // Serene Koi Pond with Ripple Rings
+      drawKoiPond(600, 1050, 200, 130);
+      drawKoiPond(1800, 500, 180, 110);
 
-      // Ambient Falling Petals
+      // Cherry Blossom Trees
+      drawSakuraTree(SPAWN_X - 340, SPAWN_Y - 140);
+      drawSakuraTree(SPAWN_X + 340, SPAWN_Y - 140);
+      drawSakuraTree(SPAWN_X - 280, SPAWN_Y + 220);
+      drawSakuraTree(SPAWN_X + 280, SPAWN_Y + 220);
+      drawSakuraTree(500, 400);
+      drawSakuraTree(1900, 1100);
+
+      // Stone Lanterns with Warm Halo
+      drawLantern(SPAWN_X - 120, SPAWN_Y - 180);
+      drawLantern(SPAWN_X + 120, SPAWN_Y - 180);
+      drawLantern(SPAWN_X - 180, SPAWN_Y + 140);
+      drawLantern(SPAWN_X + 180, SPAWN_Y + 140);
+
+      // Ambient Drifting Petals
       ctx.fillStyle = '#ffb7c5';
       for (let p of ambientPetals) {
         ctx.save();
         ctx.translate(p.x, p.y);
-        ctx.rotate(p.angle);
+        ctx.rotate(p.rot);
         ctx.beginPath();
         ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
 
-        p.x += p.speedX;
-        p.y += p.speedY;
-        p.angle += p.angularSpeed;
-        if (p.x > width) p.x = -10;
-        if (p.y > height) p.y = -10;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vrot;
+        if (p.x > WORLD_W) p.x = 0;
+        if (p.y > WORLD_H) p.y = 0;
       }
+    }
+
+    function drawToriiGate(x, y) {
+      ctx.save();
+      ctx.fillStyle = '#c0392b';
+      // Pillars
+      ctx.fillRect(x - 90, y - 80, 16, 90);
+      ctx.fillRect(x + 74, y - 80, 16, 90);
+      // Top Crossbars
+      ctx.fillRect(x - 110, y - 88, 220, 16);
+      ctx.fillRect(x - 98, y - 66, 196, 10);
+      // Gold highlights
+      ctx.fillStyle = '#f1c40f';
+      ctx.fillRect(x - 10, y - 82, 20, 14);
+      ctx.restore();
+    }
+
+    function drawKoiPond(x, y, rx, ry) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#0984e3';
+      ctx.globalAlpha = 0.5;
+      ctx.fill();
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = '#74b9ff';
+      ctx.stroke();
+
+      // Ripple ring
+      const wave = (Date.now() * 0.002) % 1;
+      ctx.beginPath();
+      ctx.ellipse(x, y, rx * wave, ry * wave, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255, 255, 255, ${1 - wave})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
     }
 
     function drawLantern(x, y) {
       ctx.save();
-      // Glow
-      const glow = ctx.createRadialGradient(x, y, 5, x, y, 40);
-      glow.addColorStop(0, 'rgba(255, 234, 167, 0.5)');
-      glow.addColorStop(1, 'transparent');
-      ctx.fillStyle = glow;
+      // Glow Aura
+      const halo = ctx.createRadialGradient(x, y, 4, x, y, 45);
+      halo.addColorStop(0, 'rgba(255, 234, 167, 0.45)');
+      halo.addColorStop(1, 'transparent');
+      ctx.fillStyle = halo;
       ctx.beginPath();
-      ctx.arc(x, y, 40, 0, Math.PI * 2);
+      ctx.arc(x, y, 45, 0, Math.PI * 2);
       ctx.fill();
 
-      // Stone structure
+      // Stone Lantern
       ctx.fillStyle = '#636e72';
-      ctx.fillRect(x - 10, y + 5, 20, 25);
-      ctx.fillRect(x - 14, y - 10, 28, 15);
-      // Fire core
+      ctx.fillRect(x - 8, y, 16, 20);
+      ctx.fillRect(x - 12, y - 10, 24, 12);
       ctx.fillStyle = '#ffeaa7';
-      ctx.fillRect(x - 6, y - 7, 12, 10);
+      ctx.fillRect(x - 5, y - 8, 10, 8);
       ctx.restore();
     }
 
@@ -1408,194 +1556,176 @@
       // Trunk
       ctx.fillStyle = '#4a2f1c';
       ctx.beginPath();
-      ctx.moveTo(x - 12, y + 100);
-      ctx.lineTo(x + 12, y + 100);
+      ctx.moveTo(x - 14, y + 90);
+      ctx.lineTo(x + 14, y + 90);
       ctx.lineTo(x + 6, y);
       ctx.lineTo(x - 6, y);
       ctx.fill();
-      // Blossom Clouds
-      const pinks = ['#ff758f', '#ffb3c1', '#ffccd5'];
+
+      // Foliage Puff
+      const colors = ['#ff758f', '#ffb3c1', '#ffccd5'];
       for (let i = 0; i < 5; i++) {
-        ctx.fillStyle = pinks[i % pinks.length];
+        ctx.fillStyle = colors[i % colors.length];
         ctx.beginPath();
-        ctx.arc(x + Math.sin(i * 1.5) * 45, y - 20 + Math.cos(i * 1.5) * 25, 42, 0, Math.PI * 2);
+        ctx.arc(x + Math.sin(i * 1.4) * 44, y - 24 + Math.cos(i * 1.4) * 26, 42, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
     }
 
-    // Procedural Slime Renderer
-    function drawSlime(x, y, slimeObj, name, tag, pfp) {
-      ctx.save();
-      ctx.translate(x, y + slimeObj.jumpOffset);
+    // --- 8. PROCEDURAL SLIME RENDERING ---
+    function renderSlimeEntity(targetCtx, x, y, slimeObj, displayName, tag) {
+      targetCtx.save();
+      targetCtx.translate(x, y + slimeObj.jumpOffset);
 
-      // Shadow on floor
+      // Floor Shadow
       if (slimeObj.jumpOffset < 0) {
-        ctx.save();
-        ctx.translate(0, -slimeObj.jumpOffset);
-        ctx.beginPath();
-        const shadowScale = Math.max(0.3, 1 + slimeObj.jumpOffset * 0.015);
-        ctx.ellipse(0, 20, 24 * shadowScale, 8 * shadowScale, 0, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-        ctx.fill();
-        ctx.restore();
+        targetCtx.save();
+        targetCtx.translate(0, -slimeObj.jumpOffset);
+        targetCtx.beginPath();
+        const s = Math.max(0.3, 1 + slimeObj.jumpOffset * 0.015);
+        targetCtx.ellipse(0, 18, 22 * s, 8 * s, 0, 0, Math.PI * 2);
+        targetCtx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+        targetCtx.fill();
+        targetCtx.restore();
       }
 
+      // Dancing wiggle
       if (slimeObj.isDancing) {
-        ctx.rotate(slimeObj.danceAngle);
+        const wiggle = Math.sin(Date.now() * 0.015) * 0.18;
+        targetCtx.rotate(wiggle);
+
+        // Music notes floating up
+        targetCtx.font = '14px sans-serif';
+        targetCtx.fillStyle = '#ff6584';
+        targetCtx.fillText('♪', 16, -30 + Math.sin(Date.now() * 0.01) * 6);
       }
 
-      // Slime Body Curves & Colors
-      ctx.beginPath();
-      ctx.ellipse(0, 0, slimeObj.radius * slimeObj.squash, (slimeObj.radius - 4) / slimeObj.squash, 0, 0, Math.PI * 2);
+      // Slime Jelly Body
+      targetCtx.beginPath();
+      targetCtx.ellipse(0, 0, slimeObj.radius * slimeObj.squash, (slimeObj.radius - 4) / slimeObj.squash, 0, 0, Math.PI * 2);
 
-      // Body Color Determination
+      // Skin Colors & Visual Effects
       if (slimeObj.skin === 'dev_pure_white') {
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = '#00f0ff';
-        ctx.shadowBlur = 24;
+        targetCtx.fillStyle = '#ffffff';
+        targetCtx.shadowColor = '#00f0ff';
+        targetCtx.shadowBlur = 25;
       } else if (slimeObj.skin === 'skin_admin_black') {
-        ctx.fillStyle = '#100f14';
-        ctx.shadowColor = '#ff3366';
-        ctx.shadowBlur = 18;
+        targetCtx.fillStyle = '#100f14';
+        targetCtx.shadowColor = '#ff3366';
+        targetCtx.shadowBlur = 20;
       } else if (slimeObj.skin === 'skin_prismatic') {
-        const rainbowGrad = ctx.createLinearGradient(-30, -30, 30, 30);
-        rainbowGrad.addColorStop(0, '#ff7675');
-        rainbowGrad.addColorStop(0.5, '#74b9ff');
-        rainbowGrad.addColorStop(1, '#55efc4');
-        ctx.fillStyle = rainbowGrad;
+        const pGrad = targetCtx.createLinearGradient(-30, -30, 30, 30);
+        pGrad.addColorStop(0, '#ff7675');
+        pGrad.addColorStop(0.5, '#74b9ff');
+        pGrad.addColorStop(1, '#55efc4');
+        targetCtx.fillStyle = pGrad;
       } else {
-        const skinData = MARKET_ITEMS.skins.find(s => s.id === slimeObj.skin);
-        ctx.fillStyle = skinData ? skinData.color : '#ff94b8';
+        const sk = SHOP_CATALOG.skins.find(s => s.id === slimeObj.skin);
+        targetCtx.fillStyle = sk ? sk.color : '#ff94b8';
       }
-      ctx.fill();
+      targetCtx.fill();
+      targetCtx.shadowBlur = 0;
 
-      // Slime Cute Eyes & Kawaii Cheeks
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = slimeObj.skin === 'skin_admin_black' ? '#ff3366' : '#2d3436';
-      ctx.beginPath();
-      ctx.arc(-8, -4, 3.5, 0, Math.PI * 2);
-      ctx.arc(8, -4, 3.5, 0, Math.PI * 2);
-      ctx.fill();
+      // Cute Eyes with Glimmer
+      targetCtx.fillStyle = slimeObj.skin === 'skin_admin_black' ? '#ff3366' : '#222f3e';
+      targetCtx.beginPath();
+      targetCtx.arc(-8, -4, 3.5, 0, Math.PI * 2);
+      targetCtx.arc(8, -4, 3.5, 0, Math.PI * 2);
+      targetCtx.fill();
 
-      // Eye glimmer
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(-9, -5, 1.2, 0, Math.PI * 2);
-      ctx.arc(7, -5, 1.2, 0, Math.PI * 2);
-      ctx.fill();
+      // Eye shine
+      targetCtx.fillStyle = '#ffffff';
+      targetCtx.beginPath();
+      targetCtx.arc(-9, -5, 1.4, 0, Math.PI * 2);
+      targetCtx.arc(7, -5, 1.4, 0, Math.PI * 2);
+      targetCtx.fill();
 
-      // Cheeks
-      ctx.fillStyle = 'rgba(255, 118, 117, 0.6)';
-      ctx.beginPath();
-      ctx.arc(-14, 2, 4, 0, Math.PI * 2);
-      ctx.arc(14, 2, 4, 0, Math.PI * 2);
-      ctx.fill();
+      // Blushing Cheeks
+      targetCtx.fillStyle = 'rgba(255, 107, 129, 0.55)';
+      targetCtx.beginPath();
+      targetCtx.arc(-13, 2, 4, 0, Math.PI * 2);
+      targetCtx.arc(13, 2, 4, 0, Math.PI * 2);
+      targetCtx.fill();
 
-      // Accessories
+      // Render Accessories
       if (slimeObj.accessory) {
-        drawAccessory(slimeObj.accessory);
+        renderAccessoryGraphic(targetCtx, slimeObj.accessory);
       }
 
-      // Overhead Title & Name
-      ctx.restore();
-      ctx.save();
-      ctx.translate(x, y + slimeObj.jumpOffset - 36);
+      targetCtx.restore();
 
-      // Overhead Title Badge
-      if (tag) {
-        ctx.font = 'bold 10px Nunito';
-        ctx.textAlign = 'center';
-        if (tag === 'DEV' || slimeObj.skin === 'dev_pure_white') {
-          ctx.fillStyle = '#00f0ff';
-          ctx.fillText('⚡ DEV MASTER ⚡', 0, -14);
-        } else if (tag === 'ADMIN' || slimeObj.skin === 'skin_admin_black') {
-          ctx.fillStyle = '#ff3366';
-          ctx.fillText('🛡️ RED ADMIN 🛡️', 0, -14);
-        } else {
-          ctx.fillStyle = '#ffd166';
-          ctx.fillText(`★ ${tag} ★`, 0, -14);
+      // Overhead Title & Display Name
+      if (displayName) {
+        targetCtx.save();
+        targetCtx.translate(x, y + slimeObj.jumpOffset - 36);
+
+        if (tag) {
+          targetCtx.font = 'bold 9px Nunito';
+          targetCtx.textAlign = 'center';
+          if (tag === 'DEV' || slimeObj.skin === 'dev_pure_white') {
+            targetCtx.fillStyle = '#00f0ff';
+            targetCtx.fillText('⚡ DEV MASTER ⚡', 0, -12);
+          } else if (tag === 'ADMIN' || slimeObj.skin === 'skin_admin_black') {
+            targetCtx.fillStyle = '#ff3366';
+            targetCtx.fillText('🛡️ RED ADMIN 🛡️', 0, -12);
+          } else {
+            targetCtx.fillStyle = '#ffd166';
+            targetCtx.fillText(`★ ${tag} ★`, 0, -12);
+          }
         }
-      }
 
-      // Username
-      ctx.font = '800 12px Nunito';
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.fillText(name, 0, 0);
-
-      ctx.restore();
-    }
-
-    function drawAccessory(accId) {
-      ctx.save();
-      ctx.font = '20px sans-serif';
-      ctx.textAlign = 'center';
-      if (accId === 'acc_sakura_crown') ctx.fillText('🌸', 0, -22);
-      if (accId === 'acc_golden_halo') ctx.fillText('✨', 0, -24);
-      if (accId === 'acc_wizard_hat') ctx.fillText('🧙', 0, -20);
-      if (accId === 'acc_cat_ears') ctx.fillText('🐱', 0, -20);
-      if (accId === 'acc_samurai_ribbon') ctx.fillText('🎀', 0, -20);
-      if (accId === 'acc_cyber_visor') ctx.fillText('🕶️', 0, -6);
-      ctx.restore();
-    }
-
-    // Speech Bubbles Rendering
-    function drawSpeechBubbles() {
-      const now = Date.now();
-      speechBubbles = speechBubbles.filter(b => now - b.time < 5000);
-
-      for (let b of speechBubbles) {
-        ctx.save();
-        ctx.font = '700 11px Nunito';
-        const txtWidth = ctx.measureText(b.text).width;
-        const padX = 10;
-        const boxW = txtWidth + padX * 2;
-        const boxH = 24;
-
-        ctx.translate(b.x - boxW / 2, b.y - 70);
-        ctx.fillStyle = 'rgba(26, 20, 42, 0.9)';
-        ctx.strokeStyle = '#ffb7c5';
-        ctx.lineWidth = 1.5;
-
-        ctx.beginPath();
-        ctx.roundRect(0, 0, boxW, boxH, 8);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(b.text, padX, 16);
-        ctx.restore();
+        targetCtx.font = '800 12px Nunito';
+        targetCtx.fillStyle = '#ffffff';
+        targetCtx.textAlign = 'center';
+        targetCtx.fillText(displayName, 0, 0);
+        targetCtx.restore();
       }
     }
 
-    // --- 7. MAIN ENGINE GAME LOOP ---
-    function gameLoop() {
-      // Movement Calculation
-      let moveX = 0;
-      let moveY = 0;
-      if (keys['w'] || keys['arrowup']) moveY -= 1;
-      if (keys['s'] || keys['arrowdown']) moveY += 1;
-      if (keys['a'] || keys['arrowleft']) moveX -= 1;
-      if (keys['d'] || keys['arrowright']) moveX += 1;
+    function renderAccessoryGraphic(ctxTarget, accId) {
+      ctxTarget.save();
+      ctxTarget.font = '22px sans-serif';
+      ctxTarget.textAlign = 'center';
+      if (accId === 'acc_flower_pin') ctxTarget.fillText('🌸', 10, -18);
+      if (accId === 'acc_cat_ears') ctxTarget.fillText('🐱', 0, -18);
+      if (accId === 'acc_angel_halo') ctxTarget.fillText('✨', 0, -22);
+      if (accId === 'acc_samurai_ribbon') ctxTarget.fillText('🎀', 0, -16);
+      if (accId === 'acc_kitsune_mask') ctxTarget.fillText('🦊', 12, -8);
+      if (accId === 'acc_wizard_hat') ctxTarget.fillText('🧙', 0, -18);
+      if (accId === 'acc_cyber_visor') ctxTarget.fillText('🕶️', 0, -4);
+      if (accId === 'acc_dragon_horns') ctxTarget.fillText('🐉', 0, -18);
+      ctxTarget.restore();
+    }
 
-      if (joystickActive) {
-        moveX = joystickVector.x;
-        moveY = joystickVector.y;
+    // --- 9. GAME ENGINE LOOP ---
+    function runWorldLoop() {
+      // Input Movement Vectors
+      let vx = 0;
+      let vy = 0;
+
+      if (keyState['w'] || keyState['arrowup']) vy -= 1;
+      if (keyState['s'] || keyState['arrowdown']) vy += 1;
+      if (keyState['a'] || keyState['arrowleft']) vx -= 1;
+      if (keyState['d'] || keyState['arrowright']) vx += 1;
+
+      if (isJoyActive) {
+        vx = joyDelta.x;
+        vy = joyDelta.y;
       }
 
-      if (moveX !== 0 || moveY !== 0) {
-        const len = Math.hypot(moveX, moveY);
-        mySlime.x += (moveX / len) * mySlime.speed;
-        mySlime.y += (moveY / len) * mySlime.speed;
-        mySlime.squash = 1.15; // stretch when walking
+      if (vx !== 0 || vy !== 0) {
+        const len = Math.hypot(vx, vy);
+        mySlime.x += (vx / len) * mySlime.speed;
+        mySlime.y += (vy / len) * mySlime.speed;
+        mySlime.squash = 1.15;
       } else {
-        mySlime.squash = 1 + Math.sin(Date.now() * 0.006) * 0.04; // rhythmic idle breathing
+        mySlime.squash = 1 + Math.sin(Date.now() * 0.007) * 0.04;
       }
 
-      // Clamp inside screen bounds
-      mySlime.x = Math.max(30, Math.min(width - 30, mySlime.x));
-      mySlime.y = Math.max(50, Math.min(height - 50, mySlime.y));
+      // Clamp within Community World Bounds
+      mySlime.x = Math.max(40, Math.min(WORLD_W - 40, mySlime.x));
+      mySlime.y = Math.max(40, Math.min(WORLD_H - 40, mySlime.y));
 
       // Jump Physics
       if (mySlime.isJumping) {
@@ -1604,134 +1734,177 @@
         if (mySlime.jumpOffset >= 0) {
           mySlime.jumpOffset = 0;
           mySlime.isJumping = false;
-          mySlime.squash = 0.8; // squash on landing
+          mySlime.squash = 0.82;
         }
       }
 
-      // Dance rotation
-      if (mySlime.isDancing) {
-        mySlime.danceAngle += 0.12;
-      }
+      // Smooth Camera Follow
+      camera.x += (mySlime.x - camera.x) * 0.1;
+      camera.y += (mySlime.y - camera.y) * 0.1;
 
-      // Clear & Render Scene
-      ctx.clearRect(0, 0, width, height);
-      drawParkEnvironment();
+      // Render Scene with Camera Offset
+      ctx.clearRect(0, 0, viewW, viewH);
+      ctx.save();
+      ctx.translate(viewW / 2 - camera.x, viewH / 2 - camera.y);
 
-      // Render Other Online/Mock Slimes
+      drawWorldEnvironment();
+
+      // Render Other Players
       otherPlayers.forEach((p) => {
-        drawSlime(p.x, p.y, p, p.username, p.title, p.pfp);
+        renderSlimeEntity(ctx, p.x, p.y, p, p.displayName, p.title);
       });
 
-      // Render Current Player
+      // Render Local Player
       if (currentUser) {
-        const currentTag = isDevActive ? 'DEV' : (currentUser.role === 'admin' ? 'ADMIN' : currentUser.title);
-        drawSlime(mySlime.x, mySlime.y, mySlime, currentUser.username, currentTag, currentUser.pfp);
+        const currentTag = isDevModeActive ? 'DEV' : (currentUser.role === 'admin' ? 'ADMIN' : currentUser.title);
+        renderSlimeEntity(ctx, mySlime.x, mySlime.y, mySlime, currentUser.displayName, currentTag);
       }
 
-      drawSpeechBubbles();
-      requestAnimationFrame(gameLoop);
+      // Floating Speech Bubbles
+      renderWorldSpeechBubbles();
+
+      ctx.restore();
+      requestAnimationFrame(runWorldLoop);
     }
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(runWorldLoop);
 
-    // --- 8. CLICKING OTHER SLIMES IN PARK (ADD FRIEND / DM) ---
-    const playerPopup = document.getElementById('playerPopup');
-    let targetedSlime = null;
+    function renderWorldSpeechBubbles() {
+      const now = Date.now();
+      floatingBubbles = floatingBubbles.filter(b => now - b.time < 5000);
 
-    canvas.addEventListener('click', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const clickY = e.clientY - rect.top;
+      for (let b of floatingBubbles) {
+        ctx.save();
+        ctx.font = '700 11px Nunito';
+        const tw = ctx.measureText(b.text).width;
+        const bw = tw + 20;
+        const bh = 24;
 
-      let clicked = null;
-      otherPlayers.forEach((p) => {
-        if (Math.hypot(p.x - clickX, p.y - clickY) < 45) {
-          clicked = p;
-        }
-      });
+        ctx.translate(b.x - bw / 2, b.y - 70);
+        ctx.fillStyle = 'rgba(23, 17, 38, 0.92)';
+        ctx.strokeStyle = '#ffb7c5';
+        ctx.lineWidth = 1.5;
 
-      if (clicked) {
-        targetedSlime = clicked;
-        document.getElementById('popupPfp').src = clicked.pfp;
-        document.getElementById('popupName').innerText = clicked.username;
-        document.getElementById('popupTitle').innerText = clicked.title || 'Park Visitor';
-        playerPopup.style.left = `${clickX}px`;
-        playerPopup.style.top = `${clickY}px`;
-        playerPopup.style.display = 'block';
-      } else {
-        playerPopup.style.display = 'none';
+        ctx.beginPath();
+        ctx.roundRect(0, 0, bw, bh, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(b.text, 10, 16);
+        ctx.restore();
       }
-    });
+    }
 
-    document.getElementById('popupAddFriendBtn').addEventListener('click', () => {
-      if (targetedSlime && currentUser) {
-        if (!currentUser.friends.includes(targetedSlime.username)) {
-          currentUser.friends.push(targetedSlime.username);
-          updateHud();
-          showToast(`🌸 Added <b>${targetedSlime.username}</b> as a friend!`);
-        } else {
-          showToast(`${targetedSlime.username} is already your friend.`);
-        }
-      }
-      playerPopup.style.display = 'none';
-    });
+    // Community Mock Players in the Plaza
+    function initCommunityDemoPlayers() {
+      const mocks = [
+        { dName: '🌸 Sakura Spirit', uName: 'sakura_spirit', x: SPAWN_X - 70, y: SPAWN_Y - 50, skin: 'skin_ocean', acc: 'acc_flower_pin', title: 'DANCER' },
+        { dName: '🍵 Matcha Boba', uName: 'matcha_boba', x: SPAWN_X + 80, y: SPAWN_Y + 60, skin: 'skin_matcha', acc: 'acc_cat_ears', title: 'SAGE' },
+        { dName: '✨ Luna Starlight', uName: 'luna_star', x: SPAWN_X + 120, y: SPAWN_Y - 70, skin: 'skin_lavender', acc: 'acc_angel_halo', title: 'MONARCH' }
+      ];
 
-    document.getElementById('popupDmBtn').addEventListener('click', () => {
-      if (targetedSlime) {
-        targetDmUser = targetedSlime.username;
-        switchChatTab('dm');
-        document.getElementById('chatInput').placeholder = `Direct message to @${targetedSlime.username}...`;
-      }
-      playerPopup.style.display = 'none';
-    });
-
-    // Populate mock players so the park is vibrant immediately
-    function initMockPlayers() {
-      const mockNames = ['SakuraSpirit', 'HanamiSlime', 'MatchaMochi', 'ZenBreeze'];
-      mockNames.forEach((name, i) => {
-        otherPlayers.set(name, {
-          x: width * 0.3 + i * 110,
-          y: height * 0.45 + (i % 2) * 80,
+      mocks.forEach(m => {
+        otherPlayers.set(m.uName, {
+          x: m.x,
+          y: m.y,
           radius: 28,
           jumpOffset: 0,
           squash: 1,
           isDancing: false,
-          username: name,
-          title: i === 0 ? 'WHISPERER' : 'ROYALTY',
-          pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`,
-          skin: i === 0 ? 'skin_ocean' : 'skin_amber',
-          accessory: i === 0 ? 'acc_sakura_crown' : 'acc_golden_halo'
+          displayName: m.dName,
+          username: m.uName,
+          title: m.title,
+          pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${m.uName}`,
+          skin: m.skin,
+          accessory: m.acc
         });
       });
+      syncDmSelectorOptions();
     }
 
-    // --- 9. SUPABASE REALTIME SYNC (Presence, Positions, Chat) ---
-    let worldChannel = null;
-    function initSupabasePresence() {
+    // --- 10. CLICK ON SLIMES TO INTERACT (ADD FRIEND / DM) ---
+    const targetPopup = document.getElementById('playerTargetPopup');
+    let selectedTargetSlime = null;
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clickScreenX = e.clientX - rect.left;
+      const clickScreenY = e.clientY - rect.top;
+
+      // Transform to world coordinates using camera
+      const worldClickX = clickScreenX - viewW / 2 + camera.x;
+      const worldClickY = clickScreenY - viewH / 2 + camera.y;
+
+      let found = null;
+      otherPlayers.forEach((p) => {
+        if (Math.hypot(p.x - worldClickX, p.y - worldClickY) < 42) {
+          found = p;
+        }
+      });
+
+      if (found) {
+        selectedTargetSlime = found;
+        document.getElementById('popupAvatar').src = found.pfp;
+        document.getElementById('popupDisplayName').innerText = found.displayName;
+        document.getElementById('popupUsername').innerText = `@${found.username}`;
+        targetPopup.style.left = `${clickScreenX}px`;
+        targetPopup.style.top = `${clickScreenY}px`;
+        targetPopup.style.display = 'block';
+      } else {
+        targetPopup.style.display = 'none';
+      }
+    });
+
+    document.getElementById('popupBtnAddFriend').addEventListener('click', () => {
+      if (selectedTargetSlime && currentUser) {
+        if (!currentUser.friends.includes(selectedTargetSlime.username)) {
+          currentUser.friends.push(selectedTargetSlime.username);
+          updatePlayerHUD();
+          showToast(`🌸 Added <b>${selectedTargetSlime.displayName}</b> as a friend!`);
+        } else {
+          showToast('Already in your friend list.');
+        }
+      }
+      targetPopup.style.display = 'none';
+    });
+
+    document.getElementById('popupBtnDirectDm').addEventListener('click', () => {
+      if (selectedTargetSlime) {
+        startDmConversation(selectedTargetSlime.username);
+      }
+      targetPopup.style.display = 'none';
+    });
+
+    // --- 11. SUPABASE REALTIME SYNC & BROADCAST ---
+    let parkChannel = null;
+    function initRealtimeNetwork() {
       try {
-        worldChannel = supabaseClient.channel('sakura-blossom-park', {
+        parkChannel = supabaseClient.channel('sakura-community-plaza', {
           config: { presence: { key: currentUser.username } }
         });
 
-        worldChannel
+        parkChannel
           .on('presence', { event: 'sync' }, () => {
-            const state = worldChannel.presenceState();
-            for (let id in state) {
-              const p = state[id][0];
+            const state = parkChannel.presenceState();
+            for (let k in state) {
+              const p = state[k][0];
               if (p && p.username !== currentUser.username) {
                 otherPlayers.set(p.username, p);
               }
             }
+            syncDmSelectorOptions();
           })
-          .on('broadcast', { event: 'chat' }, (payload) => {
-            addChatMessage(payload.payload);
+          .on('broadcast', { event: 'chat' }, (res) => {
+            receiveNetworkChatMessage(res.payload);
           })
-          .on('broadcast', { event: 'admin_broadcast' }, (payload) => {
-            handleAdminBroadcast(payload.payload);
+          .on('broadcast', { event: 'authority' }, (res) => {
+            handleAuthorityEvent(res.payload);
           })
           .subscribe(async (status) => {
             if (status === 'SUBSCRIBED') {
-              await worldChannel.track({
+              await parkChannel.track({
                 username: currentUser.username,
+                displayName: currentUser.displayName,
                 x: mySlime.x,
                 y: mySlime.y,
                 skin: mySlime.skin,
@@ -1742,664 +1915,760 @@
             }
           });
 
-        // Broadcast position periodically
+        // Broadcast Position Heartbeat
         setInterval(() => {
-          if (worldChannel && currentUser) {
-            worldChannel.send({
+          if (parkChannel && currentUser) {
+            parkChannel.send({
               type: 'broadcast',
               event: 'pos',
               payload: {
                 username: currentUser.username,
+                displayName: currentUser.displayName,
                 x: mySlime.x,
                 y: mySlime.y,
                 skin: mySlime.skin,
                 accessory: mySlime.accessory,
-                isJumping: mySlime.isJumping
+                isJumping: mySlime.isJumping,
+                isDancing: mySlime.isDancing
               }
             });
           }
-        }, 150);
+        }, 160);
       } catch (err) {
         console.warn('Realtime fallback active:', err);
       }
     }
 
-    // --- 10. CHAT SYSTEM (GLOBAL & DIRECT DMS, MUTES) ---
-    const chatBox = document.getElementById('chatBox');
-    const chatHeader = document.getElementById('chatHeader');
-    const chatToggleIcon = document.getElementById('chatToggleIcon');
-    const chatMessagesList = document.getElementById('chatMessagesList');
-    const chatInput = document.getElementById('chatInput');
-    const btnSendChat = document.getElementById('btnSendChat');
-    const chatMuteNotice = document.getElementById('chatMuteNotice');
-    const muteTimerDisplay = document.getElementById('muteTimerDisplay');
+    // --- 12. CHAT SYSTEM (STRICT GLOBAL & DM SEPARATION) ---
+    const chatDock = document.getElementById('chatDock');
+    const chatHeaderBar = document.getElementById('chatHeaderBar');
+    const chatCollapseIcon = document.getElementById('chatCollapseIcon');
+    const tabGlobalBtn = document.getElementById('tabGlobalBtn');
+    const tabDmBtn = document.getElementById('tabDmBtn');
+    const dmPartnerSelector = document.getElementById('dmPartnerSelector');
+    const dmSelectPartner = document.getElementById('dmSelectPartner');
+    const chatMessagesBox = document.getElementById('chatMessagesBox');
+    const chatInputField = document.getElementById('chatInputField');
+    const btnSendChatMessage = document.getElementById('btnSendChatMessage');
 
-    chatHeader.addEventListener('click', (e) => {
-      if (e.target.closest('.chat-tabs')) return;
-      chatBox.classList.toggle('minimized');
-      chatToggleIcon.className = chatBox.classList.contains('minimized') ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
+    chatHeaderBar.addEventListener('click', (e) => {
+      if (e.target.closest('.chat-tab-group')) return;
+      chatDock.classList.toggle('collapsed');
+      chatCollapseIcon.className = chatDock.classList.contains('collapsed') ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
     });
 
-    document.getElementById('tabGlobalChat').addEventListener('click', () => switchChatTab('global'));
-    document.getElementById('tabDmChat').addEventListener('click', () => switchChatTab('dm'));
+    tabGlobalBtn.addEventListener('click', () => switchChatView('global'));
+    tabDmBtn.addEventListener('click', () => switchChatView('dm'));
 
-    function switchChatTab(tab) {
-      selectedChatTab = tab;
-      document.getElementById('tabGlobalChat').classList.toggle('active', tab === 'global');
-      document.getElementById('tabDmChat').classList.toggle('active', tab === 'dm');
-      chatInput.placeholder = tab === 'global' ? 'Say something in Sakura Park...' : (targetDmUser ? `DM to @${targetDmUser}...` : 'Search friend to start DM...');
+    function switchChatView(tab) {
+      currentChatTab = tab;
+      tabGlobalBtn.classList.toggle('active', tab === 'global');
+      tabDmBtn.classList.toggle('active', tab === 'dm');
+      dmPartnerSelector.style.display = tab === 'dm' ? 'flex' : 'none';
+
+      if (tab === 'dm') {
+        syncDmSelectorOptions();
+        if (!currentDmPartner && dmSelectPartner.value) {
+          currentDmPartner = dmSelectPartner.value;
+        }
+        chatInputField.placeholder = currentDmPartner ? `DM to @${currentDmPartner}...` : 'Choose a partner above...';
+      } else {
+        chatInputField.placeholder = 'Chat in Sakura Park...';
+      }
+      renderActiveChatMessages();
     }
 
-    btnSendChat.addEventListener('click', sendChatMessage);
-    chatInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') sendChatMessage();
+    dmSelectPartner.addEventListener('change', () => {
+      currentDmPartner = dmSelectPartner.value;
+      chatInputField.placeholder = currentDmPartner ? `DM to @${currentDmPartner}...` : 'Choose a partner above...';
+      renderActiveChatMessages();
     });
 
-    function sendChatMessage() {
-      if (!currentUser) return;
-      const text = chatInput.value.trim();
-      if (!text) return;
+    function syncDmSelectorOptions() {
+      const prev = dmSelectPartner.value;
+      dmSelectPartner.innerHTML = '';
 
-      // Check Mute
-      if (Date.now() < mutedUntil) {
-        showToast('🔒 You are currently muted from chat!');
-        return;
+      // Collect all known players
+      const knownUsers = new Set();
+      otherPlayers.forEach(p => knownUsers.add(p.username));
+      if (currentUser && currentUser.friends) {
+        currentUser.friends.forEach(f => knownUsers.add(f));
       }
 
-      const msgObj = {
-        sender: currentUser.username,
-        text: text,
+      knownUsers.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u;
+        const playerObj = otherPlayers.get(u);
+        opt.innerText = playerObj ? `${playerObj.displayName} (@${u})` : `@${u}`;
+        dmSelectPartner.appendChild(opt);
+      });
+
+      if (prev && knownUsers.has(prev)) {
+        dmSelectPartner.value = prev;
+      }
+      currentDmPartner = dmSelectPartner.value;
+    }
+
+    function startDmConversation(username) {
+      currentDmPartner = username;
+      switchChatView('dm');
+      dmSelectPartner.value = username;
+      chatDock.classList.remove('collapsed');
+      chatCollapseIcon.className = 'fa-solid fa-chevron-down';
+    }
+
+    btnSendChatMessage.addEventListener('click', dispatchMessage);
+    chatInputField.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') dispatchMessage();
+    });
+
+    function dispatchMessage() {
+      if (!currentUser) return;
+      const text = chatInputField.value.trim();
+      if (!text) return;
+
+      if (Date.now() < chatMutedUntil) {
+        return showToast('🔒 You are currently muted by an administrator!');
+      }
+
+      const msg = {
+        id: 'msg_' + Math.random().toString(36).substring(2, 9),
+        senderUsername: currentUser.username,
+        senderDisplayName: currentUser.displayName,
         pfp: currentUser.pfp,
-        tag: isDevActive ? 'DEV' : (currentUser.role === 'admin' ? 'ADMIN' : currentUser.title),
-        isDm: selectedChatTab === 'dm',
-        recipient: targetDmUser,
-        time: Date.now()
+        tag: isDevModeActive ? 'DEV' : (currentUser.role === 'admin' ? 'ADMIN' : currentUser.title),
+        text: text,
+        isDm: currentChatTab === 'dm',
+        recipientUsername: currentChatTab === 'dm' ? currentDmPartner : null,
+        timestamp: Date.now()
       };
 
-      // Add speech bubble above slime
-      speechBubbles.push({
+      if (msg.isDm && !msg.recipientUsername) {
+        return showToast('Select a player to DM first!');
+      }
+
+      // Add speech bubble over player head
+      floatingBubbles.push({
         x: mySlime.x,
         y: mySlime.y + mySlime.jumpOffset,
         text: text,
         time: Date.now()
       });
 
-      // Broadcast via Supabase Realtime
-      if (worldChannel) {
-        worldChannel.send({
+      // Broadcast via Supabase
+      if (parkChannel) {
+        parkChannel.send({
           type: 'broadcast',
           event: 'chat',
-          payload: msgObj
+          payload: msg
         });
       }
 
-      addChatMessage(msgObj);
-      chatInput.value = '';
+      storeAndDisplayMessage(msg);
+      chatInputField.value = '';
     }
 
-    function addChatMessage(msg) {
-      if (msg.isDm) {
-        if (msg.sender !== currentUser.username && msg.recipient !== currentUser.username) {
-          return; // Not for us
-        }
-      }
+    function receiveNetworkChatMessage(msg) {
+      storeAndDisplayMessage(msg);
+    }
 
-      const item = document.createElement('div');
-      item.className = 'chat-msg';
-      item.innerHTML = `
-        <img src="${msg.pfp}" class="chat-msg-avatar" />
-        <div class="chat-msg-body">
-          <div class="chat-msg-author">
-            ${msg.sender} ${msg.tag ? `<span class="badge-tag ${msg.tag === 'DEV' ? 'badge-dev' : (msg.tag === 'ADMIN' ? 'badge-admin' : '')}">${msg.tag}</span>` : ''}
-            ${msg.isDm ? `<span style="color:var(--dev-cyan);">[DM]</span>` : ''}
+    function storeAndDisplayMessage(msg) {
+      if (!msg.isDm) {
+        // Global message: strictly stored in global log
+        globalChatLog.push(msg);
+      } else {
+        // DM message: strictly stored in DM conversation between the two users
+        const partner = msg.senderUsername === currentUser.username ? msg.recipientUsername : msg.senderUsername;
+        if (!dmConversations[partner]) {
+          dmConversations[partner] = [];
+        }
+        dmConversations[partner].push(msg);
+      }
+      renderActiveChatMessages();
+    }
+
+    function renderActiveChatMessages() {
+      chatMessagesBox.innerHTML = '';
+
+      if (currentChatTab === 'global') {
+        globalChatLog.forEach(appendMessageRow);
+      } else {
+        const dmList = dmConversations[currentDmPartner] || [];
+        dmList.forEach(appendMessageRow);
+      }
+      chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+    }
+
+    function appendMessageRow(msg) {
+      const row = document.createElement('div');
+      row.className = 'chat-bubble-row';
+      row.innerHTML = `
+        <img src="${msg.pfp}" class="chat-avatar-thumb" />
+        <div class="chat-message-content">
+          <div class="chat-sender-header">
+            <span>${msg.senderDisplayName}</span>
+            <span style="font-size:0.65rem; color:var(--text-muted);">@${msg.senderUsername}</span>
+            ${msg.tag ? `<span class="badge-tag ${msg.tag === 'DEV' ? 'badge-dev' : (msg.tag === 'ADMIN' ? 'badge-admin' : '')}">${msg.tag}</span>` : ''}
           </div>
           <div>${escapeHTML(msg.text)}</div>
         </div>
       `;
-      chatMessagesList.appendChild(item);
-      chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
+      chatMessagesBox.appendChild(row);
     }
 
     function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+      return str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t));
     }
 
-    // Mute countdown updater
-    setInterval(() => {
-      if (Date.now() < mutedUntil) {
-        chatMuteNotice.style.display = 'block';
-        const remSeconds = Math.ceil((mutedUntil - Date.now()) / 1000);
-        const m = Math.floor(remSeconds / 60).toString().padStart(2, '0');
-        const s = (remSeconds % 60).toString().padStart(2, '0');
-        muteTimerDisplay.innerText = `${m}:${s}`;
-      } else {
-        chatMuteNotice.style.display = 'none';
-      }
-    }, 1000);
+    // --- 13. MARKETPLACE DRESSING ROOM & PREVIEW ---
+    const shopPreviewCanvas = document.getElementById('shopPreviewCanvas');
+    const sctx = shopPreviewCanvas ? shopPreviewCanvas.getContext('2d') : null;
+    let shopPreviewSlime = { radius: 36, jumpOffset: 0, squash: 1, skin: 'skin_blossom', accessory: null, isDancing: false };
 
-    // --- 11. MARKETPLACE CONTROLLER ---
-    const shopModal = document.getElementById('modalShop');
-    const shopGridContainer = document.getElementById('shopGridContainer');
-    document.getElementById('btnShop').addEventListener('click', () => {
-      openShopModal('accessories');
-    });
+    function initShopDressingRoom() {
+      renderShopItemsGrid('accessories');
+      startShopPreviewLoop();
+    }
 
-    document.querySelectorAll('.shop-tab-btn').forEach(btn => {
+    function startShopPreviewLoop() {
+      if (!sctx) return;
+      sctx.clearRect(0, 0, 160, 160);
+      shopPreviewSlime.squash = 1 + Math.sin(Date.now() * 0.006) * 0.04;
+      renderSlimeEntity(sctx, 80, 90, shopPreviewSlime, null, null);
+      requestAnimationFrame(startShopPreviewLoop);
+    }
+
+    document.querySelectorAll('.shop-category-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.shop-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.shop-category-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderShopItems(btn.dataset.shoptab);
+        renderShopItemsGrid(btn.dataset.cat);
       });
     });
 
-    function openShopModal(tab) {
-      shopModal.classList.add('active');
-      renderShopItems(tab);
-    }
-
-    function renderShopItems(tab) {
-      shopGridContainer.innerHTML = '';
-      const items = MARKET_ITEMS[tab] || [];
+    function renderShopItemsGrid(cat) {
+      const grid = document.getElementById('marketGridItems');
+      grid.innerHTML = '';
+      const items = SHOP_CATALOG[cat] || [];
 
       items.forEach(item => {
         const card = document.createElement('div');
-        card.className = `shop-card ${item.adminOnly ? 'locked-admin' : ''}`;
+        card.className = `market-item-card ${item.adminOnly ? 'admin-exclusive' : ''}`;
 
-        let isOwned = currentUser.inventory.includes(item.id);
-        let isEquipped = (currentUser.accessory === item.id) || (currentUser.skin === item.id) || (currentUser.title === item.name);
+        const isOwned = currentUser.inventory.includes(item.id);
+        const isEquipped = (currentUser.accessory === item.id) || (currentUser.skin === item.id) || (currentUser.title === item.tag);
 
-        let actionBtnHTML = '';
+        let btnHTML = '';
         if (item.adminOnly) {
-          actionBtnHTML = `<button class="shop-btn" style="background:#ff3366; color:#fff;" disabled><i class="fa-solid fa-lock"></i> Admin Exclusive</button>`;
+          btnHTML = `<button class="btn-item-action" style="background:#ff3366; color:#fff;" disabled><i class="fa-solid fa-lock"></i> Admin Only</button>`;
         } else if (isEquipped) {
-          actionBtnHTML = `<button class="shop-btn shop-btn-equip" onclick="unequipItem('${tab}', '${item.id}')">Unequip</button>`;
+          btnHTML = `<button class="btn-item-action" style="background:rgba(0,240,255,0.2); border:1px solid var(--dev-cyan); color:var(--dev-cyan);" onclick="unequipCatalogItem('${cat}', '${item.id}')">Unequip</button>`;
         } else if (isOwned) {
-          actionBtnHTML = `<button class="shop-btn shop-btn-buy" onclick="equipItem('${tab}', '${item.id}')">Equip</button>`;
+          btnHTML = `<button class="btn-item-action" style="background:var(--sakura-pink); color:#0f0c1b;" onclick="equipCatalogItem('${cat}', '${item.id}')">Equip</button>`;
         } else {
-          actionBtnHTML = `<button class="shop-btn shop-btn-buy" onclick="buyShopItem('${tab}', '${item.id}', ${item.price})"><i class="fa-solid fa-gem"></i> Buy ${item.price}</button>`;
+          btnHTML = `<button class="btn-item-action" style="background:var(--sakura-pink); color:#0f0c1b;" onclick="buyCatalogItem('${cat}', '${item.id}', ${item.price})"><i class="fa-solid fa-gem"></i> Buy ${item.price}</button>`;
         }
 
+        // Live Preview on Hover / Click
+        card.addEventListener('mouseenter', () => {
+          if (cat === 'accessories') shopPreviewSlime.accessory = item.id;
+          if (cat === 'skins') shopPreviewSlime.skin = item.id;
+          document.getElementById('previewItemName').innerText = item.name;
+          document.getElementById('previewItemCost').innerText = item.adminOnly ? 'Admin Locked' : `${item.price} Blossom Pts`;
+        });
+
         card.innerHTML = `
-          <div class="shop-preview">${item.icon || '🌸'}</div>
-          <div class="shop-title">${item.name}</div>
-          <div class="shop-price">${item.adminOnly ? 'Locked' : item.price + ' Blossom Pts'}</div>
-          ${actionBtnHTML}
+          <div class="market-icon-display">${item.icon || '🌸'}</div>
+          <div class="market-item-name">${item.name}</div>
+          <div class="market-item-cost">${item.adminOnly ? 'Locked' : item.price + ' Pts'}</div>
+          ${btnHTML}
         `;
-        shopGridContainer.appendChild(card);
-      });
-    }
-
-    window.buyShopItem = function(tab, itemId, price) {
-      if (currentUser.points < price) {
-        return showToast('❌ Not enough Blossom Points!');
-      }
-      currentUser.points -= price;
-      currentUser.inventory.push(itemId);
-      updateHud();
-      renderShopItems(tab);
-      showToast('🌸 Purchase successful!');
-    };
-
-    window.equipItem = function(tab, itemId) {
-      if (tab === 'accessories') currentUser.accessory = itemId;
-      if (tab === 'skins') currentUser.skin = itemId;
-      if (tab === 'titles') {
-        const titleObj = MARKET_ITEMS.titles.find(t => t.id === itemId);
-        if (titleObj) currentUser.title = titleObj.tag;
-      }
-      updateHud();
-      renderShopItems(tab);
-      showToast('Equipped item!');
-    };
-
-    window.unequipItem = function(tab, itemId) {
-      if (tab === 'accessories' && currentUser.accessory === itemId) currentUser.accessory = null;
-      if (tab === 'skins' && currentUser.skin === itemId) currentUser.skin = 'skin_sakura';
-      updateHud();
-      renderShopItems(tab);
-    };
-
-    // --- 12. MINIGAMES (MEMORY & CATCH THE PETALS) ---
-    const minigamesModal = document.getElementById('modalMinigames');
-    document.getElementById('btnMinigames').addEventListener('click', () => {
-      minigamesModal.classList.add('active');
-      document.getElementById('memoryGameArea').style.display = 'none';
-      document.getElementById('petalsGameArea').style.display = 'none';
-    });
-
-    // --- Minigame 1: Slime Memory (+3 Points) ---
-    const memoryEmojis = ['🌸', '🍡', '🍵', '🏮', '🎏', '🎋', '⛩️', '🐸'];
-    let memoryFlipped = [];
-    let memoryMatched = 0;
-
-    document.getElementById('btnPlayMemory').addEventListener('click', () => {
-      document.getElementById('memoryGameArea').style.display = 'block';
-      document.getElementById('petalsGameArea').style.display = 'none';
-      startMemoryGame();
-    });
-
-    function startMemoryGame() {
-      const grid = document.getElementById('memoryGrid');
-      grid.innerHTML = '';
-      memoryFlipped = [];
-      memoryMatched = 0;
-      const cards = [...memoryEmojis, ...memoryEmojis].sort(() => 0.5 - Math.random());
-
-      cards.forEach((emoji) => {
-        const card = document.createElement('div');
-        card.className = 'memory-card';
-        card.dataset.emoji = emoji;
-        card.innerHTML = '❓';
-        card.addEventListener('click', () => onCardClicked(card));
         grid.appendChild(card);
       });
     }
 
-    function onCardClicked(card) {
-      if (memoryFlipped.length >= 2 || card.classList.contains('flipped')) return;
+    window.buyCatalogItem = function(cat, id, cost) {
+      if (currentUser.points < cost) return showToast('❌ Insufficient Blossom Points!');
+      currentUser.points -= cost;
+      currentUser.inventory.push(id);
+      updatePlayerHUD();
+      renderShopItemsGrid(cat);
+      showToast('🌸 Item successfully acquired!');
+    };
 
-      card.classList.add('flipped');
-      card.innerHTML = card.dataset.emoji;
-      memoryFlipped.push(card);
+    window.equipCatalogItem = function(cat, id) {
+      if (cat === 'accessories') currentUser.accessory = id;
+      if (cat === 'skins') currentUser.skin = id;
+      if (cat === 'titles') {
+        const t = SHOP_CATALOG.titles.find(x => x.id === id);
+        if (t) currentUser.title = t.tag;
+      }
+      updatePlayerHUD();
+      renderShopItemsGrid(cat);
+      showToast('Equipped!');
+    };
 
-      if (memoryFlipped.length === 2) {
-        if (memoryFlipped[0].dataset.emoji === memoryFlipped[1].dataset.emoji) {
-          memoryMatched += 2;
-          memoryFlipped = [];
-          if (memoryMatched === 16) {
+    window.unequipCatalogItem = function(cat, id) {
+      if (cat === 'accessories' && currentUser.accessory === id) currentUser.accessory = null;
+      if (cat === 'skins' && currentUser.skin === id) currentUser.skin = 'skin_blossom';
+      updatePlayerHUD();
+      renderShopItemsGrid(cat);
+    };
+
+    // --- 14. MINIGAMES (MEMORY = 3 PTS, PETALS = SCALED 10:1 PT) ---
+    // Memory Game
+    const memoryCardsData = ['🌸', '🍡', '🍵', '🏮', '🎏', '🎋', '⛩️', '🐸'];
+    let memFlippedCards = [];
+    let memMatches = 0;
+
+    document.getElementById('btnLaunchMemoryGame').addEventListener('click', () => {
+      document.getElementById('memoryGameArea').style.display = 'block';
+      document.getElementById('petalGameArea').style.display = 'none';
+      initMemoryGame();
+    });
+
+    function initMemoryGame() {
+      const board = document.getElementById('memoryGameBoard');
+      board.innerHTML = '';
+      memFlippedCards = [];
+      memMatches = 0;
+      const deck = [...memoryCardsData, ...memoryCardsData].sort(() => 0.5 - Math.random());
+
+      deck.forEach(symbol => {
+        const tile = document.createElement('div');
+        tile.className = 'memory-tile';
+        tile.dataset.sym = symbol;
+        tile.innerHTML = '❓';
+        tile.addEventListener('click', () => onMemoryTileClick(tile));
+        board.appendChild(tile);
+      });
+    }
+
+    function onMemoryTileClick(tile) {
+      if (memFlippedCards.length >= 2 || tile.classList.contains('flipped')) return;
+      tile.classList.add('flipped');
+      tile.innerHTML = tile.dataset.sym;
+      memFlippedCards.push(tile);
+
+      if (memFlippedCards.length === 2) {
+        if (memFlippedCards[0].dataset.sym === memFlippedCards[1].dataset.sym) {
+          memMatches += 2;
+          memFlippedCards = [];
+          if (memMatches === 16) {
             currentUser.points += 3;
-            updateHud();
-            showToast('🎉 Victory! You won <b>+3 Blossom Points</b>!');
+            updatePlayerHUD();
+            showToast('🎉 Perfect Match! Won <b>+3 Blossom Points</b>!');
           }
         } else {
           setTimeout(() => {
-            memoryFlipped.forEach(c => {
+            memFlippedCards.forEach(c => {
               c.classList.remove('flipped');
               c.innerHTML = '❓';
             });
-            memoryFlipped = [];
-          }, 800);
+            memFlippedCards = [];
+          }, 750);
         }
       }
     }
 
-    // --- Minigame 2: Catch The Petals (50 Petals, 30s, Scaled Points) ---
-    const petalCanvas = document.getElementById('petalGameCanvas');
-    const pctx = petalCanvas.getContext('2d');
-    let petalGameLoopId = null;
-    let petalsCaught = 0;
-    let petalsSpawned = 0;
-    let petalTimeLeft = 30;
-    let fallingGamePetals = [];
-    let basket = { x: 220, width: 70, height: 16 };
+    // Catch The Petals Minigame
+    const pDropCanvas = document.getElementById('petalDropCanvas');
+    const pdctx = pDropCanvas.getContext('2d');
+    let petalGameLoop = null;
+    let petalsCaughtCount = 0;
+    let petalsSpawnedTotal = 0;
+    let petalGameSecs = 30;
+    let dropPetalsList = [];
+    let playerCatchBasket = { x: 200, w: 75, h: 16 };
 
-    document.getElementById('btnPlayPetals').addEventListener('click', () => {
+    document.getElementById('btnLaunchPetalGame').addEventListener('click', () => {
       document.getElementById('memoryGameArea').style.display = 'none';
-      document.getElementById('petalsGameArea').style.display = 'block';
-      startPetalsGame();
+      document.getElementById('petalGameArea').style.display = 'block';
+      startCatchPetalGame();
     });
 
-    petalCanvas.addEventListener('pointermove', (e) => {
-      const rect = petalCanvas.getBoundingClientRect();
-      basket.x = (e.clientX - rect.left) - basket.width / 2;
+    pDropCanvas.addEventListener('pointermove', (e) => {
+      const rect = pDropCanvas.getBoundingClientRect();
+      playerCatchBasket.x = (e.clientX - rect.left) - playerCatchBasket.w / 2;
     });
 
-    function startPetalsGame() {
-      petalsCaught = 0;
-      petalsSpawned = 0;
-      petalTimeLeft = 30;
-      fallingGamePetals = [];
-      document.getElementById('petalScore').innerText = '0';
-      document.getElementById('petalTimer').innerText = '30';
+    function startCatchPetalGame() {
+      petalsCaughtCount = 0;
+      petalsSpawnedTotal = 0;
+      petalGameSecs = 30;
+      dropPetalsList = [];
+      document.getElementById('petalGameScore').innerText = '0';
+      document.getElementById('petalGameTimer').innerText = '30';
 
-      const timerInterval = setInterval(() => {
-        petalTimeLeft--;
-        document.getElementById('petalTimer').innerText = petalTimeLeft;
-        if (petalTimeLeft <= 0 || (petalsSpawned >= 50 && fallingGamePetals.length === 0)) {
-          clearInterval(timerInterval);
-          endPetalsGame();
+      const timerInt = setInterval(() => {
+        petalGameSecs--;
+        document.getElementById('petalGameTimer').innerText = petalGameSecs;
+        if (petalGameSecs <= 0 || (petalsSpawnedTotal >= 50 && dropPetalsList.length === 0)) {
+          clearInterval(timerInt);
+          finishPetalGame();
         }
       }, 1000);
 
       // Spawn exactly 50 challenging petals
-      const spawnInterval = setInterval(() => {
-        if (petalsSpawned < 50 && petalTimeLeft > 0) {
-          fallingGamePetals.push({
-            x: Math.random() * (petalCanvas.width - 20) + 10,
+      const spawnInt = setInterval(() => {
+        if (petalsSpawnedTotal < 50 && petalGameSecs > 0) {
+          dropPetalsList.push({
+            x: Math.random() * (pDropCanvas.width - 24) + 12,
             y: -10,
-            speedY: 2.5 + Math.random() * 3.5,
-            drift: (Math.random() - 0.5) * 3,
-            size: 8
+            vy: 2.5 + Math.random() * 3.5,
+            drift: (Math.random() - 0.5) * 3.2,
+            r: 7
           });
-          petalsSpawned++;
+          petalsSpawnedTotal++;
         } else {
-          clearInterval(spawnInterval);
+          clearInterval(spawnInt);
         }
       }, 550);
 
-      runPetalsLoop();
+      executePetalDropLoop();
     }
 
-    function runPetalsLoop() {
-      pctx.clearRect(0, 0, petalCanvas.width, petalCanvas.height);
+    function executePetalDropLoop() {
+      pdctx.clearRect(0, 0, pDropCanvas.width, pDropCanvas.height);
 
       // Draw Basket
-      pctx.fillStyle = '#ffb7c5';
-      pctx.beginPath();
-      pctx.roundRect(basket.x, petalCanvas.height - 24, basket.width, basket.height, 8);
-      pctx.fill();
+      pdctx.fillStyle = '#ffb7c5';
+      pdctx.beginPath();
+      pdctx.roundRect(playerCatchBasket.x, pDropCanvas.height - 24, playerCatchBasket.w, playerCatchBasket.h, 8);
+      pdctx.fill();
 
       // Update & Draw Petals
-      for (let i = fallingGamePetals.length - 1; i >= 0; i--) {
-        const p = fallingGamePetals[i];
-        p.y += p.speedY;
+      for (let i = dropPetalsList.length - 1; i >= 0; i--) {
+        const p = dropPetalsList[i];
+        p.y += p.vy;
         p.x += p.drift;
 
-        pctx.fillStyle = '#ff6584';
-        pctx.beginPath();
-        pctx.ellipse(p.x, p.y, p.size, p.size * 0.6, 0.4, 0, Math.PI * 2);
-        pctx.fill();
+        pdctx.fillStyle = '#ff6584';
+        pdctx.beginPath();
+        pdctx.ellipse(p.x, p.y, p.r, p.r * 0.6, 0.3, 0, Math.PI * 2);
+        pdctx.fill();
 
-        // Catch Detection
-        if (p.y >= petalCanvas.height - 28 && p.x >= basket.x && p.x <= basket.x + basket.width) {
-          petalsCaught++;
-          document.getElementById('petalScore').innerText = petalsCaught;
-          fallingGamePetals.splice(i, 1);
+        // Check Basket Catch
+        if (p.y >= pDropCanvas.height - 28 && p.x >= playerCatchBasket.x && p.x <= playerCatchBasket.x + playerCatchBasket.w) {
+          petalsCaughtCount++;
+          document.getElementById('petalGameScore').innerText = petalsCaughtCount;
+          dropPetalsList.splice(i, 1);
           continue;
         }
 
-        // Missed bottom
-        if (p.y > petalCanvas.height) {
-          fallingGamePetals.splice(i, 1);
+        if (p.y > pDropCanvas.height) {
+          dropPetalsList.splice(i, 1);
         }
       }
 
-      if (petalTimeLeft > 0) {
-        petalGameLoopId = requestAnimationFrame(runPetalsLoop);
+      if (petalGameSecs > 0) {
+        petalGameLoop = requestAnimationFrame(executePetalDropLoop);
       }
     }
 
-    function endPetalsGame() {
-      cancelAnimationFrame(petalGameLoopId);
-      // Scaled points: 10 caught = 1 pt, 20 = 2 pts, 30 = 3 pts, 40 = 4 pts, 50 = 5 pts
-      const pointsAwarded = Math.floor(petalsCaught / 10);
-      if (pointsAwarded > 0) {
-        currentUser.points += pointsAwarded;
-        updateHud();
-        showToast(`🌸 Game Over! Caught <b>${petalsCaught}</b> petals. Awarded <b>+${pointsAwarded} Blossom Points</b>!`);
+    function finishPetalGame() {
+      cancelAnimationFrame(petalGameLoop);
+      // Scaled points: 10 caught = 1 pt, 20 = 2 pts, 30 = 3 pts, etc.
+      const reward = Math.floor(petalsCaughtCount / 10);
+      if (reward > 0) {
+        currentUser.points += reward;
+        updatePlayerHUD();
+        showToast(`🌸 Caught <b>${petalsCaughtCount}</b> petals! Awarded <b>+${reward} Blossom Points</b>!`);
       } else {
-        showToast(`Caught ${petalsCaught} petals. Need at least 10 petals for points!`);
+        showToast(`Caught ${petalsCaughtCount} petals. You need 10 or more to earn points!`);
       }
     }
 
-    // --- 13. FRIENDS & SEARCH SYSTEM ---
-    const friendsModal = document.getElementById('modalFriends');
-    document.getElementById('btnFriends').addEventListener('click', () => {
-      friendsModal.classList.add('active');
+    // --- 15. FRIENDS & SEARCH BY DISPLAY NAME ---
+    document.getElementById('btnOpenFriends').addEventListener('click', () => {
+      document.getElementById('modalFriends').classList.add('active');
       renderFriendsList();
     });
 
     function renderFriendsList() {
-      const container = document.getElementById('friendsListContainer');
+      const container = document.getElementById('friendsListDisplay');
       container.innerHTML = '';
+
       if (!currentUser.friends || currentUser.friends.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">No friends added yet.</p>';
+        container.innerHTML = `<p style="font-size:0.8rem; color:var(--text-muted);">No friends added yet.</p>`;
         return;
       }
 
-      currentUser.friends.forEach(fName => {
+      currentUser.friends.forEach(fUName => {
+        const playerObj = otherPlayers.get(fUName);
+        const disp = playerObj ? playerObj.displayName : fUName;
         const row = document.createElement('div');
-        row.className = 'user-list-item';
+        row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.04); border-radius:10px; margin-bottom:6px;';
         row.innerHTML = `
-          <div class="user-list-left">
-            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${fName}" class="user-list-img" />
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${fUName}" style="width:34px; height:34px; border-radius:50%; border:1px solid var(--sakura-pink);" />
             <div>
-              <div style="font-weight:800; font-size:0.9rem;">${fName}</div>
-              <div style="font-size:0.75rem; color:#20bf6b;">● Online in Park</div>
+              <div style="font-weight:800; font-size:0.85rem;">${disp}</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);">@${fUName}</div>
             </div>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="shop-btn shop-btn-equip" onclick="startDmWith('${fName}')">DM</button>
-            <button class="shop-btn" style="background:#ff3366; color:#fff;" onclick="unfriendUser('${fName}')">Unfriend</button>
+            <button class="btn-item-action" style="background:var(--dev-cyan); color:#000; width:60px;" onclick="startDmConversation('${fUName}'); document.getElementById('modalFriends').classList.remove('active');">DM</button>
+            <button class="btn-item-action" style="background:var(--admin-red); color:#fff; width:70px;" onclick="unfriendPlayer('${fUName}')">Unfriend</button>
           </div>
         `;
         container.appendChild(row);
       });
     }
 
-    window.unfriendUser = function(name) {
-      currentUser.friends = currentUser.friends.filter(f => f !== name);
-      updateHud();
+    window.unfriendPlayer = function(uName) {
+      currentUser.friends = currentUser.friends.filter(f => f !== uName);
+      updatePlayerHUD();
       renderFriendsList();
-      showToast(`Removed ${name} from friends.`);
+      showToast(`Removed @${uName} from friends.`);
     };
 
-    window.startDmWith = function(name) {
-      targetDmUser = name;
-      switchChatTab('dm');
-      friendsModal.classList.remove('active');
-    };
+    // Search by Display Name
+    document.getElementById('btnPerformSearch').addEventListener('click', () => {
+      const term = document.getElementById('inputSearchDisplayName').value.trim().toLowerCase();
+      if (!term) return;
 
-    document.getElementById('btnSearchPlayer').addEventListener('click', () => {
-      const q = document.getElementById('friendSearchInput').value.trim();
-      if (!q) return;
-      const area = document.getElementById('searchResultsArea');
-      const card = document.getElementById('searchResultCard');
-      area.style.display = 'block';
+      const resBox = document.getElementById('directorySearchResults');
+      const list = document.getElementById('directoryResultsList');
+      resBox.style.display = 'block';
+      list.innerHTML = '';
 
-      card.innerHTML = `
-        <div class="user-list-item">
-          <div class="user-list-left">
-            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${q}" class="user-list-img" />
+      const matched = [];
+      otherPlayers.forEach(p => {
+        if (p.displayName.toLowerCase().includes(term) || p.username.toLowerCase().includes(term)) {
+          matched.push(p);
+        }
+      });
+
+      if (matched.length === 0) {
+        list.innerHTML = `<p style="font-size:0.8rem; color:var(--text-muted);">No player found matching "${term}".</p>`;
+        return;
+      }
+
+      matched.forEach(p => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.04); border-radius:10px; margin-bottom:6px;';
+        item.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="${p.pfp}" style="width:34px; height:34px; border-radius:50%; border:1px solid var(--sakura-pink);" />
             <div>
-              <div style="font-weight:800; font-size:0.9rem;">${q}</div>
-              <div style="font-size:0.75rem; color:var(--text-muted);">Sakura Park Resident</div>
+              <div style="font-weight:800; font-size:0.85rem;">${p.displayName}</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);">@${p.username}</div>
             </div>
           </div>
-          <button class="shop-btn shop-btn-buy" onclick="addFriendDirect('${q}')"><i class="fa-solid fa-user-plus"></i> Add</button>
-        </div>
-      `;
+          <button class="btn-item-action" style="background:var(--sakura-pink); color:#0f0c1b; width:70px;" onclick="addFriendFromSearch('${p.username}')"><i class="fa-solid fa-user-plus"></i> Add</button>
+        `;
+        list.appendChild(item);
+      });
     });
 
-    window.addFriendDirect = function(name) {
-      if (!currentUser.friends.includes(name)) {
-        currentUser.friends.push(name);
-        updateHud();
+    window.addFriendFromSearch = function(uName) {
+      if (!currentUser.friends.includes(uName)) {
+        currentUser.friends.push(uName);
+        updatePlayerHUD();
         renderFriendsList();
-        showToast(`🌸 Added <b>${name}</b> to friends list!`);
+        showToast(`🌸 Added @${uName} as friend!`);
       }
     };
 
-    // Profile Picture Upload Handler (Base64 data URL)
-    document.getElementById('pfpUploadInput').addEventListener('change', (e) => {
+    // Update Display Name
+    document.getElementById('btnSaveDisplayName').addEventListener('click', () => {
+      const nd = document.getElementById('inputUpdateDisplayName').value.trim();
+      if (nd) {
+        currentUser.displayName = nd;
+        updatePlayerHUD();
+        showToast('Display Name updated!');
+      }
+    });
+
+    // Profile Picture Upload
+    document.getElementById('inputFilePfp').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(evt) {
+        reader.onload = (evt) => {
           currentUser.pfp = evt.target.result;
-          updateHud();
-          showToast('Profile picture updated successfully!');
+          updatePlayerHUD();
+          showToast('Profile picture successfully updated!');
         };
         reader.readAsDataURL(file);
       }
     });
 
-    // --- 14. DEVELOPER & ADMIN SYSTEM ---
-    const devAdminModal = document.getElementById('modalDevAdmin');
-    const btnDevSecret = document.getElementById('btnDevSecret');
-
-    btnDevSecret.addEventListener('click', () => {
-      if (currentUser.role === 'admin' || isDevActive) {
-        openDevAdminModal();
+    // --- 16. DEVELOPER & ADMIN AUTHORITY (DEV PASSCODE `1357` HIDDEN) ---
+    document.getElementById('btnOpenDev').addEventListener('click', () => {
+      if (isDevModeActive || currentUser.role === 'admin') {
+        openAuthorityPanel();
       } else {
-        // Prompt for Passcode (Passcode is 1357, never exposed in UI text)
-        const code = prompt('Enter Authority Key:');
-        if (code === '1357') {
-          isDevActive = true;
+        // Dev Key prompt without exposing the passcode
+        const entered = prompt('Enter Authority Key:');
+        if (entered === '1357') {
+          isDevModeActive = true;
           currentUser.role = 'dev';
-          updateHud();
-          showToast('⚡ DEV MODE ACTIVATED! Pure White Skin & DEV Title Enabled.');
-          openDevAdminModal();
-        } else if (code !== null) {
+          updatePlayerHUD();
+          showToast('⚡ DEV MODE ACTIVATED! Pure White Slime & Dev Title Active.');
+          openAuthorityPanel();
+        } else if (entered !== null) {
           showToast('❌ Access Denied.');
         }
       }
     });
 
-    function openDevAdminModal() {
-      devAdminModal.classList.add('active');
-      const isDev = isDevActive || currentUser.role === 'dev';
+    function openAuthorityPanel() {
+      document.getElementById('modalDevAdmin').classList.add('active');
+      const isDev = isDevModeActive || currentUser.role === 'dev';
 
-      // Restrict features: Dev has full rights including sending points; Admin cannot send points
-      document.getElementById('devToggleSection').style.display = isDev ? 'flex' : 'none';
-      document.getElementById('devPointSection').style.display = isDev ? 'block' : 'none';
-      document.getElementById('devRoleSection').style.display = isDev ? 'block' : 'none';
-      document.getElementById('devAdminModalTitle').innerHTML = isDev ? `<i class="fa-solid fa-code"></i> Developer Console` : `<i class="fa-solid fa-shield-halved"></i> Admin Control Panel`;
+      // Rights partition: Dev can send points & assign admins; Admins CANNOT send points
+      document.getElementById('devModeToggleCard').style.display = isDev ? 'flex' : 'none';
+      document.getElementById('devPointGrantCard').style.display = isDev ? 'block' : 'none';
+      document.getElementById('devAdminRoleCard').style.display = isDev ? 'block' : 'none';
+      document.getElementById('devAdminTitle').innerHTML = isDev ? `<i class="fa-solid fa-code"></i> Developer Console` : `<i class="fa-solid fa-shield-halved"></i> Admin Control Panel`;
     }
 
     // Toggle Dev Mode on/off
     document.getElementById('btnToggleDevMode').addEventListener('click', () => {
-      isDevActive = !isDevActive;
-      updateHud();
-      showToast(isDevActive ? 'Pure White Dev Mode Enabled' : 'Dev Mode Disabled. Restored original skin & title.');
+      isDevModeActive = !isDevModeActive;
+      updatePlayerHUD();
+      showToast(isDevModeActive ? 'Dev Mode Enabled' : 'Dev Mode Disabled. Skin and Title reverted.');
     });
 
     // Dev Only: Send Points
-    document.getElementById('btnDevSendPoints').addEventListener('click', () => {
-      const target = document.getElementById('devPointsTargetUser').value.trim();
-      const amount = parseInt(document.getElementById('devPointsAmount').value, 10);
-      if (!target || isNaN(amount) || amount <= 0) return showToast('Enter valid target user and point amount!');
+    document.getElementById('btnGrantPoints').addEventListener('click', () => {
+      const target = document.getElementById('inputGrantTarget').value.trim().toLowerCase();
+      const amount = parseInt(document.getElementById('inputGrantAmount').value, 10);
+      if (!target || isNaN(amount) || amount <= 0) return showToast('Please enter target and valid points!');
 
-      const users = DB.getUsers();
-      if (users[target.toLowerCase()]) {
-        users[target.toLowerCase()].points += amount;
-        DB.saveUsers(users);
+      const users = Storage.getUsers();
+      if (users[target]) {
+        users[target].points += amount;
+        Storage.saveUsers(users);
       }
-      if (currentUser.username.toLowerCase() === target.toLowerCase()) {
+      if (currentUser.username === target) {
         currentUser.points += amount;
-        updateHud();
+        updatePlayerHUD();
       }
-      broadcastAdminAction({ type: 'gift_points', target: target, amount: amount });
-      showToast(`✨ Successfully granted <b>${amount} points</b> to ${target}!`);
+      broadcastAuthorityEvent({ type: 'gift_points', target: target, amount: amount });
+      showToast(`✨ Sent <b>+${amount} Points</b> to @${target}!`);
     });
 
-    // Dev Only: Assign Admin
-    document.getElementById('btnAssignAdmin').addEventListener('click', () => {
-      const target = document.getElementById('adminRoleTargetUser').value.trim();
+    // Dev Only: Promote Admin
+    document.getElementById('btnPromoteAdmin').addEventListener('click', () => {
+      const target = document.getElementById('inputAdminTarget').value.trim().toLowerCase();
       if (!target) return;
-      const admins = DB.getAdmins();
-      if (!admins.includes(target.toLowerCase())) {
-        admins.push(target.toLowerCase());
-        DB.saveAdmins(admins);
+      const admins = Storage.getAdmins();
+      if (!admins.includes(target)) {
+        admins.push(target);
+        Storage.saveAdmins(admins);
       }
-      broadcastAdminAction({ type: 'assign_admin', target: target });
-      showToast(`Promoted <b>${target}</b> to Admin! (Void Black Skin & Red Title unlocked)`);
+      broadcastAuthorityEvent({ type: 'promote_admin', target: target });
+      showToast(`Promoted @${target} to Admin!`);
     });
 
     // Dev Only: Revoke Admin
     document.getElementById('btnRevokeAdmin').addEventListener('click', () => {
-      const target = document.getElementById('adminRoleTargetUser').value.trim();
+      const target = document.getElementById('inputAdminTarget').value.trim().toLowerCase();
       if (!target) return;
-      let admins = DB.getAdmins();
-      admins = admins.filter(a => a !== target.toLowerCase());
-      DB.saveAdmins(admins);
-      broadcastAdminAction({ type: 'revoke_admin', target: target });
-      showToast(`Revoked Admin rights from <b>${target}</b>.`);
+      let admins = Storage.getAdmins().filter(a => a !== target);
+      Storage.saveAdmins(admins);
+      broadcastAuthorityEvent({ type: 'revoke_admin', target: target });
+      showToast(`Revoked Admin from @${target}.`);
     });
 
-    // Moderation: Mute Player (10m - 60m)
+    // Moderation: Mute Chat (10m - 1hr)
     document.getElementById('btnApplyMute').addEventListener('click', () => {
-      const target = document.getElementById('modTargetUser').value.trim();
-      const mins = parseInt(document.getElementById('modMuteDuration').value, 10);
+      const target = document.getElementById('inputModTarget').value.trim().toLowerCase();
+      const mins = parseInt(document.getElementById('selectMuteDuration').value, 10);
       if (!target) return showToast('Enter target username!');
 
-      broadcastAdminAction({ type: 'mute', target: target, minutes: mins });
-      showToast(`Muted <b>${target}</b> for ${mins} minutes.`);
+      broadcastAuthorityEvent({ type: 'mute_chat', target: target, minutes: mins });
+      showToast(`Muted @${target} for ${mins} minutes.`);
     });
 
-    // Moderation: Ban Player from Login
-    document.getElementById('btnBanUser').addEventListener('click', () => {
-      const target = document.getElementById('modTargetUser').value.trim();
-      if (!target) return showToast('Enter target username!');
-      const banned = DB.getBanned();
-      if (!banned.includes(target.toLowerCase())) {
-        banned.push(target.toLowerCase());
-        DB.saveBanned(banned);
-      }
-      broadcastAdminAction({ type: 'ban', target: target });
-      showToast(`Banned <b>${target}</b> from logging in!`);
-    });
-
-    // Moderation: Unban Player
-    document.getElementById('btnUnbanUser').addEventListener('click', () => {
-      const target = document.getElementById('modTargetUser').value.trim();
+    // Moderation: Ban Login
+    document.getElementById('btnBanPlayer').addEventListener('click', () => {
+      const target = document.getElementById('inputModTarget').value.trim().toLowerCase();
       if (!target) return;
-      let banned = DB.getBanned();
-      banned = banned.filter(b => b !== target.toLowerCase());
-      DB.saveBanned(banned);
-      showToast(`Unbanned <b>${target}</b>.`);
+      const banned = Storage.getBanned();
+      if (!banned.includes(target)) {
+        banned.push(target);
+        Storage.saveBanned(banned);
+      }
+      broadcastAuthorityEvent({ type: 'ban_player', target: target });
+      showToast(`Banned @${target} from logging in!`);
+    });
+
+    // Moderation: Unban
+    document.getElementById('btnUnbanPlayer').addEventListener('click', () => {
+      const target = document.getElementById('inputModTarget').value.trim().toLowerCase();
+      if (!target) return;
+      let banned = Storage.getBanned().filter(b => b !== target);
+      Storage.saveBanned(banned);
+      showToast(`Unbanned @${target}.`);
     });
 
     // Moderation: Delete Account
-    document.getElementById('btnDeleteUser').addEventListener('click', () => {
-      const target = document.getElementById('modTargetUser').value.trim();
+    document.getElementById('btnDeletePlayer').addEventListener('click', () => {
+      const target = document.getElementById('inputModTarget').value.trim().toLowerCase();
       if (!target) return;
-      if (!confirm(`Are you sure you want to completely delete account ${target}?`)) return;
-      const users = DB.getUsers();
-      delete users[target.toLowerCase()];
-      DB.saveUsers(users);
-      broadcastAdminAction({ type: 'delete', target: target });
-      showToast(`Deleted account <b>${target}</b>.`);
+      if (!confirm(`Permanently delete account @${target}?`)) return;
+      const users = Storage.getUsers();
+      delete users[target];
+      Storage.saveUsers(users);
+      broadcastAuthorityEvent({ type: 'delete_player', target: target });
+      showToast(`Deleted account @${target}.`);
     });
 
-    function broadcastAdminAction(action) {
-      if (worldChannel) {
-        worldChannel.send({
+    function broadcastAuthorityEvent(payload) {
+      if (parkChannel) {
+        parkChannel.send({
           type: 'broadcast',
-          event: 'admin_broadcast',
-          payload: action
+          event: 'authority',
+          payload: payload
         });
       }
     }
 
-    function handleAdminBroadcast(action) {
+    function handleAuthorityEvent(ev) {
       if (!currentUser) return;
-      const myName = currentUser.username.toLowerCase();
-      const targetName = (action.target || '').toLowerCase();
+      const myU = currentUser.username.toLowerCase();
+      const targetU = (ev.target || '').toLowerCase();
 
-      if (action.type === 'mute' && myName === targetName) {
-        mutedUntil = Date.now() + action.minutes * 60 * 1000;
-        showToast(`🔒 You have been muted by an Admin for ${action.minutes} minutes!`);
+      if (ev.type === 'mute_chat' && myU === targetU) {
+        chatMutedUntil = Date.now() + ev.minutes * 60 * 1000;
+        showToast(`🔒 You have been muted by an Admin for ${ev.minutes} minutes!`);
       }
-      if (action.type === 'ban' && myName === targetName) {
-        alert('You have been banned by an Admin.');
+      if (ev.type === 'ban_player' && myU === targetU) {
+        alert('You have been banned from Sakura Park.');
         location.reload();
       }
-      if (action.type === 'delete' && myName === targetName) {
-        alert('Your account has been deleted by an administrator.');
+      if (ev.type === 'delete_player' && myU === targetU) {
+        alert('Your account was deleted by an administrator.');
         location.reload();
       }
-      if (action.type === 'assign_admin' && myName === targetName) {
+      if (ev.type === 'promote_admin' && myU === targetU) {
         currentUser.role = 'admin';
-        updateHud();
-        showToast('🛡️ You have been promoted to ADMIN! Void Black Skin & Red Title unlocked.');
+        updatePlayerHUD();
+        showToast('🛡️ You have been promoted to ADMIN! Void Black Skin & Red Admin Title unlocked.');
       }
-      if (action.type === 'revoke_admin' && myName === targetName) {
+      if (ev.type === 'revoke_admin' && myU === targetU) {
         currentUser.role = 'user';
-        updateHud();
-        showToast('Your Admin rights have been revoked.');
+        updatePlayerHUD();
+        showToast('Your Admin privileges were revoked.');
       }
-      if (action.type === 'gift_points' && myName === targetName) {
-        currentUser.points += action.amount;
-        updateHud();
-        showToast(`✨ You received a gift of <b>+${action.amount} Blossom Points</b>!`);
+      if (ev.type === 'gift_points' && myU === targetU) {
+        currentUser.points += ev.amount;
+        updatePlayerHUD();
+        showToast(`✨ Received a gift of <b>+${ev.amount} Blossom Points</b>!`);
       }
     }
 
-    // Modal Close Events
-    document.querySelectorAll('.modal-close').forEach(btn => {
+    // Modal Switchers
+    document.getElementById('btnOpenShop').addEventListener('click', () => document.getElementById('modalShop').classList.add('active'));
+    document.getElementById('btnOpenGames').addEventListener('click', () => document.getElementById('modalGames').classList.add('active'));
+
+    document.querySelectorAll('.modal-close-icon').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.getElementById(btn.dataset.close).classList.remove('active');
+        document.getElementById(btn.dataset.modal).classList.remove('active');
       });
     });
   </script>
