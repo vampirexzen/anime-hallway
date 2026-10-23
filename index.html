@@ -1276,19 +1276,19 @@
     let unreadDmCount = 0;
     let chatMutedUntil = 0;
     let passiveRewardSeconds = 20 * 60;
-    let otherPlayers = new Map();
+    let otherPlayers = new Map(); // Strictly stores active online players (NO MOCK SLIMES)
     let floatingBubbles = [];
 
     const Storage = {
-      getUsers: () => JSON.parse(localStorage.getItem('sakura_users_v6') || '{}'),
-      saveUsers: (u) => localStorage.setItem('sakura_users_v6', JSON.stringify(u)),
-      getBanned: () => JSON.parse(localStorage.getItem('sakura_banned_v6') || '[]'),
-      saveBanned: (b) => localStorage.setItem('sakura_banned_v6', JSON.stringify(b)),
-      getAdmins: () => JSON.parse(localStorage.getItem('sakura_admins_v6') || '[]'),
-      saveAdmins: (a) => localStorage.setItem('sakura_admins_v6', JSON.stringify(a))
+      getUsers: () => JSON.parse(localStorage.getItem('sakura_users_v7') || '{}'),
+      saveUsers: (u) => localStorage.setItem('sakura_users_v7', JSON.stringify(u)),
+      getBanned: () => JSON.parse(localStorage.getItem('sakura_banned_v7') || '[]'),
+      saveBanned: (b) => localStorage.setItem('sakura_banned_v7', JSON.stringify(b)),
+      getAdmins: () => JSON.parse(localStorage.getItem('sakura_admins_v7') || '[]'),
+      saveAdmins: (a) => localStorage.setItem('sakura_admins_v7', JSON.stringify(a))
     };
 
-    // --- 3. EXPANDED MARKETPLACE CATALOG WITH MULTI-SHADE EXPENSIVE SLIMES & NEW TITLES ---
+    // --- 3. EXPANDED MARKETPLACE CATALOG ---
     const MARKET_CATALOG = {
       accessories: [
         { id: 'acc_sakura_pin', name: 'Sakura Pin', price: 400, icon: '🌸' },
@@ -1316,7 +1316,6 @@
         { id: 'skin_ruby', name: 'Ruby Crimson', price: 4200, color: '#ff4757' },
         { id: 'skin_emerald', name: 'Emerald Forest', price: 6500, color: '#2ed573' },
         { id: 'skin_sapphire', name: 'Sapphire Royal', price: 9000, color: '#1e90ff' },
-        // Multi-shade expensive slimes with rich multi-stop gradients
         { id: 'skin_sunset_aurora', name: 'Sunset Aurora (Multi)', price: 14000, multiShade: ['#ff7675', '#fdcb6e', '#e84393', '#6c5ce7'] },
         { id: 'skin_galaxy_nebula', name: 'Galaxy Nebula (Multi)', price: 20000, multiShade: ['#2f3640', '#9c88ff', '#8c7ae3', '#fbc531'] },
         { id: 'skin_cyber_neon', name: 'Cyber Neon (Multi)', price: 28000, multiShade: ['#00cec9', '#0984e3', '#00b894', '#fd79a8'] },
@@ -1357,7 +1356,7 @@
         id: 'u_' + Math.random().toString(36).substring(2, 9),
         email: email,
         displayName: defaultDisplayName,
-        points: 100, // Starting bonus points to test market!
+        points: 100,
         skin: 'skin_blossom',
         accessory: null,
         title: 'NOVICE',
@@ -1420,10 +1419,11 @@
       const sp = SPAWN_POINTS[Math.floor(Math.random() * SPAWN_POINTS.length)];
       mySlime.x = sp.x + (Math.random() - 0.5) * 80;
       mySlime.y = sp.y + (Math.random() - 0.5) * 80;
+      camera.x = mySlime.x;
+      camera.y = mySlime.y;
 
       updateHUD();
       initSupabaseNetworking();
-      initCommunityDemoPlayers();
       startPassiveRewardTimer();
       initDressingRoom();
       initMusicPlayer();
@@ -1712,18 +1712,19 @@
       showToast('Request rejected.');
     };
 
-    // --- 7. GRAPHICS ENGINE & ROBUST CANVAS SCALE FIX ---
+    // --- 7. GRAPHICS ENGINE & FIXES ---
     const canvas = document.getElementById('worldCanvas');
     const ctx = canvas.getContext('2d');
-    let viewW, viewH;
+    let viewW = window.innerWidth;
+    let viewH = window.innerHeight;
 
     function resizeCanvas() {
       viewW = window.innerWidth;
       viewH = window.innerHeight;
-      canvas.width = viewW * window.devicePixelRatio;
-      canvas.height = viewH * window.devicePixelRatio;
-      // CRITICAL FIX: setTransform instead of compounding ctx.scale prevents blackouts when screens/canvases re-render or join states update
-      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = viewW * dpr;
+      canvas.height = viewH * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
@@ -1957,7 +1958,6 @@
         targetCtx.shadowColor = '#ff3366';
         targetCtx.shadowBlur = 20;
       } else if (sk && sk.multiShade) {
-        // Multi-shade expensive slime gradient with 4 color stops
         const multiGrad = targetCtx.createLinearGradient(-30, -30, 30, 30);
         const stops = sk.multiShade;
         stops.forEach((col, idx) => {
@@ -2114,10 +2114,12 @@
 
         drawWorld();
 
+        // Render other real players online
         otherPlayers.forEach((p) => {
-          renderSlime(ctx, p.x, p.y, p, p.displayName, p.title);
+          renderSlime(ctx, p.x || 1200, p.y || 800, p, p.displayName, p.title);
         });
 
+        // Render local user slime
         if (currentUser) {
           const currentTag = isDevModeActive ? 'DEV' : (currentUser.role === 'admin' ? 'ADMIN' : currentUser.title);
           renderSlime(ctx, mySlime.x, mySlime.y, mySlime, currentUser.displayName, currentTag);
@@ -2158,30 +2160,6 @@
         ctx.fillText(b.text, 10, 17);
         ctx.restore();
       }
-    }
-
-    function initCommunityDemoPlayers() {
-      const mocks = [
-        { dName: '🌸 Sakura Spirit', uName: 'sakura_spirit@sakura.park', x: 1140, y: 760, skin: 'skin_ocean', acc: 'acc_sakura_pin', title: 'DANCER' },
-        { dName: '🍵 Matcha Boba', uName: 'matcha_boba@sakura.park', x: 1270, y: 850, skin: 'skin_matcha', acc: 'acc_cat_ears', title: 'SAGE' }
-      ];
-
-      mocks.forEach(m => {
-        otherPlayers.set(m.uName, {
-          x: m.x,
-          y: m.y,
-          radius: 28,
-          jumpOffset: 0,
-          squash: 1,
-          isDancing: false,
-          displayName: m.dName,
-          email: m.uName,
-          title: m.title,
-          pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${m.uName}`,
-          skin: m.skin,
-          accessory: m.acc
-        });
-      });
     }
 
     // --- 11. CLICK WORLD SLIMES ---
@@ -2234,7 +2212,7 @@
     let parkChannel = null;
     function initSupabaseNetworking() {
       try {
-        parkChannel = supabaseClient.channel('sakura-community-park-v6', {
+        parkChannel = supabaseClient.channel('sakura-community-park-v8', {
           config: { presence: { key: currentUser.email } }
         });
 
@@ -2244,14 +2222,20 @@
             for (let k in state) {
               const p = state[k][0];
               if (p && p.email !== currentUser.email) {
-                otherPlayers.set(p.email, p);
+                otherPlayers.set(p.email, {
+                  radius: 28,
+                  jumpOffset: 0,
+                  squash: 1,
+                  isDancing: false,
+                  ...p
+                });
               }
             }
           })
           .on('broadcast', { event: 'pos' }, (res) => {
             const p = res.payload;
             if (p && p.email !== currentUser.email) {
-              const existing = otherPlayers.get(p.email) || {};
+              const existing = otherPlayers.get(p.email) || { radius: 28, jumpOffset: 0, squash: 1 };
               otherPlayers.set(p.email, { ...existing, ...p });
             }
           })
