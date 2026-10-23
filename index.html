@@ -1256,7 +1256,6 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // WORLD MAP DIMENSIONS & SPAWN LOCATIONS
     const WORLD_W = 2400;
     const WORLD_H = 1600;
     const SPAWN_POINTS = [
@@ -1270,61 +1269,70 @@
     // --- 2. GAME STATE ---
     let currentUser = null;
     let isDevModeActive = false;
-    let activeFriendsTab = 'friends'; // 'friends' or 'requests'
+    let activeFriendsTab = 'friends';
     let activeDmPartner = '';
     let globalChatLog = [];
-    let dmChatLogs = {}; // { [email]: [messages] }
+    let dmChatLogs = {};
     let unreadDmCount = 0;
     let chatMutedUntil = 0;
     let passiveRewardSeconds = 20 * 60;
     let otherPlayers = new Map();
     let floatingBubbles = [];
 
-    // Local Storage Helpers
     const Storage = {
-      getUsers: () => JSON.parse(localStorage.getItem('sakura_users_v5') || '{}'),
-      saveUsers: (u) => localStorage.setItem('sakura_users_v5', JSON.stringify(u)),
-      getBanned: () => JSON.parse(localStorage.getItem('sakura_banned_v5') || '[]'),
-      saveBanned: (b) => localStorage.setItem('sakura_banned_v5', JSON.stringify(b)),
-      getAdmins: () => JSON.parse(localStorage.getItem('sakura_admins_v5') || '[]'),
-      saveAdmins: (a) => localStorage.setItem('sakura_admins_v5', JSON.stringify(a))
+      getUsers: () => JSON.parse(localStorage.getItem('sakura_users_v6') || '{}'),
+      saveUsers: (u) => localStorage.setItem('sakura_users_v6', JSON.stringify(u)),
+      getBanned: () => JSON.parse(localStorage.getItem('sakura_banned_v6') || '[]'),
+      saveBanned: (b) => localStorage.setItem('sakura_banned_v6', JSON.stringify(b)),
+      getAdmins: () => JSON.parse(localStorage.getItem('sakura_admins_v6') || '[]'),
+      saveAdmins: (a) => localStorage.setItem('sakura_admins_v6', JSON.stringify(a))
     };
 
-    // EXPANDED MARKETPLACE CATALOG WITH RICH NEW ITEMS & BETTER SKIN GRADIENTS
+    // --- 3. EXPANDED MARKETPLACE CATALOG WITH MULTI-SHADE EXPENSIVE SLIMES & NEW TITLES ---
     const MARKET_CATALOG = {
       accessories: [
-        { id: 'acc_sakura_pin', name: 'Sakura Pin', price: 450, icon: '🌸' },
-        { id: 'acc_cat_ears', name: 'Neko Ears', price: 750, icon: '🐱' },
-        { id: 'acc_angel_halo', name: 'Angel Halo', price: 1200, icon: '✨' },
-        { id: 'acc_kabuto_ribbon', name: 'Kabuto Ribbon', price: 1900, icon: '🎀' },
-        { id: 'acc_kitsune_mask', name: 'Kitsune Mask', price: 2800, icon: '🦊' },
-        { id: 'acc_starlight_hat', name: 'Wizard Hat', price: 4200, icon: '🧙' },
-        { id: 'acc_cyber_visor', name: 'Cyber Visor', price: 6500, icon: '🕶️' },
-        { id: 'acc_dragon_horns', name: 'Dragon Horns', price: 9500, icon: '🐉' },
-        { id: 'acc_royal_crown', name: 'Royal Crown', price: 14000, icon: '👑' },
-        { id: 'acc_celestial_wings', name: 'Celestial Wings', price: 20000, icon: '🪽' },
-        { id: 'acc_magic_wand', name: 'Magic Wand', price: 26000, icon: '🪄' },
-        { id: 'acc_crystal_orb', name: 'Crystal Orb', price: 35000, icon: '🔮' }
+        { id: 'acc_sakura_pin', name: 'Sakura Pin', price: 400, icon: '🌸' },
+        { id: 'acc_cat_ears', name: 'Neko Ears', price: 650, icon: '🐱' },
+        { id: 'acc_angel_halo', name: 'Angel Halo', price: 1000, icon: '✨' },
+        { id: 'acc_kabuto_ribbon', name: 'Kabuto Ribbon', price: 1600, icon: '🎀' },
+        { id: 'acc_kitsune_mask', name: 'Kitsune Mask', price: 2400, icon: '🦊' },
+        { id: 'acc_starlight_hat', name: 'Wizard Hat', price: 3600, icon: '🧙' },
+        { id: 'acc_cyber_visor', name: 'Cyber Visor', price: 5200, icon: '🕶️' },
+        { id: 'acc_dragon_horns', name: 'Dragon Horns', price: 7800, icon: '🐉' },
+        { id: 'acc_royal_crown', name: 'Royal Crown', price: 11000, icon: '👑' },
+        { id: 'acc_celestial_wings', name: 'Celestial Wings', price: 16000, icon: '🪽' },
+        { id: 'acc_magic_wand', name: 'Magic Wand', price: 22000, icon: '🪄' },
+        { id: 'acc_crystal_orb', name: 'Crystal Orb', price: 29000, icon: '🔮' },
+        { id: 'acc_golden_phoenix', name: 'Golden Phoenix', price: 40000, icon: '🔥' },
+        { id: 'acc_star_glasses', name: 'Star Glasses', price: 850, icon: '🌟' },
+        { id: 'acc_devil_horns', name: 'Devil Horns', price: 2100, icon: '😈' }
       ],
       skins: [
         { id: 'skin_blossom', name: 'Blossom Pink', price: 0, color: '#ff94b8' },
-        { id: 'skin_matcha', name: 'Matcha Mint', price: 500, color: '#55efc4' },
-        { id: 'skin_lavender', name: 'Lavender Dusk', price: 1000, color: '#a29bfe' },
-        { id: 'skin_ocean', name: 'Ocean Cyan', price: 1800, color: '#00cec9' },
-        { id: 'skin_amber', name: 'Sunset Amber', price: 3200, color: '#fdcb6e' },
-        { id: 'skin_ruby', name: 'Ruby Crimson', price: 5500, color: '#ff4757' },
-        { id: 'skin_emerald', name: 'Emerald Forest', price: 8000, color: '#2ed573' },
-        { id: 'skin_sapphire', name: 'Sapphire Royal', price: 11000, color: '#1e90ff' },
-        { id: 'skin_prismatic', name: 'Prismatic Aura', price: 16000, color: 'rainbow' },
+        { id: 'skin_matcha', name: 'Matcha Mint', price: 450, color: '#55efc4' },
+        { id: 'skin_lavender', name: 'Lavender Dusk', price: 900, color: '#a29bfe' },
+        { id: 'skin_ocean', name: 'Ocean Cyan', price: 1500, color: '#00cec9' },
+        { id: 'skin_amber', name: 'Sunset Amber', price: 2600, color: '#fdcb6e' },
+        { id: 'skin_ruby', name: 'Ruby Crimson', price: 4200, color: '#ff4757' },
+        { id: 'skin_emerald', name: 'Emerald Forest', price: 6500, color: '#2ed573' },
+        { id: 'skin_sapphire', name: 'Sapphire Royal', price: 9000, color: '#1e90ff' },
+        // Multi-shade expensive slimes with rich multi-stop gradients
+        { id: 'skin_sunset_aurora', name: 'Sunset Aurora (Multi)', price: 14000, multiShade: ['#ff7675', '#fdcb6e', '#e84393', '#6c5ce7'] },
+        { id: 'skin_galaxy_nebula', name: 'Galaxy Nebula (Multi)', price: 20000, multiShade: ['#2f3640', '#9c88ff', '#8c7ae3', '#fbc531'] },
+        { id: 'skin_cyber_neon', name: 'Cyber Neon (Multi)', price: 28000, multiShade: ['#00cec9', '#0984e3', '#00b894', '#fd79a8'] },
+        { id: 'skin_molten_gold', name: 'Molten Gold (Multi)', price: 38000, multiShade: ['#ffeaa7', '#fab1a0', '#e17055', '#d63031'] },
+        { id: 'skin_prismatic', name: 'Prismatic Aura', price: 12000, color: 'rainbow' },
         { id: 'skin_admin_black', name: 'Void Black', price: 999999, color: '#100f14', adminOnly: true }
       ],
       titles: [
-        { id: 'title_novice', name: '🌸 Sakura Novice', price: 400, tag: 'NOVICE' },
-        { id: 'title_dancer', name: '🍃 Petal Dancer', price: 900, tag: 'DANCER' },
-        { id: 'title_sage', name: '🌙 Moonlight Sage', price: 2100, tag: 'SAGE' },
-        { id: 'title_monarch', name: '👑 Slime Monarch', price: 5000, tag: 'MONARCH' },
-        { id: 'title_celestial', name: '🌌 Celestial Being', price: 10000, tag: 'CELESTIAL' },
-        { id: 'title_legend', name: '⚡ Park Legend', price: 18000, tag: 'LEGEND' },
+        { id: 'title_novice', name: '🌸 Sakura Novice', price: 350, tag: 'NOVICE' },
+        { id: 'title_dancer', name: '🍃 Petal Dancer', price: 800, tag: 'DANCER' },
+        { id: 'title_sage', name: '🌙 Moonlight Sage', price: 1800, tag: 'SAGE' },
+        { id: 'title_monarch', name: '👑 Slime Monarch', price: 4200, tag: 'MONARCH' },
+        { id: 'title_celestial', name: '🌌 Celestial Being', price: 8500, tag: 'CELESTIAL' },
+        { id: 'title_legend', name: '⚡ Park Legend', price: 15000, tag: 'LEGEND' },
+        { id: 'title_galactic', name: '🪐 Galactic Emperor', price: 25000, tag: 'EMPEROR' },
+        { id: 'title_mythic', name: '💎 Mythic Paragon', price: 38000, tag: 'PARAGON' },
         { id: 'title_admin', name: '🛡️ RED ADMIN', price: 999999, tag: 'ADMIN', adminOnly: true }
       ]
     };
@@ -1341,7 +1349,7 @@
       }, duration);
     }
 
-    // --- 3. AUTHENTICATION & AUTOMATIC DISPLAY NAME ---
+    // --- 4. AUTHENTICATION & AUTOMATIC DISPLAY NAME ---
     function createInitialUser(email, isGuest = false) {
       const randomNum = Math.floor(1000 + Math.random() * 9000);
       const defaultDisplayName = `slime_${randomNum}`;
@@ -1349,7 +1357,7 @@
         id: 'u_' + Math.random().toString(36).substring(2, 9),
         email: email,
         displayName: defaultDisplayName,
-        points: 0,
+        points: 100, // Starting bonus points to test market!
         skin: 'skin_blossom',
         accessory: null,
         title: 'NOVICE',
@@ -1459,7 +1467,6 @@
       }
     }
 
-    // Passive 20 Minute Reward (+1 Point)
     function startPassiveRewardTimer() {
       setInterval(() => {
         if (passiveRewardSeconds > 0) {
@@ -1476,7 +1483,7 @@
       }, 1000);
     }
 
-    // --- 4. PROFILE CARD CLICK -> EDIT PROFILE MODAL ---
+    // --- 5. PROFILE EDIT ---
     document.getElementById('hudProfileCard').addEventListener('click', () => {
       if (!currentUser) return;
       document.getElementById('profileEditAvatar').src = currentUser.pfp;
@@ -1501,15 +1508,13 @@
 
     document.getElementById('btnSaveProfile').addEventListener('click', () => {
       const newDName = document.getElementById('profileEditDisplayName').value.trim();
-      if (newDName) {
-        currentUser.displayName = newDName;
-      }
+      if (newDName) currentUser.displayName = newDName;
       updateHUD();
       document.getElementById('modalProfile').classList.remove('active');
       showToast('🌸 Profile changes saved!');
     });
 
-    // --- 5. FRIENDS & INTEGRATED DM SECTION ---
+    // --- 6. FRIENDS & INTEGRATED DM SECTION ---
     document.getElementById('btnOpenFriends').addEventListener('click', () => {
       if (!currentUser) return;
       renderFriendsModal();
@@ -1707,7 +1712,7 @@
       showToast('Request rejected.');
     };
 
-    // --- 6. GRAPHICS ENGINE & IMPROVED SLIME SKIN COLORS ---
+    // --- 7. GRAPHICS ENGINE & ROBUST CANVAS SCALE FIX ---
     const canvas = document.getElementById('worldCanvas');
     const ctx = canvas.getContext('2d');
     let viewW, viewH;
@@ -1717,7 +1722,8 @@
       viewH = window.innerHeight;
       canvas.width = viewW * window.devicePixelRatio;
       canvas.height = viewH * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      // CRITICAL FIX: setTransform instead of compounding ctx.scale prevents blackouts when screens/canvases re-render or join states update
+      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
@@ -1819,7 +1825,7 @@
       joyDelta = { x: (Math.cos(angle) * dist) / 36, y: (Math.sin(angle) * dist) / 36 };
     }
 
-    // --- 7. WORLD DRAWING ---
+    // --- 8. WORLD DRAWING ---
     function drawWorld() {
       ctx.fillStyle = '#17221c';
       ctx.fillRect(0, 0, WORLD_W, WORLD_H);
@@ -1913,7 +1919,7 @@
       ctx.restore();
     }
 
-    // --- 8. BETTER SLIME SKIN RENDERING & SHINE ---
+    // --- 9. ADVANCED MULTI-SHADE SLIME RENDERING ---
     function renderSlime(targetCtx, x, y, slimeObj, displayName, tag) {
       targetCtx.save();
       targetCtx.translate(x, y + slimeObj.jumpOffset);
@@ -1939,34 +1945,43 @@
       targetCtx.beginPath();
       targetCtx.ellipse(0, 0, slimeObj.radius * slimeObj.squash, (slimeObj.radius - 4) / slimeObj.squash, 0, 0, Math.PI * 2);
 
-      let bodyColor = '#ff94b8';
+      let bodyFill = '#ff94b8';
+      const sk = MARKET_CATALOG.skins.find(s => s.id === slimeObj.skin);
+
       if (slimeObj.skin === 'dev_pure_white') {
-        bodyColor = '#ffffff';
+        bodyFill = '#ffffff';
         targetCtx.shadowColor = '#00f0ff';
         targetCtx.shadowBlur = 25;
       } else if (slimeObj.skin === 'skin_admin_black') {
-        bodyColor = '#100f14';
+        bodyFill = '#100f14';
         targetCtx.shadowColor = '#ff3366';
         targetCtx.shadowBlur = 20;
+      } else if (sk && sk.multiShade) {
+        // Multi-shade expensive slime gradient with 4 color stops
+        const multiGrad = targetCtx.createLinearGradient(-30, -30, 30, 30);
+        const stops = sk.multiShade;
+        stops.forEach((col, idx) => {
+          multiGrad.addColorStop(idx / (stops.length - 1), col);
+        });
+        bodyFill = multiGrad;
       } else if (slimeObj.skin === 'skin_prismatic') {
         const pGrad = targetCtx.createLinearGradient(-30, -30, 30, 30);
         pGrad.addColorStop(0, '#ff7675');
         pGrad.addColorStop(0.5, '#74b9ff');
         pGrad.addColorStop(1, '#55efc4');
-        bodyColor = pGrad;
-      } else {
-        const sk = MARKET_CATALOG.skins.find(s => s.id === slimeObj.skin);
-        if (sk) bodyColor = sk.color;
+        bodyFill = pGrad;
+      } else if (sk && sk.color) {
+        bodyFill = sk.color;
       }
 
-      targetCtx.fillStyle = bodyColor;
+      targetCtx.fillStyle = bodyFill;
       targetCtx.fill();
       targetCtx.shadowBlur = 0;
 
       // Glossy Radial Shine
       targetCtx.save();
       const shineGrad = targetCtx.createRadialGradient(-8, -10, 2, 0, 0, slimeObj.radius);
-      shineGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+      shineGrad.addColorStop(0, 'rgba(255, 255, 255, 0.75)');
       shineGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.25)');
       shineGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
       targetCtx.fillStyle = shineGrad;
@@ -2046,67 +2061,74 @@
       if (accId === 'acc_celestial_wings') ctxT.fillText('🪽', 0, -10);
       if (accId === 'acc_magic_wand') ctxT.fillText('🪄', 14, -12);
       if (accId === 'acc_crystal_orb') ctxT.fillText('🔮', 0, -20);
+      if (accId === 'acc_golden_phoenix') ctxT.fillText('🔥', 0, -22);
+      if (accId === 'acc_star_glasses') ctxT.fillText('🌟', 0, -6);
+      if (accId === 'acc_devil_horns') ctxT.fillText('😈', 0, -20);
       ctxT.restore();
     }
 
-    // --- 9. GAME LOOP ---
+    // --- 10. GAME LOOP WITH SAFEGUARD TRY/CATCH ---
     function worldLoop() {
-      let vx = 0;
-      let vy = 0;
+      try {
+        let vx = 0;
+        let vy = 0;
 
-      if (keyState['w'] || keyState['arrowup']) vy -= 1;
-      if (keyState['s'] || keyState['arrowdown']) vy += 1;
-      if (keyState['a'] || keyState['arrowleft']) vx -= 1;
-      if (keyState['d'] || keyState['arrowright']) vx += 1;
+        if (keyState['w'] || keyState['arrowup']) vy -= 1;
+        if (keyState['s'] || keyState['arrowdown']) vy += 1;
+        if (keyState['a'] || keyState['arrowleft']) vx -= 1;
+        if (keyState['d'] || keyState['arrowright']) vx += 1;
 
-      if (isJoyActive) {
-        vx = joyDelta.x;
-        vy = joyDelta.y;
-      }
-
-      if (vx !== 0 || vy !== 0) {
-        const len = Math.hypot(vx, vy);
-        mySlime.x += (vx / len) * mySlime.speed;
-        mySlime.y += (vy / len) * mySlime.speed;
-        mySlime.squash = 1.15;
-      } else {
-        mySlime.squash = 1 + Math.sin(Date.now() * 0.007) * 0.04;
-      }
-
-      mySlime.x = Math.max(40, Math.min(WORLD_W - 40, mySlime.x));
-      mySlime.y = Math.max(40, Math.min(WORLD_H - 40, mySlime.y));
-
-      if (mySlime.isJumping) {
-        mySlime.jumpOffset += mySlime.jumpVelocity;
-        mySlime.jumpVelocity += 0.65;
-        if (mySlime.jumpOffset >= 0) {
-          mySlime.jumpOffset = 0;
-          mySlime.isJumping = false;
-          mySlime.squash = 0.82;
+        if (isJoyActive) {
+          vx = joyDelta.x;
+          vy = joyDelta.y;
         }
+
+        if (vx !== 0 || vy !== 0) {
+          const len = Math.hypot(vx, vy);
+          mySlime.x += (vx / len) * mySlime.speed;
+          mySlime.y += (vy / len) * mySlime.speed;
+          mySlime.squash = 1.15;
+        } else {
+          mySlime.squash = 1 + Math.sin(Date.now() * 0.007) * 0.04;
+        }
+
+        mySlime.x = Math.max(40, Math.min(WORLD_W - 40, mySlime.x));
+        mySlime.y = Math.max(40, Math.min(WORLD_H - 40, mySlime.y));
+
+        if (mySlime.isJumping) {
+          mySlime.jumpOffset += mySlime.jumpVelocity;
+          mySlime.jumpVelocity += 0.65;
+          if (mySlime.jumpOffset >= 0) {
+            mySlime.jumpOffset = 0;
+            mySlime.isJumping = false;
+            mySlime.squash = 0.82;
+          }
+        }
+
+        camera.x += (mySlime.x - camera.x) * 0.1;
+        camera.y += (mySlime.y - camera.y) * 0.1;
+
+        ctx.clearRect(0, 0, viewW, viewH);
+        ctx.save();
+        ctx.translate(viewW / 2 - camera.x, viewH / 2 - camera.y);
+
+        drawWorld();
+
+        otherPlayers.forEach((p) => {
+          renderSlime(ctx, p.x, p.y, p, p.displayName, p.title);
+        });
+
+        if (currentUser) {
+          const currentTag = isDevModeActive ? 'DEV' : (currentUser.role === 'admin' ? 'ADMIN' : currentUser.title);
+          renderSlime(ctx, mySlime.x, mySlime.y, mySlime, currentUser.displayName, currentTag);
+        }
+
+        renderFloatingSpeechBubbles();
+
+        ctx.restore();
+      } catch (err) {
+        console.error('World render error safeguard:', err);
       }
-
-      camera.x += (mySlime.x - camera.x) * 0.1;
-      camera.y += (mySlime.y - camera.y) * 0.1;
-
-      ctx.clearRect(0, 0, viewW, viewH);
-      ctx.save();
-      ctx.translate(viewW / 2 - camera.x, viewH / 2 - camera.y);
-
-      drawWorld();
-
-      otherPlayers.forEach((p) => {
-        renderSlime(ctx, p.x, p.y, p, p.displayName, p.title);
-      });
-
-      if (currentUser) {
-        const currentTag = isDevModeActive ? 'DEV' : (currentUser.role === 'admin' ? 'ADMIN' : currentUser.title);
-        renderSlime(ctx, mySlime.x, mySlime.y, mySlime, currentUser.displayName, currentTag);
-      }
-
-      renderFloatingSpeechBubbles();
-
-      ctx.restore();
       requestAnimationFrame(worldLoop);
     }
     requestAnimationFrame(worldLoop);
@@ -2162,7 +2184,7 @@
       });
     }
 
-    // --- 10. CLICK WORLD SLIMES ---
+    // --- 11. CLICK WORLD SLIMES ---
     const targetPopup = document.getElementById('playerTargetPopup');
     let targetedSlime = null;
 
@@ -2208,11 +2230,11 @@
       targetPopup.style.display = 'none';
     });
 
-    // --- 11. SUPABASE NETWORKING ---
+    // --- 12. SUPABASE NETWORKING ---
     let parkChannel = null;
     function initSupabaseNetworking() {
       try {
-        parkChannel = supabaseClient.channel('sakura-community-park-v5', {
+        parkChannel = supabaseClient.channel('sakura-community-park-v6', {
           config: { presence: { key: currentUser.email } }
         });
 
@@ -2281,7 +2303,7 @@
       }
     }
 
-    // --- 12. SOLO GLOBAL CHAT DRAWER & EMOJIS ---
+    // --- 13. SOLO GLOBAL CHAT DRAWER & EMOJIS ---
     const chatDrawer = document.getElementById('chatDrawer');
     const chatToggleIcon = document.getElementById('chatToggleIcon');
     const chatMessagesContainer = document.getElementById('chatMessagesContainer');
@@ -2400,7 +2422,7 @@
       return str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t));
     }
 
-    // --- 13. MUSIC PLAYER ---
+    // --- 14. MUSIC PLAYER ---
     let audioCtx = null;
     let musicInterval = null;
     let masterGain = null;
@@ -2473,7 +2495,7 @@
       showToast(`🎵 Music changed to <b>${trackId.replace('_', ' ').toUpperCase()}</b>!`);
     };
 
-    // --- 14. MARKETPLACE & DRESSING ROOM ---
+    // --- 15. MARKETPLACE & DRESSING ROOM ---
     const dressingRoomCanvas = document.getElementById('dressingRoomCanvas');
     const drCtx = dressingRoomCanvas ? dressingRoomCanvas.getContext('2d') : null;
     let dressingRoomSlime = { radius: 36, jumpOffset: 0, squash: 1, skin: 'skin_blossom', accessory: null, isDancing: false };
@@ -2567,7 +2589,7 @@
       renderMarketGrid(cat);
     };
 
-    // --- 15. MINIGAMES ---
+    // --- 16. MINIGAMES ---
     const memorySymbols = ['🌸', '🍡', '🍵', '🏮', '🎏', '🎋', '⛩️', '🐸'];
     let memoryFlipped = [];
     let memoryMatches = 0;
@@ -2720,7 +2742,7 @@
       }
     }
 
-    // --- 16. DEVELOPER & ADMIN SYSTEM ---
+    // --- 17. DEVELOPER & ADMIN SYSTEM ---
     document.getElementById('btnOpenDev').addEventListener('click', () => {
       if (isDevModeActive || currentUser.role === 'admin') {
         openDevAdminModal();
