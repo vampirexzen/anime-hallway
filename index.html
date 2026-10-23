@@ -94,6 +94,13 @@
       border-color: var(--sakura-pink);
     }
 
+    .hud-avatar-wrapper {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+    }
+
     .hud-avatar {
       width: 44px;
       height: 44px;
@@ -101,7 +108,19 @@
       border: 2px solid var(--sakura-pink);
       object-fit: cover;
       background: #251b3d;
-      flex-shrink: 0;
+    }
+
+    .hud-frame-overlay {
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border-radius: 50%;
+      pointer-events: none;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+      display: none;
     }
 
     .hud-info {
@@ -694,10 +713,11 @@
 
     .market-category-nav {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 14px;
       border-bottom: 1px solid var(--panel-border);
       padding-bottom: 8px;
+      overflow-x: auto;
     }
 
     .market-cat-btn {
@@ -705,10 +725,11 @@
       border: 1px solid var(--panel-border);
       color: var(--text-muted);
       border-radius: 10px;
-      padding: 6px 12px;
+      padding: 6px 10px;
       cursor: pointer;
       font-weight: 700;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
+      white-space: nowrap;
     }
 
     .market-cat-btn.active {
@@ -893,7 +914,10 @@
   <div class="top-hud">
     <!-- Clickable User Profile Card (Opens Profile Edit) -->
     <div class="hud-profile-card glass" id="hudProfileCard" title="Click to view & edit Profile">
-      <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Sakura" id="hudAvatarImg" class="hud-avatar" />
+      <div class="hud-avatar-wrapper">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Sakura" id="hudAvatarImg" class="hud-avatar" />
+        <div class="hud-frame-overlay" id="hudFrameOverlay"></div>
+      </div>
       <div class="hud-info">
         <div class="hud-name-row">
           <span class="hud-display-name" id="hudDisplayName">slime_0000</span>
@@ -971,10 +995,7 @@
     <img id="popupAvatar" src="" style="width: 46px; height: 46px; border-radius: 50%; margin: 0 auto 6px; display: block; border: 2px solid var(--sakura-pink);" />
     <h4 id="popupDisplayName" style="font-size: 0.95rem; margin-bottom: 2px;"></h4>
     <div id="popupUsername" style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 8px;"></div>
-    <div style="display: flex; gap: 6px; justify-content: center;">
-      <button class="btn-market-action" id="popupAddFriendBtn" style="background: var(--sakura-pink); color: #0e0a1a;"><i class="fa-solid fa-user-plus"></i> Add Friend</button>
-      <button class="btn-market-action" id="popupDirectDmBtn" style="background: rgba(0, 240, 255, 0.2); color: var(--dev-cyan); border: 1px solid var(--dev-cyan);"><i class="fa-solid fa-comment-dots"></i> Open DM</button>
-    </div>
+    <div style="display: flex; gap: 6px; justify-content: center;" id="popupActionButtonsContainer"></div>
   </div>
 
   <!-- MODAL: AUTHENTICATION (EMAIL & PASSWORD) -->
@@ -1012,16 +1033,17 @@
       </div>
       <div class="modal-body">
         <div class="friends-split-layout">
-          <!-- Sidebar: Friends & Requests -->
+          <!-- Sidebar: Friends, Requests & Global Search -->
           <div class="friends-sidebar">
             <div class="friends-nav-tabs">
               <button class="friends-tab-btn active" id="btnTabFriendsList" onclick="switchFriendsTab('friends')">Friends</button>
               <button class="friends-tab-btn" id="btnTabFriendRequests" onclick="switchFriendsTab('requests')">
                 Requests <span id="reqBadgeCount" style="background:var(--notif-red); color:#fff; font-size:0.6rem; padding:1px 4px; border-radius:6px; display:none;">0</span>
               </button>
+              <button class="friends-tab-btn" id="btnTabAddGlobal" onclick="switchFriendsTab('add')">Add</button>
             </div>
             <div class="form-group" style="margin-bottom: 6px;">
-              <input type="text" id="friendSearchInput" class="input-field" placeholder="Search friends..." style="padding: 6px 10px; font-size: 0.76rem;" />
+              <input type="text" id="friendSearchInput" class="input-field" placeholder="Search friends or players..." style="padding: 6px 10px; font-size: 0.76rem;" />
             </div>
             <div id="friendsSidebarList" style="display: flex; flex-direction: column; gap: 6px;"></div>
           </div>
@@ -1130,6 +1152,8 @@
               <button class="market-cat-btn active" data-cat="accessories">Accessories</button>
               <button class="market-cat-btn" data-cat="skins">Skins</button>
               <button class="market-cat-btn" data-cat="titles">Titles</button>
+              <button class="market-cat-btn" data-cat="frames">Frames</button>
+              <button class="market-cat-btn" data-cat="avatars">Avatars</button>
             </div>
             <div class="market-item-grid" id="marketItemGrid"></div>
           </div>
@@ -1198,22 +1222,27 @@
 
         <!-- Dev Only: Send Points Direct -->
         <div id="devPointGrantCard" style="padding: 12px; background: rgba(255, 209, 102, 0.08); border: 1px solid var(--gold); border-radius: 12px; margin-bottom: 14px;">
-          <h4 style="color: var(--gold); font-size: 0.88rem; margin-bottom: 6px;"><i class="fa-solid fa-coins"></i> Send Blossom Points (Dev Exclusive)</h4>
-          <div style="display: flex; gap: 6px;">
+          <h4 style="color: var(--gold); font-size: 0.88rem; margin-bottom: 6px;"><i class="fa-solid fa-coins"></i> Send or Deduct Blossom Points (Dev Exclusive)</h4>
+          <div style="display: flex; gap: 6px; margin-bottom: 6px;">
             <input type="text" id="inputGrantTarget" class="input-field" placeholder="Email" />
             <input type="number" id="inputGrantAmount" class="input-field" placeholder="Points" style="width: 100px;" />
-            <button class="btn-main" id="btnGrantPoints" style="width: 90px; margin-top: 0;">Send</button>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn-main" id="btnGrantPoints" style="margin-top: 0;">Send Points</button>
+            <button class="btn-secondary" id="btnDeductPoints" style="margin-top: 0; border-color: var(--admin-red); color: var(--admin-red);">Deduct Points</button>
           </div>
         </div>
 
-        <!-- Dev Only: Promote / Demote Admin -->
+        <!-- Dev Only: Promote / Demote Admin & Admin List -->
         <div id="devAdminRoleCard" style="padding: 12px; background: rgba(255, 51, 102, 0.08); border: 1px solid var(--admin-red); border-radius: 12px; margin-bottom: 14px;">
-          <h4 style="color: var(--admin-red); font-size: 0.88rem; margin-bottom: 6px;"><i class="fa-solid fa-user-shield"></i> Admin Promotion & Demotion</h4>
-          <div style="display: flex; gap: 6px;">
+          <h4 style="color: var(--admin-red); font-size: 0.88rem; margin-bottom: 6px;"><i class="fa-solid fa-user-shield"></i> Admin Management & List</h4>
+          <div style="display: flex; gap: 6px; margin-bottom: 8px;">
             <input type="text" id="inputAdminTarget" class="input-field" placeholder="Email" />
             <button class="btn-main" id="btnPromoteAdmin" style="width: 100px; margin-top: 0;">Promote</button>
             <button class="btn-secondary" id="btnRevokeAdmin" style="width: 100px; margin-top: 0;">Revoke</button>
           </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Active Admins List:</div>
+          <div id="devAdminListContainer" style="display: flex; flex-direction: column; gap: 4px; max-height: 100px; overflow-y: auto;"></div>
         </div>
 
         <!-- Moderation: Mute, Ban, Delete Account -->
@@ -1269,26 +1298,26 @@
     // --- 2. GAME STATE ---
     let currentUser = null;
     let isDevModeActive = false;
-    let activeFriendsTab = 'friends';
+    let activeFriendsTab = 'friends'; // 'friends', 'requests', 'add'
     let activeDmPartner = '';
     let globalChatLog = [];
     let dmChatLogs = {};
     let unreadDmCount = 0;
     let chatMutedUntil = 0;
     let passiveRewardSeconds = 20 * 60;
-    let otherPlayers = new Map(); // Strictly stores active online players (NO MOCK SLIMES)
+    let otherPlayers = new Map();
     let floatingBubbles = [];
 
     const Storage = {
-      getUsers: () => JSON.parse(localStorage.getItem('sakura_users_v7') || '{}'),
-      saveUsers: (u) => localStorage.setItem('sakura_users_v7', JSON.stringify(u)),
-      getBanned: () => JSON.parse(localStorage.getItem('sakura_banned_v7') || '[]'),
-      saveBanned: (b) => localStorage.setItem('sakura_banned_v7', JSON.stringify(b)),
-      getAdmins: () => JSON.parse(localStorage.getItem('sakura_admins_v7') || '[]'),
-      saveAdmins: (a) => localStorage.setItem('sakura_admins_v7', JSON.stringify(a))
+      getUsers: () => JSON.parse(localStorage.getItem('sakura_users_v9') || '{}'),
+      saveUsers: (u) => localStorage.setItem('sakura_users_v9', JSON.stringify(u)),
+      getBanned: () => JSON.parse(localStorage.getItem('sakura_banned_v9') || '[]'),
+      saveBanned: (b) => localStorage.setItem('sakura_banned_v9', JSON.stringify(b)),
+      getAdmins: () => JSON.parse(localStorage.getItem('sakura_admins_v9') || '[]'),
+      saveAdmins: (a) => localStorage.setItem('sakura_admins_v9', JSON.stringify(a))
     };
 
-    // --- 3. EXPANDED MARKETPLACE CATALOG ---
+    // --- 3. EXPANDED MARKETPLACE CATALOG (FRAMES & AVATARS INCLUDED) ---
     const MARKET_CATALOG = {
       accessories: [
         { id: 'acc_sakura_pin', name: 'Sakura Pin', price: 400, icon: '🌸' },
@@ -1302,10 +1331,7 @@
         { id: 'acc_royal_crown', name: 'Royal Crown', price: 11000, icon: '👑' },
         { id: 'acc_celestial_wings', name: 'Celestial Wings', price: 16000, icon: '🪽' },
         { id: 'acc_magic_wand', name: 'Magic Wand', price: 22000, icon: '🪄' },
-        { id: 'acc_crystal_orb', name: 'Crystal Orb', price: 29000, icon: '🔮' },
-        { id: 'acc_golden_phoenix', name: 'Golden Phoenix', price: 40000, icon: '🔥' },
-        { id: 'acc_star_glasses', name: 'Star Glasses', price: 850, icon: '🌟' },
-        { id: 'acc_devil_horns', name: 'Devil Horns', price: 2100, icon: '😈' }
+        { id: 'acc_crystal_orb', name: 'Crystal Orb', price: 29000, icon: '🔮' }
       ],
       skins: [
         { id: 'skin_blossom', name: 'Blossom Pink', price: 0, color: '#ff94b8' },
@@ -1321,7 +1347,7 @@
         { id: 'skin_cyber_neon', name: 'Cyber Neon (Multi)', price: 28000, multiShade: ['#00cec9', '#0984e3', '#00b894', '#fd79a8'] },
         { id: 'skin_molten_gold', name: 'Molten Gold (Multi)', price: 38000, multiShade: ['#ffeaa7', '#fab1a0', '#e17055', '#d63031'] },
         { id: 'skin_prismatic', name: 'Prismatic Aura', price: 12000, color: 'rainbow' },
-        { id: 'skin_admin_black', name: 'Void Black', price: 999999, color: '#100f14', adminOnly: true }
+        { id: 'skin_admin_black', name: 'Void Black', price: 0, color: '#100f14', adminOnly: true }
       ],
       titles: [
         { id: 'title_novice', name: '🌸 Sakura Novice', price: 350, tag: 'NOVICE' },
@@ -1330,9 +1356,19 @@
         { id: 'title_monarch', name: '👑 Slime Monarch', price: 4200, tag: 'MONARCH' },
         { id: 'title_celestial', name: '🌌 Celestial Being', price: 8500, tag: 'CELESTIAL' },
         { id: 'title_legend', name: '⚡ Park Legend', price: 15000, tag: 'LEGEND' },
-        { id: 'title_galactic', name: '🪐 Galactic Emperor', price: 25000, tag: 'EMPEROR' },
-        { id: 'title_mythic', name: '💎 Mythic Paragon', price: 38000, tag: 'PARAGON' },
-        { id: 'title_admin', name: '🛡️ RED ADMIN', price: 999999, tag: 'ADMIN', adminOnly: true }
+        { id: 'title_admin', name: '🛡️ RED ADMIN', price: 0, tag: 'ADMIN', adminOnly: true }
+      ],
+      frames: [
+        { id: 'frame_gold', name: 'Golden Aura Frame', price: 2500, color: '#ffd166', icon: '🟡' },
+        { id: 'frame_sakura', name: 'Sakura Blossom Frame', price: 4000, color: '#ff6584', icon: '🌸' },
+        { id: 'frame_cyber', name: 'Cyber Neon Frame', price: 6500, color: '#00f0ff', icon: '💠' },
+        { id: 'frame_royal', name: 'Royal Diamond Frame', price: 12000, color: '#9c88ff', icon: '💎' }
+      ],
+      avatars: [
+        { id: 'avatar_kitsune', name: 'Kitsune Mask Avatar', price: 1500, seed: 'KitsuneFox', icon: '🦊' },
+        { id: 'avatar_dragon', name: 'Dragon Soul Avatar', price: 3000, seed: 'DragonFlame', icon: '🐲' },
+        { id: 'avatar_angel', name: 'Celestial Angel Avatar', price: 5000, seed: 'AngelHalo', icon: '👼' },
+        { id: 'avatar_wizard', name: 'Arcane Wizard Avatar', price: 8000, seed: 'WizardMagic', icon: '🧙' }
       ]
     };
 
@@ -1356,9 +1392,10 @@
         id: 'u_' + Math.random().toString(36).substring(2, 9),
         email: email,
         displayName: defaultDisplayName,
-        points: 100,
+        points: 500, // Starting bonus points
         skin: 'skin_blossom',
         accessory: null,
+        frame: null,
         title: 'NOVICE',
         pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${email || defaultDisplayName}`,
         friends: [],
@@ -1411,6 +1448,9 @@
     function finishLogin() {
       if (Storage.getAdmins().includes(currentUser.email)) {
         currentUser.role = 'admin';
+        // Auto grant admin items if not present
+        if (!currentUser.inventory.includes('skin_admin_black')) currentUser.inventory.push('skin_admin_black');
+        if (!currentUser.inventory.includes('title_admin')) currentUser.inventory.push('title_admin');
       }
 
       document.getElementById('modalAuth').classList.remove('active');
@@ -1435,6 +1475,21 @@
       document.getElementById('hudAvatarImg').src = currentUser.pfp;
       document.getElementById('hudPoints').innerText = currentUser.points;
 
+      // Profile frame styling
+      const frameEl = document.getElementById('hudFrameOverlay');
+      if (currentUser.frame) {
+        const fObj = MARKET_CATALOG.frames.find(f => f.id === currentUser.frame);
+        if (fObj) {
+          frameEl.style.borderColor = fObj.color;
+          frameEl.style.boxShadow = `0 0 10px ${fObj.color}`;
+          frameEl.style.display = 'block';
+        } else {
+          frameEl.style.display = 'none';
+        }
+      } else {
+        frameEl.style.display = 'none';
+      }
+
       const badge = document.getElementById('hudRoleBadge');
       if (isDevModeActive) {
         badge.className = 'badge-tag badge-dev';
@@ -1450,7 +1505,7 @@
 
       if (isDevModeActive) {
         mySlime.skin = 'dev_pure_white';
-      } else if (currentUser.role === 'admin') {
+      } else if (currentUser.role === 'admin' && currentUser.skin === 'skin_admin_black') {
         mySlime.skin = 'skin_admin_black';
       } else {
         mySlime.skin = currentUser.skin;
@@ -1514,9 +1569,12 @@
       showToast('🌸 Profile changes saved!');
     });
 
-    // --- 6. FRIENDS & INTEGRATED DM SECTION ---
+    // --- 6. FRIENDS & INTEGRATED DM SECTION (SEARCH, REQS, PERSISTENT BADGES) ---
     document.getElementById('btnOpenFriends').addEventListener('click', () => {
       if (!currentUser) return;
+      // Clear notification badges upon opening
+      document.getElementById('friendsNotifBadge').classList.remove('active');
+      unreadDmCount = 0;
       renderFriendsModal();
       document.getElementById('modalFriends').classList.add('active');
     });
@@ -1527,6 +1585,7 @@
       activeFriendsTab = tab;
       document.getElementById('btnTabFriendsList').classList.toggle('active', tab === 'friends');
       document.getElementById('btnTabFriendRequests').classList.toggle('active', tab === 'requests');
+      document.getElementById('btnTabAddGlobal').classList.toggle('active', tab === 'add');
       renderFriendsModal();
     }
 
@@ -1536,14 +1595,11 @@
       sidebarList.innerHTML = '';
 
       const reqBadge = document.getElementById('reqBadgeCount');
-      const globalBadge = document.getElementById('friendsNotifBadge');
       if (currentUser.friendRequests && currentUser.friendRequests.length > 0) {
         reqBadge.innerText = currentUser.friendRequests.length;
         reqBadge.style.display = 'inline-block';
-        globalBadge.classList.add('active');
       } else {
         reqBadge.style.display = 'none';
-        if (unreadDmCount === 0) globalBadge.classList.remove('active');
       }
 
       if (activeFriendsTab === 'friends') {
@@ -1555,23 +1611,23 @@
           return;
         }
 
-        filtered.forEach(friendId => {
-          const pObj = otherPlayers.get(friendId) || { displayName: friendId, pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${friendId}` };
+        filtered.forEach(friendEmail => {
+          const pObj = otherPlayers.get(friendEmail) || { displayName: friendEmail, pfp: `https://api.dicebear.com/7.x/bottts/svg?seed=${friendEmail}` };
           const row = document.createElement('div');
-          row.className = `friend-row-card ${activeDmPartner === friendId ? 'active' : ''}`;
+          row.className = `friend-row-card ${activeDmPartner === friendEmail ? 'active' : ''}`;
           row.innerHTML = `
             <div style="display:flex; align-items:center; gap:8px;">
               <img src="${pObj.pfp}" style="width:28px; height:28px; border-radius:50%; border:1px solid var(--sakura-pink); object-fit:cover;" />
               <div style="font-weight:800; font-size:0.8rem; max-width:110px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${pObj.displayName}</div>
             </div>
             <div style="display:flex; gap:4px;">
-              <button class="btn-market-action" style="background:var(--dev-cyan); color:#000; padding:2px 6px; font-size:0.68rem;" onclick="openDmWithFriend('${friendId}')">Chat</button>
-              <button class="btn-market-action" style="background:rgba(255,51,102,0.2); color:var(--admin-red); padding:2px 6px; font-size:0.68rem;" onclick="unfriendUser('${friendId}')">✕</button>
+              <button class="btn-market-action" style="background:var(--dev-cyan); color:#000; padding:2px 6px; font-size:0.68rem;" onclick="openDmWithFriend('${friendEmail}')">Chat</button>
+              <button class="btn-market-action" style="background:rgba(255,51,102,0.2); color:var(--admin-red); padding:2px 6px; font-size:0.68rem;" onclick="unfriendUser('${friendEmail}')">✕</button>
             </div>
           `;
           sidebarList.appendChild(row);
         });
-      } else {
+      } else if (activeFriendsTab === 'requests') {
         const reqs = currentUser.friendRequests || [];
         const filtered = reqs.filter(r => r.toLowerCase().includes(filter));
 
@@ -1596,12 +1652,40 @@
           `;
           sidebarList.appendChild(row);
         });
+      } else {
+        // 'add' tab: search anyone in the game online
+        const allKnown = Array.from(otherPlayers.values());
+        const filtered = allKnown.filter(p => p.email !== currentUser.email && (p.displayName.toLowerCase().includes(filter) || p.email.toLowerCase().includes(filter)));
+
+        if (filtered.length === 0) {
+          sidebarList.innerHTML = `<div style="text-align:center; padding:15px; font-size:0.76rem; color:var(--text-muted);">No other players found online to add.</div>`;
+          return;
+        }
+
+        filtered.forEach(p => {
+          const isAlreadyFriend = currentUser.friends.includes(p.email);
+          const row = document.createElement('div');
+          row.className = 'friend-row-card';
+          row.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px;">
+              <img src="${p.pfp}" style="width:28px; height:28px; border-radius:50%; border:1px solid var(--sakura-pink); object-fit:cover;" />
+              <div style="font-weight:800; font-size:0.8rem; max-width:110px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.displayName}</div>
+            </div>
+            <div>
+              ${isAlreadyFriend ? '<span style="font-size:0.7rem; color:var(--gold);">Friends</span>' : `<button class="btn-market-action" style="background:var(--sakura-pink); color:#0e0a1a; padding:2px 8px; font-size:0.68rem;" onclick="sendFriendRequest('${p.email}')">Add</button>`}
+            </div>
+          `;
+          sidebarList.appendChild(row);
+        });
       }
     }
 
-    window.openDmWithFriend = function(friendId) {
-      activeDmPartner = friendId;
-      const pObj = otherPlayers.get(friendId) || { displayName: friendId };
+    window.openDmWithFriend = function(friendEmail) {
+      if (!currentUser.friends.includes(friendEmail)) {
+        return showToast('❌ You must be friends with this user to open a Direct Message!');
+      }
+      activeDmPartner = friendEmail;
+      const pObj = otherPlayers.get(friendEmail) || { displayName: friendEmail };
       document.getElementById('dmChatHeaderTitle').innerText = `Direct Chat with @${pObj.displayName}`;
       document.getElementById('dmChatInputArea').style.display = 'flex';
       renderDmWorkspaceMessages();
@@ -1613,6 +1697,12 @@
       container.innerHTML = '';
       if (!activeDmPartner) {
         container.innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:40px;">Select a friend from the left sidebar to talk.</div>`;
+        return;
+      }
+
+      if (!currentUser.friends.includes(activeDmPartner)) {
+        container.innerHTML = `<div style="text-align:center; color:var(--admin-red); margin-top:40px;">Direct messaging requires an accepted friendship.</div>`;
+        document.getElementById('dmChatInputArea').style.display = 'none';
         return;
       }
 
@@ -1647,6 +1737,7 @@
 
     function dispatchDmMessage() {
       if (!currentUser || !activeDmPartner) return;
+      if (!currentUser.friends.includes(activeDmPartner)) return showToast('Must be friends to DM!');
       const text = dmInputField.value.trim();
       if (!text) return;
 
@@ -1676,9 +1767,9 @@
       renderDmWorkspaceMessages();
     }
 
-    window.unfriendUser = function(friendId) {
-      currentUser.friends = currentUser.friends.filter(f => f !== friendId);
-      if (activeDmPartner === friendId) {
+    window.unfriendUser = function(friendEmail) {
+      currentUser.friends = currentUser.friends.filter(f => f !== friendEmail);
+      if (activeDmPartner === friendEmail) {
         activeDmPartner = '';
         document.getElementById('dmChatHeaderTitle').innerText = 'Select a friend to start chatting';
         document.getElementById('dmChatInputArea').style.display = 'none';
@@ -1712,7 +1803,7 @@
       showToast('Request rejected.');
     };
 
-    // --- 7. GRAPHICS ENGINE & FIXES ---
+    // --- 7. GRAPHICS ENGINE & FLUID PHYSICS ---
     const canvas = document.getElementById('worldCanvas');
     const ctx = canvas.getContext('2d');
     let viewW = window.innerWidth;
@@ -1734,7 +1825,7 @@
     const mySlime = {
       x: 1200,
       y: 800,
-      speed: 4.5,
+      speed: 5.8, // Snappier movement speed
       radius: 28,
       jumpOffset: 0,
       jumpVelocity: 0,
@@ -1780,7 +1871,7 @@
     function triggerJump() {
       if (!mySlime.isJumping) {
         mySlime.isJumping = true;
-        mySlime.jumpVelocity = -10.5;
+        mySlime.jumpVelocity = -11.5; // Snappier jump
       }
     }
 
@@ -1920,7 +2011,7 @@
       ctx.restore();
     }
 
-    // --- 9. ADVANCED MULTI-SHADE SLIME RENDERING ---
+    // --- 9. FLUID SLIME RENDERING ---
     function renderSlime(targetCtx, x, y, slimeObj, displayName, tag) {
       targetCtx.save();
       targetCtx.translate(x, y + slimeObj.jumpOffset);
@@ -1937,10 +2028,10 @@
       }
 
       if (slimeObj.isDancing) {
-        targetCtx.rotate(Math.sin(Date.now() * 0.015) * 0.18);
+        targetCtx.rotate(Math.sin(Date.now() * 0.02) * 0.22);
         targetCtx.font = '14px sans-serif';
         targetCtx.fillStyle = '#ff6584';
-        targetCtx.fillText('♪', 16, -30 + Math.sin(Date.now() * 0.01) * 6);
+        targetCtx.fillText('♪', 16, -30 + Math.sin(Date.now() * 0.012) * 6);
       }
 
       targetCtx.beginPath();
@@ -2061,13 +2152,10 @@
       if (accId === 'acc_celestial_wings') ctxT.fillText('🪽', 0, -10);
       if (accId === 'acc_magic_wand') ctxT.fillText('🪄', 14, -12);
       if (accId === 'acc_crystal_orb') ctxT.fillText('🔮', 0, -20);
-      if (accId === 'acc_golden_phoenix') ctxT.fillText('🔥', 0, -22);
-      if (accId === 'acc_star_glasses') ctxT.fillText('🌟', 0, -6);
-      if (accId === 'acc_devil_horns') ctxT.fillText('😈', 0, -20);
       ctxT.restore();
     }
 
-    // --- 10. GAME LOOP WITH SAFEGUARD TRY/CATCH ---
+    // --- 10. GAME LOOP WITH SAFEGUARD ---
     function worldLoop() {
       try {
         let vx = 0;
@@ -2087,9 +2175,9 @@
           const len = Math.hypot(vx, vy);
           mySlime.x += (vx / len) * mySlime.speed;
           mySlime.y += (vy / len) * mySlime.speed;
-          mySlime.squash = 1.15;
+          mySlime.squash = 1.18;
         } else {
-          mySlime.squash = 1 + Math.sin(Date.now() * 0.007) * 0.04;
+          mySlime.squash = 1 + Math.sin(Date.now() * 0.009) * 0.05;
         }
 
         mySlime.x = Math.max(40, Math.min(WORLD_W - 40, mySlime.x));
@@ -2097,16 +2185,16 @@
 
         if (mySlime.isJumping) {
           mySlime.jumpOffset += mySlime.jumpVelocity;
-          mySlime.jumpVelocity += 0.65;
+          mySlime.jumpVelocity += 0.72; // Snappy gravity
           if (mySlime.jumpOffset >= 0) {
             mySlime.jumpOffset = 0;
             mySlime.isJumping = false;
-            mySlime.squash = 0.82;
+            mySlime.squash = 0.8;
           }
         }
 
-        camera.x += (mySlime.x - camera.x) * 0.1;
-        camera.y += (mySlime.y - camera.y) * 0.1;
+        camera.x += (mySlime.x - camera.x) * 0.15;
+        camera.y += (mySlime.y - camera.y) * 0.15;
 
         ctx.clearRect(0, 0, viewW, viewH);
         ctx.save();
@@ -2114,12 +2202,10 @@
 
         drawWorld();
 
-        // Render other real players online
         otherPlayers.forEach((p) => {
           renderSlime(ctx, p.x || 1200, p.y || 800, p, p.displayName, p.title);
         });
 
-        // Render local user slime
         if (currentUser) {
           const currentTag = isDevModeActive ? 'DEV' : (currentUser.role === 'admin' ? 'ADMIN' : currentUser.title);
           renderSlime(ctx, mySlime.x, mySlime.y, mySlime, currentUser.displayName, currentTag);
@@ -2162,7 +2248,7 @@
       }
     }
 
-    // --- 11. CLICK WORLD SLIMES ---
+    // --- 11. CLICK WORLD SLIMES & SMART TARGET POPUP ---
     const targetPopup = document.getElementById('playerTargetPopup');
     let targetedSlime = null;
 
@@ -2187,6 +2273,20 @@
         document.getElementById('popupAvatar').src = hit.pfp;
         document.getElementById('popupDisplayName').innerText = hit.displayName;
         document.getElementById('popupUsername').innerText = hit.email;
+
+        const btnContainer = document.getElementById('popupActionButtonsContainer');
+        const isFriend = currentUser.friends.includes(hit.email);
+
+        if (isFriend) {
+          btnContainer.innerHTML = `
+            <button class="btn-market-action" style="background: rgba(0, 240, 255, 0.2); color: var(--dev-cyan); border: 1px solid var(--dev-cyan);" onclick="popupOpenDm('${hit.email}')"><i class="fa-solid fa-comment-dots"></i> Open DM</button>
+          `;
+        } else {
+          btnContainer.innerHTML = `
+            <button class="btn-market-action" style="background: var(--sakura-pink); color: #0e0a1a;" onclick="popupAddFriend('${hit.email}')"><i class="fa-solid fa-user-plus"></i> Add Friend</button>
+          `;
+        }
+
         targetPopup.style.left = `${clickScreenX}px`;
         targetPopup.style.top = `${clickScreenY}px`;
         targetPopup.style.display = 'block';
@@ -2195,24 +2295,22 @@
       }
     });
 
-    document.getElementById('popupAddFriendBtn').addEventListener('click', () => {
-      if (targetedSlime && currentUser) sendFriendRequest(targetedSlime.email);
+    window.popupAddFriend = function(email) {
+      if (currentUser) sendFriendRequest(email);
       targetPopup.style.display = 'none';
-    });
+    };
 
-    document.getElementById('popupDirectDmBtn').addEventListener('click', () => {
-      if (targetedSlime) {
-        document.getElementById('modalFriends').classList.add('active');
-        openDmWithFriend(targetedSlime.email);
-      }
+    window.popupOpenDm = function(email) {
+      document.getElementById('modalFriends').classList.add('active');
+      openDmWithFriend(email);
       targetPopup.style.display = 'none';
-    });
+    };
 
     // --- 12. SUPABASE NETWORKING ---
     let parkChannel = null;
     function initSupabaseNetworking() {
       try {
-        parkChannel = supabaseClient.channel('sakura-community-park-v8', {
+        parkChannel = supabaseClient.channel('sakura-community-park-v10', {
           config: { presence: { key: currentUser.email } }
         });
 
@@ -2479,7 +2577,7 @@
       showToast(`🎵 Music changed to <b>${trackId.replace('_', ' ').toUpperCase()}</b>!`);
     };
 
-    // --- 15. MARKETPLACE & DRESSING ROOM ---
+    // --- 15. MARKETPLACE & DRESSING ROOM (FRAMES & AVATARS) ---
     const dressingRoomCanvas = document.getElementById('dressingRoomCanvas');
     const drCtx = dressingRoomCanvas ? dressingRoomCanvas.getContext('2d') : null;
     let dressingRoomSlime = { radius: 36, jumpOffset: 0, squash: 1, skin: 'skin_blossom', accessory: null, isDancing: false };
@@ -2512,14 +2610,18 @@
 
       items.forEach(item => {
         const card = document.createElement('div');
-        card.className = `market-product-card ${item.adminOnly ? 'admin-locked' : ''}`;
+        card.className = `market-product-card ${item.adminOnly && currentUser.role !== 'admin' ? 'admin-locked' : ''}`;
 
-        const isOwned = currentUser.inventory.includes(item.id);
-        const isEquipped = (currentUser.accessory === item.id) || (currentUser.skin === item.id) || (currentUser.title === item.tag);
+        const isOwned = currentUser.inventory.includes(item.id) || (item.adminOnly && currentUser.role === 'admin');
+        const isEquipped = (currentUser.accessory === item.id) || (currentUser.skin === item.id) || (currentUser.title === item.tag) || (currentUser.frame === item.id);
 
         let btnHTML = '';
-        if (item.adminOnly) {
+        if (item.adminOnly && currentUser.role !== 'admin') {
           btnHTML = `<button class="btn-market-action" style="background:#ff3366; color:#fff;" disabled>Admin Only</button>`;
+        } else if (item.adminOnly && currentUser.role === 'admin') {
+          btnHTML = isEquipped 
+            ? `<button class="btn-market-action" style="background:rgba(0,240,255,0.2); border:1px solid var(--dev-cyan); color:var(--dev-cyan);" onclick="unequipMarketItem('${cat}', '${item.id}')">Unequip</button>`
+            : `<button class="btn-market-action" style="background:var(--sakura-pink); color:#0e0a1a;" onclick="equipMarketItem('${cat}', '${item.id}')">Equip</button>`;
         } else if (isEquipped) {
           btnHTML = `<button class="btn-market-action" style="background:rgba(0,240,255,0.2); border:1px solid var(--dev-cyan); color:var(--dev-cyan);" onclick="unequipMarketItem('${cat}', '${item.id}')">Unequip</button>`;
         } else if (isOwned) {
@@ -2532,13 +2634,13 @@
           if (cat === 'accessories') dressingRoomSlime.accessory = item.id;
           if (cat === 'skins') dressingRoomSlime.skin = item.id;
           document.getElementById('previewItemName').innerText = item.name;
-          document.getElementById('previewItemCost').innerText = item.adminOnly ? 'Admin Exclusive' : `${item.price} Blossom Pts`;
+          document.getElementById('previewItemCost').innerText = item.adminOnly ? 'Admin Free' : `${item.price} Blossom Pts`;
         });
 
         card.innerHTML = `
           <div class="product-icon-view">${item.icon || '🌸'}</div>
           <div class="product-title">${item.name}</div>
-          <div class="product-cost">${item.adminOnly ? 'Admin Locked' : item.price + ' Pts'}</div>
+          <div class="product-cost">${item.adminOnly ? 'Admin Free' : item.price + ' Pts'}</div>
           ${btnHTML}
         `;
         grid.appendChild(card);
@@ -2557,6 +2659,11 @@
     window.equipMarketItem = function(cat, id) {
       if (cat === 'accessories') currentUser.accessory = id;
       if (cat === 'skins') currentUser.skin = id;
+      if (cat === 'frames') currentUser.frame = id;
+      if (cat === 'avatars') {
+        const av = MARKET_CATALOG.avatars.find(a => a.id === id);
+        if (av) currentUser.pfp = `https://api.dicebear.com/7.x/bottts/svg?seed=${av.seed}`;
+      }
       if (cat === 'titles') {
         const t = MARKET_CATALOG.titles.find(x => x.id === id);
         if (t) currentUser.title = t.tag;
@@ -2569,6 +2676,8 @@
     window.unequipMarketItem = function(cat, id) {
       if (cat === 'accessories' && currentUser.accessory === id) currentUser.accessory = null;
       if (cat === 'skins' && currentUser.skin === id) currentUser.skin = 'skin_blossom';
+      if (cat === 'frames' && currentUser.frame === id) currentUser.frame = null;
+      if (cat === 'titles' && currentUser.title === 'ADMIN') currentUser.title = 'NOVICE';
       updateHUD();
       renderMarketGrid(cat);
     };
@@ -2726,7 +2835,7 @@
       }
     }
 
-    // --- 17. DEVELOPER & ADMIN SYSTEM ---
+    // --- 17. DEVELOPER & ADMIN SYSTEM (ADMIN LIST, POINT DEDUCTION) ---
     document.getElementById('btnOpenDev').addEventListener('click', () => {
       if (isDevModeActive || currentUser.role === 'admin') {
         openDevAdminModal();
@@ -2752,7 +2861,33 @@
       document.getElementById('devPointGrantCard').style.display = isDev ? 'block' : 'none';
       document.getElementById('devAdminRoleCard').style.display = isDev ? 'block' : 'none';
       document.getElementById('devAdminTitle').innerHTML = isDev ? `<i class="fa-solid fa-code"></i> Developer Console` : `<i class="fa-solid fa-shield-halved"></i> Admin Control Panel`;
+
+      renderAdminListInDevPanel();
     }
+
+    function renderAdminListInDevPanel() {
+      const container = document.getElementById('devAdminListContainer');
+      container.innerHTML = '';
+      const admins = Storage.getAdmins();
+      if (admins.length === 0) {
+        container.innerHTML = `<div style="font-size:0.72rem; color:var(--text-muted);">No secondary admins registered.</div>`;
+        return;
+      }
+      admins.forEach(adm => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px; font-size:0.75rem;';
+        row.innerHTML = `<span>${adm}</span> <button class="btn-market-action" style="background:var(--admin-red); color:#fff; width:60px; padding:2px; font-size:0.65rem;" onclick="revokeAdminDirect('${adm}')">Revoke</button>`;
+        container.appendChild(row);
+      });
+    }
+
+    window.revokeAdminDirect = function(email) {
+      let admins = Storage.getAdmins().filter(a => a !== email);
+      Storage.saveAdmins(admins);
+      broadcastAuthority({ type: 'revoke_admin', target: email });
+      renderAdminListInDevPanel();
+      showToast(`Revoked Admin from ${email}.`);
+    };
 
     document.getElementById('btnToggleDevMode').addEventListener('click', () => {
       isDevModeActive = !isDevModeActive;
@@ -2778,6 +2913,24 @@
       showToast(`✨ Sent <b>+${amount} Points</b> to ${target}!`);
     });
 
+    document.getElementById('btnDeductPoints').addEventListener('click', () => {
+      const target = document.getElementById('inputGrantTarget').value.trim().toLowerCase();
+      const amount = parseInt(document.getElementById('inputGrantAmount').value, 10);
+      if (!target || isNaN(amount) || amount <= 0) return showToast('Enter target email and valid amount!');
+
+      const users = Storage.getUsers();
+      if (users[target]) {
+        users[target].points = Math.max(0, users[target].points - amount);
+        Storage.saveUsers(users);
+      }
+      if (currentUser.email === target) {
+        currentUser.points = Math.max(0, currentUser.points - amount);
+        updateHUD();
+      }
+      broadcastAuthority({ type: 'deduct_points', target: target, amount: amount });
+      showToast(`🔻 Deducted <b>-${amount} Points</b> from ${target}!`);
+    });
+
     document.getElementById('btnPromoteAdmin').addEventListener('click', () => {
       const target = document.getElementById('inputAdminTarget').value.trim().toLowerCase();
       if (!target) return;
@@ -2787,6 +2940,7 @@
         Storage.saveAdmins(admins);
       }
       broadcastAuthority({ type: 'promote_admin', target: target });
+      renderAdminListInDevPanel();
       showToast(`Promoted ${target} to Admin!`);
     });
 
@@ -2796,6 +2950,7 @@
       let admins = Storage.getAdmins().filter(a => a !== target);
       Storage.saveAdmins(admins);
       broadcastAuthority({ type: 'revoke_admin', target: target });
+      renderAdminListInDevPanel();
       showToast(`Revoked Admin from ${target}.`);
     });
 
@@ -2871,11 +3026,15 @@
       }
       if (ev.type === 'promote_admin' && myEmail === targetEmail) {
         currentUser.role = 'admin';
+        if (!currentUser.inventory.includes('skin_admin_black')) currentUser.inventory.push('skin_admin_black');
+        if (!currentUser.inventory.includes('title_admin')) currentUser.inventory.push('title_admin');
         updateHUD();
         showToast('🛡️ Promoted to ADMIN!');
       }
       if (ev.type === 'revoke_admin' && myEmail === targetEmail) {
         currentUser.role = 'user';
+        if (currentUser.skin === 'skin_admin_black') currentUser.skin = 'skin_blossom';
+        if (currentUser.title === 'ADMIN') currentUser.title = 'NOVICE';
         updateHUD();
         showToast('Admin privileges revoked.');
       }
@@ -2883,6 +3042,11 @@
         currentUser.points += ev.amount;
         updateHUD();
         showToast(`✨ Received gift of <b>+${ev.amount} Points</b>!`);
+      }
+      if (ev.type === 'deduct_points' && myEmail === targetEmail) {
+        currentUser.points = Math.max(0, currentUser.points - ev.amount);
+        updateHUD();
+        showToast(`🔻 Deducted <b>-${ev.amount} Points</b> from your account!`);
       }
     }
 
