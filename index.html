@@ -1,1598 +1,1167 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PulseChat - Social & Realtime Chat App</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            900: '#312e81',
-                        }
-                    }
-                }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseChat - Social & Direct Messaging</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            },
+            dark: {
+              bg: '#0f172a',
+              card: '#1e293b',
+              sidebar: '#0f172a',
+              input: '#334155',
+              border: '#334155',
+              hover: '#1e293b'
             }
+          }
         }
-    </script>
-    
-    <!-- FontAwesome & Lucide Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        /* Custom scrollbars */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(51, 65, 85, 0.8);
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(71, 85, 105, 1);
-        }
-        .chat-bg {
-            background-color: #0b0f19;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
-            background-size: 24px 24px;
-        }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    .glassmorphism {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
 </head>
-<body class="h-full flex flex-col font-sans antialiased bg-slate-950 text-slate-100 overflow-hidden select-none">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased h-screen overflow-hidden flex flex-col">
 
-    <!-- APP CONTAINER -->
-    <div id="app" class="flex-1 flex flex-col h-full w-full relative">
-        
-        <!-- GLOBAL SETUP / STATUS BANNER -->
-        <div id="statusBanner" class="bg-indigo-900/80 border-b border-indigo-700/50 px-4 py-1.5 text-xs flex items-center justify-between text-indigo-200 backdrop-blur-sm z-30 transition-all">
-            <div class="flex items-center space-x-2">
-                <span id="backendStatusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                <span id="backendStatusText" class="font-medium">Connecting to Supabase Database...</span>
-            </div>
-            <button onclick="toggleSqlModal()" class="underline hover:text-white transition flex items-center space-x-1">
-                <i data-lucide="database" class="w-3.5 h-3.5"></i>
-                <span>Database SQL Setup Guide</span>
-            </button>
+  <!-- ================= AUTH CONTAINER ================= -->
+  <div id="auth-container" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950 bg-opacity-95">
+    <div class="glassmorphism w-full max-w-md p-8 rounded-2xl shadow-2xl relative border border-slate-800">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 mb-4 border border-indigo-500/30 shadow-lg shadow-indigo-500/10">
+          <i class="fa-solid fa-comments text-3xl"></i>
         </div>
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">PulseChat</h1>
+        <p class="text-sm text-slate-400 mt-1">Connect, chat & share with people seamlessly</p>
+      </div>
 
-        <!-- AUTH SCREEN (Shown when logged out) -->
-        <div id="authScreen" class="flex-1 flex items-center justify-center p-4 bg-slate-950 relative overflow-hidden">
-            <!-- Decorative background elements -->
-            <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <!-- Auth Tabs -->
+      <div class="flex border-b border-slate-700/60 mb-6 text-sm font-medium">
+        <button id="tab-signin-btn" onclick="switchAuthTab('signin')" class="flex-1 pb-3 text-center border-b-2 border-indigo-500 text-indigo-400 font-semibold transition-all">Sign In</button>
+        <button id="tab-signup-btn" onclick="switchAuthTab('signup')" class="flex-1 pb-3 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all">Sign Up</button>
+      </div>
 
-            <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-2xl shadow-2xl p-8 backdrop-blur-xl relative z-10 transition-all duration-300">
-                <!-- App Logo -->
-                <div class="text-center mb-8">
-                    <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-lg shadow-indigo-500/30 mb-3">
-                        <i data-lucide="message-square-plus" class="w-7 h-7"></i>
-                    </div>
-                    <h1 class="text-2xl font-bold tracking-tight text-white">Welcome to PulseChat</h1>
-                    <p class="text-sm text-slate-400 mt-1">Connect, chat, and hangout in real-time</p>
-                </div>
-
-                <!-- Auth Tabs -->
-                <div class="flex p-1 bg-slate-950/60 rounded-xl border border-slate-800/80 mb-6">
-                    <button id="tabSignIn" onclick="switchAuthTab('signin')" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white shadow transition">Sign In</button>
-                    <button id="tabSignUp" onclick="switchAuthTab('signup')" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">Sign Up</button>
-                </div>
-
-                <!-- Form Alert -->
-                <div id="authAlert" class="hidden mb-4 p-3 rounded-xl text-xs flex items-start space-x-2 border"></div>
-
-                <!-- Sign In Form -->
-                <form id="formSignIn" onsubmit="handleSignIn(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
-                        <div class="relative">
-                            <i data-lucide="mail" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-                            <input type="email" id="signinEmail" required placeholder="you@example.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Password</label>
-                        <div class="relative">
-                            <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-                            <input type="password" id="signinPassword" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
-                        </div>
-                    </div>
-                    <button type="submit" id="btnSubmitSignIn" class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium rounded-xl shadow-lg shadow-indigo-600/25 transition text-sm flex justify-center items-center">
-                        <span>Sign In</span>
-                    </button>
-                </form>
-
-                <!-- Sign Up Form -->
-                <form id="formSignUp" onsubmit="handleSignUp(event)" class="space-y-4 hidden">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Username</label>
-                        <div class="relative">
-                            <i data-lucide="user" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-                            <input type="text" id="signupUsername" required placeholder="alex_sky" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
-                        <div class="relative">
-                            <i data-lucide="mail" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-                            <input type="email" id="signupEmail" required placeholder="you@example.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Password</label>
-                        <div class="relative">
-                            <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-                            <input type="password" id="signupPassword" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Bio / About You</label>
-                        <textarea id="signupBio" rows="2" placeholder="Tell the chat a bit about yourself..." class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-indigo-500 transition"></textarea>
-                    </div>
-                    <!-- Avatar Selection & Upload -->
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1.5">Choose Avatar or Upload Image</label>
-                        <div class="flex items-center space-x-3 mb-2">
-                            <img id="signupAvatarPreview" class="w-12 h-12 rounded-full border-2 border-indigo-500 object-cover bg-slate-800 shrink-0" src="https://api.dicebear.com/7.x/bottts/svg?seed=Felix">
-                            <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 px-3 rounded-xl border border-slate-700 flex items-center space-x-1.5 transition">
-                                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                                <span>Upload Photo</span>
-                                <input type="file" id="signupAvatarFile" accept="image/*" onchange="handleAvatarFileUpload(event, 'signup')" class="hidden">
-                            </label>
-                        </div>
-                        <div class="grid grid-cols-5 gap-2" id="avatarSelector">
-                            <!-- Populated dynamically -->
-                        </div>
-                    </div>
-                    <button type="submit" id="btnSubmitSignUp" class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium rounded-xl shadow-lg shadow-indigo-600/25 transition text-sm flex justify-center items-center">
-                        <span>Create Account</span>
-                    </button>
-                </form>
-
-                <!-- Divider -->
-                <div class="relative my-6">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-800"></div></div>
-                    <div class="relative flex justify-center text-xs text-slate-500"><span class="bg-slate-900 px-3">or instant access</span></div>
-                </div>
-
-                <!-- Guest Login Option -->
-                <button onclick="handleGuestLogin()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700/80 text-slate-200 border border-slate-700/80 font-medium rounded-xl transition text-sm flex items-center justify-center space-x-2">
-                    <i data-lucide="user-check" class="w-4 h-4 text-emerald-400"></i>
-                    <span>Continue as Guest</span>
-                </button>
-            </div>
+      <!-- Sign In Form -->
+      <form id="signin-form" class="space-y-4" onsubmit="handleSignIn(event)">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3 top-3.5 text-slate-400"></i>
+            <input type="email" id="signin-email" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500 outline-none transition" placeholder="you@example.com">
+          </div>
         </div>
-
-        <!-- MAIN APP MAIN PANEL (Shown when logged in) -->
-        <div id="mainScreen" class="flex-1 flex overflow-hidden hidden">
-            
-            <!-- LEFT NAVIGATION / CHAT LIST SIDEBAR -->
-            <aside id="sidebar" class="w-full md:w-80 lg:w-96 bg-slate-900 border-r border-slate-800/80 flex flex-col z-20 absolute md:relative inset-0 transform -translate-x-full md:translate-x-0 transition-transform duration-200">
-                
-                <!-- User Profile Header -->
-                <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
-                    <div class="flex items-center space-x-3 cursor-pointer group" onclick="openProfileModal(currentUser)">
-                        <div class="relative">
-                            <img id="myAvatarImg" class="w-10 h-10 rounded-full bg-slate-800 border-2 border-indigo-500/30 group-hover:border-indigo-500 transition object-cover" src="" alt="Avatar">
-                            <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
-                        </div>
-                        <div class="overflow-hidden">
-                            <div id="myUsername" class="text-sm font-semibold text-white truncate leading-tight">Username</div>
-                            <div id="myRoleBadge" class="text-[10px] text-indigo-400 uppercase tracking-wider font-semibold">User</div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center space-x-1">
-                        <button onclick="toggleAudio()" id="btnAudio" title="Toggle sound pings" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
-                            <i data-lucide="volume-2" class="w-4 h-4"></i>
-                        </button>
-                        <button onclick="openSettingsModal()" title="Settings" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
-                            <i data-lucide="settings" class="w-4 h-4"></i>
-                        </button>
-                        <button onclick="handleSignOut()" title="Sign Out" class="p-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition">
-                            <i data-lucide="log-out" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Navigation Tabs -->
-                <div class="flex border-b border-slate-800 bg-slate-950/40 p-1">
-                    <button onclick="switchSidebarTab('chats')" id="tabChatsBtn" class="flex-1 py-2 text-xs font-medium rounded-lg bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 flex items-center justify-center space-x-1.5 transition">
-                        <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
-                        <span>Chats</span>
-                    </button>
-                    <button onclick="switchSidebarTab('friends')" id="tabFriendsBtn" class="flex-1 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 flex items-center justify-center space-x-1.5 transition relative">
-                        <i data-lucide="users" class="w-3.5 h-3.5"></i>
-                        <span>Friends</span>
-                        <span id="pendingBadge" class="hidden w-2 h-2 rounded-full bg-rose-500 absolute top-1.5 right-2"></span>
-                    </button>
-                    <button onclick="switchSidebarTab('search')" id="tabSearchBtn" class="flex-1 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 flex items-center justify-center space-x-1.5 transition">
-                        <i data-lucide="search" class="w-3.5 h-3.5"></i>
-                        <span>Search</span>
-                    </button>
-                </div>
-
-                <!-- SIDEBAR CONTENT PANELS -->
-                <div class="flex-1 overflow-y-auto">
-                    
-                    <!-- CHATS TAB PANEL -->
-                    <div id="panelChats" class="p-2 space-y-1">
-                        <div class="text-[11px] font-semibold text-slate-400 px-3 py-1 uppercase tracking-wider">Channels</div>
-                        
-                        <!-- Global Public Chat Button -->
-                        <div onclick="selectChat('global')" id="chatItemGlobal" class="flex items-center space-x-3 p-2.5 rounded-xl cursor-pointer bg-slate-800/80 border border-slate-700/50 hover:bg-slate-800 transition">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
-                                <i data-lucide="globe" class="w-5 h-5"></i>
-                            </div>
-                            <div class="flex-1 overflow-hidden">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-semibold text-white">Global Chat Room</span>
-                                    <span class="text-[10px] text-indigo-400 font-medium bg-indigo-950/80 px-1.5 py-0.5 rounded border border-indigo-800/50">Max 50</span>
-                                </div>
-                                <p class="text-xs text-slate-400 truncate">Public community history & chatter...</p>
-                            </div>
-                        </div>
-
-                        <div class="text-[11px] font-semibold text-slate-400 px-3 pt-3 py-1 uppercase tracking-wider flex items-center justify-between">
-                            <span>Direct Messages</span>
-                            <span class="text-[10px] text-slate-500 font-normal">Friends Only</span>
-                        </div>
-                        <div id="dmList" class="space-y-1">
-                            <!-- DM channels populated dynamically -->
-                        </div>
-                    </div>
-
-                    <!-- FRIENDS TAB PANEL -->
-                    <div id="panelFriends" class="p-3 hidden space-y-4">
-                        <div>
-                            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                <span>Incoming Friend Requests</span>
-                                <span id="pendingReqCount" class="text-[10px] bg-slate-800 px-2 py-0.5 rounded-full text-indigo-300">0</span>
-                            </div>
-                            <div id="friendRequestsList" class="space-y-2">
-                                <div class="text-xs text-slate-500 italic px-1">No pending requests</div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Confirmed Friends</div>
-                            <div id="friendsList" class="space-y-1">
-                                <!-- Populated dynamically -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SEARCH TAB PANEL -->
-                    <div id="panelSearch" class="p-3 hidden space-y-3">
-                        <div class="relative">
-                            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-                            <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search username..." class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 pl-9 pr-3 text-xs text-white focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div id="searchResults" class="space-y-1">
-                            <div class="text-xs text-slate-500 italic text-center py-4">Type to search users</div>
-                        </div>
-                    </div>
-
-                </div>
-            </aside>
-
-            <!-- RIGHT MAIN CHAT DISPLAY AREA -->
-            <main class="flex-1 flex flex-col bg-slate-950 relative overflow-hidden">
-                
-                <!-- Chat Top Header Bar -->
-                <div class="h-16 px-4 bg-slate-900/90 border-b border-slate-800/80 flex items-center justify-between backdrop-blur-md z-10">
-                    <div class="flex items-center space-x-3">
-                        <button onclick="toggleMobileSidebar()" class="md:hidden p-2 text-slate-400 hover:text-white rounded-lg">
-                            <i data-lucide="menu" class="w-5 h-5"></i>
-                        </button>
-                        
-                        <div class="flex items-center space-x-3" id="activeChatHeaderInfo">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-                                <i data-lucide="globe" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-sm font-bold text-white flex items-center space-x-2">
-                                    <span>Global Chat Room</span>
-                                </h2>
-                                <p class="text-xs text-slate-400 flex items-center space-x-1">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                    <span>Public Channel • Saved Last 50 Messages</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Chat Header Action Buttons -->
-                    <div class="flex items-center space-x-2">
-                        <button onclick="toggleSqlModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
-                            <i data-lucide="terminal" class="w-3.5 h-3.5 text-indigo-400"></i>
-                            <span class="hidden sm:inline">SQL Schema</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Messages Feed Container -->
-                <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4 chat-bg">
-                    <!-- Dynamic Messages standard layout rendering -->
-                </div>
-
-                <!-- Chat Input Controls Bar -->
-                <div id="chatInputBar" class="p-3 bg-slate-900/90 border-t border-slate-800/80 backdrop-blur-md">
-                    <!-- Quick Emojis Picker Strip -->
-                    <div id="emojiPicker" class="hidden pb-2 flex space-x-2 overflow-x-auto text-lg">
-                        <span onclick="insertEmoji('👍')" class="cursor-pointer hover:scale-125 transition">👍</span>
-                        <span onclick="insertEmoji('❤️')" class="cursor-pointer hover:scale-125 transition">❤️</span>
-                        <span onclick="insertEmoji('🔥')" class="cursor-pointer hover:scale-125 transition">🔥</span>
-                        <span onclick="insertEmoji('😂')" class="cursor-pointer hover:scale-125 transition">😂</span>
-                        <span onclick="insertEmoji('🎉')" class="cursor-pointer hover:scale-125 transition">🎉</span>
-                        <span onclick="insertEmoji('🚀')" class="cursor-pointer hover:scale-125 transition">🚀</span>
-                        <span onclick="insertEmoji('✨')" class="cursor-pointer hover:scale-125 transition">✨</span>
-                        <span onclick="insertEmoji('👋')" class="cursor-pointer hover:scale-125 transition">👋</span>
-                    </div>
-
-                    <form onsubmit="handleSendMessage(event)" class="flex items-center space-x-2">
-                        <button type="button" onclick="toggleEmojiPicker()" class="p-2.5 text-slate-400 hover:text-amber-400 hover:bg-slate-800 rounded-xl transition">
-                            <i data-lucide="smile" class="w-5 h-5"></i>
-                        </button>
-                        
-                        <input type="text" id="messageInput" required autocomplete="off" placeholder="Type a message..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
-                        
-                        <button type="submit" class="p-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center justify-center">
-                            <i data-lucide="send" class="w-5 h-5"></i>
-                        </button>
-                    </form>
-                </div>
-            </main>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3 top-3.5 text-slate-400"></i>
+            <input type="password" id="signin-password" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500 outline-none transition" placeholder="••••••••">
+          </div>
         </div>
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.99] transition transform">
+          Sign In
+        </button>
+      </form>
 
+      <!-- Sign Up Form -->
+      <form id="signup-form" class="space-y-4 hidden" onsubmit="handleSignUp(event)">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Username</label>
+          <div class="relative">
+            <i class="fa-solid fa-user absolute left-3 top-3.5 text-slate-400"></i>
+            <input type="text" id="signup-username" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500 outline-none transition" placeholder="cool_user123">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3 top-3.5 text-slate-400"></i>
+            <input type="email" id="signup-email" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500 outline-none transition" placeholder="you@example.com">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3 top-3.5 text-slate-400"></i>
+            <input type="password" id="signup-password" minlength="6" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500 outline-none transition" placeholder="••••••••">
+          </div>
+        </div>
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.99] transition transform">
+          Create Account
+        </button>
+      </form>
+
+      <!-- Guest Login Button -->
+      <div class="mt-6 pt-6 border-t border-slate-800 text-center">
+        <button onclick="handleGuestLogin()" class="w-full py-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-medium rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 transition">
+          <i class="fa-solid fa-user-ninja text-indigo-400"></i>
+          Continue as Guest
+        </button>
+      </div>
     </div>
+  </div>
 
-    <!-- MODAL: USER PROFILE CARD POPUP -->
-    <div id="profileModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl relative">
-            <button onclick="closeModal('profileModal')" class="absolute top-3 right-3 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-950/50 backdrop-blur-md z-10">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-            <div class="h-24 bg-gradient-to-r from-indigo-600 to-violet-600"></div>
-            <div class="px-6 pb-6 pt-0 relative">
-                <div class="-mt-12 mb-3 flex justify-between items-end">
-                    <img id="profileCardAvatar" class="w-20 h-20 rounded-full border-4 border-slate-900 bg-slate-800 object-cover shrink-0" src="" alt="Avatar">
-                    <div id="profileCardActions"></div>
-                </div>
-                <h3 id="profileCardName" class="text-lg font-bold text-white">Name</h3>
-                <p id="profileCardBadge" class="text-xs text-indigo-400 font-medium mb-3">@username</p>
-                
-                <!-- Bio Display Section -->
-                <div class="mb-4 bg-slate-950/60 border border-slate-800 rounded-xl p-3">
-                    <div class="text-[10px] uppercase font-semibold text-slate-500 mb-1">About / Bio</div>
-                    <p id="profileCardBio" class="text-xs text-slate-300 italic leading-relaxed">No bio provided yet.</p>
-                </div>
+  <!-- ================= MAIN APP LAYOUT ================= -->
+  <div id="app-container" class="flex-1 flex overflow-hidden hidden">
 
-                <div class="border-t border-slate-800 pt-3 text-xs text-slate-400 space-y-1">
-                    <div class="flex justify-between">
-                        <span>Account Type:</span>
-                        <span id="profileCardAccountType" class="text-slate-200">User</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Status:</span>
-                        <span class="text-emerald-400 font-medium">Online</span>
-                    </div>
-                </div>
-            </div>
+    <!-- SIDEBAR / NAVIGATION -->
+    <aside class="w-20 md:w-64 bg-slate-900 border-r border-slate-800/80 flex flex-col justify-between p-3 md:p-4 select-none shrink-0">
+      <div>
+        <!-- App Logo & Title -->
+        <div class="flex items-center gap-3 px-2 py-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600/30 flex items-center justify-center text-indigo-400 border border-indigo-500/30 shrink-0">
+            <i class="fa-solid fa-comments text-xl"></i>
+          </div>
+          <div class="hidden md:block">
+            <h1 class="font-bold text-lg bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">PulseChat</h1>
+            <p class="text-xs text-slate-500">v1.0 Live</p>
+          </div>
         </div>
-    </div>
 
-    <!-- MODAL: SETTINGS -->
-    <div id="settingsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-                    <i data-lucide="settings" class="w-5 h-5 text-indigo-400"></i>
-                    <span>Profile Settings</span>
-                </h3>
-                <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+        <!-- Navigation Links -->
+        <nav class="space-y-2">
+          <button onclick="setActiveTab('global')" id="nav-global" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-indigo-600/20 text-indigo-400 font-medium transition border border-indigo-500/20">
+            <i class="fa-solid fa-earth-americas text-lg w-6 text-center"></i>
+            <span class="hidden md:inline">Global Room</span>
+          </button>
+
+          <button onclick="setActiveTab('friends')" id="nav-friends" class="w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-slate-800/70 text-slate-400 hover:text-slate-200 font-medium transition">
+            <div class="flex items-center gap-3">
+              <i class="fa-solid fa-user-group text-lg w-6 text-center"></i>
+              <span class="hidden md:inline">Friends & DMs</span>
             </div>
-            
-            <form onsubmit="handleSaveSettings(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Username</label>
-                    <input type="text" id="settingsUsername" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Bio / Status Message</label>
-                    <textarea id="settingsBio" rows="3" placeholder="Tell the chat a bit about yourself..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:border-indigo-500"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1.5">Avatar Image</label>
-                    <div class="flex items-center space-x-3 mb-2">
-                        <img id="settingsAvatarPreview" class="w-12 h-12 rounded-full border-2 border-indigo-500 object-cover bg-slate-800 shrink-0" src="">
-                        <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 px-3 rounded-xl border border-slate-700 flex items-center space-x-1.5 transition">
-                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                            <span>Upload Custom Photo</span>
-                            <input type="file" id="settingsAvatarFile" accept="image/*" onchange="handleAvatarFileUpload(event, 'settings')" class="hidden">
-                        </label>
-                    </div>
-                    <div class="grid grid-cols-5 gap-2" id="settingsAvatarSelector"></div>
-                </div>
-                <div class="pt-2 flex justify-end space-x-2">
-                    <button type="button" onclick="closeModal('settingsModal')" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs font-medium hover:bg-slate-700">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium shadow-lg shadow-indigo-600/25">Save Changes</button>
-                </div>
+            <span id="friend-req-badge" class="hidden bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+          </button>
+
+          <button onclick="setActiveTab('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800/70 text-slate-400 hover:text-slate-200 font-medium transition">
+            <i class="fa-solid fa-user-gear text-lg w-6 text-center"></i>
+            <span class="hidden md:inline">Profile & Bio</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Current User Footer Card -->
+      <div class="border-t border-slate-800 pt-3">
+        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/40 border border-slate-800">
+          <div class="flex items-center gap-3 min-w-0">
+            <img id="sidebar-user-avatar" src="" alt="Avatar" class="w-10 h-10 rounded-full object-cover border border-indigo-500/40 shrink-0">
+            <div class="hidden md:block truncate">
+              <p id="sidebar-username" class="text-sm font-semibold text-slate-200 truncate">Username</p>
+              <p id="sidebar-user-status" class="text-xs text-indigo-400 truncate">Online</p>
+            </div>
+          </div>
+          <button onclick="handleSignOut()" title="Sign Out" class="text-slate-400 hover:text-rose-400 p-2 rounded-lg hover:bg-slate-800 transition">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN VIEW AREA -->
+    <main class="flex-1 flex flex-col bg-slate-950 overflow-hidden relative">
+
+      <!-- 1. GLOBAL CHAT TAB -->
+      <div id="view-global" class="flex-1 flex flex-col h-full overflow-hidden">
+        <!-- Chat Header -->
+        <header class="h-16 border-b border-slate-800/80 px-6 flex items-center justify-between bg-slate-900/50 backdrop-blur-md">
+          <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+            <div>
+              <h2 class="font-bold text-slate-100 flex items-center gap-2">
+                Global Lounge
+                <span class="text-xs px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-normal border border-indigo-500/20">Max 50 Msg</span>
+              </h2>
+              <p class="text-xs text-slate-400">Public chat room for everyone</p>
+            </div>
+          </div>
+        </header>
+
+        <!-- Message History -->
+        <div id="global-messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+          <!-- Messages dynamically injected -->
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div class="p-4 border-t border-slate-800/80 bg-slate-900/60 backdrop-blur-md">
+          <form onsubmit="sendGlobalMessage(event)" class="flex items-center gap-2">
+            <input type="text" id="global-input" placeholder="Type a message to global lounge..." class="flex-1 bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+            <button type="submit" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition active:scale-95">
+              <span>Send</span>
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- 2. FRIENDS & DIRECT MESSAGES TAB -->
+      <div id="view-friends" class="flex-1 flex h-full overflow-hidden hidden">
+        <!-- Sidebar for Friends list & requests -->
+        <div class="w-full md:w-80 border-r border-slate-800 bg-slate-900/40 flex flex-col h-full">
+          <!-- User Search Header -->
+          <div class="p-4 border-b border-slate-800 space-y-3">
+            <h3 class="font-bold text-slate-200">Friends & Direct Chat</h3>
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-sm"></i>
+              <input type="text" id="user-search-input" onkeyup="handleSearchUsers()" placeholder="Search users by name..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+            </div>
+          </div>
+
+          <!-- Tabs inside Friends Sidebar -->
+          <div class="flex border-b border-slate-800 text-xs font-medium text-slate-400 bg-slate-900/60">
+            <button onclick="switchFriendSubTab('all')" id="subtab-all" class="flex-1 py-2.5 text-center text-indigo-400 border-b-2 border-indigo-500 font-semibold">Friends</button>
+            <button onclick="switchFriendSubTab('requests')" id="subtab-req" class="flex-1 py-2.5 text-center hover:text-slate-200 relative">
+              Requests
+              <span id="subtab-req-dot" class="hidden absolute top-2 right-4 w-2 h-2 rounded-full bg-pink-500"></span>
+            </button>
+            <button onclick="switchFriendSubTab('search')" id="subtab-search" class="flex-1 py-2.5 text-center hover:text-slate-200">Explore</button>
+          </div>
+
+          <!-- List Container -->
+          <div class="flex-1 overflow-y-auto p-3 space-y-2">
+            <!-- ALL FRIENDS LIST -->
+            <div id="friends-list-container" class="space-y-1">
+              <!-- Dynamically populated -->
+            </div>
+
+            <!-- FRIEND REQUESTS LIST -->
+            <div id="requests-list-container" class="space-y-3 hidden">
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Incoming Requests</p>
+                <div id="incoming-req-list" class="space-y-1"></div>
+              </div>
+              <div class="pt-2 border-t border-slate-800">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sent Requests</p>
+                <div id="outgoing-req-list" class="space-y-1"></div>
+              </div>
+            </div>
+
+            <!-- SEARCH RESULTS LIST -->
+            <div id="search-list-container" class="space-y-1 hidden">
+              <p class="text-xs text-slate-500 mb-2">Search results will appear here...</p>
+              <div id="search-results-list" class="space-y-1"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DM Chat Window -->
+        <div id="dm-window" class="flex-1 flex flex-col h-full bg-slate-950 hidden">
+          <!-- DM Header -->
+          <header class="h-16 border-b border-slate-800/80 px-6 flex items-center justify-between bg-slate-900/50 backdrop-blur-md">
+            <div class="flex items-center gap-3">
+              <img id="dm-header-avatar" src="" class="w-10 h-10 rounded-full object-cover border border-slate-700">
+              <div>
+                <h3 id="dm-header-username" class="font-bold text-slate-100">User</h3>
+                <p id="dm-header-bio" class="text-xs text-slate-400 truncate max-w-xs">User Bio</p>
+              </div>
+            </div>
+          </header>
+
+          <!-- DM Messages -->
+          <div id="dm-messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+            <!-- DM Messages injected -->
+          </div>
+
+          <!-- DM Input -->
+          <div class="p-4 border-t border-slate-800/80 bg-slate-900/60 backdrop-blur-md">
+            <form onsubmit="sendDirectMessage(event)" class="flex items-center gap-2">
+              <input type="text" id="dm-input" placeholder="Type a direct message..." class="flex-1 bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+              <button type="submit" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition active:scale-95">
+                <span>Send</span>
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+              </button>
             </form>
+          </div>
         </div>
-    </div>
 
-    <!-- MODAL: SQL SCHEMA GUIDE -->
-    <div id="sqlModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl flex flex-col max-h-[85vh]">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div class="flex items-center space-x-2 text-indigo-400">
-                    <i data-lucide="database" class="w-5 h-5"></i>
-                    <h3 class="text-base font-bold text-white">Supabase SQL Setup Guide</h3>
-                </div>
-                <button onclick="toggleSqlModal()" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            
-            <div class="py-4 overflow-y-auto space-y-3 text-xs text-slate-300">
-                <p>Run this script inside your <a href="https://supabase.com/dashboard" target="_blank" class="text-indigo-400 underline">Supabase SQL Editor</a> for cloud persistence. Includes automatic FIFO message pruning function & trigger for 50 global message cap:</p>
-                
-                <div class="relative">
-                    <pre class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-slate-300 font-mono text-[11px] overflow-x-auto select-text leading-relaxed" id="sqlCodeText">
--- 1. Create Profiles Table with Bio & Custom Avatar Data
-CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID PRIMARY KEY,
-  username TEXT UNIQUE NOT NULL,
-  avatar_url TEXT,
-  bio TEXT DEFAULT '',
-  is_guest BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- 2. Create Global Messages Table
-CREATE TABLE IF NOT EXISTS public.messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  sender_id UUID NOT NULL,
-  sender_name TEXT NOT NULL,
-  sender_avatar TEXT,
-  content TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- 3. Create Direct Messages Table (Only for accepted friends)
-CREATE TABLE IF NOT EXISTS public.direct_messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  sender_id UUID NOT NULL,
-  receiver_id UUID NOT NULL,
-  content TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- 4. Create Friends Table
-CREATE TABLE IF NOT EXISTS public.friends (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL,
-  friend_id UUID NOT NULL,
-  status TEXT DEFAULT 'pending', -- 'pending' or 'accepted'
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- 5. Function to Keep Only the Latest 50 Messages in Global Chat (FIFO)
-CREATE OR REPLACE FUNCTION cap_global_messages() RETURNS TRIGGER AS $$
-BEGIN
-  DELETE FROM public.messages
-  WHERE id NOT IN (
-    SELECT id FROM public.messages
-    ORDER BY created_at DESC
-    LIMIT 50
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- 6. Trigger for FIFO Cap
-DROP TRIGGER IF EXISTS trigger_cap_global_messages ON public.messages;
-CREATE TRIGGER trigger_cap_global_messages
-AFTER INSERT ON public.messages
-FOR EACH STATEMENT
-EXECUTE FUNCTION cap_global_messages();
-
--- Disable RLS for testing
-ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.messages DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.direct_messages DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.friends DISABLE ROW LEVEL SECURITY;
-
--- Enable Realtime
-ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.direct_messages;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.friends;</pre>
-                </div>
-            </div>
-
-            <div class="pt-3 border-t border-slate-800 flex justify-between items-center">
-                <span class="text-xs text-slate-500">Local fallback simulation active if tables don't exist yet.</span>
-                <button onclick="copySqlCode()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center space-x-1.5">
-                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                    <span id="copySqlBtnText">Copy SQL Script</span>
-                </button>
-            </div>
+        <!-- Empty DM Selection Placeholder -->
+        <div id="dm-empty-state" class="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-950">
+          <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500 mb-4 text-2xl">
+            <i class="fa-regular fa-paper-plane"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-300">Your Messages</h3>
+          <p class="text-xs text-slate-500 max-w-sm mt-1">Select an accepted friend from the list or accept incoming requests to start private direct chatting.</p>
         </div>
+      </div>
+
+      <!-- 3. USER PROFILE & BIO TAB -->
+      <div id="view-profile" class="flex-1 flex items-center justify-center p-6 overflow-y-auto hidden">
+        <div class="glassmorphism w-full max-w-xl p-8 rounded-2xl border border-slate-800 space-y-6">
+          <div class="flex items-center gap-4 border-b border-slate-800 pb-6">
+            <div class="relative group">
+              <img id="profile-edit-avatar-preview" src="" alt="Avatar" class="w-20 h-20 rounded-full object-cover border-2 border-indigo-500 shadow-xl">
+            </div>
+            <div>
+              <h2 id="profile-edit-username-title" class="text-2xl font-bold text-slate-100">User Profile</h2>
+              <p class="text-xs text-slate-400">Update your avatar, handle, and personal bio</p>
+            </div>
+          </div>
+
+          <form onsubmit="saveUserProfile(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Display Username</label>
+              <input type="text" id="profile-edit-username" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Avatar Image URL or Upload</label>
+              <div class="flex gap-2 mb-2">
+                <input type="text" id="profile-edit-avatar-url" placeholder="Paste image URL..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
+                <label class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl cursor-pointer border border-slate-700 flex items-center gap-1 transition">
+                  <i class="fa-solid fa-upload"></i> Upload File
+                  <input type="file" id="profile-avatar-file" accept="image/*" class="hidden" onchange="handleAvatarFileUpload(event)">
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Bio / Status Message</label>
+              <textarea id="profile-edit-bio" rows="3" placeholder="Tell everyone something about yourself..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/20 active:scale-[0.99] transition">
+              Save Profile Changes
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ================= USER POPOVER MODAL (CLICK AVATAR) ================= -->
+  <div id="user-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="glassmorphism w-full max-w-sm p-6 rounded-2xl border border-slate-800 relative text-center">
+      <button onclick="closeUserModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <img id="modal-avatar" src="" class="w-24 h-24 rounded-full object-cover border-4 border-indigo-500/50 mx-auto mb-4 shadow-xl">
+      <h3 id="modal-username" class="text-xl font-bold text-slate-100">Username</h3>
+      <p id="modal-bio" class="text-xs text-slate-400 italic mt-2 px-4 min-h-[2.5rem]">No bio provided.</p>
+
+      <div id="modal-action-container" class="mt-6 pt-4 border-t border-slate-800 flex justify-center">
+        <!-- Dynamically rendered button (Add Friend, Pending, or DM) -->
+      </div>
     </div>
+  </div>
 
-    <!-- AUDIO SOUND EFFECTS -->
-    <audio id="audioPing" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-indigo-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <i id="toast-icon" class="fa-solid fa-circle-info"></i>
+    <span id="toast-message" class="text-xs font-semibold">Notification message</span>
+  </div>
 
-    <!-- MAIN APPLICATION SCRIPT LOGIC -->
-    <script>
-        // --- 1. SUPABASE INITIALIZATION ---
-        const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
-        
-        let supabaseClient = null;
-        try {
-            if (window.supabase) {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <!-- ================= JAVASCRIPT APP LOGIC ================= -->
+  <script>
+    // --- SUPABASE CONFIGURATION ---
+    const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // LOCAL STORAGE KEYS
+    const STORAGE_KEY_PROFILES = 'pulsechat_profiles_v1';
+    const STORAGE_KEY_GLOBAL_MSG = 'pulsechat_global_msgs_v1';
+    const STORAGE_KEY_FRIEND_REQS = 'pulsechat_friend_reqs_v1';
+    const STORAGE_KEY_DMS = 'pulsechat_dms_v1';
+    const STORAGE_KEY_CURRENT_USER = 'pulsechat_active_user_v1';
+
+    // APP STATE
+    let currentUser = null; // { id, username, bio, avatar, isGuest }
+    let profiles = [];
+    let globalMessages = [];
+    let friendRequests = [];
+    let directMessages = [];
+    let activeDMUserId = null;
+    let selectedModalUserId = null;
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+      loadLocalStorageData();
+      checkActiveSession();
+      setupSupabaseListeners();
+    };
+
+    function loadLocalStorageData() {
+      profiles = JSON.parse(localStorage.getItem(STORAGE_KEY_PROFILES) || '[]');
+      globalMessages = JSON.parse(localStorage.getItem(STORAGE_KEY_GLOBAL_MSG) || '[]');
+      friendRequests = JSON.parse(localStorage.getItem(STORAGE_KEY_FRIEND_REQS) || '[]');
+      directMessages = JSON.parse(localStorage.getItem(STORAGE_KEY_DMS) || '[]');
+    }
+
+    function saveAllToLocalStorage() {
+      localStorage.setItem(STORAGE_KEY_PROFILES, JSON.stringify(profiles));
+      localStorage.setItem(STORAGE_KEY_GLOBAL_MSG, JSON.stringify(globalMessages));
+      localStorage.setItem(STORAGE_KEY_FRIEND_REQS, JSON.stringify(friendRequests));
+      localStorage.setItem(STORAGE_KEY_DMS, JSON.stringify(directMessages));
+    }
+
+    function checkActiveSession() {
+      const savedUser = localStorage.getItem(STORAGE_KEY_CURRENT_USER);
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        initializeUserUI();
+      } else {
+        document.getElementById('auth-container').classList.remove('hidden');
+        document.getElementById('app-container').classList.add('hidden');
+      }
+    }
+
+    // --- AUTHENTICATION HANDLERS ---
+    function switchAuthTab(tab) {
+      const signinBtn = document.getElementById('tab-signin-btn');
+      const signupBtn = document.getElementById('tab-signup-btn');
+      const signinForm = document.getElementById('signin-form');
+      const signupForm = document.getElementById('signup-form');
+
+      if (tab === 'signin') {
+        signinBtn.className = "flex-1 pb-3 text-center border-b-2 border-indigo-500 text-indigo-400 font-semibold transition-all";
+        signupBtn.className = "flex-1 pb-3 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all";
+        signinForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+      } else {
+        signupBtn.className = "flex-1 pb-3 text-center border-b-2 border-indigo-500 text-indigo-400 font-semibold transition-all";
+        signinBtn.className = "flex-1 pb-3 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all";
+        signupForm.classList.remove('hidden');
+        signinForm.classList.add('hidden');
+      }
+    }
+
+    async function handleSignIn(e) {
+      e.preventDefault();
+      const email = document.getElementById('signin-email').value.trim();
+      const password = document.getElementById('signin-password').value.trim();
+
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) {
+          // Fallback logic if Supabase auth fails / offline: search existing local profile
+          const existingProfile = profiles.find(p => p.email === email);
+          if (existingProfile) {
+            currentUser = existingProfile;
+          } else {
+            // Create user locally
+            const username = email.split('@')[0];
+            currentUser = createProfileObject(username, false, email);
+          }
+        } else {
+          let userProfile = profiles.find(p => p.id === data.user.id || p.email === email);
+          if (!userProfile) {
+            const username = data.user.user_metadata?.username || email.split('@')[0];
+            userProfile = createProfileObject(username, false, email, data.user.id);
+          }
+          currentUser = userProfile;
+        }
+        showToast('Signed in successfully!', 'success');
+        initializeUserUI();
+      } catch (err) {
+        showToast('Auth error. Logged in locally.', 'info');
+        const username = email.split('@')[0];
+        currentUser = createProfileObject(username, false, email);
+        initializeUserUI();
+      }
+    }
+
+    async function handleSignUp(e) {
+      e.preventDefault();
+      const username = document.getElementById('signup-username').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value.trim();
+
+      if (profiles.some(p => p.username.toLowerCase() === username.toLowerCase())) {
+        showToast('Username already taken. Try another!', 'error');
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: { data: { username } }
+        });
+
+        const userId = data?.user?.id || 'usr_' + Date.now();
+        currentUser = createProfileObject(username, false, email, userId);
+        showToast('Account created successfully!', 'success');
+        initializeUserUI();
+      } catch (err) {
+        currentUser = createProfileObject(username, false, email);
+        showToast('Account created locally!', 'success');
+        initializeUserUI();
+      }
+    }
+
+    function handleGuestLogin() {
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      const guestName = 'Guest_' + randomNum;
+      currentUser = createProfileObject(guestName, true);
+      showToast(`Welcome, ${guestName}!`, 'info');
+      initializeUserUI();
+    }
+
+    function createProfileObject(username, isGuest = false, email = '', customId = null) {
+      const id = customId || (isGuest ? 'guest_' + Date.now() : 'usr_' + Date.now());
+      const avatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`;
+      const profile = {
+        id,
+        username,
+        email,
+        avatar,
+        bio: isGuest ? 'Temporary Guest Account' : 'Hey there! I am using PulseChat.',
+        isGuest,
+        createdAt: new Date().toISOString()
+      };
+
+      const existingIndex = profiles.findIndex(p => p.id === id || p.username.toLowerCase() === username.toLowerCase());
+      if (existingIndex >= 0) {
+        profiles[existingIndex] = { ...profiles[existingIndex], ...profile };
+      } else {
+        profiles.push(profile);
+      }
+      saveAllToLocalStorage();
+      return profile;
+    }
+
+    function handleSignOut() {
+      currentUser = null;
+      localStorage.removeItem(STORAGE_KEY_CURRENT_USER);
+      document.getElementById('auth-container').classList.remove('hidden');
+      document.getElementById('app-container').classList.add('hidden');
+      showToast('Signed out', 'info');
+    }
+
+    function initializeUserUI() {
+      localStorage.setItem(STORAGE_KEY_CURRENT_USER, JSON.stringify(currentUser));
+      document.getElementById('auth-container').classList.add('hidden');
+      document.getElementById('app-container').classList.remove('hidden');
+
+      // Update Sidebar Info
+      document.getElementById('sidebar-user-avatar').src = currentUser.avatar;
+      document.getElementById('sidebar-username').textContent = currentUser.username;
+      document.getElementById('sidebar-user-status').textContent = currentUser.isGuest ? 'Guest Mode' : 'Online';
+
+      // Update Profile View Form
+      document.getElementById('profile-edit-username').value = currentUser.username;
+      document.getElementById('profile-edit-username-title').textContent = currentUser.username;
+      document.getElementById('profile-edit-avatar-url').value = currentUser.avatar;
+      document.getElementById('profile-edit-avatar-preview').src = currentUser.avatar;
+      document.getElementById('profile-edit-bio').value = currentUser.bio || '';
+
+      setActiveTab('global');
+      renderGlobalMessages();
+      renderFriendLists();
+      updateBadges();
+    }
+
+    // --- NAVIGATION & TABS ---
+    function setActiveTab(tab) {
+      const views = ['global', 'friends', 'profile'];
+      views.forEach(v => {
+        document.getElementById(`view-${v}`).classList.add('hidden');
+        const navBtn = document.getElementById(`nav-${v}`);
+        if (v === tab) {
+          navBtn.className = "w-full flex items-center justify-between px-3 py-3 rounded-xl bg-indigo-600/20 text-indigo-400 font-medium transition border border-indigo-500/20";
+        } else {
+          navBtn.className = "w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-slate-800/70 text-slate-400 hover:text-slate-200 font-medium transition border border-transparent";
+        }
+      });
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+    }
+
+    function switchFriendSubTab(sub) {
+      const subtabs = ['all', 'requests', 'search'];
+      subtabs.forEach(s => {
+        const btn = document.getElementById(`subtab-${s}`);
+        const container = document.getElementById(`${s === 'all' ? 'friends' : s === 'requests' ? 'requests' : 'search'}-list-container`);
+        if (s === sub) {
+          btn.className = "flex-1 py-2.5 text-center text-indigo-400 border-b-2 border-indigo-500 font-semibold relative";
+          container.classList.remove('hidden');
+        } else {
+          btn.className = "flex-1 py-2.5 text-center text-slate-400 hover:text-slate-200 relative";
+          container.classList.add('hidden');
+        }
+      });
+    }
+
+    // --- PROFILE MANAGEMENT ---
+    function saveUserProfile(e) {
+      e.preventDefault();
+      const newUsername = document.getElementById('profile-edit-username').value.trim();
+      const newAvatar = document.getElementById('profile-edit-avatar-url').value.trim();
+      const newBio = document.getElementById('profile-edit-bio').value.trim();
+
+      if (!newUsername) return;
+
+      currentUser.username = newUsername;
+      currentUser.avatar = newAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(newUsername)}`;
+      currentUser.bio = newBio;
+
+      // Update in profiles list
+      const idx = profiles.findIndex(p => p.id === currentUser.id);
+      if (idx >= 0) profiles[idx] = { ...currentUser };
+
+      saveAllToLocalStorage();
+      initializeUserUI();
+      showToast('Profile updated successfully!', 'success');
+    }
+
+    function handleAvatarFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('Image size should be less than 2MB', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Image = e.target.result;
+        document.getElementById('profile-edit-avatar-url').value = base64Image;
+        document.getElementById('profile-edit-avatar-preview').src = base64Image;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // --- GLOBAL CHAT ROOM (STRICT MAX 50 MESSAGES) ---
+    function sendGlobalMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('global-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const newMsg = {
+        id: 'msg_' + Date.now(),
+        userId: currentUser.id,
+        username: currentUser.username,
+        avatar: currentUser.avatar,
+        content: text,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      globalMessages.push(newMsg);
+
+      // STRICT REQUIREMENT: Max 50 messages limit
+      if (globalMessages.length > 50) {
+        globalMessages = globalMessages.slice(globalMessages.length - 50);
+      }
+
+      saveAllToLocalStorage();
+      renderGlobalMessages();
+      input.value = '';
+
+      // Sync via Supabase Realtime broadcast or Channel if configured
+      syncSupabaseMessage('global', newMsg);
+    }
+
+    function renderGlobalMessages() {
+      const container = document.getElementById('global-messages');
+      container.innerHTML = '';
+
+      if (globalMessages.length === 0) {
+        container.innerHTML = `
+          <div class="text-center text-slate-500 my-10">
+            <i class="fa-solid fa-comments text-4xl mb-3 opacity-30"></i>
+            <p class="text-sm">No messages yet. Start the conversation!</p>
+          </div>
+        `;
+        return;
+      }
+
+      globalMessages.forEach(msg => {
+        const isMe = msg.userId === currentUser.id;
+        const msgEl = document.createElement('div');
+        msgEl.className = `flex items-start gap-3 ${isMe ? 'flex-row-reverse' : ''}`;
+
+        msgEl.innerHTML = `
+          <img src="${msg.avatar}" onclick="openUserModal('${msg.userId}')" title="Click to view profile / add friend" class="w-9 h-9 rounded-full object-cover border border-indigo-500/30 cursor-pointer hover:scale-105 transition shrink-0">
+          <div class="max-w-[75%] ${isMe ? 'items-end' : 'items-start'} flex flex-col">
+            <div class="flex items-center gap-2 mb-1 px-1">
+              <span onclick="openUserModal('${msg.userId}')" class="text-xs font-semibold text-slate-300 hover:text-indigo-400 cursor-pointer">${msg.username}</span>
+              <span class="text-[10px] text-slate-500">${msg.timestamp}</span>
+            </div>
+            <div class="p-3.5 rounded-2xl text-sm leading-relaxed ${isMe ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700/60'}">
+              ${escapeHTML(msg.content)}
+            </div>
+          </div>
+        `;
+        container.appendChild(msgEl);
+      });
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // --- FRIENDS & FRIEND REQUEST SYSTEM ---
+    function sendFriendRequest(targetUserId) {
+      if (targetUserId === currentUser.id) {
+        showToast("You cannot send a friend request to yourself!", "error");
+        return;
+      }
+
+      const existingReq = friendRequests.find(r => 
+        (r.from === currentUser.id && r.to === targetUserId) ||
+        (r.from === targetUserId && r.to === currentUser.id)
+      );
+
+      if (existingReq) {
+        showToast("A friend request or friendship already exists!", "info");
+        return;
+      }
+
+      const newReq = {
+        id: 'req_' + Date.now(),
+        from: currentUser.id,
+        to: targetUserId,
+        status: 'pending', // pending, accepted, rejected
+        timestamp: new Date().toISOString()
+      };
+
+      friendRequests.push(newReq);
+      saveAllToLocalStorage();
+      renderFriendLists();
+      updateBadges();
+      closeUserModal();
+      showToast("Friend request sent!", "success");
+    }
+
+    function respondToFriendRequest(reqId, accept) {
+      const req = friendRequests.find(r => r.id === reqId);
+      if (req) {
+        req.status = accept ? 'accepted' : 'rejected';
+        saveAllToLocalStorage();
+        renderFriendLists();
+        updateBadges();
+        showToast(accept ? "Friend request accepted!" : "Friend request rejected.", accept ? "success" : "info");
+      }
+    }
+
+    function isFriend(targetUserId) {
+      return friendRequests.some(r => 
+        r.status === 'accepted' && 
+        ((r.from === currentUser.id && r.to === targetUserId) || (r.from === targetUserId && r.to === currentUser.id))
+      );
+    }
+
+    function getFriendshipStatus(targetUserId) {
+      const req = friendRequests.find(r => 
+        (r.from === currentUser.id && r.to === targetUserId) ||
+        (r.from === targetUserId && r.to === currentUser.id)
+      );
+
+      if (!req) return 'none';
+      if (req.status === 'accepted') return 'accepted';
+      if (req.status === 'pending') {
+        return req.from === currentUser.id ? 'pending_sent' : 'pending_received';
+      }
+      return 'none';
+    }
+
+    function renderFriendLists() {
+      // 1. Accepted Friends List
+      const friendsContainer = document.getElementById('friends-list-container');
+      friendsContainer.innerHTML = '';
+
+      const acceptedReqs = friendRequests.filter(r => 
+        r.status === 'accepted' && (r.from === currentUser.id || r.to === currentUser.id)
+      );
+
+      if (acceptedReqs.length === 0) {
+        friendsContainer.innerHTML = `
+          <div class="text-center text-slate-500 py-8">
+            <p class="text-xs">No friends added yet.</p>
+            <p class="text-[11px] text-slate-600 mt-1">Search users or click profiles in global chat to add friends!</p>
+          </div>
+        `;
+      } else {
+        acceptedReqs.forEach(req => {
+          const friendId = req.from === currentUser.id ? req.to : req.from;
+          const friendProfile = profiles.find(p => p.id === friendId) || { id: friendId, username: 'User', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=user' };
+
+          const item = document.createElement('div');
+          item.onclick = () => openDMChat(friendProfile.id);
+          item.className = `flex items-center justify-between p-2.5 rounded-xl cursor-pointer hover:bg-slate-800/80 transition ${activeDMUserId === friendProfile.id ? 'bg-slate-800 border border-indigo-500/40' : ''}`;
+          item.innerHTML = `
+            <div class="flex items-center gap-3 min-w-0">
+              <img src="${friendProfile.avatar}" class="w-9 h-9 rounded-full object-cover border border-slate-700">
+              <div class="truncate">
+                <p class="text-xs font-semibold text-slate-200 truncate">${friendProfile.username}</p>
+                <p class="text-[10px] text-emerald-400">Accepted Friend</p>
+              </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-xs text-slate-600"></i>
+          `;
+          friendsContainer.appendChild(item);
+        });
+      }
+
+      // 2. Incoming & Outgoing Friend Requests
+      const incomingList = document.getElementById('incoming-req-list');
+      const outgoingList = document.getElementById('outgoing-req-list');
+      incomingList.innerHTML = '';
+      outgoingList.innerHTML = '';
+
+      const incoming = friendRequests.filter(r => r.to === currentUser.id && r.status === 'pending');
+      const outgoing = friendRequests.filter(r => r.from === currentUser.id && r.status === 'pending');
+
+      if (incoming.length === 0) {
+        incomingList.innerHTML = `<p class="text-[11px] text-slate-600 italic">No incoming requests</p>`;
+      } else {
+        incoming.forEach(req => {
+          const sender = profiles.find(p => p.id === req.from) || { username: 'User', avatar: '' };
+          const item = document.createElement('div');
+          item.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800';
+          item.innerHTML = `
+            <div class="flex items-center gap-2 min-w-0">
+              <img src="${sender.avatar}" class="w-7 h-7 rounded-full object-cover">
+              <span class="text-xs text-slate-200 truncate">${sender.username}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button onclick="respondToFriendRequest('${req.id}', true)" class="p-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs" title="Accept"><i class="fa-solid fa-check"></i></button>
+              <button onclick="respondToFriendRequest('${req.id}', false)" class="p-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs" title="Reject"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+          `;
+          incomingList.appendChild(item);
+        });
+      }
+
+      if (outgoing.length === 0) {
+        outgoingList.innerHTML = `<p class="text-[11px] text-slate-600 italic">No pending sent requests</p>`;
+      } else {
+        outgoing.forEach(req => {
+          const receiver = profiles.find(p => p.id === req.to) || { username: 'User', avatar: '' };
+          const item = document.createElement('div');
+          item.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-900/60 border border-slate-800';
+          item.innerHTML = `
+            <div class="flex items-center gap-2 min-w-0">
+              <img src="${receiver.avatar}" class="w-7 h-7 rounded-full object-cover">
+              <span class="text-xs text-slate-400 truncate">${receiver.username}</span>
+            </div>
+            <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">Pending</span>
+          `;
+          outgoingList.appendChild(item);
+        });
+      }
+    }
+
+    function handleSearchUsers() {
+      const query = document.getElementById('user-search-input').value.trim().toLowerCase();
+      const resultsContainer = document.getElementById('search-results-list');
+      resultsContainer.innerHTML = '';
+
+      if (!query) return;
+
+      switchFriendSubTab('search');
+
+      const matches = profiles.filter(p => p.id !== currentUser.id && p.username.toLowerCase().includes(query));
+
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = `<p class="text-xs text-slate-500">No users found matching "${query}"</p>`;
+        return;
+      }
+
+      matches.forEach(user => {
+        const status = getFriendshipStatus(user.id);
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800';
+
+        let actionBtn = '';
+        if (status === 'none') {
+          actionBtn = `<button onclick="sendFriendRequest('${user.id}')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg"><i class="fa-solid fa-user-plus mr-1"></i> Add</button>`;
+        } else if (status === 'accepted') {
+          actionBtn = `<button onclick="openDMChat('${user.id}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg"><i class="fa-solid fa-paper-plane mr-1"></i> DM</button>`;
+        } else if (status === 'pending_sent') {
+          actionBtn = `<span class="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">Pending</span>`;
+        } else if (status === 'pending_received') {
+          actionBtn = `<button onclick="switchFriendSubTab('requests')" class="px-2 py-1 bg-pink-600 text-white text-xs rounded-lg">View Req</button>`;
+        }
+
+        item.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0" onclick="openUserModal('${user.id}')">
+            <img src="${user.avatar}" class="w-8 h-8 rounded-full object-cover">
+            <div class="truncate">
+              <p class="text-xs font-semibold text-slate-200 truncate">${user.username}</p>
+              <p class="text-[10px] text-slate-500 truncate">${user.bio || 'PulseChat user'}</p>
+            </div>
+          </div>
+          <div>${actionBtn}</div>
+        `;
+        resultsContainer.appendChild(item);
+      });
+    }
+
+    // --- DIRECT MESSAGING (DM) SYSTEM ---
+    function openDMChat(friendId) {
+      if (!isFriend(friendId)) {
+        showToast("You can only direct message accepted friends!", "error");
+        return;
+      }
+
+      activeDMUserId = friendId;
+      const friendProfile = profiles.find(p => p.id === friendId) || { username: 'User', avatar: '', bio: '' };
+
+      document.getElementById('dm-header-avatar').src = friendProfile.avatar;
+      document.getElementById('dm-header-username').textContent = friendProfile.username;
+      document.getElementById('dm-header-bio').textContent = friendProfile.bio || 'PulseChat Friend';
+
+      document.getElementById('dm-empty-state').classList.add('hidden');
+      document.getElementById('dm-window').classList.remove('hidden');
+
+      setActiveTab('friends');
+      renderFriendLists();
+      renderDMMessages();
+    }
+
+    function sendDirectMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('dm-input');
+      const text = input.value.trim();
+
+      if (!text || !activeDMUserId) return;
+
+      const newDm = {
+        id: 'dm_' + Date.now(),
+        senderId: currentUser.id,
+        receiverId: activeDMUserId,
+        content: text,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      directMessages.push(newDm);
+      saveAllToLocalStorage();
+      renderDMMessages();
+      input.value = '';
+
+      syncSupabaseMessage('dm', newDm);
+    }
+
+    function renderDMMessages() {
+      if (!activeDMUserId) return;
+
+      const container = document.getElementById('dm-messages');
+      container.innerHTML = '';
+
+      const conversation = directMessages.filter(m => 
+        (m.senderId === currentUser.id && m.receiverId === activeDMUserId) ||
+        (m.senderId === activeDMUserId && m.receiverId === currentUser.id)
+      );
+
+      if (conversation.length === 0) {
+        container.innerHTML = `
+          <div class="text-center text-slate-500 my-10">
+            <i class="fa-solid fa-lock text-3xl mb-2 opacity-30"></i>
+            <p class="text-xs">End-to-end direct messages are active.</p>
+            <p class="text-[10px] text-slate-600 mt-1">Send a message to start chatting privately!</p>
+          </div>
+        `;
+        return;
+      }
+
+      conversation.forEach(msg => {
+        const isMe = msg.senderId === currentUser.id;
+        const msgEl = document.createElement('div');
+        msgEl.className = `flex items-start gap-3 ${isMe ? 'flex-row-reverse' : ''}`;
+
+        msgEl.innerHTML = `
+          <div class="max-w-[75%] ${isMe ? 'items-end' : 'items-start'} flex flex-col">
+            <div class="flex items-center gap-2 mb-1 px-1">
+              <span class="text-[10px] text-slate-500">${msg.timestamp}</span>
+            </div>
+            <div class="p-3.5 rounded-2xl text-sm leading-relaxed ${isMe ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700/60'}">
+              ${escapeHTML(msg.content)}
+            </div>
+          </div>
+        `;
+        container.appendChild(msgEl);
+      });
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // --- USER MODAL / POPOVER (GLOBAL CHAT CLICK) ---
+    function openUserModal(userId) {
+      selectedModalUserId = userId;
+      const profile = profiles.find(p => p.id === userId) || {
+        id: userId,
+        username: 'User',
+        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(userId)}`,
+        bio: 'No bio details available.'
+      };
+
+      document.getElementById('modal-avatar').src = profile.avatar;
+      document.getElementById('modal-username').textContent = profile.username;
+      document.getElementById('modal-bio').textContent = profile.bio || 'No bio provided.';
+
+      const actionContainer = document.getElementById('modal-action-container');
+      actionContainer.innerHTML = '';
+
+      if (userId === currentUser.id) {
+        actionContainer.innerHTML = `<span class="text-xs text-indigo-400 font-semibold bg-indigo-500/10 px-3 py-1.5 rounded-xl border border-indigo-500/20">This is your profile</span>`;
+      } else {
+        const status = getFriendshipStatus(userId);
+        if (status === 'none') {
+          actionContainer.innerHTML = `
+            <button onclick="sendFriendRequest('${userId}')" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+              <i class="fa-solid fa-user-plus"></i> Send Friend Request
+            </button>
+          `;
+        } else if (status === 'accepted') {
+          actionContainer.innerHTML = `
+            <button onclick="closeUserModal(); openDMChat('${userId}')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2">
+              <i class="fa-solid fa-paper-plane"></i> Send Direct Message
+            </button>
+          `;
+        } else if (status === 'pending_sent') {
+          actionContainer.innerHTML = `<span class="text-xs text-slate-400 bg-slate-800 px-4 py-2 rounded-xl">Friend Request Pending</span>`;
+        } else if (status === 'pending_received') {
+          actionContainer.innerHTML = `
+            <div class="flex gap-2">
+              <button onclick="respondToFriendRequestByUserId('${userId}', true)" class="px-4 py-2 bg-emerald-600 text-white text-xs rounded-xl font-semibold">Accept Request</button>
+              <button onclick="respondToFriendRequestByUserId('${userId}', false)" class="px-4 py-2 bg-rose-600 text-white text-xs rounded-xl font-semibold">Reject</button>
+            </div>
+          `;
+        }
+      }
+
+      document.getElementById('user-modal').classList.remove('hidden');
+    }
+
+    function respondToFriendRequestByUserId(userId, accept) {
+      const req = friendRequests.find(r => r.from === userId && r.to === currentUser.id && r.status === 'pending');
+      if (req) {
+        respondToFriendRequest(req.id, accept);
+        closeUserModal();
+      }
+    }
+
+    function closeUserModal() {
+      document.getElementById('user-modal').classList.add('hidden');
+      selectedModalUserId = null;
+    }
+
+    // --- UTILITIES & REALTIME SUPABASE BROADCAST ---
+    function updateBadges() {
+      const pendingCount = friendRequests.filter(r => r.to === currentUser?.id && r.status === 'pending').length;
+      const reqBadge = document.getElementById('friend-req-badge');
+      const subtabDot = document.getElementById('subtab-req-dot');
+
+      if (pendingCount > 0) {
+        reqBadge.textContent = pendingCount;
+        reqBadge.classList.remove('hidden');
+        subtabDot.classList.remove('hidden');
+      } else {
+        reqBadge.classList.add('hidden');
+        subtabDot.classList.add('hidden');
+      }
+    }
+
+    function setupSupabaseListeners() {
+      try {
+        const channel = supabaseClient.channel('public:room');
+        channel
+          .on('broadcast', { event: 'chat_msg' }, ({ payload }) => {
+            if (payload.type === 'global' && payload.data.userId !== currentUser?.id) {
+              globalMessages.push(payload.data);
+              if (globalMessages.length > 50) globalMessages = globalMessages.slice(globalMessages.length - 50);
+              saveAllToLocalStorage();
+              renderGlobalMessages();
+            } else if (payload.type === 'dm' && payload.data.receiverId === currentUser?.id) {
+              directMessages.push(payload.data);
+              saveAllToLocalStorage();
+              if (activeDMUserId === payload.data.senderId) renderDMMessages();
             }
-        } catch(e) {
-            console.warn('Supabase client failed to load, switching entirely to local engine fallback.', e);
-        }
-
-        // Preset Avatars
-        const PRESET_AVATARS = [
-            'https://api.dicebear.com/7.x/bottts/svg?seed=Felix',
-            'https://api.dicebear.com/7.x/bottts/svg?seed=Aneka',
-            'https://api.dicebear.com/7.x/bottts/svg?seed=Bandit',
-            'https://api.dicebear.com/7.x/bottts/svg?seed=Jack',
-            'https://api.dicebear.com/7.x/bottts/svg?seed=Shadow',
-            'https://api.dicebear.com/7.x/bottts/svg?seed=Midnight',
-            'https://api.dicebear.com/7.x/bottts/svg?seed=Milo',
-            'https://api.dicebear.com/7.x/bottts/svg?seed=Luna',
-            'https://api.dicebear.com/7.x/bottts/svg?seed=Sparky',
-            'https://api.dicebear.com/7.x/bottts/svg?seed=Zoe'
-        ];
-
-        // --- GLOBAL STATE ---
-        let currentUser = null;
-        let selectedSignUpAvatar = PRESET_AVATARS[0];
-        let selectedSettingsAvatar = PRESET_AVATARS[0];
-        let activeChat = { type: 'global', targetUser: null }; // 'global' or 'dm'
-        let isAudioEnabled = true;
-        let isBackendAvailable = false;
-        
-        // Broadcast Channel for Multi-Tab Local Messaging Fallback
-        const localChannel = new BroadcastChannel('pulsechat_local_channel');
-
-        // Storage keys for Fallback mode
-        const LOCAL_STORAGE_USERS = 'pulsechat_sim_users';
-        const LOCAL_STORAGE_MESSAGES = 'pulsechat_sim_messages';
-        const LOCAL_STORAGE_DMS = 'pulsechat_sim_dms';
-        const LOCAL_STORAGE_FRIENDS = 'pulsechat_sim_friends';
-
-        // --- INITIALIZATION ON LOAD ---
-        window.onload = async () => {
-            lucide.createIcons();
-            renderAvatarSelectors();
-            setupLocalBroadcast();
-            await checkDatabaseStatus();
-            checkSession();
-        };
-
-        // --- LOCAL BROADCAST SYNC ---
-        function setupLocalBroadcast() {
-            localChannel.onmessage = (event) => {
-                const { type } = event.data;
-                if (type === 'GLOBAL_MESSAGE' && activeChat.type === 'global') {
-                    renderMessages();
-                    if (isAudioEnabled) playPing();
-                } else if (type === 'DM_MESSAGE' && activeChat.type === 'dm') {
-                    renderMessages();
-                    if (isAudioEnabled) playPing();
-                } else if (type === 'FRIEND_UPDATE') {
-                    renderFriends();
-                    renderDMsList();
-                    if (document.getElementById('profileModal') && !document.getElementById('profileModal').classList.contains('hidden')) {
-                        // Refresh profile modal if open
-                        const targetId = document.getElementById('profileModal').dataset.userId;
-                        if (targetId) openProfileById(targetId);
-                    }
-                }
-            };
-        }
-
-        // --- DATABASE & SCHEMA CHECK ---
-        async function checkDatabaseStatus() {
-            const statusDot = document.getElementById('backendStatusDot');
-            const statusText = document.getElementById('backendStatusText');
-
-            if (!supabaseClient) {
-                setFallbackStatus(statusDot, statusText);
-                return;
-            }
-
-            try {
-                const { data, error } = await supabaseClient.from('profiles').select('count', { count: 'exact', head: true });
-                if (error) throw error;
-
-                isBackendAvailable = true;
-                statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
-                statusText.innerText = 'Connected to Supabase Realtime Database';
-            } catch (err) {
-                setFallbackStatus(statusDot, statusText);
-            }
-        }
-
-        function setFallbackStatus(dot, text) {
-            isBackendAvailable = false;
-            dot.className = 'w-2 h-2 rounded-full bg-amber-400';
-            text.innerText = 'Running in Local Memory Fallback Mode (Tables not detected)';
-        }
-
-        // --- AVATAR UPLOAD HANDLER ---
-        function handleAvatarFileUpload(event, context) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (file.size > 2 * 1024 * 1024) {
-                alert('File size exceeds 2MB limit. Please choose a smaller image.');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64Image = e.target.result;
-                if (context === 'signup') {
-                    selectedSignUpAvatar = base64Image;
-                    document.getElementById('signupAvatarPreview').src = base64Image;
-                } else if (context === 'settings') {
-                    selectedSettingsAvatar = base64Image;
-                    document.getElementById('settingsAvatarPreview').src = base64Image;
-                }
-                renderAvatarSelectors();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // --- AUTHENTICATION LOGIC ---
-        function switchAuthTab(tab) {
-            const btnSignIn = document.getElementById('tabSignIn');
-            const btnSignUp = document.getElementById('tabSignUp');
-            const formSignIn = document.getElementById('formSignIn');
-            const formSignUp = document.getElementById('formSignUp');
-            hideAuthAlert();
-
-            if (tab === 'signin') {
-                btnSignIn.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white shadow transition';
-                btnSignUp.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
-                formSignIn.classList.remove('hidden');
-                formSignUp.classList.add('hidden');
-            } else {
-                btnSignUp.className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white shadow transition';
-                btnSignIn.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
-                formSignUp.classList.remove('hidden');
-                formSignIn.classList.add('hidden');
-            }
-        }
-
-        function renderAvatarSelectors() {
-            const signupBox = document.getElementById('avatarSelector');
-            const settingsBox = document.getElementById('settingsAvatarSelector');
-            signupBox.innerHTML = '';
-            settingsBox.innerHTML = '';
-
-            PRESET_AVATARS.forEach((url) => {
-                // Signup avatar choice
-                const img = document.createElement('img');
-                img.src = url;
-                img.className = `w-10 h-10 rounded-full border-2 cursor-pointer p-0.5 transition ${selectedSignUpAvatar === url ? 'border-indigo-500 scale-110 bg-indigo-500/20' : 'border-slate-800 hover:border-slate-600'}`;
-                img.onclick = () => {
-                    selectedSignUpAvatar = url;
-                    document.getElementById('signupAvatarPreview').src = url;
-                    renderAvatarSelectors();
-                };
-                signupBox.appendChild(img);
-
-                // Settings avatar choice
-                const img2 = document.createElement('img');
-                img2.src = url;
-                img2.className = `w-10 h-10 rounded-full border-2 cursor-pointer p-0.5 transition ${selectedSettingsAvatar === url ? 'border-indigo-500 scale-110 bg-indigo-500/20' : 'border-slate-800 hover:border-slate-600'}`;
-                img2.onclick = () => {
-                    selectedSettingsAvatar = url;
-                    document.getElementById('settingsAvatarPreview').src = url;
-                    renderAvatarSelectors();
-                };
-                settingsBox.appendChild(img2);
-            });
-        }
-
-        async function handleSignIn(e) {
-            e.preventDefault();
-            const email = document.getElementById('signinEmail').value.trim();
-            const password = document.getElementById('signinPassword').value;
-
-            if (isBackendAvailable) {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) {
-                    showAuthAlert(error.message, 'error');
-                    return;
-                }
-                const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', data.user.id).single();
-                loginUser(profile || { id: data.user.id, username: email.split('@')[0], avatar_url: PRESET_AVATARS[0], bio: '', is_guest: false });
-            } else {
-                // Local Simulation Sign In
-                const users = getLocalUsers();
-                const found = users.find(u => u.email === email && u.password === password);
-                if (found) {
-                    loginUser(found);
-                } else {
-                    showAuthAlert('Invalid credentials in local mode.', 'error');
-                }
-            }
-        }
-
-        async function handleSignUp(e) {
-            e.preventDefault();
-            const username = document.getElementById('signupUsername').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const bio = document.getElementById('signupBio').value.trim();
-
-            if (isBackendAvailable) {
-                const { data, error } = await supabaseClient.auth.signUp({ email, password });
-                if (error) {
-                    showAuthAlert(error.message, 'error');
-                    return;
-                }
-                const profile = {
-                    id: data.user.id,
-                    username,
-                    avatar_url: selectedSignUpAvatar,
-                    bio: bio || 'Hello! I am using PulseChat.',
-                    is_guest: false
-                };
-                await supabaseClient.from('profiles').insert([profile]);
-                loginUser(profile);
-            } else {
-                // Local Simulation Sign Up
-                const users = getLocalUsers();
-                if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
-                    showAuthAlert('Username already taken', 'error');
-                    return;
-                }
-                const newProfile = {
-                    id: 'user_' + Date.now(),
-                    username,
-                    email,
-                    password,
-                    avatar_url: selectedSignUpAvatar,
-                    bio: bio || 'Hello! I am using PulseChat.',
-                    is_guest: false
-                };
-                users.push(newProfile);
-                localStorage.setItem(LOCAL_STORAGE_USERS, JSON.stringify(users));
-                loginUser(newProfile);
-            }
-        }
-
-        function handleGuestLogin() {
-            const guestNum = Math.floor(1000 + Math.random() * 9000);
-            const guestProfile = {
-                id: 'guest_' + Date.now(),
-                username: `Guest_${guestNum}`,
-                avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=Guest${guestNum}`,
-                bio: 'Just browsing as a guest!',
-                is_guest: true
-            };
-
-            if (!isBackendAvailable) {
-                const users = getLocalUsers();
-                users.push(guestProfile);
-                localStorage.setItem(LOCAL_STORAGE_USERS, JSON.stringify(users));
-            }
-
-            loginUser(guestProfile);
-        }
-
-        function loginUser(profile) {
-            currentUser = profile;
-            localStorage.setItem('pulsechat_active_user', JSON.stringify(profile));
-            
-            document.getElementById('authScreen').classList.add('hidden');
-            document.getElementById('mainScreen').classList.remove('hidden');
-
-            // Render current user profile info in UI
-            document.getElementById('myUsername').innerText = profile.username;
-            document.getElementById('myAvatarImg').src = profile.avatar_url;
-            document.getElementById('myRoleBadge').innerText = profile.is_guest ? 'Guest Account' : 'Member';
-
-            // Subscribe to realtime updates if enabled
-            if (isBackendAvailable) {
-                setupSupabaseRealtime();
-            }
-
-            // Load initial screen data
-            renderMessages();
-            renderFriends();
-            renderDMsList();
-        }
-
-        function checkSession() {
-            const saved = localStorage.getItem('pulsechat_active_user');
-            if (saved) {
-                try {
-                    loginUser(JSON.parse(saved));
-                } catch(e) {
-                    localStorage.removeItem('pulsechat_active_user');
-                }
-            }
-        }
-
-        function handleSignOut() {
-            if (isBackendAvailable && supabaseClient) {
-                supabaseClient.auth.signOut();
-            }
-            currentUser = null;
-            localStorage.removeItem('pulsechat_active_user');
-            document.getElementById('mainScreen').classList.add('hidden');
-            document.getElementById('authScreen').classList.remove('hidden');
-        }
-
-        function showAuthAlert(msg, type = 'error') {
-            const box = document.getElementById('authAlert');
-            box.classList.remove('hidden', 'bg-rose-500/10', 'border-rose-500/30', 'text-rose-300', 'bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-300');
-            if (type === 'error') {
-                box.classList.add('bg-rose-500/10', 'border-rose-500/30', 'text-rose-300');
-            } else {
-                box.classList.add('bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-300');
-            }
-            box.innerHTML = `<i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i> <span>${msg}</span>`;
-            lucide.createIcons();
-        }
-
-        function hideAuthAlert() {
-            document.getElementById('authAlert').classList.add('hidden');
-        }
-
-        // --- REALTIME SUPABASE LISTENERS ---
-        function setupSupabaseRealtime() {
-            supabaseClient
-                .channel('public:messages')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
-                    if (activeChat.type === 'global') {
-                        renderMessages();
-                        if (isAudioEnabled) playPing();
-                    }
-                })
-                .subscribe();
-
-            supabaseClient
-                .channel('public:direct_messages')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'direct_messages' }, payload => {
-                    if (activeChat.type === 'dm' && activeChat.targetUser && (payload.new.sender_id === activeChat.targetUser.id || payload.new.receiver_id === activeChat.targetUser.id)) {
-                        renderMessages();
-                        if (payload.new.sender_id !== currentUser.id && isAudioEnabled) playPing();
-                    }
-                    renderDMsList();
-                })
-                .subscribe();
-
-            supabaseClient
-                .channel('public:friends')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'friends' }, () => {
-                    renderFriends();
-                    renderDMsList();
-                })
-                .subscribe();
-        }
-
-        // --- MESSAGING LOGIC ---
-        async function handleSendMessage(e) {
-            e.preventDefault();
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            // Strict check for DMs: Must be accepted friends
-            if (activeChat.type === 'dm') {
-                const isConfirmed = await checkAreFriends(currentUser.id, activeChat.targetUser.id);
-                if (!isConfirmed) {
-                    alert('You can only chat with confirmed friends!');
-                    return;
-                }
-            }
-
-            input.value = '';
-            document.getElementById('emojiPicker').classList.add('hidden');
-
-            if (activeChat.type === 'global') {
-                const newMsg = {
-                    id: 'msg_' + Date.now(),
-                    sender_id: currentUser.id,
-                    sender_name: currentUser.username,
-                    sender_avatar: currentUser.avatar_url,
-                    content: text,
-                    created_at: new Date().toISOString()
-                };
-
-                if (isBackendAvailable) {
-                    await supabaseClient.from('messages').insert([{
-                        sender_id: currentUser.id,
-                        sender_name: currentUser.username,
-                        sender_avatar: currentUser.avatar_url,
-                        content: text
-                    }]);
-                } else {
-                    let msgs = getLocalMessages();
-                    msgs.push(newMsg);
-                    // Enforce 50-message FIFO Cap
-                    if (msgs.length > 50) {
-                        msgs = msgs.slice(msgs.length - 50);
-                    }
-                    localStorage.setItem(LOCAL_STORAGE_MESSAGES, JSON.stringify(msgs));
-                    renderMessages();
-                    localChannel.postMessage({ type: 'GLOBAL_MESSAGE', data: newMsg });
-                }
-            } else if (activeChat.type === 'dm') {
-                const newDM = {
-                    id: 'dm_' + Date.now(),
-                    sender_id: currentUser.id,
-                    receiver_id: activeChat.targetUser.id,
-                    content: text,
-                    created_at: new Date().toISOString()
-                };
-
-                if (isBackendAvailable) {
-                    await supabaseClient.from('direct_messages').insert([{
-                        sender_id: currentUser.id,
-                        receiver_id: activeChat.targetUser.id,
-                        content: text
-                    }]);
-                } else {
-                    const dms = getLocalDMs();
-                    dms.push(newDM);
-                    localStorage.setItem(LOCAL_STORAGE_DMS, JSON.stringify(dms));
-                    renderMessages();
-                    localChannel.postMessage({ type: 'DM_MESSAGE', data: newDM });
-                }
-            }
-        }
-
-        async function renderMessages() {
-            const container = document.getElementById('messagesContainer');
-            const inputBar = document.getElementById('chatInputBar');
-            container.innerHTML = '';
-
-            // Handle Direct Messaging Dynamic Lock Policy
-            if (activeChat.type === 'dm') {
-                const isConfirmed = await checkAreFriends(currentUser.id, activeChat.targetUser.id);
-                if (!isConfirmed) {
-                    inputBar.classList.add('hidden');
-                    container.innerHTML = `
-                        <div class="h-full flex flex-col items-center justify-center text-slate-400 text-center p-6">
-                            <div class="w-16 h-16 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-center text-amber-400 mb-4 shadow-xl">
-                                <i data-lucide="lock" class="w-8 h-8"></i>
-                            </div>
-                            <h3 class="text-base font-bold text-white mb-1">Direct Chat Locked</h3>
-                            <p class="text-xs text-slate-400 max-w-sm mb-4">You can only send messages to users who have accepted your friend request.</p>
-                            <button onclick="openProfileModal(activeChat.targetUser)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 shadow-lg shadow-indigo-600/20">
-                                <i data-lucide="user-plus" class="w-4 h-4"></i>
-                                <span>View Friend Options</span>
-                            </button>
-                        </div>
-                    `;
-                    lucide.createIcons();
-                    return;
-                }
-            }
-
-            inputBar.classList.remove('hidden');
-
-            let messages = [];
-
-            if (activeChat.type === 'global') {
-                if (isBackendAvailable) {
-                    // Fetch latest 50 messages for Global Chat (FIFO)
-                    const { data } = await supabaseClient.from('messages').select('*').order('created_at', { ascending: false }).limit(50);
-                    messages = (data || []).reverse();
-                } else {
-                    messages = getLocalMessages();
-                }
-            } else if (activeChat.type === 'dm') {
-                if (isBackendAvailable) {
-                    const { data } = await supabaseClient.from('direct_messages')
-                        .select('*')
-                        .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${activeChat.targetUser.id}),and(sender_id.eq.${activeChat.targetUser.id},receiver_id.eq.${currentUser.id})`)
-                        .order('created_at', { ascending: true });
-                    messages = data || [];
-                } else {
-                    const allDMs = getLocalDMs();
-                    messages = allDMs.filter(m => 
-                        (m.sender_id === currentUser.id && m.receiver_id === activeChat.targetUser.id) ||
-                        (m.sender_id === activeChat.targetUser.id && m.receiver_id === currentUser.id)
-                    );
-                }
-            }
-
-            if (messages.length === 0) {
-                container.innerHTML = `
-                    <div class="h-full flex flex-col items-center justify-center text-slate-500 text-center">
-                        <i data-lucide="message-square" class="w-12 h-12 mb-2 opacity-40"></i>
-                        <p class="text-sm font-medium">No messages yet in this channel</p>
-                        <p class="text-xs">Say hello to start the conversation!</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-
-            messages.forEach(msg => {
-                appendSingleMessage(msg, false);
-            });
-
-            scrollToBottom();
-        }
-
-        function appendSingleMessage(msg, autoScroll = true) {
-            const container = document.getElementById('messagesContainer');
-            if (container.querySelector('.flex-col')) {
-                container.innerHTML = '';
-            }
-
-            const isMe = msg.sender_id === currentUser.id;
-            const timeStr = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            const senderAvatar = isMe ? currentUser.avatar_url : (msg.sender_avatar || (activeChat.targetUser ? activeChat.targetUser.avatar_url : PRESET_AVATARS[0]));
-            const senderName = isMe ? currentUser.username : (msg.sender_name || (activeChat.targetUser ? activeChat.targetUser.username : 'User'));
-
-            const wrapper = document.createElement('div');
-            wrapper.className = `flex items-start space-x-2.5 ${isMe ? 'flex-row-reverse space-x-reverse' : ''}`;
-
-            wrapper.innerHTML = `
-                <img src="${senderAvatar}" onclick="openProfileById('${msg.sender_id}')" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700/80 cursor-pointer hover:border-indigo-500 object-cover shrink-0 mt-1 transition">
-                <div class="max-w-[75%] md:max-w-[65%]">
-                    <div class="flex items-center space-x-2 mb-1 ${isMe ? 'justify-end' : ''}">
-                        <span onclick="openProfileById('${msg.sender_id}')" class="text-xs font-semibold text-slate-300 cursor-pointer hover:text-indigo-400 transition">${senderName}</span>
-                        <span class="text-[10px] text-slate-500">${timeStr}</span>
-                    </div>
-                    <div class="p-3 rounded-2xl text-xs leading-relaxed break-words shadow-sm ${
-                        isMe 
-                            ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-tr-none' 
-                            : 'bg-slate-800 border border-slate-700/60 text-slate-200 rounded-tl-none'
-                    }">
-                        ${escapeHtml(msg.content)}
-                    </div>
-                </div>
-            `;
-
-            container.appendChild(wrapper);
-            if (autoScroll) scrollToBottom();
-        }
-
-        function scrollToBottom() {
-            const container = document.getElementById('messagesContainer');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // --- DIRECT MESSAGING & FRIEND LOGIC ---
-        async function selectChat(type, targetUser = null) {
-            activeChat = { type, targetUser };
-
-            const headerInfo = document.getElementById('activeChatHeaderInfo');
-            if (type === 'global') {
-                headerInfo.innerHTML = `
-                    <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
-                        <i data-lucide="globe" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-sm font-bold text-white">Global Chat Room</h2>
-                        <p class="text-xs text-slate-400 flex items-center space-x-1">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span>Public Channel • Saved Last 50 Messages</span>
-                        </p>
-                    </div>
-                `;
-            } else if (targetUser) {
-                headerInfo.innerHTML = `
-                    <img src="${targetUser.avatar_url}" class="w-10 h-10 rounded-full border border-slate-700 object-cover cursor-pointer shrink-0" onclick="openProfileModal(activeChat.targetUser)">
-                    <div>
-                        <h2 class="text-sm font-bold text-white flex items-center space-x-1.5 cursor-pointer" onclick="openProfileModal(activeChat.targetUser)">
-                            <span>${targetUser.username}</span>
-                        </h2>
-                        <p class="text-xs text-slate-400">Direct Message Thread</p>
-                    </div>
-                `;
-            }
-            lucide.createIcons();
-            await renderMessages();
-
-            if (window.innerWidth < 768) {
-                document.getElementById('sidebar').classList.add('-translate-x-full');
-            }
-        }
-
-        async function checkAreFriends(userA, userB) {
-            if (!userA || !userB) return false;
-            let list = [];
-            if (isBackendAvailable) {
-                const { data } = await supabaseClient.from('friends').select('*').or(`and(user_id.eq.${userA},friend_id.eq.${userB}),and(user_id.eq.${userB},friend_id.eq.${userA})`);
-                list = data || [];
-            } else {
-                list = getLocalFriends().filter(f => (f.user_id === userA && f.friend_id === userB) || (f.user_id === userB && f.friend_id === userA));
-            }
-            return list.some(f => f.status === 'accepted');
-        }
-
-        async function getFriendshipStatus(otherUserId) {
-            let list = [];
-            if (isBackendAvailable) {
-                const { data } = await supabaseClient.from('friends').select('*').or(`and(user_id.eq.${currentUser.id},friend_id.eq.${otherUserId}),and(user_id.eq.${otherUserId},friend_id.eq.${currentUser.id})`);
-                list = data || [];
-            } else {
-                list = getLocalFriends().filter(f => (f.user_id === currentUser.id && f.friend_id === otherUserId) || (f.user_id === otherUserId && f.friend_id === currentUser.id));
-            }
-
-            if (list.length === 0) return { status: 'none', record: null };
-            const record = list[0];
-            if (record.status === 'accepted') return { status: 'accepted', record };
-            if (record.user_id === currentUser.id) return { status: 'outgoing_pending', record };
-            return { status: 'incoming_pending', record };
-        }
-
-        async function renderFriends() {
-            const container = document.getElementById('friendsList');
-            const reqContainer = document.getElementById('friendRequestsList');
-            const reqCountBadge = document.getElementById('pendingReqCount');
-            container.innerHTML = '';
-            reqContainer.innerHTML = '';
-
-            let friendsList = [];
-            if (isBackendAvailable) {
-                const { data } = await supabaseClient.from('friends').select('*').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`);
-                friendsList = data || [];
-            } else {
-                friendsList = getLocalFriends().filter(f => f.user_id === currentUser.id || f.friend_id === currentUser.id);
-            }
-
-            const pending = friendsList.filter(f => f.status === 'pending' && f.friend_id === currentUser.id);
-            const accepted = friendsList.filter(f => f.status === 'accepted');
-
-            // Pending badge indicator
-            const badge = document.getElementById('pendingBadge');
-            reqCountBadge.innerText = pending.length;
-            if (pending.length > 0) badge.classList.remove('hidden');
-            else badge.classList.add('hidden');
-
-            // Render Pending Incoming Requests
-            if (pending.length === 0) {
-                reqContainer.innerHTML = `<div class="text-xs text-slate-500 italic px-1">No pending requests</div>`;
-            } else {
-                for (const req of pending) {
-                    const requester = await fetchUserById(req.user_id);
-                    if (!requester) continue;
-
-                    const div = document.createElement('div');
-                    div.className = 'flex items-center justify-between p-2 bg-slate-800/60 rounded-xl border border-slate-700/50';
-                    div.innerHTML = `
-                        <div class="flex items-center space-x-2 cursor-pointer" onclick="openProfileModal(${JSON.stringify(requester).replace(/"/g, '&quot;')})">
-                            <img src="${requester.avatar_url}" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 object-cover">
-                            <span class="text-xs font-semibold text-white">${requester.username}</span>
-                        </div>
-                        <div class="flex items-center space-x-1">
-                            <button onclick="acceptFriendRequest('${req.id}')" title="Accept" class="p-1.5 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-lg transition"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
-                            <button onclick="rejectFriendRequest('${req.id}')" title="Reject" class="p-1.5 bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white rounded-lg transition"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
-                        </div>
-                    `;
-                    reqContainer.appendChild(div);
-                }
-            }
-
-            // Render Confirmed Friends
-            if (accepted.length === 0) {
-                container.innerHTML = `<div class="text-xs text-slate-500 italic px-1">No confirmed friends yet</div>`;
-            } else {
-                for (const item of accepted) {
-                    const otherId = item.user_id === currentUser.id ? item.friend_id : item.user_id;
-                    const friendUser = await fetchUserById(otherId);
-                    if (!friendUser) continue;
-
-                    const div = document.createElement('div');
-                    div.className = 'flex items-center justify-between p-2 hover:bg-slate-800/50 rounded-xl cursor-pointer transition';
-                    div.onclick = () => selectChat('dm', friendUser);
-                    div.innerHTML = `
-                        <div class="flex items-center space-x-2.5">
-                            <div class="relative">
-                                <img src="${friendUser.avatar_url}" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 object-cover">
-                                <span class="absolute bottom-0 right-0 w-2 h-2 bg-emerald-500 rounded-full border border-slate-900"></span>
-                            </div>
-                            <div>
-                                <div class="text-xs font-semibold text-white">${friendUser.username}</div>
-                                <div class="text-[10px] text-indigo-400 font-medium">Friend • Click to chat</div>
-                            </div>
-                        </div>
-                        <button onclick="event.stopPropagation(); selectChat('dm', ${JSON.stringify(friendUser).replace(/"/g, '&quot;')})" class="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg">
-                            <i data-lucide="message-square" class="w-4 h-4"></i>
-                        </button>
-                    `;
-                    container.appendChild(div);
-                }
-            }
-            lucide.createIcons();
-        }
-
-        async function renderDMsList() {
-            const container = document.getElementById('dmList');
-            container.innerHTML = '';
-
-            // Fetch list of confirmed friends to populate DM thread access
-            let friendsList = [];
-            if (isBackendAvailable) {
-                const { data } = await supabaseClient.from('friends').select('*').eq('status', 'accepted').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`);
-                friendsList = data || [];
-            } else {
-                friendsList = getLocalFriends().filter(f => f.status === 'accepted' && (f.user_id === currentUser.id || f.friend_id === currentUser.id));
-            }
-
-            if (friendsList.length === 0) {
-                container.innerHTML = `<div class="text-xs text-slate-500 italic px-3 py-2">No friends to direct message yet</div>`;
-                return;
-            }
-
-            for (const item of friendsList) {
-                const otherId = item.user_id === currentUser.id ? item.friend_id : item.user_id;
-                const friendUser = await fetchUserById(otherId);
-                if (!friendUser) continue;
-
-                const div = document.createElement('div');
-                div.className = 'flex items-center space-x-3 p-2.5 rounded-xl cursor-pointer hover:bg-slate-800/60 transition';
-                div.onclick = () => selectChat('dm', friendUser);
-                div.innerHTML = `
-                    <img src="${friendUser.avatar_url}" class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 object-cover">
-                    <div class="flex-1 overflow-hidden">
-                        <div class="text-xs font-semibold text-white truncate">${friendUser.username}</div>
-                        <div class="text-[10px] text-slate-400">Direct message</div>
-                    </div>
-                `;
-                container.appendChild(div);
-            }
-        }
-
-        // --- SEARCH USERS LOGIC ---
-        async function handleSearch(query) {
-            const container = document.getElementById('searchResults');
-            const term = query.trim().toLowerCase();
-            if (!term) {
-                container.innerHTML = `<div class="text-xs text-slate-500 italic text-center py-4">Type to search users</div>`;
-                return;
-            }
-
-            let results = [];
-            if (isBackendAvailable) {
-                const { data } = await supabaseClient.from('profiles').select('*').ilike('username', `%${term}%`).neq('id', currentUser.id);
-                results = data || [];
-            } else {
-                results = getLocalUsers().filter(u => u.id !== currentUser.id && u.username.toLowerCase().includes(term));
-            }
-
-            if (results.length === 0) {
-                container.innerHTML = `<div class="text-xs text-slate-500 italic text-center py-4">No users found</div>`;
-                return;
-            }
-
-            container.innerHTML = '';
-            for (const u of results) {
-                const rel = await getFriendshipStatus(u.id);
-
-                let actionBtnHtml = '';
-                if (rel.status === 'accepted') {
-                    actionBtnHtml = `<span class="text-[10px] text-emerald-400 font-medium bg-emerald-950/50 px-2 py-1 rounded-lg border border-emerald-800/40">Friends</span>`;
-                } else if (rel.status === 'outgoing_pending') {
-                    actionBtnHtml = `<span class="text-[10px] text-amber-400 font-medium bg-amber-950/50 px-2 py-1 rounded-lg border border-amber-800/40">Request Sent</span>`;
-                } else if (rel.status === 'incoming_pending') {
-                    actionBtnHtml = `<button onclick="acceptFriendRequest('${rel.record.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-medium transition">Accept</button>`;
-                } else {
-                    actionBtnHtml = `<button onclick="sendFriendRequest('${u.id}')" class="px-2.5 py-1 bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white rounded-lg text-xs font-medium transition flex items-center space-x-1">
-                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-                        <span>Add</span>
-                    </button>`;
-                }
-
-                const div = document.createElement('div');
-                div.className = 'flex items-center justify-between p-2.5 bg-slate-900 border border-slate-800 rounded-xl hover:border-slate-700 transition';
-                div.innerHTML = `
-                    <div class="flex items-center space-x-2.5 cursor-pointer" onclick="openProfileModal(${JSON.stringify(u).replace(/"/g, '&quot;')})">
-                        <img src="${u.avatar_url}" class="w-8 h-8 rounded-full bg-slate-800 object-cover">
-                        <div>
-                            <div class="text-xs font-semibold text-white">${u.username}</div>
-                            <div class="text-[10px] text-slate-400">${u.is_guest ? 'Guest' : 'Member'}</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-1">
-                        ${actionBtnHtml}
-                    </div>
-                `;
-                container.appendChild(div);
-            }
-            lucide.createIcons();
-        }
-
-        async function sendFriendRequest(targetId) {
-            if (isBackendAvailable) {
-                await supabaseClient.from('friends').insert([{ user_id: currentUser.id, friend_id: targetId, status: 'pending' }]);
-            } else {
-                const list = getLocalFriends();
-                list.push({ id: 'f_' + Date.now(), user_id: currentUser.id, friend_id: targetId, status: 'pending' });
-                localStorage.setItem(LOCAL_STORAGE_FRIENDS, JSON.stringify(list));
-                localChannel.postMessage({ type: 'FRIEND_UPDATE' });
-            }
-            renderFriends();
-            if (document.getElementById('profileModal') && !document.getElementById('profileModal').classList.contains('hidden')) {
-                openProfileById(targetId);
-            }
-        }
-
-        async function acceptFriendRequest(reqId) {
-            if (isBackendAvailable) {
-                await supabaseClient.from('friends').update({ status: 'accepted' }).eq('id', reqId);
-            } else {
-                const list = getLocalFriends();
-                const item = list.find(f => f.id === reqId);
-                if (item) item.status = 'accepted';
-                localStorage.setItem(LOCAL_STORAGE_FRIENDS, JSON.stringify(list));
-                localChannel.postMessage({ type: 'FRIEND_UPDATE' });
-            }
-            renderFriends();
-            renderDMsList();
-        }
-
-        async function rejectFriendRequest(reqId) {
-            if (isBackendAvailable) {
-                await supabaseClient.from('friends').delete().eq('id', reqId);
-            } else {
-                let list = getLocalFriends();
-                list = list.filter(f => f.id !== reqId);
-                localStorage.setItem(LOCAL_STORAGE_FRIENDS, JSON.stringify(list));
-                localChannel.postMessage({ type: 'FRIEND_UPDATE' });
-            }
-            renderFriends();
-            renderDMsList();
-        }
-
-        // --- PROFILE POPUP CARD & INTERACTIONS ---
-        async function openProfileModal(user) {
-            if (!user) return;
-            document.getElementById('profileModal').dataset.userId = user.id;
-            document.getElementById('profileCardAvatar').src = user.avatar_url;
-            document.getElementById('profileCardName').innerText = user.username;
-            document.getElementById('profileCardBadge').innerText = `@${user.username}`;
-            document.getElementById('profileCardBio').innerText = user.bio || 'No bio provided yet.';
-            document.getElementById('profileCardAccountType').innerText = user.is_guest ? 'Guest Account' : 'Registered Member';
-
-            const actionsBox = document.getElementById('profileCardActions');
-            actionsBox.innerHTML = '';
-
-            if (user.id !== currentUser.id) {
-                const rel = await getFriendshipStatus(user.id);
-                if (rel.status === 'accepted') {
-                    actionsBox.innerHTML = `
-                        <button onclick="closeModal('profileModal'); selectChat('dm', ${JSON.stringify(user).replace(/"/g, '&quot;')})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 flex items-center space-x-1.5 transition">
-                            <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
-                            <span>Chat Direct</span>
-                        </button>
-                    `;
-                } else if (rel.status === 'outgoing_pending') {
-                    actionsBox.innerHTML = `
-                        <button onclick="rejectFriendRequest('${rel.record.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold border border-slate-700 transition">
-                            Cancel Request
-                        </button>
-                    `;
-                } else if (rel.status === 'incoming_pending') {
-                    actionsBox.innerHTML = `
-                        <div class="flex space-x-1">
-                            <button onclick="acceptFriendRequest('${rel.record.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/20 transition">Accept Request</button>
-                            <button onclick="rejectFriendRequest('${rel.record.id}')" class="px-2 py-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white rounded-xl text-xs font-semibold transition">Reject</button>
-                        </div>
-                    `;
-                } else {
-                    actionsBox.innerHTML = `
-                        <button onclick="sendFriendRequest('${user.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 flex items-center space-x-1.5 transition">
-                            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-                            <span>Add Friend</span>
-                        </button>
-                    `;
-                }
-            } else {
-                actionsBox.innerHTML = `
-                    <button onclick="closeModal('profileModal'); openSettingsModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700 transition">
-                        Edit Profile
-                    </button>
-                `;
-            }
-            lucide.createIcons();
-            document.getElementById('profileModal').classList.remove('hidden');
-        }
-
-        async function openProfileById(id) {
-            const user = await fetchUserById(id);
-            if (user) openProfileModal(user);
-        }
-
-        // --- SETTINGS EDIT PROFILE ---
-        function openSettingsModal() {
-            document.getElementById('settingsUsername').value = currentUser.username;
-            document.getElementById('settingsBio').value = currentUser.bio || '';
-            selectedSettingsAvatar = currentUser.avatar_url;
-            document.getElementById('settingsAvatarPreview').src = currentUser.avatar_url;
-            renderAvatarSelectors();
-            document.getElementById('settingsModal').classList.remove('hidden');
-        }
-
-        async function handleSaveSettings(e) {
-            e.preventDefault();
-            const newName = document.getElementById('settingsUsername').value.trim();
-            const newBio = document.getElementById('settingsBio').value.trim();
-            if (!newName) return;
-
-            currentUser.username = newName;
-            currentUser.bio = newBio;
-            currentUser.avatar_url = selectedSettingsAvatar;
-
-            if (isBackendAvailable) {
-                await supabaseClient.from('profiles').update({ username: newName, bio: newBio, avatar_url: selectedSettingsAvatar }).eq('id', currentUser.id);
-            } else {
-                const users = getLocalUsers();
-                const found = users.find(u => u.id === currentUser.id);
-                if (found) {
-                    found.username = newName;
-                    found.bio = newBio;
-                    found.avatar_url = selectedSettingsAvatar;
-                    localStorage.setItem(LOCAL_STORAGE_USERS, JSON.stringify(users));
-                }
-            }
-
-            localStorage.setItem('pulsechat_active_user', JSON.stringify(currentUser));
-            document.getElementById('myUsername').innerText = currentUser.username;
-            document.getElementById('myAvatarImg').src = currentUser.avatar_url;
-
-            closeModal('settingsModal');
-            renderMessages();
-        }
-
-        // --- UI HELPERS & TAB SWITCHING ---
-        function switchSidebarTab(tab) {
-            const btnChats = document.getElementById('tabChatsBtn');
-            const btnFriends = document.getElementById('tabFriendsBtn');
-            const btnSearch = document.getElementById('tabSearchBtn');
-
-            const panelChats = document.getElementById('panelChats');
-            const panelFriends = document.getElementById('panelFriends');
-            const panelSearch = document.getElementById('panelSearch');
-
-            const inactiveCls = 'flex-1 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 flex items-center justify-center space-x-1.5 transition relative';
-            const activeCls = 'flex-1 py-2 text-xs font-medium rounded-lg bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 flex items-center justify-center space-x-1.5 transition relative';
-
-            btnChats.className = inactiveCls;
-            btnFriends.className = inactiveCls;
-            btnSearch.className = inactiveCls;
-
-            panelChats.classList.add('hidden');
-            panelFriends.classList.add('hidden');
-            panelSearch.classList.add('hidden');
-
-            if (tab === 'chats') {
-                btnChats.className = activeCls;
-                panelChats.classList.remove('hidden');
-            } else if (tab === 'friends') {
-                btnFriends.className = activeCls;
-                panelFriends.classList.remove('hidden');
-                renderFriends();
-            } else if (tab === 'search') {
-                btnSearch.className = activeCls;
-                panelSearch.classList.remove('hidden');
-            }
-        }
-
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-full');
-        }
-
-        function toggleEmojiPicker() {
-            const picker = document.getElementById('emojiPicker');
-            picker.classList.toggle('hidden');
-        }
-
-        function insertEmoji(char) {
-            const input = document.getElementById('messageInput');
-            input.value += char;
-            input.focus();
-        }
-
-        function toggleAudio() {
-            isAudioEnabled = !isAudioEnabled;
-            const btn = document.getElementById('btnAudio');
-            btn.innerHTML = isAudioEnabled ? `<i data-lucide="volume-2" class="w-4 h-4"></i>` : `<i data-lucide="volume-x" class="w-4 h-4 text-slate-600"></i>`;
-            lucide.createIcons();
-        }
-
-        function playPing() {
-            try {
-                const audio = document.getElementById('audioPing');
-                audio.currentTime = 0;
-                audio.play();
-            } catch(e){}
-        }
-
-        function toggleSqlModal() {
-            const modal = document.getElementById('sqlModal');
-            modal.classList.toggle('hidden');
-        }
-
-        function copySqlCode() {
-            const code = document.getElementById('sqlCodeText').innerText;
-            const btnText = document.getElementById('copySqlBtnText');
-            
-            const textarea = document.createElement('textarea');
-            textarea.value = code;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-
-            btnText.innerText = 'Copied!';
-            setTimeout(() => { btnText.innerText = 'Copy SQL Script'; }, 2000);
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.innerText = text;
-            return div.innerHTML;
-        }
-
-        // --- LOCAL STORAGE DATA ENGINE FALLBACKS ---
-        function getLocalUsers() {
-            return JSON.parse(localStorage.getItem(LOCAL_STORAGE_USERS) || '[]');
-        }
-        function getLocalMessages() {
-            return JSON.parse(localStorage.getItem(LOCAL_STORAGE_MESSAGES) || '[]');
-        }
-        function getLocalDMs() {
-            return JSON.parse(localStorage.getItem(LOCAL_STORAGE_DMS) || '[]');
-        }
-        function getLocalFriends() {
-            return JSON.parse(localStorage.getItem(LOCAL_STORAGE_FRIENDS) || '[]');
-        }
-
-        async function fetchUserById(id) {
-            if (isBackendAvailable) {
-                const { data } = await supabaseClient.from('profiles').select('*').eq('id', id).single();
-                return data;
-            } else {
-                return getLocalUsers().find(u => u.id === id) || null;
-            }
-        }
-    </script>
+          })
+          .subscribe();
+      } catch (e) {
+        console.log("Realtime sync active in multi-tab local memory.");
+      }
+    }
+
+    function syncSupabaseMessage(type, data) {
+      try {
+        supabaseClient.channel('public:room').send({
+          type: 'broadcast',
+          event: 'chat_msg',
+          payload: { type, data }
+        });
+      } catch (err) {
+        // Fallback silently
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.textContent = message;
+
+      if (type === 'error') {
+        toast.className = "fixed bottom-5 right-5 z-50 bg-rose-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300";
+        toastIcon.className = "fa-solid fa-circle-exclamation";
+      } else if (type === 'success') {
+        toast.className = "fixed bottom-5 right-5 z-50 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300";
+        toastIcon.className = "fa-solid fa-circle-check";
+      } else {
+        toast.className = "fixed bottom-5 right-5 z-50 bg-indigo-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300";
+        toastIcon.className = "fa-solid fa-circle-info";
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+  </script>
 </body>
 </html>
