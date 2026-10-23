@@ -1,1167 +1,1499 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="h-full w-full">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PulseChat - Social & Direct Messaging</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
-            },
-            dark: {
-              bg: '#0f172a',
-              card: '#1e293b',
-              sidebar: '#0f172a',
-              input: '#334155',
-              border: '#334155',
-              hover: '#1e293b'
-            }
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakura Slime World - Anime Hallway</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #fdf2f8;
+            user-select: none;
+            overflow: hidden;
         }
-      }
-    }
-  </script>
-  <style>
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0f172a;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #475569;
-    }
-    .glassmorphism {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-  </style>
+        h1, h2, h3, .font-fun {
+            font-family: 'Fredoka One', cursive;
+        }
+        /* Custom Pink Glassmorphism Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(253, 242, 248, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 9999px;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(251, 207, 232, 0.7);
+        }
+        .glass-panel-dark {
+            background: rgba(30, 27, 38, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(244, 114, 182, 0.3);
+        }
+        /* Subtle glowing elements */
+        .glow-sakura {
+            box-shadow: 0 0 15px rgba(244, 114, 182, 0.4);
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased h-screen overflow-hidden flex flex-col">
+<body class="h-screen w-screen relative overflow-hidden flex flex-col justify-between select-none">
 
-  <!-- ================= AUTH CONTAINER ================= -->
-  <div id="auth-container" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950 bg-opacity-95">
-    <div class="glassmorphism w-full max-w-md p-8 rounded-2xl shadow-2xl relative border border-slate-800">
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 mb-4 border border-indigo-500/30 shadow-lg shadow-indigo-500/10">
-          <i class="fa-solid fa-comments text-3xl"></i>
-        </div>
-        <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">PulseChat</h1>
-        <p class="text-sm text-slate-400 mt-1">Connect, chat & share with people seamlessly</p>
-      </div>
+    <!-- CANVAS PARK BACKGROUND -->
+    <canvas id="parkCanvas" class="absolute inset-0 w-full h-full z-0 bg-pink-100"></canvas>
 
-      <!-- Auth Tabs -->
-      <div class="flex border-b border-slate-700/60 mb-6 text-sm font-medium">
-        <button id="tab-signin-btn" onclick="switchAuthTab('signin')" class="flex-1 pb-3 text-center border-b-2 border-indigo-500 text-indigo-400 font-semibold transition-all">Sign In</button>
-        <button id="tab-signup-btn" onclick="switchAuthTab('signup')" class="flex-1 pb-3 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all">Sign Up</button>
-      </div>
+    <!-- TOP NAVIGATION BAR -->
+    <div class="relative z-10 p-3 sm:p-4 flex justify-between items-center pointer-events-none">
+        
+        <!-- USER PROFILE BADGE & POINTS -->
+        <div class="pointer-events-auto glass-panel rounded-2xl p-2 sm:px-4 sm:py-2 flex items-center space-x-3 shadow-lg hover:border-pink-400 transition cursor-pointer" onclick="openStudioAndSelect('profile')">
+            <div id="navAvatar" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-pink-400 bg-pink-200 flex items-center justify-center text-xl overflow-hidden shadow-sm">
+                🌸
+            </div>
+            <div>
+                <div class="flex items-center space-x-1.5">
+                    <span id="navDisplayName" class="font-bold text-pink-900 text-sm sm:text-base leading-tight">Slime Explorer</span>
+                    <span id="navRoleBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider text-white"></span>
+                </div>
+                <div class="flex items-center space-x-2 text-xs font-semibold text-pink-600">
+                    <span class="flex items-center"><i class="fa-solid fa-crown text-amber-400 mr-1"></i> <span id="navTitle">Newbie</span></span>
+                    <span class="text-pink-300">•</span>
+                    <span class="flex items-center text-pink-700 font-bold"><i class="fa-solid fa-gem text-pink-500 mr-1"></i> <span id="navPoints">0</span> SP</span>
+                </div>
+            </div>
+        </div>
 
-      <!-- Sign In Form -->
-      <form id="signin-form" class="space-y-4" onsubmit="handleSignIn(event)">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Email</label>
-          <div class="relative">
-            <i class="fa-solid fa-envelope absolute left-3 top-3.5 text-slate-400"></i>
-            <input type="email" id="signin-email" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500 outline-none transition" placeholder="you@example.com">
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Password</label>
-          <div class="relative">
-            <i class="fa-solid fa-lock absolute left-3 top-3.5 text-slate-400"></i>
-            <input type="password" id="signin-password" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500 outline-none transition" placeholder="••••••••">
-          </div>
-        </div>
-        <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.99] transition transform">
-          Sign In
-        </button>
-      </form>
+        <!-- IDLE REWARD TIMER & TOP ACTIONS -->
+        <div class="pointer-events-auto flex items-center space-x-2">
+            <!-- 20-min Idle Timer Badge -->
+            <div class="hidden sm:flex glass-panel px-3 py-2 rounded-xl text-xs font-bold text-pink-700 items-center space-x-1.5 shadow">
+                <i class="fa-solid fa-hourglass-half text-pink-500 animate-spin"></i>
+                <span>Reward in: <span id="idleTimerText" class="text-pink-900 font-bold">20:00</span></span>
+            </div>
 
-      <!-- Sign Up Form -->
-      <form id="signup-form" class="space-y-4 hidden" onsubmit="handleSignUp(event)">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Username</label>
-          <div class="relative">
-            <i class="fa-solid fa-user absolute left-3 top-3.5 text-slate-400"></i>
-            <input type="text" id="signup-username" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500 outline-none transition" placeholder="cool_user123">
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Email</label>
-          <div class="relative">
-            <i class="fa-solid fa-envelope absolute left-3 top-3.5 text-slate-400"></i>
-            <input type="email" id="signup-email" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500 outline-none transition" placeholder="you@example.com">
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Password</label>
-          <div class="relative">
-            <i class="fa-solid fa-lock absolute left-3 top-3.5 text-slate-400"></i>
-            <input type="password" id="signup-password" minlength="6" required class="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-500 outline-none transition" placeholder="••••••••">
-          </div>
-        </div>
-        <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.99] transition transform">
-          Create Account
-        </button>
-      </form>
+            <button onclick="openModal('studioModal')" class="glass-panel hover:bg-pink-100 text-pink-700 font-bold px-3 py-2 rounded-xl shadow transition flex items-center space-x-1.5 text-xs sm:text-sm">
+                <i class="fa-solid fa-store text-pink-500 text-base"></i>
+                <span class="hidden sm:inline">Slime Studio</span>
+            </button>
 
-      <!-- Guest Login Button -->
-      <div class="mt-6 pt-6 border-t border-slate-800 text-center">
-        <button onclick="handleGuestLogin()" class="w-full py-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-medium rounded-xl border border-slate-700/80 flex items-center justify-center gap-2 transition">
-          <i class="fa-solid fa-user-ninja text-indigo-400"></i>
-          Continue as Guest
-        </button>
-      </div>
+            <button onclick="openModal('searchModal')" class="glass-panel hover:bg-pink-100 text-pink-700 font-bold px-3 py-2 rounded-xl shadow transition flex items-center space-x-1.5 text-xs sm:text-sm relative">
+                <i class="fa-solid fa-user-plus text-pink-500 text-base"></i>
+                <span class="hidden sm:inline">Friends</span>
+                <span id="friendReqBadge" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+            </button>
+
+            <button onclick="toggleChatDrawer()" class="glass-panel hover:bg-pink-100 text-pink-700 font-bold px-3 py-2 rounded-xl shadow transition flex items-center space-x-1.5 text-xs sm:text-sm">
+                <i class="fa-solid fa-comments text-pink-500 text-base"></i>
+                <span class="hidden sm:inline">Chat</span>
+            </button>
+
+            <button id="devBtn" onclick="openDevPrompt()" class="glass-panel hover:bg-purple-100 text-purple-700 font-bold p-2.5 rounded-xl shadow transition text-xs sm:text-sm" title="Toggle Developer Mode">
+                <i class="fa-solid fa-code"></i>
+            </button>
+
+            <button onclick="logoutUser()" class="glass-panel hover:bg-red-100 text-red-600 font-bold p-2.5 rounded-xl shadow transition text-xs sm:text-sm" title="Sign Out">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
     </div>
-  </div>
 
-  <!-- ================= MAIN APP LAYOUT ================= -->
-  <div id="app-container" class="flex-1 flex overflow-hidden hidden">
-
-    <!-- SIDEBAR / NAVIGATION -->
-    <aside class="w-20 md:w-64 bg-slate-900 border-r border-slate-800/80 flex flex-col justify-between p-3 md:p-4 select-none shrink-0">
-      <div>
-        <!-- App Logo & Title -->
-        <div class="flex items-center gap-3 px-2 py-3 mb-6">
-          <div class="w-10 h-10 rounded-xl bg-indigo-600/30 flex items-center justify-center text-indigo-400 border border-indigo-500/30 shrink-0">
-            <i class="fa-solid fa-comments text-xl"></i>
-          </div>
-          <div class="hidden md:block">
-            <h1 class="font-bold text-lg bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">PulseChat</h1>
-            <p class="text-xs text-slate-500">v1.0 Live</p>
-          </div>
-        </div>
-
-        <!-- Navigation Links -->
-        <nav class="space-y-2">
-          <button onclick="setActiveTab('global')" id="nav-global" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-indigo-600/20 text-indigo-400 font-medium transition border border-indigo-500/20">
-            <i class="fa-solid fa-earth-americas text-lg w-6 text-center"></i>
-            <span class="hidden md:inline">Global Room</span>
-          </button>
-
-          <button onclick="setActiveTab('friends')" id="nav-friends" class="w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-slate-800/70 text-slate-400 hover:text-slate-200 font-medium transition">
-            <div class="flex items-center gap-3">
-              <i class="fa-solid fa-user-group text-lg w-6 text-center"></i>
-              <span class="hidden md:inline">Friends & DMs</span>
-            </div>
-            <span id="friend-req-badge" class="hidden bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
-          </button>
-
-          <button onclick="setActiveTab('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800/70 text-slate-400 hover:text-slate-200 font-medium transition">
-            <i class="fa-solid fa-user-gear text-lg w-6 text-center"></i>
-            <span class="hidden md:inline">Profile & Bio</span>
-          </button>
-        </nav>
-      </div>
-
-      <!-- Current User Footer Card -->
-      <div class="border-t border-slate-800 pt-3">
-        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/40 border border-slate-800">
-          <div class="flex items-center gap-3 min-w-0">
-            <img id="sidebar-user-avatar" src="" alt="Avatar" class="w-10 h-10 rounded-full object-cover border border-indigo-500/40 shrink-0">
-            <div class="hidden md:block truncate">
-              <p id="sidebar-username" class="text-sm font-semibold text-slate-200 truncate">Username</p>
-              <p id="sidebar-user-status" class="text-xs text-indigo-400 truncate">Online</p>
-            </div>
-          </div>
-          <button onclick="handleSignOut()" title="Sign Out" class="text-slate-400 hover:text-rose-400 p-2 rounded-lg hover:bg-slate-800 transition">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          </button>
-        </div>
-      </div>
-    </aside>
-
-    <!-- MAIN VIEW AREA -->
-    <main class="flex-1 flex flex-col bg-slate-950 overflow-hidden relative">
-
-      <!-- 1. GLOBAL CHAT TAB -->
-      <div id="view-global" class="flex-1 flex flex-col h-full overflow-hidden">
-        <!-- Chat Header -->
-        <header class="h-16 border-b border-slate-800/80 px-6 flex items-center justify-between bg-slate-900/50 backdrop-blur-md">
-          <div class="flex items-center gap-3">
-            <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-            <div>
-              <h2 class="font-bold text-slate-100 flex items-center gap-2">
-                Global Lounge
-                <span class="text-xs px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-normal border border-indigo-500/20">Max 50 Msg</span>
-              </h2>
-              <p class="text-xs text-slate-400">Public chat room for everyone</p>
-            </div>
-          </div>
-        </header>
-
-        <!-- Message History -->
-        <div id="global-messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-          <!-- Messages dynamically injected -->
-        </div>
-
-        <!-- Chat Input Bar -->
-        <div class="p-4 border-t border-slate-800/80 bg-slate-900/60 backdrop-blur-md">
-          <form onsubmit="sendGlobalMessage(event)" class="flex items-center gap-2">
-            <input type="text" id="global-input" placeholder="Type a message to global lounge..." class="flex-1 bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-            <button type="submit" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition active:scale-95">
-              <span>Send</span>
-              <i class="fa-solid fa-paper-plane text-xs"></i>
+    <!-- LEFT-SIDE EMOTES & DANCE CONTROL PANEL -->
+    <div class="absolute left-3 top-24 z-20 flex flex-col space-y-2 pointer-events-auto max-h-[70vh] overflow-y-auto pr-1">
+        <div class="glass-panel p-2 rounded-2xl shadow-md flex flex-col space-y-1.5 text-center w-16">
+            <span class="text-[9px] font-bold text-pink-800 uppercase tracking-wider border-b border-pink-200 pb-1">Dances</span>
+            <button id="dance_wave" onclick="toggleDance('wave')" class="dance-btn p-1.5 rounded-xl hover:bg-pink-200 text-pink-700 transition flex flex-col items-center" title="Sakura Wave">
+                <span class="text-base">🌸</span>
+                <span class="text-[8px] font-bold mt-0.5">Wave</span>
             </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- 2. FRIENDS & DIRECT MESSAGES TAB -->
-      <div id="view-friends" class="flex-1 flex h-full overflow-hidden hidden">
-        <!-- Sidebar for Friends list & requests -->
-        <div class="w-full md:w-80 border-r border-slate-800 bg-slate-900/40 flex flex-col h-full">
-          <!-- User Search Header -->
-          <div class="p-4 border-b border-slate-800 space-y-3">
-            <h3 class="font-bold text-slate-200">Friends & Direct Chat</h3>
-            <div class="relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-sm"></i>
-              <input type="text" id="user-search-input" onkeyup="handleSearchUsers()" placeholder="Search users by name..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-            </div>
-          </div>
-
-          <!-- Tabs inside Friends Sidebar -->
-          <div class="flex border-b border-slate-800 text-xs font-medium text-slate-400 bg-slate-900/60">
-            <button onclick="switchFriendSubTab('all')" id="subtab-all" class="flex-1 py-2.5 text-center text-indigo-400 border-b-2 border-indigo-500 font-semibold">Friends</button>
-            <button onclick="switchFriendSubTab('requests')" id="subtab-req" class="flex-1 py-2.5 text-center hover:text-slate-200 relative">
-              Requests
-              <span id="subtab-req-dot" class="hidden absolute top-2 right-4 w-2 h-2 rounded-full bg-pink-500"></span>
+            <button id="dance_bounce" onclick="toggleDance('bounce')" class="dance-btn p-1.5 rounded-xl hover:bg-pink-200 text-pink-700 transition flex flex-col items-center" title="Bounce Spin">
+                <span class="text-base">🌀</span>
+                <span class="text-[8px] font-bold mt-0.5">Bounce</span>
             </button>
-            <button onclick="switchFriendSubTab('search')" id="subtab-search" class="flex-1 py-2.5 text-center hover:text-slate-200">Explore</button>
-          </div>
-
-          <!-- List Container -->
-          <div class="flex-1 overflow-y-auto p-3 space-y-2">
-            <!-- ALL FRIENDS LIST -->
-            <div id="friends-list-container" class="space-y-1">
-              <!-- Dynamically populated -->
-            </div>
-
-            <!-- FRIEND REQUESTS LIST -->
-            <div id="requests-list-container" class="space-y-3 hidden">
-              <div>
-                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Incoming Requests</p>
-                <div id="incoming-req-list" class="space-y-1"></div>
-              </div>
-              <div class="pt-2 border-t border-slate-800">
-                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sent Requests</p>
-                <div id="outgoing-req-list" class="space-y-1"></div>
-              </div>
-            </div>
-
-            <!-- SEARCH RESULTS LIST -->
-            <div id="search-list-container" class="space-y-1 hidden">
-              <p class="text-xs text-slate-500 mb-2">Search results will appear here...</p>
-              <div id="search-results-list" class="space-y-1"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- DM Chat Window -->
-        <div id="dm-window" class="flex-1 flex flex-col h-full bg-slate-950 hidden">
-          <!-- DM Header -->
-          <header class="h-16 border-b border-slate-800/80 px-6 flex items-center justify-between bg-slate-900/50 backdrop-blur-md">
-            <div class="flex items-center gap-3">
-              <img id="dm-header-avatar" src="" class="w-10 h-10 rounded-full object-cover border border-slate-700">
-              <div>
-                <h3 id="dm-header-username" class="font-bold text-slate-100">User</h3>
-                <p id="dm-header-bio" class="text-xs text-slate-400 truncate max-w-xs">User Bio</p>
-              </div>
-            </div>
-          </header>
-
-          <!-- DM Messages -->
-          <div id="dm-messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-            <!-- DM Messages injected -->
-          </div>
-
-          <!-- DM Input -->
-          <div class="p-4 border-t border-slate-800/80 bg-slate-900/60 backdrop-blur-md">
-            <form onsubmit="sendDirectMessage(event)" class="flex items-center gap-2">
-              <input type="text" id="dm-input" placeholder="Type a direct message..." class="flex-1 bg-slate-900 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
-              <button type="submit" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition active:scale-95">
-                <span>Send</span>
-                <i class="fa-solid fa-paper-plane text-xs"></i>
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <!-- Empty DM Selection Placeholder -->
-        <div id="dm-empty-state" class="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-950">
-          <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500 mb-4 text-2xl">
-            <i class="fa-regular fa-paper-plane"></i>
-          </div>
-          <h3 class="text-lg font-bold text-slate-300">Your Messages</h3>
-          <p class="text-xs text-slate-500 max-w-sm mt-1">Select an accepted friend from the list or accept incoming requests to start private direct chatting.</p>
-        </div>
-      </div>
-
-      <!-- 3. USER PROFILE & BIO TAB -->
-      <div id="view-profile" class="flex-1 flex items-center justify-center p-6 overflow-y-auto hidden">
-        <div class="glassmorphism w-full max-w-xl p-8 rounded-2xl border border-slate-800 space-y-6">
-          <div class="flex items-center gap-4 border-b border-slate-800 pb-6">
-            <div class="relative group">
-              <img id="profile-edit-avatar-preview" src="" alt="Avatar" class="w-20 h-20 rounded-full object-cover border-2 border-indigo-500 shadow-xl">
-            </div>
-            <div>
-              <h2 id="profile-edit-username-title" class="text-2xl font-bold text-slate-100">User Profile</h2>
-              <p class="text-xs text-slate-400">Update your avatar, handle, and personal bio</p>
-            </div>
-          </div>
-
-          <form onsubmit="saveUserProfile(event)" class="space-y-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Display Username</label>
-              <input type="text" id="profile-edit-username" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Avatar Image URL or Upload</label>
-              <div class="flex gap-2 mb-2">
-                <input type="text" id="profile-edit-avatar-url" placeholder="Paste image URL..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
-                <label class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl cursor-pointer border border-slate-700 flex items-center gap-1 transition">
-                  <i class="fa-solid fa-upload"></i> Upload File
-                  <input type="file" id="profile-avatar-file" accept="image/*" class="hidden" onchange="handleAvatarFileUpload(event)">
-                </label>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Bio / Status Message</label>
-              <textarea id="profile-edit-bio" rows="3" placeholder="Tell everyone something about yourself..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
-            </div>
-
-            <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/20 active:scale-[0.99] transition">
-              Save Profile Changes
+            <button id="dance_jiggly" onclick="toggleDance('jiggly')" class="dance-btn p-1.5 rounded-xl hover:bg-pink-200 text-pink-700 transition flex flex-col items-center" title="Jiggly Dance">
+                <span class="text-base">💃</span>
+                <span class="text-[8px] font-bold mt-0.5">Jiggly</span>
             </button>
-          </form>
+            <button id="dance_squish" onclick="toggleDance('squish')" class="dance-btn p-1.5 rounded-xl hover:bg-pink-200 text-pink-700 transition flex flex-col items-center" title="Squish Hop">
+                <span class="text-base">🦘</span>
+                <span class="text-[8px] font-bold mt-0.5">Squish</span>
+            </button>
+            <button id="dance_nap" onclick="toggleDance('nap')" class="dance-btn p-1.5 rounded-xl hover:bg-pink-200 text-pink-700 transition flex flex-col items-center" title="Nap Sleep">
+                <span class="text-base">💤</span>
+                <span class="text-[8px] font-bold mt-0.5">Sleep</span>
+            </button>
         </div>
-      </div>
 
-    </main>
-  </div>
-
-  <!-- ================= USER POPOVER MODAL (CLICK AVATAR) ================= -->
-  <div id="user-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
-    <div class="glassmorphism w-full max-w-sm p-6 rounded-2xl border border-slate-800 relative text-center">
-      <button onclick="closeUserModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
-
-      <img id="modal-avatar" src="" class="w-24 h-24 rounded-full object-cover border-4 border-indigo-500/50 mx-auto mb-4 shadow-xl">
-      <h3 id="modal-username" class="text-xl font-bold text-slate-100">Username</h3>
-      <p id="modal-bio" class="text-xs text-slate-400 italic mt-2 px-4 min-h-[2.5rem]">No bio provided.</p>
-
-      <div id="modal-action-container" class="mt-6 pt-4 border-t border-slate-800 flex justify-center">
-        <!-- Dynamically rendered button (Add Friend, Pending, or DM) -->
-      </div>
+        <div class="glass-panel p-2 rounded-2xl shadow-md flex flex-col space-y-1.5 text-center w-16">
+            <span class="text-[9px] font-bold text-pink-800 uppercase tracking-wider border-b border-pink-200 pb-1">Emotes</span>
+            <button onclick="triggerEmoteBubble('💕')" class="p-1.5 rounded-xl hover:bg-pink-200 transition text-base">💕</button>
+            <button onclick="triggerEmoteBubble('💮')" class="p-1.5 rounded-xl hover:bg-pink-200 transition text-base">💮</button>
+            <button onclick="triggerEmoteBubble('🎉')" class="p-1.5 rounded-xl hover:bg-pink-200 transition text-base">🎉</button>
+            <button onclick="triggerEmoteBubble('✨')" class="p-1.5 rounded-xl hover:bg-pink-200 transition text-base">✨</button>
+            <button onclick="triggerEmoteBubble('💢')" class="p-1.5 rounded-xl hover:bg-pink-200 transition text-base">💢</button>
+        </div>
     </div>
-  </div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-indigo-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-    <i id="toast-icon" class="fa-solid fa-circle-info"></i>
-    <span id="toast-message" class="text-xs font-semibold">Notification message</span>
-  </div>
-
-  <!-- ================= JAVASCRIPT APP LOGIC ================= -->
-  <script>
-    // --- SUPABASE CONFIGURATION ---
-    const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // LOCAL STORAGE KEYS
-    const STORAGE_KEY_PROFILES = 'pulsechat_profiles_v1';
-    const STORAGE_KEY_GLOBAL_MSG = 'pulsechat_global_msgs_v1';
-    const STORAGE_KEY_FRIEND_REQS = 'pulsechat_friend_reqs_v1';
-    const STORAGE_KEY_DMS = 'pulsechat_dms_v1';
-    const STORAGE_KEY_CURRENT_USER = 'pulsechat_active_user_v1';
-
-    // APP STATE
-    let currentUser = null; // { id, username, bio, avatar, isGuest }
-    let profiles = [];
-    let globalMessages = [];
-    let friendRequests = [];
-    let directMessages = [];
-    let activeDMUserId = null;
-    let selectedModalUserId = null;
-
-    // --- INITIALIZATION ---
-    window.onload = function() {
-      loadLocalStorageData();
-      checkActiveSession();
-      setupSupabaseListeners();
-    };
-
-    function loadLocalStorageData() {
-      profiles = JSON.parse(localStorage.getItem(STORAGE_KEY_PROFILES) || '[]');
-      globalMessages = JSON.parse(localStorage.getItem(STORAGE_KEY_GLOBAL_MSG) || '[]');
-      friendRequests = JSON.parse(localStorage.getItem(STORAGE_KEY_FRIEND_REQS) || '[]');
-      directMessages = JSON.parse(localStorage.getItem(STORAGE_KEY_DMS) || '[]');
-    }
-
-    function saveAllToLocalStorage() {
-      localStorage.setItem(STORAGE_KEY_PROFILES, JSON.stringify(profiles));
-      localStorage.setItem(STORAGE_KEY_GLOBAL_MSG, JSON.stringify(globalMessages));
-      localStorage.setItem(STORAGE_KEY_FRIEND_REQS, JSON.stringify(friendRequests));
-      localStorage.setItem(STORAGE_KEY_DMS, JSON.stringify(directMessages));
-    }
-
-    function checkActiveSession() {
-      const savedUser = localStorage.getItem(STORAGE_KEY_CURRENT_USER);
-      if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        initializeUserUI();
-      } else {
-        document.getElementById('auth-container').classList.remove('hidden');
-        document.getElementById('app-container').classList.add('hidden');
-      }
-    }
-
-    // --- AUTHENTICATION HANDLERS ---
-    function switchAuthTab(tab) {
-      const signinBtn = document.getElementById('tab-signin-btn');
-      const signupBtn = document.getElementById('tab-signup-btn');
-      const signinForm = document.getElementById('signin-form');
-      const signupForm = document.getElementById('signup-form');
-
-      if (tab === 'signin') {
-        signinBtn.className = "flex-1 pb-3 text-center border-b-2 border-indigo-500 text-indigo-400 font-semibold transition-all";
-        signupBtn.className = "flex-1 pb-3 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all";
-        signinForm.classList.remove('hidden');
-        signupForm.classList.add('hidden');
-      } else {
-        signupBtn.className = "flex-1 pb-3 text-center border-b-2 border-indigo-500 text-indigo-400 font-semibold transition-all";
-        signinBtn.className = "flex-1 pb-3 text-center text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all";
-        signupForm.classList.remove('hidden');
-        signinForm.classList.add('hidden');
-      }
-    }
-
-    async function handleSignIn(e) {
-      e.preventDefault();
-      const email = document.getElementById('signin-email').value.trim();
-      const password = document.getElementById('signin-password').value.trim();
-
-      try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) {
-          // Fallback logic if Supabase auth fails / offline: search existing local profile
-          const existingProfile = profiles.find(p => p.email === email);
-          if (existingProfile) {
-            currentUser = existingProfile;
-          } else {
-            // Create user locally
-            const username = email.split('@')[0];
-            currentUser = createProfileObject(username, false, email);
-          }
-        } else {
-          let userProfile = profiles.find(p => p.id === data.user.id || p.email === email);
-          if (!userProfile) {
-            const username = data.user.user_metadata?.username || email.split('@')[0];
-            userProfile = createProfileObject(username, false, email, data.user.id);
-          }
-          currentUser = userProfile;
-        }
-        showToast('Signed in successfully!', 'success');
-        initializeUserUI();
-      } catch (err) {
-        showToast('Auth error. Logged in locally.', 'info');
-        const username = email.split('@')[0];
-        currentUser = createProfileObject(username, false, email);
-        initializeUserUI();
-      }
-    }
-
-    async function handleSignUp(e) {
-      e.preventDefault();
-      const username = document.getElementById('signup-username').value.trim();
-      const email = document.getElementById('signup-email').value.trim();
-      const password = document.getElementById('signup-password').value.trim();
-
-      if (profiles.some(p => p.username.toLowerCase() === username.toLowerCase())) {
-        showToast('Username already taken. Try another!', 'error');
-        return;
-      }
-
-      try {
-        const { data, error } = await supabaseClient.auth.signUp({
-          email,
-          password,
-          options: { data: { username } }
-        });
-
-        const userId = data?.user?.id || 'usr_' + Date.now();
-        currentUser = createProfileObject(username, false, email, userId);
-        showToast('Account created successfully!', 'success');
-        initializeUserUI();
-      } catch (err) {
-        currentUser = createProfileObject(username, false, email);
-        showToast('Account created locally!', 'success');
-        initializeUserUI();
-      }
-    }
-
-    function handleGuestLogin() {
-      const randomNum = Math.floor(1000 + Math.random() * 9000);
-      const guestName = 'Guest_' + randomNum;
-      currentUser = createProfileObject(guestName, true);
-      showToast(`Welcome, ${guestName}!`, 'info');
-      initializeUserUI();
-    }
-
-    function createProfileObject(username, isGuest = false, email = '', customId = null) {
-      const id = customId || (isGuest ? 'guest_' + Date.now() : 'usr_' + Date.now());
-      const avatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(username)}`;
-      const profile = {
-        id,
-        username,
-        email,
-        avatar,
-        bio: isGuest ? 'Temporary Guest Account' : 'Hey there! I am using PulseChat.',
-        isGuest,
-        createdAt: new Date().toISOString()
-      };
-
-      const existingIndex = profiles.findIndex(p => p.id === id || p.username.toLowerCase() === username.toLowerCase());
-      if (existingIndex >= 0) {
-        profiles[existingIndex] = { ...profiles[existingIndex], ...profile };
-      } else {
-        profiles.push(profile);
-      }
-      saveAllToLocalStorage();
-      return profile;
-    }
-
-    function handleSignOut() {
-      currentUser = null;
-      localStorage.removeItem(STORAGE_KEY_CURRENT_USER);
-      document.getElementById('auth-container').classList.remove('hidden');
-      document.getElementById('app-container').classList.add('hidden');
-      showToast('Signed out', 'info');
-    }
-
-    function initializeUserUI() {
-      localStorage.setItem(STORAGE_KEY_CURRENT_USER, JSON.stringify(currentUser));
-      document.getElementById('auth-container').classList.add('hidden');
-      document.getElementById('app-container').classList.remove('hidden');
-
-      // Update Sidebar Info
-      document.getElementById('sidebar-user-avatar').src = currentUser.avatar;
-      document.getElementById('sidebar-username').textContent = currentUser.username;
-      document.getElementById('sidebar-user-status').textContent = currentUser.isGuest ? 'Guest Mode' : 'Online';
-
-      // Update Profile View Form
-      document.getElementById('profile-edit-username').value = currentUser.username;
-      document.getElementById('profile-edit-username-title').textContent = currentUser.username;
-      document.getElementById('profile-edit-avatar-url').value = currentUser.avatar;
-      document.getElementById('profile-edit-avatar-preview').src = currentUser.avatar;
-      document.getElementById('profile-edit-bio').value = currentUser.bio || '';
-
-      setActiveTab('global');
-      renderGlobalMessages();
-      renderFriendLists();
-      updateBadges();
-    }
-
-    // --- NAVIGATION & TABS ---
-    function setActiveTab(tab) {
-      const views = ['global', 'friends', 'profile'];
-      views.forEach(v => {
-        document.getElementById(`view-${v}`).classList.add('hidden');
-        const navBtn = document.getElementById(`nav-${v}`);
-        if (v === tab) {
-          navBtn.className = "w-full flex items-center justify-between px-3 py-3 rounded-xl bg-indigo-600/20 text-indigo-400 font-medium transition border border-indigo-500/20";
-        } else {
-          navBtn.className = "w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-slate-800/70 text-slate-400 hover:text-slate-200 font-medium transition border border-transparent";
-        }
-      });
-      document.getElementById(`view-${tab}`).classList.remove('hidden');
-    }
-
-    function switchFriendSubTab(sub) {
-      const subtabs = ['all', 'requests', 'search'];
-      subtabs.forEach(s => {
-        const btn = document.getElementById(`subtab-${s}`);
-        const container = document.getElementById(`${s === 'all' ? 'friends' : s === 'requests' ? 'requests' : 'search'}-list-container`);
-        if (s === sub) {
-          btn.className = "flex-1 py-2.5 text-center text-indigo-400 border-b-2 border-indigo-500 font-semibold relative";
-          container.classList.remove('hidden');
-        } else {
-          btn.className = "flex-1 py-2.5 text-center text-slate-400 hover:text-slate-200 relative";
-          container.classList.add('hidden');
-        }
-      });
-    }
-
-    // --- PROFILE MANAGEMENT ---
-    function saveUserProfile(e) {
-      e.preventDefault();
-      const newUsername = document.getElementById('profile-edit-username').value.trim();
-      const newAvatar = document.getElementById('profile-edit-avatar-url').value.trim();
-      const newBio = document.getElementById('profile-edit-bio').value.trim();
-
-      if (!newUsername) return;
-
-      currentUser.username = newUsername;
-      currentUser.avatar = newAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(newUsername)}`;
-      currentUser.bio = newBio;
-
-      // Update in profiles list
-      const idx = profiles.findIndex(p => p.id === currentUser.id);
-      if (idx >= 0) profiles[idx] = { ...currentUser };
-
-      saveAllToLocalStorage();
-      initializeUserUI();
-      showToast('Profile updated successfully!', 'success');
-    }
-
-    function handleAvatarFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      if (file.size > 2 * 1024 * 1024) {
-        showToast('Image size should be less than 2MB', 'error');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const base64Image = e.target.result;
-        document.getElementById('profile-edit-avatar-url').value = base64Image;
-        document.getElementById('profile-edit-avatar-preview').src = base64Image;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // --- GLOBAL CHAT ROOM (STRICT MAX 50 MESSAGES) ---
-    function sendGlobalMessage(e) {
-      e.preventDefault();
-      const input = document.getElementById('global-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const newMsg = {
-        id: 'msg_' + Date.now(),
-        userId: currentUser.id,
-        username: currentUser.username,
-        avatar: currentUser.avatar,
-        content: text,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      globalMessages.push(newMsg);
-
-      // STRICT REQUIREMENT: Max 50 messages limit
-      if (globalMessages.length > 50) {
-        globalMessages = globalMessages.slice(globalMessages.length - 50);
-      }
-
-      saveAllToLocalStorage();
-      renderGlobalMessages();
-      input.value = '';
-
-      // Sync via Supabase Realtime broadcast or Channel if configured
-      syncSupabaseMessage('global', newMsg);
-    }
-
-    function renderGlobalMessages() {
-      const container = document.getElementById('global-messages');
-      container.innerHTML = '';
-
-      if (globalMessages.length === 0) {
-        container.innerHTML = `
-          <div class="text-center text-slate-500 my-10">
-            <i class="fa-solid fa-comments text-4xl mb-3 opacity-30"></i>
-            <p class="text-sm">No messages yet. Start the conversation!</p>
-          </div>
-        `;
-        return;
-      }
-
-      globalMessages.forEach(msg => {
-        const isMe = msg.userId === currentUser.id;
-        const msgEl = document.createElement('div');
-        msgEl.className = `flex items-start gap-3 ${isMe ? 'flex-row-reverse' : ''}`;
-
-        msgEl.innerHTML = `
-          <img src="${msg.avatar}" onclick="openUserModal('${msg.userId}')" title="Click to view profile / add friend" class="w-9 h-9 rounded-full object-cover border border-indigo-500/30 cursor-pointer hover:scale-105 transition shrink-0">
-          <div class="max-w-[75%] ${isMe ? 'items-end' : 'items-start'} flex flex-col">
-            <div class="flex items-center gap-2 mb-1 px-1">
-              <span onclick="openUserModal('${msg.userId}')" class="text-xs font-semibold text-slate-300 hover:text-indigo-400 cursor-pointer">${msg.username}</span>
-              <span class="text-[10px] text-slate-500">${msg.timestamp}</span>
-            </div>
-            <div class="p-3.5 rounded-2xl text-sm leading-relaxed ${isMe ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700/60'}">
-              ${escapeHTML(msg.content)}
-            </div>
-          </div>
-        `;
-        container.appendChild(msgEl);
-      });
-
-      container.scrollTop = container.scrollHeight;
-    }
-
-    // --- FRIENDS & FRIEND REQUEST SYSTEM ---
-    function sendFriendRequest(targetUserId) {
-      if (targetUserId === currentUser.id) {
-        showToast("You cannot send a friend request to yourself!", "error");
-        return;
-      }
-
-      const existingReq = friendRequests.find(r => 
-        (r.from === currentUser.id && r.to === targetUserId) ||
-        (r.from === targetUserId && r.to === currentUser.id)
-      );
-
-      if (existingReq) {
-        showToast("A friend request or friendship already exists!", "info");
-        return;
-      }
-
-      const newReq = {
-        id: 'req_' + Date.now(),
-        from: currentUser.id,
-        to: targetUserId,
-        status: 'pending', // pending, accepted, rejected
-        timestamp: new Date().toISOString()
-      };
-
-      friendRequests.push(newReq);
-      saveAllToLocalStorage();
-      renderFriendLists();
-      updateBadges();
-      closeUserModal();
-      showToast("Friend request sent!", "success");
-    }
-
-    function respondToFriendRequest(reqId, accept) {
-      const req = friendRequests.find(r => r.id === reqId);
-      if (req) {
-        req.status = accept ? 'accepted' : 'rejected';
-        saveAllToLocalStorage();
-        renderFriendLists();
-        updateBadges();
-        showToast(accept ? "Friend request accepted!" : "Friend request rejected.", accept ? "success" : "info");
-      }
-    }
-
-    function isFriend(targetUserId) {
-      return friendRequests.some(r => 
-        r.status === 'accepted' && 
-        ((r.from === currentUser.id && r.to === targetUserId) || (r.from === targetUserId && r.to === currentUser.id))
-      );
-    }
-
-    function getFriendshipStatus(targetUserId) {
-      const req = friendRequests.find(r => 
-        (r.from === currentUser.id && r.to === targetUserId) ||
-        (r.from === targetUserId && r.to === currentUser.id)
-      );
-
-      if (!req) return 'none';
-      if (req.status === 'accepted') return 'accepted';
-      if (req.status === 'pending') {
-        return req.from === currentUser.id ? 'pending_sent' : 'pending_received';
-      }
-      return 'none';
-    }
-
-    function renderFriendLists() {
-      // 1. Accepted Friends List
-      const friendsContainer = document.getElementById('friends-list-container');
-      friendsContainer.innerHTML = '';
-
-      const acceptedReqs = friendRequests.filter(r => 
-        r.status === 'accepted' && (r.from === currentUser.id || r.to === currentUser.id)
-      );
-
-      if (acceptedReqs.length === 0) {
-        friendsContainer.innerHTML = `
-          <div class="text-center text-slate-500 py-8">
-            <p class="text-xs">No friends added yet.</p>
-            <p class="text-[11px] text-slate-600 mt-1">Search users or click profiles in global chat to add friends!</p>
-          </div>
-        `;
-      } else {
-        acceptedReqs.forEach(req => {
-          const friendId = req.from === currentUser.id ? req.to : req.from;
-          const friendProfile = profiles.find(p => p.id === friendId) || { id: friendId, username: 'User', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=user' };
-
-          const item = document.createElement('div');
-          item.onclick = () => openDMChat(friendProfile.id);
-          item.className = `flex items-center justify-between p-2.5 rounded-xl cursor-pointer hover:bg-slate-800/80 transition ${activeDMUserId === friendProfile.id ? 'bg-slate-800 border border-indigo-500/40' : ''}`;
-          item.innerHTML = `
-            <div class="flex items-center gap-3 min-w-0">
-              <img src="${friendProfile.avatar}" class="w-9 h-9 rounded-full object-cover border border-slate-700">
-              <div class="truncate">
-                <p class="text-xs font-semibold text-slate-200 truncate">${friendProfile.username}</p>
-                <p class="text-[10px] text-emerald-400">Accepted Friend</p>
-              </div>
-            </div>
-            <i class="fa-solid fa-chevron-right text-xs text-slate-600"></i>
-          `;
-          friendsContainer.appendChild(item);
-        });
-      }
-
-      // 2. Incoming & Outgoing Friend Requests
-      const incomingList = document.getElementById('incoming-req-list');
-      const outgoingList = document.getElementById('outgoing-req-list');
-      incomingList.innerHTML = '';
-      outgoingList.innerHTML = '';
-
-      const incoming = friendRequests.filter(r => r.to === currentUser.id && r.status === 'pending');
-      const outgoing = friendRequests.filter(r => r.from === currentUser.id && r.status === 'pending');
-
-      if (incoming.length === 0) {
-        incomingList.innerHTML = `<p class="text-[11px] text-slate-600 italic">No incoming requests</p>`;
-      } else {
-        incoming.forEach(req => {
-          const sender = profiles.find(p => p.id === req.from) || { username: 'User', avatar: '' };
-          const item = document.createElement('div');
-          item.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800';
-          item.innerHTML = `
-            <div class="flex items-center gap-2 min-w-0">
-              <img src="${sender.avatar}" class="w-7 h-7 rounded-full object-cover">
-              <span class="text-xs text-slate-200 truncate">${sender.username}</span>
-            </div>
-            <div class="flex items-center gap-1">
-              <button onclick="respondToFriendRequest('${req.id}', true)" class="p-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs" title="Accept"><i class="fa-solid fa-check"></i></button>
-              <button onclick="respondToFriendRequest('${req.id}', false)" class="p-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs" title="Reject"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-          `;
-          incomingList.appendChild(item);
-        });
-      }
-
-      if (outgoing.length === 0) {
-        outgoingList.innerHTML = `<p class="text-[11px] text-slate-600 italic">No pending sent requests</p>`;
-      } else {
-        outgoing.forEach(req => {
-          const receiver = profiles.find(p => p.id === req.to) || { username: 'User', avatar: '' };
-          const item = document.createElement('div');
-          item.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-900/60 border border-slate-800';
-          item.innerHTML = `
-            <div class="flex items-center gap-2 min-w-0">
-              <img src="${receiver.avatar}" class="w-7 h-7 rounded-full object-cover">
-              <span class="text-xs text-slate-400 truncate">${receiver.username}</span>
-            </div>
-            <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">Pending</span>
-          `;
-          outgoingList.appendChild(item);
-        });
-      }
-    }
-
-    function handleSearchUsers() {
-      const query = document.getElementById('user-search-input').value.trim().toLowerCase();
-      const resultsContainer = document.getElementById('search-results-list');
-      resultsContainer.innerHTML = '';
-
-      if (!query) return;
-
-      switchFriendSubTab('search');
-
-      const matches = profiles.filter(p => p.id !== currentUser.id && p.username.toLowerCase().includes(query));
-
-      if (matches.length === 0) {
-        resultsContainer.innerHTML = `<p class="text-xs text-slate-500">No users found matching "${query}"</p>`;
-        return;
-      }
-
-      matches.forEach(user => {
-        const status = getFriendshipStatus(user.id);
-        const item = document.createElement('div');
-        item.className = 'flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800';
-
-        let actionBtn = '';
-        if (status === 'none') {
-          actionBtn = `<button onclick="sendFriendRequest('${user.id}')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg"><i class="fa-solid fa-user-plus mr-1"></i> Add</button>`;
-        } else if (status === 'accepted') {
-          actionBtn = `<button onclick="openDMChat('${user.id}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg"><i class="fa-solid fa-paper-plane mr-1"></i> DM</button>`;
-        } else if (status === 'pending_sent') {
-          actionBtn = `<span class="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">Pending</span>`;
-        } else if (status === 'pending_received') {
-          actionBtn = `<button onclick="switchFriendSubTab('requests')" class="px-2 py-1 bg-pink-600 text-white text-xs rounded-lg">View Req</button>`;
-        }
-
-        item.innerHTML = `
-          <div class="flex items-center gap-3 min-w-0" onclick="openUserModal('${user.id}')">
-            <img src="${user.avatar}" class="w-8 h-8 rounded-full object-cover">
-            <div class="truncate">
-              <p class="text-xs font-semibold text-slate-200 truncate">${user.username}</p>
-              <p class="text-[10px] text-slate-500 truncate">${user.bio || 'PulseChat user'}</p>
-            </div>
-          </div>
-          <div>${actionBtn}</div>
-        `;
-        resultsContainer.appendChild(item);
-      });
-    }
-
-    // --- DIRECT MESSAGING (DM) SYSTEM ---
-    function openDMChat(friendId) {
-      if (!isFriend(friendId)) {
-        showToast("You can only direct message accepted friends!", "error");
-        return;
-      }
-
-      activeDMUserId = friendId;
-      const friendProfile = profiles.find(p => p.id === friendId) || { username: 'User', avatar: '', bio: '' };
-
-      document.getElementById('dm-header-avatar').src = friendProfile.avatar;
-      document.getElementById('dm-header-username').textContent = friendProfile.username;
-      document.getElementById('dm-header-bio').textContent = friendProfile.bio || 'PulseChat Friend';
-
-      document.getElementById('dm-empty-state').classList.add('hidden');
-      document.getElementById('dm-window').classList.remove('hidden');
-
-      setActiveTab('friends');
-      renderFriendLists();
-      renderDMMessages();
-    }
-
-    function sendDirectMessage(e) {
-      e.preventDefault();
-      const input = document.getElementById('dm-input');
-      const text = input.value.trim();
-
-      if (!text || !activeDMUserId) return;
-
-      const newDm = {
-        id: 'dm_' + Date.now(),
-        senderId: currentUser.id,
-        receiverId: activeDMUserId,
-        content: text,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      directMessages.push(newDm);
-      saveAllToLocalStorage();
-      renderDMMessages();
-      input.value = '';
-
-      syncSupabaseMessage('dm', newDm);
-    }
-
-    function renderDMMessages() {
-      if (!activeDMUserId) return;
-
-      const container = document.getElementById('dm-messages');
-      container.innerHTML = '';
-
-      const conversation = directMessages.filter(m => 
-        (m.senderId === currentUser.id && m.receiverId === activeDMUserId) ||
-        (m.senderId === activeDMUserId && m.receiverId === currentUser.id)
-      );
-
-      if (conversation.length === 0) {
-        container.innerHTML = `
-          <div class="text-center text-slate-500 my-10">
-            <i class="fa-solid fa-lock text-3xl mb-2 opacity-30"></i>
-            <p class="text-xs">End-to-end direct messages are active.</p>
-            <p class="text-[10px] text-slate-600 mt-1">Send a message to start chatting privately!</p>
-          </div>
-        `;
-        return;
-      }
-
-      conversation.forEach(msg => {
-        const isMe = msg.senderId === currentUser.id;
-        const msgEl = document.createElement('div');
-        msgEl.className = `flex items-start gap-3 ${isMe ? 'flex-row-reverse' : ''}`;
-
-        msgEl.innerHTML = `
-          <div class="max-w-[75%] ${isMe ? 'items-end' : 'items-start'} flex flex-col">
-            <div class="flex items-center gap-2 mb-1 px-1">
-              <span class="text-[10px] text-slate-500">${msg.timestamp}</span>
-            </div>
-            <div class="p-3.5 rounded-2xl text-sm leading-relaxed ${isMe ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700/60'}">
-              ${escapeHTML(msg.content)}
-            </div>
-          </div>
-        `;
-        container.appendChild(msgEl);
-      });
-
-      container.scrollTop = container.scrollHeight;
-    }
-
-    // --- USER MODAL / POPOVER (GLOBAL CHAT CLICK) ---
-    function openUserModal(userId) {
-      selectedModalUserId = userId;
-      const profile = profiles.find(p => p.id === userId) || {
-        id: userId,
-        username: 'User',
-        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(userId)}`,
-        bio: 'No bio details available.'
-      };
-
-      document.getElementById('modal-avatar').src = profile.avatar;
-      document.getElementById('modal-username').textContent = profile.username;
-      document.getElementById('modal-bio').textContent = profile.bio || 'No bio provided.';
-
-      const actionContainer = document.getElementById('modal-action-container');
-      actionContainer.innerHTML = '';
-
-      if (userId === currentUser.id) {
-        actionContainer.innerHTML = `<span class="text-xs text-indigo-400 font-semibold bg-indigo-500/10 px-3 py-1.5 rounded-xl border border-indigo-500/20">This is your profile</span>`;
-      } else {
-        const status = getFriendshipStatus(userId);
-        if (status === 'none') {
-          actionContainer.innerHTML = `
-            <button onclick="sendFriendRequest('${userId}')" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-2">
-              <i class="fa-solid fa-user-plus"></i> Send Friend Request
+    <!-- TOUCH CONTROLS (VIRTUAL ANALOG JOYSTICK & JUMP BUTTON) -->
+    <div class="relative z-10 p-4 flex justify-between items-end pointer-events-none mb-2">
+        <!-- Analog Joystick -->
+        <div id="joystickBase" class="pointer-events-auto w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-white/40 border-2 border-pink-300 backdrop-blur-md relative flex items-center justify-center shadow-inner touch-none">
+            <div id="joystickStick" class="w-12 h-12 rounded-full bg-pink-400/90 border-2 border-white shadow-lg absolute transition-transform duration-75"></div>
+        </div>
+
+        <!-- Controls Action Row -->
+        <div class="pointer-events-auto flex items-center space-x-3">
+            <button onclick="startPetalGame()" class="glass-panel hover:bg-pink-200 text-pink-700 font-bold px-4 py-3 rounded-2xl shadow-lg transition flex items-center space-x-2 text-xs sm:text-sm">
+                <i class="fa-solid fa-gamepad text-pink-500 text-lg"></i>
+                <span>Petal Game</span>
             </button>
-          `;
-        } else if (status === 'accepted') {
-          actionContainer.innerHTML = `
-            <button onclick="closeUserModal(); openDMChat('${userId}')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2">
-              <i class="fa-solid fa-paper-plane"></i> Send Direct Message
+            <button id="jumpBtn" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-pink-500 to-pink-300 border-2 border-white text-white font-fun text-xl shadow-xl hover:scale-105 active:scale-95 transition flex items-center justify-center">
+                JUMP
             </button>
-          `;
-        } else if (status === 'pending_sent') {
-          actionContainer.innerHTML = `<span class="text-xs text-slate-400 bg-slate-800 px-4 py-2 rounded-xl">Friend Request Pending</span>`;
-        } else if (status === 'pending_received') {
-          actionContainer.innerHTML = `
-            <div class="flex gap-2">
-              <button onclick="respondToFriendRequestByUserId('${userId}', true)" class="px-4 py-2 bg-emerald-600 text-white text-xs rounded-xl font-semibold">Accept Request</button>
-              <button onclick="respondToFriendRequestByUserId('${userId}', false)" class="px-4 py-2 bg-rose-600 text-white text-xs rounded-xl font-semibold">Reject</button>
+        </div>
+    </div>
+
+    <!-- CHAT DRAWER PANEL -->
+    <div id="chatDrawer" class="fixed right-0 top-0 bottom-0 w-80 sm:w-96 glass-panel shadow-2xl z-40 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 border-b border-pink-200 flex justify-between items-center bg-pink-100/50">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-comments text-pink-500 text-lg"></i>
+                <h3 id="chatTitle" class="font-bold text-pink-900 text-base">Global Park Chat</h3>
             </div>
-          `;
-        }
-      }
+            <button onclick="toggleChatDrawer()" class="text-pink-400 hover:text-pink-600 text-lg p-1">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        
+        <div class="flex border-b border-pink-200 bg-white/40 text-xs font-bold text-pink-700">
+            <button id="tabGlobal" onclick="switchChatTab('global')" class="flex-1 py-2 text-center border-b-2 border-pink-500 text-pink-900">Global</button>
+            <button id="tabDM" onclick="switchChatTab('dm')" class="flex-1 py-2 text-center border-b-2 border-transparent text-pink-400">Direct Message</button>
+        </div>
 
-      document.getElementById('user-modal').classList.remove('hidden');
-    }
+        <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs sm:text-sm"></div>
 
-    function respondToFriendRequestByUserId(userId, accept) {
-      const req = friendRequests.find(r => r.from === userId && r.to === currentUser.id && r.status === 'pending');
-      if (req) {
-        respondToFriendRequest(req.id, accept);
-        closeUserModal();
-      }
-    }
+        <div class="p-3 border-t border-pink-200 bg-white/60 flex items-center space-x-2">
+            <input type="text" id="chatInput" placeholder="Type a message..." class="flex-1 bg-white border border-pink-200 rounded-xl px-3 py-2 text-xs text-pink-900 focus:outline-none focus:ring-2 focus:ring-pink-400" onkeydown="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold p-2.5 rounded-xl shadow transition">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
 
-    function closeUserModal() {
-      document.getElementById('user-modal').classList.add('hidden');
-      selectedModalUserId = null;
-    }
+    <!-- AUTHENTICATION MODAL -->
+    <div id="authModal" class="fixed inset-0 bg-pink-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center relative border-2 border-pink-300">
+            <div class="w-16 h-16 rounded-full bg-pink-200 border-2 border-pink-400 mx-auto flex items-center justify-center text-3xl mb-3 shadow-inner">
+                🌸
+            </div>
+            <h2 class="text-xl font-bold text-pink-900 mb-1">Sakura Slime World</h2>
+            <p class="text-xs text-pink-600 mb-5">Sign in to start exploring the park!</p>
 
-    // --- UTILITIES & REALTIME SUPABASE BROADCAST ---
-    function updateBadges() {
-      const pendingCount = friendRequests.filter(r => r.to === currentUser?.id && r.status === 'pending').length;
-      const reqBadge = document.getElementById('friend-req-badge');
-      const subtabDot = document.getElementById('subtab-req-dot');
+            <div class="space-y-3 text-left mb-4">
+                <div>
+                    <label class="text-[10px] font-bold text-pink-700 uppercase tracking-wider block mb-1">Email Address</label>
+                    <input type="email" id="authEmail" placeholder="user@example.com" class="w-full bg-white/90 border border-pink-200 rounded-xl px-3 py-2 text-xs text-pink-900 outline-none focus:ring-2 focus:ring-pink-400">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-pink-700 uppercase tracking-wider block mb-1">Display Name (Unique)</label>
+                    <input type="text" id="authDisplayName" placeholder="e.g. SakuraMaster" class="w-full bg-white/90 border border-pink-200 rounded-xl px-3 py-2 text-xs text-pink-900 outline-none focus:ring-2 focus:ring-pink-400">
+                </div>
+            </div>
 
-      if (pendingCount > 0) {
-        reqBadge.textContent = pendingCount;
-        reqBadge.classList.remove('hidden');
-        subtabDot.classList.remove('hidden');
-      } else {
-        reqBadge.classList.add('hidden');
-        subtabDot.classList.add('hidden');
-      }
-    }
+            <div class="space-y-2">
+                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">
+                    Sign In / Create Account
+                </button>
+                <button onclick="handleGuestLogin()" class="w-full bg-white hover:bg-pink-50 text-pink-700 font-bold py-2 rounded-xl text-xs border border-pink-200 transition">
+                    Continue as Guest
+                </button>
+            </div>
+        </div>
+    </div>
 
-    function setupSupabaseListeners() {
-      try {
-        const channel = supabaseClient.channel('public:room');
-        channel
-          .on('broadcast', { event: 'chat_msg' }, ({ payload }) => {
-            if (payload.type === 'global' && payload.data.userId !== currentUser?.id) {
-              globalMessages.push(payload.data);
-              if (globalMessages.length > 50) globalMessages = globalMessages.slice(globalMessages.length - 50);
-              saveAllToLocalStorage();
-              renderGlobalMessages();
-            } else if (payload.type === 'dm' && payload.data.receiverId === currentUser?.id) {
-              directMessages.push(payload.data);
-              saveAllToLocalStorage();
-              if (activeDMUserId === payload.data.senderId) renderDMMessages();
+    <!-- SEARCH & FRIENDS MODAL -->
+    <div id="searchModal" class="fixed inset-0 bg-pink-950/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center border-b border-pink-200 pb-3 mb-4">
+                <h2 class="text-lg font-bold text-pink-900 flex items-center"><i class="fa-solid fa-user-plus text-pink-500 mr-2"></i>Find & Add Friends</h2>
+                <button onclick="closeModal('searchModal')" class="text-pink-400 hover:text-pink-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="relative mb-4">
+                <input type="text" id="userSearchInput" oninput="renderUserSearchList()" placeholder="Search strictly by Display Name..." class="w-full bg-white/80 border border-pink-200 rounded-2xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-pink-900 focus:ring-2 focus:ring-pink-400 outline-none">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-pink-400"></i>
+            </div>
+
+            <div id="searchResultsList" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+    </div>
+
+    <!-- SLIME STUDIO MODAL -->
+    <div id="studioModal" class="fixed inset-0 bg-pink-950/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center border-b border-pink-200 pb-3 mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-pink-900 flex items-center"><i class="fa-solid fa-store text-pink-500 mr-2"></i>Slime Studio & Market</h2>
+                    <p class="text-xs text-pink-600">Customize Accessories, Avatars, Titles, and Skins</p>
+                </div>
+                <button onclick="closeModal('studioModal')" class="text-pink-400 hover:text-pink-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="flex border-b border-pink-200 mb-4 font-bold text-xs">
+                <button id="studioTabProfile" onclick="switchStudioTab('profile')" class="px-4 py-2 border-b-2 border-pink-500 text-pink-900">My Profile</button>
+                <button id="studioTabMarket" onclick="switchStudioTab('market')" class="px-4 py-2 border-b-2 border-transparent text-pink-400">Marketplace</button>
+                <button id="studioTabDev" onclick="switchStudioTab('dev')" class="hidden px-4 py-2 border-b-2 border-transparent text-purple-600">Developer Tools</button>
+            </div>
+
+            <div id="studioContent" class="flex-1 overflow-y-auto pr-1"></div>
+        </div>
+    </div>
+
+    <!-- CONTEXT ACTION MODAL FOR CLICKED SLIMES -->
+    <div id="userContextModal" class="fixed inset-0 bg-pink-950/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-5 shadow-2xl text-center">
+            <div class="flex justify-end">
+                <button onclick="closeModal('userContextModal')" class="text-pink-400 hover:text-pink-600 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="ctxAvatar" class="w-16 h-16 rounded-full border-2 border-pink-400 bg-pink-200 text-3xl mx-auto flex items-center justify-center shadow-md mb-2 overflow-hidden">🌸</div>
+            <h3 id="ctxName" class="font-bold text-pink-900 text-base">Username</h3>
+            <p id="ctxTitle" class="text-xs text-pink-600 font-semibold mb-4">Slime Explorer</p>
+            
+            <div id="ctxActions" class="space-y-2 text-xs font-bold"></div>
+        </div>
+    </div>
+
+    <!-- PETAL CATCHER MINI-GAME OVERLAY -->
+    <div id="miniGameOverlay" class="fixed inset-0 bg-pink-950/60 z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 text-center shadow-2xl relative border-2 border-pink-300">
+            <h2 class="text-xl font-bold text-pink-900 mb-1">🌸 Sakura Petal Catcher</h2>
+            <p class="text-xs text-pink-600 mb-4">Catch falling petals to win Sakura Points!</p>
+            <div id="gameTimer" class="text-2xl font-bold text-pink-600 mb-2">Time: 20s</div>
+            <div id="gameScore" class="text-lg font-bold text-pink-800 mb-4">Petals: 0</div>
+            <button onclick="stopPetalGame()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold px-6 py-2 rounded-xl text-xs shadow-md">Quit Game</button>
+        </div>
+    </div>
+
+    <!-- DEVELOPER PASSCODE PROMPT MODAL -->
+    <div id="devPromptModal" class="fixed inset-0 bg-pink-950/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-xs rounded-3xl p-5 shadow-2xl text-center">
+            <h3 class="font-bold text-pink-900 text-base mb-2"><i class="fa-solid fa-lock text-purple-600 mr-2"></i>Developer Access</h3>
+            <p class="text-[11px] text-pink-600 mb-3">Enter the secret passcode to activate Developer Mode.</p>
+            <input type="password" id="devPassInput" placeholder="Passcode (SAKURA_DEV_2026)" class="w-full border border-pink-200 rounded-xl px-3 py-2 text-xs text-center text-pink-900 mb-3 outline-none focus:ring-2 focus:ring-purple-400">
+            <div class="flex space-x-2">
+                <button onclick="closeModal('devPromptModal')" class="flex-1 bg-gray-200 text-gray-700 font-bold py-2 rounded-xl text-xs">Cancel</button>
+                <button onclick="verifyDevPasscode()" class="flex-1 bg-purple-600 text-white font-bold py-2 rounded-xl text-xs shadow-md">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONSTANTS & DATABASE SCHEMAS
+        // ==========================================
+        const DB_NAMESPACE = "sakura_app_db_v2";
+        const CURRENT_USER_KEY = "sakura_app_current_user_id";
+        const GLOBAL_CHAT_KEY = "sakura_app_global_chat_v2";
+        const DEFAULT_DEV_PASSCODE = "SAKURA_DEV_2026";
+
+        // Slime Studio Market Schema (Cheapest item 500 SP)
+        const MARKET_ITEMS = [
+            // Slime Accessories
+            { id: "ribbon", name: "Sakura Ribbon", category: "slimeAccessories", price: 500, icon: "🎀" },
+            { id: "halo", name: "Angel Halo", category: "slimeAccessories", price: 800, icon: "😇" },
+            { id: "flowerClip", name: "Sakura Flower Clip", category: "slimeAccessories", price: 1000, icon: "🌸" },
+            { id: "glasses", name: "Cool Sunglasses", category: "slimeAccessories", price: 1200, icon: "🕶️" },
+            { id: "wizardHat", name: "Wizard Hat", category: "slimeAccessories", price: 2500, icon: "🧙‍♂️" },
+
+            // Profile Avatars
+            { id: "avatarPrincess", name: "Sakura Princess", category: "profileAvatars", price: 600, icon: "👸" },
+            { id: "avatarKnight", name: "Slime Knight", category: "profileAvatars", price: 900, icon: "🛡️" },
+            { id: "avatarGolden", name: "Golden Slime Avatar", category: "profileAvatars", price: 1200, icon: "🌟" },
+            { id: "avatarCyber", name: "Cyber Slime Spec", category: "profileAvatars", price: 1800, icon: "🤖" },
+
+            // Floating Titles
+            { id: "titleLegend", name: "Title: Sakura Legend", category: "titles", price: 800, value: "Sakura Legend", icon: "✨" },
+            { id: "titleLord", name: "Title: Squishy Lord", category: "titles", price: 1200, value: "Squishy Lord", icon: "👑" },
+            { id: "titleCherry", name: "Title: Cherry Blossom", category: "titles", price: 1500, value: "Cherry Blossom", icon: "🌸" },
+            { id: "titleAdventurer", name: "Title: Master Adventurer", category: "titles", price: 2500, value: "Master Adventurer", icon: "⚔️" },
+            { id: "titleCozy", name: "Title: Cozy Slime", category: "titles", price: 5000, value: "Cozy Slime", icon: "🍵" }
+        ];
+
+        let currentUser = null;
+        let activeChatTab = 'global';
+        let activeDMUser = null;
+        let selectedDance = null;
+        let emoteBubble = null;
+        let emoteBubbleTimer = null;
+        let parkSlimes = [];
+        let petalGameActive = false;
+        let gameScoreVal = 0;
+        let gameTimeVal = 20;
+        let gameInterval = null;
+        let joystickActive = false;
+        let joystickVector = { x: 0, y: 0 };
+
+        // Idle 20-min Timer Engine
+        let idleSeconds = 1200; // 20 minutes
+        let idleInterval = null;
+
+        // ==========================================
+        // INITIALIZATION & USER DATABASE REGISTRY
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            initDatabase();
+            initCanvas();
+            initJoystick();
+            startIdleTimer();
+            renderChatMessages();
+            setInterval(updateParkSlimes, 1000);
+        });
+
+        function getDB() {
+            try {
+                return JSON.parse(localStorage.getItem(DB_NAMESPACE)) || { users: {} };
+            } catch (e) {
+                return { users: {} };
             }
-          })
-          .subscribe();
-      } catch (e) {
-        console.log("Realtime sync active in multi-tab local memory.");
-      }
-    }
+        }
 
-    function syncSupabaseMessage(type, data) {
-      try {
-        supabaseClient.channel('public:room').send({
-          type: 'broadcast',
-          event: 'chat_msg',
-          payload: { type, data }
-        });
-      } catch (err) {
-        // Fallback silently
-      }
-    }
+        function saveDB(db) {
+            localStorage.setItem(DB_NAMESPACE, JSON.stringify(db));
+        }
 
-    function showToast(message, type = 'info') {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toast-message');
-      const toastIcon = document.getElementById('toast-icon');
+        function initDatabase() {
+            const db = getDB();
+            const currentId = localStorage.getItem(CURRENT_USER_KEY);
 
-      toastMsg.textContent = message;
+            if (currentId && db.users[currentId]) {
+                currentUser = db.users[currentId];
+                if (currentUser.status && currentUser.status.isBanned) {
+                    alert("This account is currently banned.");
+                    logoutUser();
+                    return;
+                }
+                document.getElementById('authModal').classList.add('hidden');
+                updateNavHeader();
+            } else {
+                openModal('authModal');
+            }
+        }
 
-      if (type === 'error') {
-        toast.className = "fixed bottom-5 right-5 z-50 bg-rose-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300";
-        toastIcon.className = "fa-solid fa-circle-exclamation";
-      } else if (type === 'success') {
-        toast.className = "fixed bottom-5 right-5 z-50 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300";
-        toastIcon.className = "fa-solid fa-circle-check";
-      } else {
-        toast.className = "fixed bottom-5 right-5 z-50 bg-indigo-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300";
-        toastIcon.className = "fa-solid fa-circle-info";
-      }
+        function saveCurrentUser() {
+            if (!currentUser) return;
+            const db = getDB();
+            db.users[currentUser.id] = currentUser;
+            saveDB(db);
+            updateNavHeader();
+        }
 
-      toast.classList.remove('translate-y-20', 'opacity-0');
+        function handleLogin() {
+            const email = document.getElementById('authEmail').value.trim();
+            let displayName = document.getElementById('authDisplayName').value.trim();
 
-      setTimeout(() => {
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
-    }
+            if (!email) {
+                alert("Please enter a valid email address.");
+                return;
+            }
 
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-        tag => ({
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          "'": '&#39;',
-          '"': '&quot;'
-        }[tag] || tag)
-      );
-    }
-  </script>
+            const db = getDB();
+            let existingUser = Object.values(db.users).find(u => u.email === email);
+
+            if (!existingUser) {
+                const newId = 'user_' + Math.random().toString(36).substring(2, 9);
+                if (!displayName) displayName = 'slime_' + newId.substring(5, 9);
+
+                existingUser = {
+                    id: newId,
+                    email: email,
+                    displayName: displayName,
+                    avatarUrl: '🌸',
+                    role: 'user', // 'user' | 'admin' | 'developer'
+                    sakuraPoints: 0,
+                    inventory: {
+                        slimeAccessories: [],
+                        profileAvatars: [],
+                        titles: [],
+                        skins: []
+                    },
+                    equipped: {
+                        slimeAccessory: null,
+                        profileAvatar: '🌸',
+                        title: null,
+                        skin: null
+                    },
+                    friends: [],
+                    friendRequestsIncoming: [],
+                    friendRequestsOutgoing: [],
+                    status: {
+                        isMuted: false,
+                        mutedUntil: null,
+                        isBanned: false,
+                        banExpiresAt: null,
+                        banReason: null
+                    },
+                    devPasscodeActive: false,
+                    x: Math.random() * 600 + 100,
+                    y: Math.random() * 200 + 300,
+                    vy: 0,
+                    isJumping: false
+                };
+                db.users[newId] = existingUser;
+                saveDB(db);
+            } else {
+                if (displayName && displayName !== existingUser.displayName) {
+                    existingUser.displayName = displayName;
+                    db.users[existingUser.id] = existingUser;
+                    saveDB(db);
+                }
+            }
+
+            if (existingUser.status.isBanned) {
+                alert("This account has been banned.");
+                return;
+            }
+
+            currentUser = existingUser;
+            localStorage.setItem(CURRENT_USER_KEY, currentUser.id);
+            closeModal('authModal');
+            updateNavHeader();
+            showNotification(`Welcome back, ${currentUser.displayName}!`);
+        }
+
+        function handleGuestLogin() {
+            const guestId = 'guest_' + Math.random().toString(36).substring(2, 9);
+            const db = getDB();
+
+            const guestUser = {
+                id: guestId,
+                email: `${guestId}@guest.park`,
+                displayName: 'slime_' + guestId.substring(6, 10),
+                avatarUrl: '🌸',
+                role: 'user',
+                sakuraPoints: 0,
+                inventory: { slimeAccessories: [], profileAvatars: [], titles: [], skins: [] },
+                equipped: { slimeAccessory: null, profileAvatar: '🌸', title: null, skin: null },
+                friends: [],
+                friendRequestsIncoming: [],
+                friendRequestsOutgoing: [],
+                status: { isMuted: false, mutedUntil: null, isBanned: false, banExpiresAt: null },
+                devPasscodeActive: false,
+                x: Math.random() * 600 + 100,
+                y: Math.random() * 200 + 300,
+                vy: 0,
+                isJumping: false
+            };
+
+            db.users[guestId] = guestUser;
+            saveDB(db);
+
+            currentUser = guestUser;
+            localStorage.setItem(CURRENT_USER_KEY, currentUser.id);
+            closeModal('authModal');
+            updateNavHeader();
+            showNotification(`Logged in as Guest (${currentUser.displayName})`);
+        }
+
+        function logoutUser() {
+            localStorage.removeItem(CURRENT_USER_KEY);
+            currentUser = null;
+            openModal('authModal');
+        }
+
+        function updateNavHeader() {
+            if (!currentUser) return;
+
+            document.getElementById('navDisplayName').innerText = currentUser.displayName;
+            document.getElementById('navAvatar').innerText = currentUser.equipped.profileAvatar || '🌸';
+            document.getElementById('navPoints').innerText = currentUser.sakuraPoints || 0;
+            
+            let effectiveTitle = currentUser.equipped.title || 'Newbie';
+            if (currentUser.role === 'developer' && currentUser.devPasscodeActive) effectiveTitle = 'Dev';
+            else if (currentUser.role === 'admin') effectiveTitle = 'Admin';
+            document.getElementById('navTitle').innerText = effectiveTitle;
+
+            const roleBadge = document.getElementById('navRoleBadge');
+            if (currentUser.role === 'developer' && currentUser.devPasscodeActive) {
+                roleBadge.innerText = 'DEV';
+                roleBadge.className = 'text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider text-white bg-purple-600 inline-block';
+            } else if (currentUser.role === 'admin') {
+                roleBadge.innerText = 'ADMIN';
+                roleBadge.className = 'text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider text-white bg-gray-900 inline-block';
+            } else {
+                roleBadge.className = 'hidden';
+            }
+
+            // Friend requests badge
+            const badge = document.getElementById('friendReqBadge');
+            if ((currentUser.friendRequestsIncoming || []).length > 0) badge.classList.remove('hidden');
+            else badge.classList.add('hidden');
+        }
+
+        function startIdleTimer() {
+            idleInterval = setInterval(() => {
+                if (!currentUser) return;
+                idleSeconds--;
+                if (idleSeconds <= 0) {
+                    idleSeconds = 1200;
+                    currentUser.sakuraPoints = (currentUser.sakuraPoints || 0) + 1;
+                    saveCurrentUser();
+                    showNotification("🌸 +1 Sakura Point earned for 20 mins active play!");
+                }
+                const mins = Math.floor(idleSeconds / 60);
+                const secs = idleSeconds % 60;
+                document.getElementById('idleTimerText').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }, 1000);
+        }
+
+        // ==========================================
+        // CANVAS PARK & FALLING PETALS ENGINE
+        // ==========================================
+        let canvas, ctx;
+        let petals = [];
+
+        function initCanvas() {
+            canvas = document.getElementById('parkCanvas');
+            ctx = canvas.getContext('2d');
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            // Initialize falling petals
+            for (let i = 0; i < 35; i++) {
+                petals.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 6 + 4,
+                    speedY: Math.random() * 1.5 + 0.8,
+                    speedX: Math.random() * 1 - 0.5,
+                    rotation: Math.random() * 360
+                });
+            }
+
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+
+                parkSlimes.forEach(slime => {
+                    const dist = Math.hypot(slime.x - clickX, slime.y - clickY);
+                    if (dist < 35) {
+                        openUserContextMenu(slime);
+                    }
+                });
+            });
+
+            requestAnimationFrame(renderLoop);
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function updateParkSlimes() {
+            const db = getDB();
+            parkSlimes = Object.values(db.users).map(u => {
+                if (currentUser && u.id === currentUser.id) return currentUser;
+                return u;
+            });
+        }
+
+        function renderLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawParkEnvironment();
+            updateAndDrawPetals();
+            updatePlayerPhysics();
+
+            parkSlimes.forEach(slime => {
+                drawSlimeSprite(slime);
+            });
+
+            requestAnimationFrame(renderLoop);
+        }
+
+        function drawParkEnvironment() {
+            // Grass Floor
+            ctx.fillStyle = "#fbcfe8";
+            ctx.fillRect(0, canvas.height - 140, canvas.width, 140);
+
+            ctx.fillStyle = "#f472b6";
+            ctx.fillRect(0, canvas.height - 145, canvas.width, 5);
+
+            // Water Pond
+            ctx.beginPath();
+            ctx.ellipse(180, canvas.height - 70, 120, 45, 0, 0, Math.PI * 2);
+            ctx.fillStyle = "#f43f5e33";
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#fb7185";
+            ctx.stroke();
+
+            // Torii Gate
+            const gateX = canvas.width / 2;
+            const gateY = canvas.height - 230;
+            
+            ctx.fillStyle = "#e11d48";
+            ctx.fillRect(gateX - 90, gateY, 18, 110);
+            ctx.fillRect(gateX + 72, gateY, 18, 110);
+            ctx.fillRect(gateX - 115, gateY - 18, 230, 20);
+            ctx.fillRect(gateX - 100, gateY + 15, 200, 14);
+
+            // Arched Bridge
+            const bridgeX = canvas.width - 220;
+            ctx.beginPath();
+            ctx.arc(bridgeX, canvas.height - 70, 70, Math.PI, 0);
+            ctx.lineWidth = 8;
+            ctx.strokeStyle = "#be123c";
+            ctx.stroke();
+        }
+
+        function updateAndDrawPetals() {
+            ctx.fillStyle = "#f472b6aa";
+            petals.forEach(p => {
+                p.y += p.speedY;
+                p.x += p.speedX;
+                p.rotation += 1;
+
+                if (p.y > canvas.height) {
+                    p.y = -10;
+                    p.x = Math.random() * canvas.width;
+                }
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+
+        function updatePlayerPhysics() {
+            if (!currentUser) return;
+
+            if (joystickActive) {
+                currentUser.x += joystickVector.x * 3.8;
+                currentUser.y += joystickVector.y * 3.8;
+            }
+
+            if (currentUser.isJumping) {
+                currentUser.y += currentUser.vy;
+                currentUser.vy += 0.8;
+
+                const floorY = canvas.height - 150;
+                if (currentUser.y >= floorY) {
+                    currentUser.y = floorY;
+                    currentUser.isJumping = false;
+                    currentUser.vy = 0;
+                }
+            }
+
+            currentUser.x = Math.max(40, Math.min(canvas.width - 40, currentUser.x));
+            currentUser.y = Math.max(160, Math.min(canvas.height - 70, currentUser.y));
+
+            saveCurrentUser();
+        }
+
+        function drawSlimeSprite(slime) {
+            ctx.save();
+            ctx.translate(slime.x, slime.y);
+
+            // Determine skin color & title
+            let slimeColor = '#f472b6'; // Standard pink
+            let titleText = (slime.equipped && slime.equipped.title) ? slime.equipped.title : 'Newbie';
+
+            if (slime.role === 'developer' && slime.devPasscodeActive) {
+                slimeColor = '#ffffff'; // Dev White Skin
+                titleText = 'Dev';
+            } else if (slime.role === 'admin') {
+                slimeColor = '#1e1b26'; // Admin Black Skin
+                titleText = 'Admin';
+            } else if (slime.equipped && slime.equipped.skin) {
+                slimeColor = slime.equipped.skin;
+            }
+
+            // Infinite Looping Dance Animations
+            let danceOffsetY = 0;
+            let danceRotation = 0;
+            let danceScaleX = 1;
+
+            if (slime.id === currentUser?.id && selectedDance) {
+                const time = Date.now() / 180;
+                if (selectedDance === 'wave') danceRotation = Math.sin(time) * 0.25;
+                else if (selectedDance === 'bounce') danceOffsetY = -Math.abs(Math.sin(time) * 18);
+                else if (selectedDance === 'jiggly') danceScaleX = 1 + Math.sin(time * 2) * 0.25;
+                else if (selectedDance === 'squish') {
+                    danceOffsetY = -Math.abs(Math.sin(time * 1.5) * 12);
+                    danceScaleX = 1 - Math.sin(time * 1.5) * 0.2;
+                } else if (selectedDance === 'nap') danceRotation = 0.3;
+            }
+
+            ctx.translate(0, danceOffsetY);
+            ctx.rotate(danceRotation);
+            ctx.scale(danceScaleX, 1);
+
+            // Draw Slime Body
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 30, 24, 0, 0, Math.PI * 2);
+            ctx.fillStyle = slimeColor;
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = (slime.role === 'developer' && slime.devPasscodeActive) ? '#a855f7' : '#db2777';
+            ctx.stroke();
+
+            // Eyes
+            ctx.fillStyle = (slime.role === 'admin') ? '#ffffff' : '#33101e';
+            ctx.beginPath();
+            ctx.arc(-10, -4, 3, 0, Math.PI * 2);
+            ctx.arc(10, -4, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Slime Accessories
+            const accessory = slime.equipped ? slime.equipped.slimeAccessory : null;
+            if (accessory === 'ribbon') { ctx.font = '16px sans-serif'; ctx.fillText('🎀', 6, -18); }
+            else if (accessory === 'halo') { ctx.font = '18px sans-serif'; ctx.fillText('😇', -9, -22); }
+            else if (accessory === 'flowerClip') { ctx.font = '16px sans-serif'; ctx.fillText('🌸', 8, -20); }
+            else if (accessory === 'glasses') { ctx.font = '16px sans-serif'; ctx.fillText('🕶️', -9, -8); }
+            else if (accessory === 'wizardHat') { ctx.font = '20px sans-serif'; ctx.fillText('🧙‍♂️', -10, -22); }
+
+            // Floating Title Above Slime
+            ctx.font = 'bold 11px Quicksand, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = (slime.role === 'developer' && slime.devPasscodeActive) ? '#9333ea' : ((slime.role === 'admin') ? '#111827' : '#be185d');
+            ctx.fillText(`[${titleText}]`, 0, -38);
+
+            // Display Name
+            ctx.fillStyle = '#831843';
+            ctx.fillText(slime.displayName || 'Slime', 0, -26);
+
+            // Emote Speech Bubble
+            if (slime.id === currentUser?.id && emoteBubble) {
+                ctx.font = '20px sans-serif';
+                ctx.fillText(emoteBubble, 0, -54);
+            }
+
+            ctx.restore();
+        }
+
+        // ==========================================
+        // DANCE & EMOTE CONTROLS
+        // ==========================================
+        function toggleDance(danceType) {
+            if (selectedDance === danceType) {
+                selectedDance = null;
+            } else {
+                selectedDance = danceType;
+            }
+
+            document.querySelectorAll('.dance-btn').forEach(btn => {
+                btn.classList.remove('bg-pink-300', 'ring-2', 'ring-pink-500');
+            });
+
+            if (selectedDance) {
+                const activeBtn = document.getElementById(`dance_${selectedDance}`);
+                if (activeBtn) activeBtn.classList.add('bg-pink-300', 'ring-2', 'ring-pink-500');
+            }
+        }
+
+        function triggerEmoteBubble(emoji) {
+            emoteBubble = emoji;
+            if (emoteBubbleTimer) clearTimeout(emoteBubbleTimer);
+            emoteBubbleTimer = setTimeout(() => { emoteBubble = null; }, 3500);
+        }
+
+        // ==========================================
+        // JOYSTICK CONTROLS
+        // ==========================================
+        function initJoystick() {
+            const base = document.getElementById('joystickBase');
+            const stick = document.getElementById('joystickStick');
+            const jumpBtn = document.getElementById('jumpBtn');
+
+            let touchId = null;
+
+            function handleStart(e) {
+                const touch = e.touches ? e.touches[0] : e;
+                touchId = touch.identifier || 'mouse';
+                joystickActive = true;
+                handleMove(e);
+            }
+
+            function handleMove(e) {
+                if (!joystickActive) return;
+                let touch = e;
+                if (e.touches) {
+                    for (let i = 0; i < e.touches.length; i++) {
+                        if (e.touches[i].identifier === touchId) {
+                            touch = e.touches[i];
+                            break;
+                        }
+                    }
+                }
+
+                const rect = base.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                let dx = touch.clientX - centerX;
+                let dy = touch.clientY - centerY;
+                const dist = Math.hypot(dx, dy);
+                const maxDist = rect.width / 2 - 10;
+
+                if (dist > maxDist) {
+                    dx = (dx / dist) * maxDist;
+                    dy = (dy / dist) * maxDist;
+                }
+
+                stick.style.transform = `translate(${dx}px, ${dy}px)`;
+                joystickVector = { x: dx / maxDist, y: dy / maxDist };
+            }
+
+            function handleEnd() {
+                joystickActive = false;
+                stick.style.transform = `translate(0px, 0px)`;
+                joystickVector = { x: 0, y: 0 };
+            }
+
+            base.addEventListener('touchstart', handleStart);
+            window.addEventListener('touchmove', handleMove);
+            window.addEventListener('touchend', handleEnd);
+
+            base.addEventListener('mousedown', handleStart);
+            window.addEventListener('mousemove', handleMove);
+            window.addEventListener('mouseup', handleEnd);
+
+            jumpBtn.addEventListener('click', () => {
+                if (currentUser && !currentUser.isJumping) {
+                    currentUser.isJumping = true;
+                    currentUser.vy = -12;
+                }
+            });
+        }
+
+        // ==========================================
+        // FRIEND SYSTEM & STRICT DM LOCK
+        // ==========================================
+        function renderUserSearchList() {
+            const query = document.getElementById('userSearchInput').value.toLowerCase().trim();
+            const db = getDB();
+            const resultsContainer = document.getElementById('searchResultsList');
+            resultsContainer.innerHTML = '';
+
+            const users = Object.values(db.users).filter(u => u.id !== currentUser.id);
+
+            // Strictly search by displayName
+            const filtered = users.filter(u => u.displayName && u.displayName.toLowerCase().includes(query));
+
+            if (filtered.length === 0) {
+                resultsContainer.innerHTML = `<div class="text-center text-xs text-pink-500 py-6">No slimes found matching display name.</div>`;
+                return;
+            }
+
+            filtered.forEach(u => {
+                const isFriend = (currentUser.friends || []).includes(u.id);
+                const hasSentReq = (u.friendRequestsIncoming || []).includes(currentUser.id);
+                const hasRecReq = (currentUser.friendRequestsIncoming || []).includes(u.id);
+
+                let actionBtnHTML = '';
+                if (isFriend) {
+                    actionBtnHTML = `
+                        <button onclick="unfriendUser('${u.id}')" class="bg-red-100 text-red-600 hover:bg-red-200 px-2.5 py-1 rounded-xl text-xs font-bold transition">Unfriend</button>
+                        <button onclick="openDMWith('${u.id}')" class="bg-pink-500 text-white hover:bg-pink-600 px-2.5 py-1 rounded-xl text-xs font-bold transition">Chat</button>
+                    `;
+                } else if (hasSentReq) {
+                    actionBtnHTML = `<span class="text-pink-400 text-xs font-bold">Request Sent</span>`;
+                } else if (hasRecReq) {
+                    actionBtnHTML = `
+                        <button onclick="acceptFriend('${u.id}')" class="bg-green-500 text-white px-2.5 py-1 rounded-xl text-xs font-bold">Accept</button>
+                        <button onclick="rejectFriend('${u.id}')" class="bg-gray-200 text-gray-700 px-2 py-1 rounded-xl text-xs font-bold">Reject</button>
+                    `;
+                } else {
+                    actionBtnHTML = `<button onclick="sendFriendRequest('${u.id}')" class="bg-pink-500 text-white hover:bg-pink-600 px-3 py-1 rounded-xl text-xs font-bold shadow-sm transition">Add Friend</button>`;
+                }
+
+                const row = document.createElement('div');
+                row.className = 'glass-panel p-3 rounded-2xl flex justify-between items-center';
+                row.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-pink-200 border border-pink-300 flex items-center justify-center text-lg overflow-hidden">${u.equipped?.profileAvatar || '🌸'}</div>
+                        <div>
+                            <div class="font-bold text-pink-900 text-sm">${u.displayName}</div>
+                            <div class="text-[10px] text-pink-500 font-semibold">[${u.equipped?.title || 'Newbie'}]</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">${actionBtnHTML}</div>
+                `;
+                resultsContainer.appendChild(row);
+            });
+        }
+
+        function sendFriendRequest(targetId) {
+            const db = getDB();
+            const targetUser = db.users[targetId];
+            if (!targetUser) return;
+
+            if (!targetUser.friendRequestsIncoming) targetUser.friendRequestsIncoming = [];
+            if (!targetUser.friendRequestsIncoming.includes(currentUser.id)) {
+                targetUser.friendRequestsIncoming.push(currentUser.id);
+                if (!currentUser.friendRequestsOutgoing) currentUser.friendRequestsOutgoing = [];
+                currentUser.friendRequestsOutgoing.push(targetId);
+
+                saveDB(db);
+                saveCurrentUser();
+                showNotification("Friend request sent!");
+                renderUserSearchList();
+            }
+        }
+
+        function acceptFriend(targetId) {
+            const db = getDB();
+            if (!currentUser.friends) currentUser.friends = [];
+            currentUser.friends.push(targetId);
+            currentUser.friendRequestsIncoming = (currentUser.friendRequestsIncoming || []).filter(id => id !== targetId);
+
+            const targetUser = db.users[targetId];
+            if (targetUser) {
+                if (!targetUser.friends) targetUser.friends = [];
+                targetUser.friends.push(currentUser.id);
+                targetUser.friendRequestsOutgoing = (targetUser.friendRequestsOutgoing || []).filter(id => id !== currentUser.id);
+            }
+
+            saveDB(db);
+            saveCurrentUser();
+            showNotification("Accepted friend request!");
+            renderUserSearchList();
+        }
+
+        function rejectFriend(targetId) {
+            const db = getDB();
+            currentUser.friendRequestsIncoming = (currentUser.friendRequestsIncoming || []).filter(id => id !== targetId);
+
+            const targetUser = db.users[targetId];
+            if (targetUser) {
+                targetUser.friendRequestsOutgoing = (targetUser.friendRequestsOutgoing || []).filter(id => id !== currentUser.id);
+            }
+
+            saveDB(db);
+            saveCurrentUser();
+            renderUserSearchList();
+        }
+
+        function unfriendUser(targetId) {
+            const db = getDB();
+            currentUser.friends = (currentUser.friends || []).filter(id => id !== targetId);
+
+            const targetUser = db.users[targetId];
+            if (targetUser) {
+                targetUser.friends = (targetUser.friends || []).filter(id => id !== currentUser.id);
+            }
+
+            saveDB(db);
+            saveCurrentUser();
+            showNotification("Unfriended user. Direct messaging locked.");
+            renderUserSearchList();
+        }
+
+        function openUserContextMenu(slime) {
+            if (!currentUser || slime.id === currentUser.id) return;
+
+            document.getElementById('ctxAvatar').innerText = slime.equipped?.profileAvatar || '🌸';
+            document.getElementById('ctxName').innerText = slime.displayName;
+            document.getElementById('ctxTitle').innerText = slime.equipped?.title || 'Newbie';
+
+            const actionsContainer = document.getElementById('ctxActions');
+            actionsContainer.innerHTML = '';
+
+            const isFriend = (currentUser.friends || []).includes(slime.id);
+
+            if (isFriend) {
+                actionsContainer.innerHTML += `
+                    <button onclick="openDMWith('${slime.id}'); closeModal('userContextModal')" class="w-full py-2 bg-pink-500 text-white rounded-xl">Direct Message</button>
+                    <button onclick="unfriendUser('${slime.id}'); closeModal('userContextModal')" class="w-full py-2 bg-red-100 text-red-600 rounded-xl">Unfriend</button>
+                `;
+            } else {
+                actionsContainer.innerHTML += `
+                    <button onclick="sendFriendRequest('${slime.id}'); closeModal('userContextModal')" class="w-full py-2 bg-pink-500 text-white rounded-xl">Send Friend Request</button>
+                `;
+            }
+
+            // Developer / Admin Moderation Privileges
+            const isDev = currentUser.role === 'developer' && currentUser.devPasscodeActive;
+            const isAdmin = currentUser.role === 'admin';
+
+            if (isDev || isAdmin) {
+                actionsContainer.innerHTML += `
+                    <hr class="my-2 border-pink-200">
+                    <div class="text-[10px] font-bold text-purple-700 uppercase tracking-wide mb-1">Moderation</div>
+                    <button onclick="muteUser('${slime.id}', 10); closeModal('userContextModal')" class="w-full py-1.5 bg-amber-500 text-white rounded-xl">Mute 10 Mins</button>
+                    <button onclick="banUserModal('${slime.id}'); closeModal('userContextModal')" class="w-full py-1.5 bg-red-600 text-white rounded-xl">Ban User</button>
+                `;
+            }
+
+            if (isDev) {
+                actionsContainer.innerHTML += `
+                    <button onclick="grantPointsPrompt('${slime.id}')" class="w-full py-1.5 bg-purple-600 text-white rounded-xl">Grant Sakura Points</button>
+                    <button onclick="deleteAccount('${slime.id}'); closeModal('userContextModal')" class="w-full py-1.5 bg-black text-white rounded-xl">Delete Account</button>
+                `;
+            }
+
+            openModal('userContextModal');
+        }
+
+        // ==========================================
+        // CHAT DRAWER ENGINE (50-MSG ROLLING)
+        // ==========================================
+        function toggleChatDrawer() {
+            document.getElementById('chatDrawer').classList.toggle('translate-x-full');
+        }
+
+        function switchChatTab(tab) {
+            activeChatTab = tab;
+            document.getElementById('tabGlobal').className = tab === 'global' ? 'flex-1 py-2 text-center border-b-2 border-pink-500 text-pink-900 font-bold' : 'flex-1 py-2 text-center border-b-2 border-transparent text-pink-400 font-bold';
+            document.getElementById('tabDM').className = tab === 'dm' ? 'flex-1 py-2 text-center border-b-2 border-pink-500 text-pink-900 font-bold' : 'flex-1 py-2 text-center border-b-2 border-transparent text-pink-400 font-bold';
+            
+            document.getElementById('chatTitle').innerText = tab === 'global' ? "Global Park Chat" : (activeDMUser ? `DM: ${activeDMUser.displayName}` : "Direct Message");
+            renderChatMessages();
+        }
+
+        function openDMWith(targetId) {
+            const db = getDB();
+            const targetUser = db.users[targetId];
+            if (!targetUser) return;
+
+            if (!(currentUser.friends || []).includes(targetId)) {
+                showNotification("Direct Messaging locked! You must be accepted friends.");
+                return;
+            }
+
+            activeDMUser = targetUser;
+            switchChatTab('dm');
+            document.getElementById('chatDrawer').classList.remove('translate-x-full');
+        }
+
+        function getChatMessages() {
+            try {
+                return JSON.parse(localStorage.getItem(GLOBAL_CHAT_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveChatMessages(msgs) {
+            if (msgs.length > 50) msgs = msgs.slice(msgs.length - 50); // Strict 50 rolling max
+            localStorage.setItem(GLOBAL_CHAT_KEY, JSON.stringify(msgs));
+        }
+
+        function sendChatMessage() {
+            if (!currentUser) return;
+
+            // Check if muted
+            if (currentUser.status && currentUser.status.isMuted && Date.now() < currentUser.status.mutedUntil) {
+                const remaining = Math.ceil((currentUser.status.mutedUntil - Date.now()) / 60000);
+                showNotification(`You are muted for ${remaining} more minutes.`);
+                return;
+            }
+
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            let allMsgs = getChatMessages();
+
+            if (activeChatTab === 'global') {
+                allMsgs.push({
+                    id: 'msg_' + Date.now(),
+                    type: 'global',
+                    senderId: currentUser.id,
+                    senderName: currentUser.displayName,
+                    senderRole: currentUser.role,
+                    devActive: currentUser.devPasscodeActive,
+                    text: text,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
+            } else {
+                if (!activeDMUser) {
+                    showNotification("Select a friend to message first.");
+                    return;
+                }
+                if (!(currentUser.friends || []).includes(activeDMUser.id)) {
+                    showNotification("Messaging locked: You are no longer friends.");
+                    return;
+                }
+
+                allMsgs.push({
+                    id: 'msg_' + Date.now(),
+                    type: 'dm',
+                    senderId: currentUser.id,
+                    receiverId: activeDMUser.id,
+                    senderName: currentUser.displayName,
+                    text: text,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
+            }
+
+            saveChatMessages(allMsgs);
+            input.value = '';
+            renderChatMessages();
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+
+            const allMsgs = getChatMessages();
+            let filtered = activeChatTab === 'global' ? 
+                allMsgs.filter(m => m.type === 'global') : 
+                (activeDMUser ? allMsgs.filter(m => m.type === 'dm' && ((m.senderId === currentUser.id && m.receiverId === activeDMUser.id) || (m.senderId === activeDMUser.id && m.receiverId === currentUser.id))) : []);
+
+            if (activeChatTab === 'dm' && !activeDMUser) {
+                container.innerHTML = `<div class="text-center text-pink-400 py-10 text-xs">Select a friend to message.</div>`;
+                return;
+            }
+
+            filtered.forEach(m => {
+                const isMe = m.senderId === currentUser.id;
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+
+                let roleBadge = '';
+                if (m.senderRole === 'developer' && m.devActive) roleBadge = `<span class="bg-purple-600 text-white text-[9px] px-1.5 py-0.2 rounded font-bold mr-1">DEV</span>`;
+                else if (m.senderRole === 'admin') roleBadge = `<span class="bg-gray-900 text-white text-[9px] px-1.5 py-0.2 rounded font-bold mr-1">ADMIN</span>`;
+
+                msgDiv.innerHTML = `
+                    <div class="text-[10px] text-pink-500 font-semibold mb-0.5">${roleBadge}${m.senderName} • ${m.time}</div>
+                    <div class="px-3 py-2 rounded-2xl max-w-[80%] ${isMe ? 'bg-pink-500 text-white rounded-br-none' : 'bg-white border border-pink-200 text-pink-900 rounded-bl-none'} shadow-sm">
+                        ${m.text}
+                    </div>
+                `;
+                container.appendChild(msgDiv);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // ==========================================
+        // SLIME STUDIO & MARKETPLACE
+        // ==========================================
+        function openStudioAndSelect(tab) {
+            openModal('studioModal');
+            switchStudioTab(tab);
+        }
+
+        function switchStudioTab(tab) {
+            document.getElementById('studioTabProfile').className = tab === 'profile' ? 'px-4 py-2 border-b-2 border-pink-500 text-pink-900 font-bold' : 'px-4 py-2 border-b-2 border-transparent text-pink-400 font-bold';
+            document.getElementById('studioTabMarket').className = tab === 'market' ? 'px-4 py-2 border-b-2 border-pink-500 text-pink-900 font-bold' : 'px-4 py-2 border-b-2 border-transparent text-pink-400 font-bold';
+            
+            const devTabBtn = document.getElementById('studioTabDev');
+            if (currentUser.role === 'developer' && currentUser.devPasscodeActive) {
+                devTabBtn.classList.remove('hidden');
+                devTabBtn.className = tab === 'dev' ? 'px-4 py-2 border-b-2 border-purple-600 text-purple-900 font-bold' : 'px-4 py-2 border-b-2 border-transparent text-purple-500 font-bold';
+            } else {
+                devTabBtn.classList.add('hidden');
+            }
+
+            const content = document.getElementById('studioContent');
+            content.innerHTML = '';
+
+            if (tab === 'profile') renderStudioProfile(content);
+            else if (tab === 'market') renderStudioMarket(content);
+            else if (tab === 'dev') renderStudioDevDashboard(content);
+        }
+
+        function renderStudioProfile(container) {
+            container.innerHTML = `
+                <div class="space-y-4 text-xs">
+                    <div class="glass-panel p-4 rounded-2xl space-y-3">
+                        <h4 class="font-bold text-pink-900 text-sm">Edit Display Name (Public)</h4>
+                        <input type="text" id="editDisplayName" value="${currentUser.displayName}" class="w-full border border-pink-200 rounded-xl px-3 py-2 text-pink-900 outline-none focus:ring-2 focus:ring-pink-400">
+                        <button onclick="saveProfileChanges()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md">Save Profile</button>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-2xl space-y-3">
+                        <h4 class="font-bold text-pink-900 text-sm">Equipped Customizations</h4>
+                        
+                        <div>
+                            <span class="text-[10px] font-bold text-pink-600 uppercase tracking-wider block mb-1">Slime Accessory</span>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="equipItem('slimeAccessory', null)" class="px-3 py-1.5 rounded-xl border border-pink-300 ${!currentUser.equipped.slimeAccessory ? 'bg-pink-500 text-white font-bold' : 'bg-white text-pink-700'}">None</button>
+                                ${(currentUser.inventory.slimeAccessories || []).map(itemId => {
+                                    const item = MARKET_ITEMS.find(i => i.id === itemId);
+                                    if (!item) return '';
+                                    const isEq = currentUser.equipped.slimeAccessory === item.id;
+                                    return `<button onclick="equipItem('slimeAccessory', '${item.id}')" class="px-3 py-1.5 rounded-xl border border-pink-300 ${isEq ? 'bg-pink-500 text-white font-bold' : 'bg-white text-pink-700'}">${item.icon} ${item.name}</button>`;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-[10px] font-bold text-pink-600 uppercase tracking-wider block mb-1">Floating Title</span>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="equipItem('title', null)" class="px-3 py-1.5 rounded-xl border border-pink-300 ${!currentUser.equipped.title ? 'bg-pink-500 text-white font-bold' : 'bg-white text-pink-700'}">Default (Newbie)</button>
+                                ${(currentUser.inventory.titles || []).map(itemId => {
+                                    const item = MARKET_ITEMS.find(i => i.id === itemId);
+                                    if (!item) return '';
+                                    const isEq = currentUser.equipped.title === item.value;
+                                    return `<button onclick="equipItem('title', '${item.value}')" class="px-3 py-1.5 rounded-xl border border-pink-300 ${isEq ? 'bg-pink-500 text-white font-bold' : 'bg-white text-pink-700'}">${item.icon} ${item.name}</button>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveProfileChanges() {
+            const newName = document.getElementById('editDisplayName').value.trim();
+            if (newName) {
+                currentUser.displayName = newName;
+                saveCurrentUser();
+                showNotification("Profile updated successfully!");
+            }
+        }
+
+        function equipItem(category, value) {
+            currentUser.equipped[category] = value;
+            saveCurrentUser();
+            switchStudioTab('profile');
+        }
+
+        function renderStudioMarket(container) {
+            container.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    ${MARKET_ITEMS.map(item => {
+                        const invList = currentUser.inventory[item.category] || [];
+                        const owned = invList.includes(item.id);
+                        return `
+                            <div class="glass-panel p-3.5 rounded-2xl flex justify-between items-center">
+                                <div class="flex items-center space-x-3">
+                                    <div class="text-2xl">${item.icon}</div>
+                                    <div>
+                                        <div class="font-bold text-pink-900 text-xs sm:text-sm">${item.name}</div>
+                                        <div class="text-[10px] text-pink-500 font-bold"><i class="fa-solid fa-gem text-pink-400 mr-1"></i>${item.price} SP</div>
+                                    </div>
+                                </div>
+                                ${owned ? 
+                                    `<span class="text-xs font-bold text-green-600 bg-green-100 px-2.5 py-1 rounded-xl">Owned</span>` :
+                                    `<button onclick="buyMarketItem('${item.id}')" class="bg-pink-500 hover:bg-pink-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow-sm">Buy</button>`
+                                }
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function buyMarketItem(itemId) {
+            const item = MARKET_ITEMS.find(i => i.id === itemId);
+            if (!item) return;
+
+            if (currentUser.sakuraPoints < item.price) {
+                showNotification(`Not enough Sakura Points! Need ${item.price} SP.`);
+                return;
+            }
+
+            currentUser.sakuraPoints -= item.price;
+            if (!currentUser.inventory[item.category]) currentUser.inventory[item.category] = [];
+            currentUser.inventory[item.category].push(item.id);
+
+            saveCurrentUser();
+            showNotification(`Purchased ${item.name}!`);
+            switchStudioTab('market');
+        }
+
+        // ==========================================
+        // DEVELOPER & ADMIN PORTAL
+        // ==========================================
+        function openDevPrompt() {
+            if (currentUser.role === 'developer' && currentUser.devPasscodeActive) {
+                // Toggle Developer Mode Off
+                currentUser.devPasscodeActive = false;
+                saveCurrentUser();
+                showNotification("Developer Mode disabled.");
+                document.getElementById('studioTabDev').classList.add('hidden');
+                return;
+            }
+            openModal('devPromptModal');
+        }
+
+        function verifyDevPasscode() {
+            const pass = document.getElementById('devPassInput').value;
+            if (pass === DEFAULT_DEV_PASSCODE) {
+                currentUser.role = 'developer';
+                currentUser.devPasscodeActive = true;
+                saveCurrentUser();
+                closeModal('devPromptModal');
+                showNotification("Developer Mode Unlocked! White Skin & Dev Title granted.");
+                openStudioAndSelect('dev');
+            } else {
+                showNotification("Incorrect Passcode!");
+            }
+        }
+
+        function renderStudioDevDashboard(container) {
+            const db = getDB();
+            const allUsers = Object.values(db.users);
+            const admins = allUsers.filter(u => u.role === 'admin');
+
+            container.innerHTML = `
+                <div class="space-y-4 text-xs">
+                    <div class="glass-panel p-4 rounded-2xl bg-purple-50/50 border-purple-200">
+                        <h4 class="font-bold text-purple-900 text-sm mb-2"><i class="fa-solid fa-user-shield mr-1"></i>Active Admins List (${admins.length})</h4>
+                        <div class="space-y-1">
+                            ${admins.length === 0 ? '<span class="text-pink-400">No active admins.</span>' : admins.map(a => `
+                                <div class="flex justify-between items-center bg-white p-2 rounded-xl">
+                                    <span class="font-bold text-purple-900">${a.displayName}</span>
+                                    <button onclick="revokeAdmin('${a.id}')" class="bg-red-500 text-white px-2 py-1 rounded-lg text-[10px]">Revoke Admin</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-2xl space-y-3">
+                        <h4 class="font-bold text-pink-900 text-sm">Registered Accounts Registry (${allUsers.length})</h4>
+                        <div class="max-h-48 overflow-y-auto space-y-2 pr-1">
+                            ${allUsers.map(u => `
+                                <div class="glass-panel p-2.5 rounded-xl flex justify-between items-center">
+                                    <div>
+                                        <div class="font-bold text-pink-900">${u.displayName}</div>
+                                        <div class="text-[10px] text-pink-600">SP: ${u.sakuraPoints || 0} | Role: ${u.role}</div>
+                                    </div>
+                                    <div class="flex space-x-1">
+                                        ${u.role !== 'admin' ? `<button onclick="makeAdmin('${u.id}')" class="bg-gray-800 text-white px-2 py-1 rounded-lg text-[10px]">Make Admin</button>` : ''}
+                                        <button onclick="grantPointsPrompt('${u.id}')" class="bg-purple-600 text-white px-2 py-1 rounded-lg text-[10px]">+SP</button>
+                                        <button onclick="deleteAccount('${u.id}')" class="bg-black text-white px-2 py-1 rounded-lg text-[10px]">Delete</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function makeAdmin(targetId) {
+            const db = getDB();
+            if (db.users[targetId]) {
+                db.users[targetId].role = 'admin';
+                saveDB(db);
+                showNotification("Promoted user to Admin! Black Skin & Title granted.");
+                switchStudioTab('dev');
+            }
+        }
+
+        function revokeAdmin(targetId) {
+            const db = getDB();
+            if (db.users[targetId]) {
+                db.users[targetId].role = 'user';
+                saveDB(db);
+                showNotification("Revoked Admin privileges.");
+                switchStudioTab('dev');
+            }
+        }
+
+        function muteUser(targetId, minutes) {
+            const db = getDB();
+            if (db.users[targetId]) {
+                db.users[targetId].status.isMuted = true;
+                db.users[targetId].status.mutedUntil = Date.now() + minutes * 60000;
+                saveDB(db);
+                showNotification(`Muted user for ${minutes} minutes.`);
+            }
+        }
+
+        function banUserModal(targetId) {
+            const db = getDB();
+            if (db.users[targetId]) {
+                db.users[targetId].status.isBanned = true;
+                saveDB(db);
+                showNotification("User account banned.");
+            }
+        }
+
+        function deleteAccount(targetId) {
+            const db = getDB();
+            delete db.users[targetId];
+            saveDB(db);
+            showNotification("Account permanently deleted.");
+            if (currentUser && currentUser.role === 'developer') switchStudioTab('dev');
+        }
+
+        function grantPointsPrompt(targetId) {
+            const amount = prompt("Enter Sakura Points to grant:", "500");
+            if (amount && !isNaN(amount)) {
+                const db = getDB();
+                if (db.users[targetId]) {
+                    db.users[targetId].sakuraPoints = (db.users[targetId].sakuraPoints || 0) + parseInt(amount);
+                    saveDB(db);
+                    showNotification(`Granted ${amount} SP!`);
+                    if (currentUser && currentUser.role === 'developer') switchStudioTab('dev');
+                }
+            }
+        }
+
+        // ==========================================
+        // PETAL CATCHER MINI-GAME
+        // ==========================================
+        function startPetalGame() {
+            gameScoreVal = 0;
+            gameTimeVal = 20;
+            petalGameActive = true;
+            document.getElementById('gameScore').innerText = `Petals: 0`;
+            document.getElementById('gameTimer').innerText = `Time: 20s`;
+            openModal('miniGameOverlay');
+
+            gameInterval = setInterval(() => {
+                gameTimeVal--;
+                gameScoreVal += Math.floor(Math.random() * 3) + 1;
+                document.getElementById('gameScore').innerText = `Petals: ${gameScoreVal}`;
+                document.getElementById('gameTimer').innerText = `Time: ${gameTimeVal}s`;
+
+                if (gameTimeVal <= 0) {
+                    stopPetalGame();
+                }
+            }, 1000);
+        }
+
+        function stopPetalGame() {
+            clearInterval(gameInterval);
+            petalGameActive = false;
+            closeModal('miniGameOverlay');
+            
+            const earnedSP = gameScoreVal * 5;
+            currentUser.sakuraPoints = (currentUser.sakuraPoints || 0) + earnedSP;
+            saveCurrentUser();
+            showNotification(`Game Over! Earned ${earnedSP} Sakura Points!`);
+        }
+
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            if (id === 'searchModal') renderUserSearchList();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function showNotification(msg) {
+            const notif = document.createElement('div');
+            notif.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 glass-panel border border-pink-400 text-pink-900 text-xs font-bold px-4 py-2 rounded-2xl shadow-xl z-50 transition duration-300';
+            notif.innerText = msg;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 2500);
+        }
+    </script>
 </body>
 </html>
