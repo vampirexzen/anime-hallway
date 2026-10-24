@@ -1,490 +1,92 @@
-// --- SUPABASE CONFIGURATION ---
-const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// --- GLOBAL APP STATE ---
-let currentUser = null;
-let userProfile = null;
-let activeChatTab = 'global';
-let activeDMRecipient = null;
-let parkPlayers = {};
-let marketplaceItems = [
-    // Skins (500 to 15,000 Pts)
-    { id: 'pink_sakura', name: 'Sakura Pink Slime', type: 'skin', price: 500, color: '#ffb7c5', glow: null },
-    { id: 'mint_leaf', name: 'Mint Leaf Slime', type: 'skin', price: 1500, color: '#98ff98', glow: null },
-    { id: 'golden_glow', name: 'Golden Aura Slime', type: 'skin', price: 7500, color: '#ffd700', glow: '#ffea00' },
-    { id: 'icy_cosmic', name: 'Cosmic Ice Slime', type: 'skin', price: 15000, color: '#00ffff', glow: '#00ffff' },
-    // Accessories
-    { id: 'hat_cap', name: 'Cherry Cap', type: 'accessory', price: 800, icon: '🧢' },
-    { id: 'spiky_hair', name: 'Spiky Hair', type: 'accessory', price: 2000, icon: '🦔' },
-    { id: 'bow_tie', name: 'Fancy Bowtie', type: 'accessory', price: 3500, icon: '🎀' },
-    // Titles
-    { id: 'title_bloomer', name: 'Sakura Bloomer', type: 'title', price: 1000, titleText: 'Sakura Bloomer' },
-    { id: 'title_legend', name: 'Park Legend', type: 'title', price: 10000, titleText: 'Park Legend' },
-    // Frames
-    { id: 'frame_blossom', name: 'Blossom Border', type: 'frame', price: 1200, borderStyle: '3px solid #ffb7c5' }
-];
-let selectedMarketItem = null;
-let activeMarketTab = 'skins';
-
-// Game Canvas Engine Variables
-let canvas, ctx;
-let playerX = 400, playerY = 300, playerVelocityY = 0, isJumping = false, bounceOffset = 0;
-let keysPressed = {};
-
-// --- INITIALIZATION ---
-window.addEventListener('DOMContentLoaded', () => {
-    initCanvas();
-    setupEventListeners();
-    startPassivePointsTimer();
-});
-
-function initCanvas() {
-    canvas = document.getElementById('parkCanvas');
-    ctx = canvas.getContext('2d');
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    requestAnimationFrame(gameLoop);
-}
-
-function resizeCanvas() {
-    const wrapper = canvas.parentElement;
-    canvas.width = wrapper.clientWidth;
-    canvas.height = wrapper.clientHeight;
-}
-
-// --- AUTHENTICATION MODULE ---
-function switchAuthMode(mode) {
-    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-    document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
-    document.getElementById('auth-btn').innerText = mode === 'login' ? 'Enter Sakura Park' : 'Create Account';
-    document.getElementById('auth-form').dataset.mode = mode;
-}
-
-async function handleAuth(e) {
-    e.preventDefault();
-    const username = document.getElementById('auth-username').value.trim();
-    const password = document.getElementById('auth-password').value.trim();
-    const mode = document.getElementById('auth-form').dataset.mode || 'login';
-    const errorDiv = document.getElementById('auth-error');
-    errorDiv.innerText = '';
-
-    if (!username || !password) return;
-
-    if (mode === 'signup') {
-        const { data: existing } = await supabaseClient.from('profiles').select('id').eq('username', username).single();
-        if (existing) return errorDiv.innerText = 'Username already exists.';
-
-        const { data, error } = await supabaseClient.from('profiles').insert([{ username, password_hash: password }]).select().single();
-        if (error) return errorDiv.innerText = error.message;
-        
-        userProfile = data;
-        finishLogin();
-    } else {
-        const { data, error } = await supabaseClient.from('profiles').select('*').eq('username', username).eq('password_hash', password).single();
-        if (error || !data) return errorDiv.innerText = 'Invalid username or password.';
-        if (data.is_banned) return errorDiv.innerText = 'This account has been banned.';
-
-        userProfile = data;
-        finishLogin();
-    }
-}
-
-function finishLogin() {
-    document.getElementById('auth-screen').classList.add('hidden');
-    document.getElementById('app-screen').classList.remove('hidden');
-    updateUIProfile();
-    setupRealtimeSubscriptions();
-    fetchFriendsList();
-    fetchGlobalMessages();
-}
-
-function handleSignOut() {
-    location.reload();
-}
-
-function updateUIProfile() {
-    document.getElementById('header-points').innerHTML = `<i class="fa-solid fa-coins"></i> ${userProfile.points} Pts`;
-    document.getElementById('profile-display-name').innerText = userProfile.username;
-    document.getElementById('profile-title').innerText = userProfile.equipped_title || 'Cherry Novice';
-    document.getElementById('profile-role-badge').innerText = userProfile.role.toUpperCase();
-    document.getElementById('profile-avatar-img').src = userProfile.avatar_url;
-    
-    // Toggle Admin/Dev Specific Panels
-    const isDev = userProfile.role === 'developer';
-    const isAdmin = userProfile.role === 'admin' || isDev;
-    document.getElementById('dev-panel-btn').classList.toggle('hidden', !isAdmin);
-    document.getElementById('admin-skin-toggle').classList.toggle('hidden', userProfile.role !== 'admin');
-    document.getElementById('dev-only-controls').classList.toggle('hidden', !isDev);
-}
-
-// --- REALTIME PRESENCE & CHAT MODULE ---
-function setupRealtimeSubscriptions() {
-    // Park Presence Channel
-    const presenceChannel = supabaseClient.channel('park_room');
-    
-    presenceChannel.on('broadcast', { event: 'player_move' }, ({ payload }) => {
-        parkPlayers[payload.user_id] = payload;
-    }).subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-            broadcastMovement();
-        }
-    });
-
-    // Global Chat Realtime
-    supabaseClient.channel('global_chat_channel')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_chat' }, payload => {
-            appendGlobalMessage(payload.new);
-        }).subscribe();
-
-    // Direct Messages Realtime
-    supabaseClient.channel('dm_channel')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'direct_messages' }, payload => {
-            if (payload.new.receiver_id === userProfile.id || payload.new.sender_id === userProfile.id) {
-                appendDMMessage(payload.new);
-            }
-        }).subscribe();
-}
-
-function broadcastMovement(speech = '', emote = '') {
-    supabaseClient.channel('park_room').send({
-        type: 'broadcast',
-        event: 'player_move',
-        payload: {
-            user_id: userProfile.id,
-            username: userProfile.username,
-            role: userProfile.role,
-            x: playerX,
-            y: playerY,
-            skin: userProfile.equipped_skin,
-            accessory: userProfile.equipped_accessory,
-            title: userProfile.equipped_title,
-            speech_bubble: speech,
-            emote: emote
-        }
-    });
-}
-
-// --- CANVAS GAME LOOP & GRAPHICS ---
-function gameLoop() {
-    updatePlayerMovement();
-    renderPark();
-    requestAnimationFrame(gameLoop);
-}
-
-function updatePlayerMovement() {
-    const speed = 4;
-    let moved = false;
-
-    if (keysPressed['ArrowUp'] || keysPressed['KeyW']) { playerY -= speed; moved = true; }
-    if (keysPressed['ArrowDown'] || keysPressed['KeyS']) { playerY += speed; moved = true; }
-    if (keysPressed['ArrowLeft'] || keysPressed['KeyA']) { playerX -= speed; moved = true; }
-    if (keysPressed['ArrowRight'] || keysPressed['KeyD']) { playerX += speed; moved = true; }
-
-    if (moved) {
-        bounceOffset = Math.abs(Math.sin(Date.now() / 100)) * 10;
-        broadcastMovement();
-    } else {
-        bounceOffset = 0;
-    }
-
-    if (isJumping) {
-        playerY -= playerVelocityY;
-        playerVelocityY -= 0.8;
-        if (playerVelocityY < -10) { isJumping = false; }
-    }
-}
-
-function renderPark() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Render Sakura Blossom Park Background
-    ctx.fillStyle = '#2b1736';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw decorative Sakura Trees
-    ctx.fillStyle = '#ffb7c5';
-    ctx.beginPath(); ctx.arc(100, 100, 60, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(canvas.width - 100, 120, 80, 0, Math.PI * 2); ctx.fill();
-
-    // Render Self Slime
-    drawSlime(playerX, playerY - bounceOffset, userProfile.equipped_skin, userProfile.equipped_accessory, userProfile.username, userProfile.equipped_title, userProfile.role);
-
-    // Render Other Realtime Players
-    Object.values(parkPlayers).forEach(p => {
-        if (p.user_id !== userProfile.id) {
-            drawSlime(p.x, p.y, p.skin, p.accessory, p.username, p.title, p.role, p.speech_bubble, p.emote);
-        }
-    });
-}
-
-function drawSlime(x, y, skinId, accessoryId, username, title, role, speech = '', emote = '') {
-    ctx.save();
-    
-    // Check Glow / Aura
-    let skinData = marketplaceItems.find(i => i.id === skinId) || { color: '#ffb7c5' };
-    
-    if (role === 'developer') {
-        skinData = { color: '#ffffff', glow: '#00ffff' };
-        title = 'DEV';
-    } else if (role === 'admin' && skinId === 'admin_black') {
-        skinData = { color: '#111111', glow: '#ff0000' };
-        title = 'Admin';
-    }
-
-    if (skinData.glow) {
-        ctx.shadowColor = skinData.glow;
-        ctx.shadowBlur = 15;
-    }
-
-    // Draw Slime Body
-    ctx.fillStyle = skinData.color;
-    ctx.beginPath();
-    ctx.ellipse(x, y, 25, 20, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Draw Eyes
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.arc(x - 8, y - 4, 3, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x + 8, y - 4, 3, 0, Math.PI * 2); ctx.fill();
-
-    // Draw Accessories
-    if (accessoryId === 'hat_cap') { ctx.fillText('🧢', x - 8, y - 20); }
-    if (accessoryId === 'spiky_hair') { ctx.fillText('🦔', x - 8, y - 20); }
-    if (accessoryId === 'bow_tie') { ctx.fillText('🎀', x - 8, y + 10); }
-
-    // Draw Username and Title
-    ctx.font = '12px sans-serif';
-    ctx.textAlign = 'center';
-    
-    if (title) {
-        ctx.fillStyle = role === 'developer' ? '#00ffff' : (role === 'admin' ? '#ff3333' : '#ffb7c5');
-        ctx.fillText(`[${title}]`, x, y - 35);
-    }
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(username, x, y - 22);
-
-    // Draw Speech Bubble
-    if (speech) {
-        ctx.fillStyle = 'white';
-        ctx.fillRect(x - 40, y - 60, 80, 20);
-        ctx.fillStyle = 'black';
-        ctx.fillText(speech, x, y - 46);
-    }
-
-    ctx.restore();
-}
-
-// --- CONTROLS LISTENERS ---
-function setupEventListeners() {
-    window.addEventListener('keydown', e => keysPressed[e.code] = true);
-    window.addEventListener('keyup', e => keysPressed[e.code] = false);
-
-    document.getElementById('jump-btn').addEventListener('click', () => {
-        if (!isJumping) { isJumping = true; playerVelocityY = 10; }
-    });
-}
-
-// --- CHAT SYSTEM ---
-async function sendGlobalMessage() {
-    if (userProfile.is_muted) return alert('You are currently muted.');
-    const input = document.getElementById('global-input');
-    const msg = input.value.trim();
-    if (!msg) return;
-
-    await supabaseClient.from('global_chat').insert([{
-        user_id: userProfile.id,
-        username: userProfile.username,
-        role: userProfile.role,
-        message: msg
-    }]);
-    input.value = '';
-}
-
-function appendGlobalMessage(data) {
-    const list = document.getElementById('global-messages');
-    const div = document.createElement('div');
-    div.className = `chat-msg ${data.role}`;
-    div.innerHTML = `<span class="sender" onclick="openUserAction('${data.username}')">${data.username}:</span> ${data.message}`;
-    list.appendChild(div);
-    list.scrollTop = list.scrollHeight;
-}
-
-// --- FRIENDS & DM SYSTEM ---
-async function fetchFriendsList() {
-    const { data } = await supabaseClient.from('friendships')
-        .select('user2_id, profiles!friendships_user2_id_fkey(username)')
-        .eq('user1_id', userProfile.id);
-
-    const listDiv = document.getElementById('friends-list');
-    listDiv.innerHTML = '';
-    (data || []).forEach(f => {
-        const item = document.createElement('div');
-        item.className = 'form-group inline';
-        item.innerHTML = `
-            <span>${f.profiles.username}</span>
-            <button class="btn-secondary" onclick="startDM('${f.user2_id}', '${f.profiles.username}')">DM</button>
-            <button class="btn-primary" style="background:#cc0000;" onclick="removeFriend('${f.user2_id}')">Unfriend</button>
-        `;
-        listDiv.appendChild(item);
-    });
-}
-
-async function searchAndAddFriend() {
-    const name = document.getElementById('search-user-input').value.trim();
-    const { data: target } = await supabaseClient.from('profiles').select('id, username').eq('username', name).single();
-    if (!target) return alert('User not found.');
-
-    await supabaseClient.from('friendships').insert([{ user1_id: userProfile.id, user2_id: target.id }]);
-    alert(`Added ${target.username} as friend!`);
-    fetchFriendsList();
-}
-
-async function removeFriend(targetId) {
-    await supabaseClient.from('friendships').delete().eq('user1_id', userProfile.id).eq('user2_id', targetId);
-    fetchFriendsList();
-}
-
-function startDM(userId, username) {
-    activeDMRecipient = { id: userId, username };
-    document.getElementById('dm-target-name').innerText = `DM with ${username}`;
-    document.getElementById('dm-input').disabled = false;
-    document.getElementById('dm-send-btn').disabled = false;
-    switchChatTab('dm');
-}
-
-async function sendDirectMessage() {
-    if (!activeDMRecipient) return;
-    const input = document.getElementById('dm-input');
-    const msg = input.value.trim();
-    if (!msg) return;
-
-    await supabaseClient.from('direct_messages').insert([{
-        sender_id: userProfile.id,
-        receiver_id: activeDMRecipient.id,
-        message: msg
-    }]);
-    input.value = '';
-}
-
-function appendDMMessage(data) {
-    const list = document.getElementById('dm-messages');
-    const div = document.createElement('div');
-    div.className = 'chat-msg';
-    div.innerHTML = `<span class="sender">${data.sender_id === userProfile.id ? 'Me' : activeDMRecipient.username}:</span> ${data.message}`;
-    list.appendChild(div);
-    list.scrollTop = list.scrollHeight;
-}
-
-// --- MARKETPLACE MODULE ---
-function switchMarketTab(tab) {
-    activeMarketTab = tab;
-    renderMarketCatalog();
-}
-
-function renderMarketCatalog() {
-    const grid = document.getElementById('market-items-grid');
-    grid.innerHTML = '';
-    const filtered = marketplaceItems.filter(i => i.type === activeMarketTab.slice(0, -1) || i.type === activeMarketTab);
-
-    filtered.forEach(item => {
-        const card = document.createElement('div');
-        card.className = `market-item-card ${selectedMarketItem?.id === item.id ? 'selected' : ''}`;
-        card.innerHTML = `<h4>${item.name}</h4><p>${item.price} Pts</p>`;
-        card.onclick = () => {
-            selectedMarketItem = item;
-            renderMarketCatalog();
-            document.getElementById('preview-item-name').innerText = item.name;
-            document.getElementById('preview-item-price').innerText = `${item.price} Pts`;
-            document.getElementById('buy-item-btn').disabled = false;
-        };
-        grid.appendChild(card);
-    });
-}
-
-async function buySelectedItem() {
-    if (!selectedMarketItem) return;
-    if (userProfile.points < selectedMarketItem.price) return alert('Not enough points!');
-
-    const newPoints = userProfile.points - selectedMarketItem.price;
-    await supabaseClient.from('profiles').update({
-        points: newPoints,
-        [`equipped_${selectedMarketItem.type}`]: selectedMarketItem.id
-    }).eq('id', userProfile.id);
-
-    userProfile.points = newPoints;
-    userProfile[`equipped_${selectedMarketItem.type}`] = selectedMarketItem.id;
-    updateUIProfile();
-    alert(`Purchased ${selectedMarketItem.name}!`);
-}
-
-// --- PASSIVE POINTS & MINIGAMES ---
-function startPassivePointsTimer() {
-    setInterval(async () => {
-        if (userProfile) {
-            userProfile.points += 1;
-            await supabaseClient.from('profiles').update({ points: userProfile.points }).eq('id', userProfile.id);
-            updateUIProfile();
-        }
-    }, 15 * 60 * 1000); // 15 Minutes
-}
-
-// --- DEVELOPER & ADMIN CONTROLS ---
-function toggleDevMode(enable) {
-    const code = document.getElementById('dev-passcode-input').value;
-    if (enable && code === '1357') {
-        userProfile.role = 'developer';
-        alert('Developer Mode Activated!');
-    } else if (!enable) {
-        userProfile.role = 'user';
-        alert('Developer Mode Deactivated!');
-    } else {
-        return alert('Incorrect Passcode');
-    }
-    updateUIProfile();
-    broadcastMovement();
-}
-
-async function adminAction(actionType) {
-    const targetName = document.getElementById('admin-target-username').value.trim();
-    if (!targetName) return;
-
-    if (actionType === 'make_admin') {
-        await supabaseClient.from('profiles').update({ role: 'admin' }).eq('username', targetName);
-    } else if (actionType === 'revoke_admin') {
-        await supabaseClient.from('profiles').update({ role: 'user' }).eq('username', targetName);
-    } else if (actionType === 'ban') {
-        await supabaseClient.from('profiles').update({ is_banned: true }).eq('username', targetName);
-    } else if (actionType === 'unban') {
-        await supabaseClient.from('profiles').update({ is_banned: false }).eq('username', targetName);
-    } else if (actionType === 'delete') {
-        await supabaseClient.from('profiles').delete().eq('username', targetName);
-    }
-    alert(`Action ${actionType} performed on ${targetName}`);
-}
-
-async function adminSendPoints() {
-    const targetName = document.getElementById('admin-target-username').value.trim();
-    const amount = parseInt(document.getElementById('admin-points-amount').value);
-    
-    const { data: target } = await supabaseClient.from('profiles').select('points').eq('username', targetName).single();
-    if (target) {
-        await supabaseClient.from('profiles').update({ points: target.points + amount }).eq('username', targetName);
-        alert(`Updated ${targetName}'s points by ${amount}`);
-    }
-}
-
-// UI HELPER FUNCTIONS
-function toggleModal(modalId) {
-    document.getElementById(modalId).classList.toggle('hidden');
-}
-
-function switchChatTab(tab) {
-    document.getElementById('global-chat-panel').classList.toggle('hidden', tab !== 'global');
-    document.getElementById('dm-chat-panel').classList.toggle('hidden', tab !== 'dm');
-    document.getElementById('tab-global-chat').classList.toggle('active', tab === 'global');
-    document.getElementById('tab-dm-chat').classList.toggle('active', tab === 'dm');
-}
+(function(){
+"use strict";
+const SB_URL="https://brvyjdtnxzjlrhukngjn.supabase.co";
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJicnZ5amR0bnh6amxyaHVrbmdqbiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzkyNTEwMDI3LCJleHAiOjIxMDgwODYwMjN9.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE";
+const DEV_CODE="1357", $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const db=window.supabase.createClient(SB_URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const S={user:null,profile:null,profiles:new Map(),players:new Map(),items:[],friends:new Set(),view:"park",dev:false,category:"all",preview:null,mode:"global",dm:null,channel:null,heartbeat:null,frame:null,lastWrite:0,x:50,y:61,jump:0,jv:0,keys:new Set(),joy:{x:0,y:0},bubble:"",bubbleEnd:0,emote:"",emoteEnd:0,dancing:false,memory:null,petal:null,audio:null,musicTimer:null,music:{enabled:false,track:"sakura"},toast:null};
+const auth=$("#auth-screen"),shell=$("#app-shell");
+function toast(m){const n=$("#toast");n.textContent=m;n.classList.add("show");clearTimeout(S.toast);S.toast=setTimeout(()=>n.classList.remove("show"),3200)}
+function note(id,m,bad){const n=$("#"+id);if(n){n.textContent=m||"";n.style.color=bad?"#b84c61":""}}
+function msg(e){return String(e&&(e.message||e.details)||"Something went wrong. Please try again.")}
+function staff(){return S.profile&&["admin","developer"].includes(S.profile.role)}
+function imgUrl(v){try{const u=new URL(v);return /^https?:$/.test(u.protocol)?u.href:""}catch(_){return""}}
+function prof(id){return S.profiles.get(id)||(S.profile&&id===S.profile.id?S.profile:null)}
+function updateProfile(p){if(!p)return;S.profiles.set(p.id,p);if(S.user&&p.id===S.user.id){S.profile=p;$("#points-count").textContent=Number(p.points||0).toLocaleString();$("#market-points").textContent=Number(p.points||0).toLocaleString();$("#header-username").textContent=p.username||"Slime";const f=$("#profile-form");if(document.activeElement!==f.elements.username)f.elements.username.value=p.username||"";if(document.activeElement!==f.elements.profile_picture)f.elements.profile_picture.value=p.profile_picture||"";$("#profile-role").textContent=p.role==="admin"?"Admin":p.role==="developer"?"Developer":"Visitor";const av=$("#profile-avatar"),src=imgUrl(p.profile_picture);av.replaceChildren();if(src){const i=document.createElement("img");i.src=src;i.alt="Profile picture";i.referrerPolicy="no-referrer";i.onerror=()=>av.textContent="🌸";av.appendChild(i)}else av.textContent="🌸";$("#admin-style-button").classList.toggle("hidden",p.role!=="admin");$("#admin-style-button").textContent=p.admin_style_enabled?"Unequip admin look":"Equip admin look";const show=p.role==="admin"||(p.role==="developer"&&S.dev);$("#moderation-panel").classList.toggle("hidden",!show);$("#points-tools").classList.toggle("hidden",p.role!=="developer"||!S.dev);renderPlayers()}}
+async function loadProfile(){const {data,error}=await db.from("profiles").select("id,username,profile_picture,points,role,admin_style_enabled,owned_item_ids,equipped_item_ids").eq("id",S.user.id).maybeSingle();if(error)throw error;if(!data)throw Error("Your profile is still being prepared. Please refresh.");updateProfile(data);return data}
+async function loadProfiles(){const {data,error}=await db.from("profiles").select("id,username,profile_picture,role,admin_style_enabled,equipped_item_ids,owned_item_ids");if(error){console.warn(error);return}(data||[]).forEach(updateProfile)}
+function showApp(){auth.classList.add("hidden");shell.classList.remove("hidden")}
+function showAuth(){shell.classList.add("hidden");auth.classList.remove("hidden")}
+function openView(name){if(!$("#view-"+name))return;S.view=name;$$(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+name));$$("[data-view-link]").forEach(b=>b.classList.toggle("active",b.dataset.viewLink===name));if(name==="social"){loadFriends().catch(e=>toast(msg(e)));loadGlobal().catch(console.warn)}if(name==="market")loadMarket().catch(e=>toast(msg(e)));if(name==="profile")loadMusic().catch(console.warn);if(name==="park")requestAnimationFrame(renderPlayers)}
+async function signin(e){e.preventDefault();const f=e.currentTarget,b=f.querySelector("button");b.disabled=true;const {error}=await db.auth.signInWithPassword({email:f.elements.email.value.trim(),password:f.elements.password.value});b.disabled=false;if(error)note("auth-notice",msg(error),true)}
+async function signup(e){e.preventDefault();const f=e.currentTarget,u=f.elements.username.value.trim();if(!/^[A-Za-z0-9_]{3,24}$/.test(u))return note("auth-notice","Use 3–24 letters, numbers, or underscores.",true);const b=f.querySelector("button");b.disabled=true;const {data,error}=await db.auth.signUp({email:f.elements.email.value.trim(),password:f.elements.password.value,options:{data:{username:u}}});b.disabled=false;if(error)note("auth-notice",msg(error),true);else note("auth-notice",data.session?"Welcome! Your account is ready.":"Check your email to confirm your account, then sign in.")}
+function authTab(tab){$$(".auth-tab").forEach(b=>b.classList.toggle("active",b.dataset.authTab===tab));$("#signin-form").classList.toggle("hidden",tab!=="signin");$("#signup-form").classList.toggle("hidden",tab!=="signup");note("auth-notice","")}
+async function enter(user){if(!user){stopAll();S.user=null;S.profile=null;showAuth();return}S.user=user;showApp();try{await loadProfile();await loadProfiles();await Promise.all([loadPresence(),loadMarket(),loadFriends(),loadGlobal(),loadMusic()]);startRealtime();loop();heartbeat();openView(S.view)}catch(e){console.error(e);toast(msg(e))}}
+function title(p,id){if(!p)return"";if(id===S.user.id&&S.dev)return"DEV";if(p.role==="admin"&&p.admin_style_enabled)return"Admin";return""}
+function avatar(p){const src=p&&imgUrl(p.profile_picture);if(src){const i=document.createElement("img");i.className="result-avatar";i.src=src;i.alt="";i.referrerPolicy="no-referrer";i.onerror=()=>i.replaceWith(emojiAvatar());return i}return emojiAvatar()}
+function emojiAvatar(){const a=document.createElement("span");a.className="result-avatar";a.textContent="🌸";return a}
+function userInfo(p,detail){const d=document.createElement("div");d.className="result-user-info";const b=document.createElement("strong");b.textContent=p?p.username:"Slime";const s=document.createElement("small");s.textContent=detail;d.append(b,s);return d}
+function accessory(p){if(!p||!Array.isArray(p.equipped_item_ids))return"";const i=S.items.find(x=>p.equipped_item_ids.includes(x.id)&&["accessory","avatar"].includes(x.category));return i?i.emoji:""}
+function playerNode(id,row){const p=prof(id),node=document.createElement("div"),mine=id===S.user.id;node.className="slime-player"+(mine?" self":"")+(mine&&S.dev?" dev":"")+(p&&p.role==="admin"&&p.admin_style_enabled&&!(mine&&S.dev)?" admin":"")+(mine&&S.dancing&&Date.now()<S.emoteEnd?" dancing":"");node.style.left=(mine?S.x:Number(row.x||50))+"%";node.style.top=(mine?S.y:Number(row.y||61))+"%";
+const skin=S.items.find(i=>p&&Array.isArray(p.equipped_item_ids)&&p.equipped_item_ids.includes(i.id)&&i.category==="skin");if(skin&&/peach/i.test(skin.name))node.classList.add("skin-peach");if(skin&&/starlight/i.test(skin.name))node.classList.add("skin-starlight");const t=title(p,id);if(t){const a=document.createElement("span");a.className="slime-title";a.textContent=t;node.appendChild(a)}
+if(row.message&&new Date(row.message_until||0).getTime()>Date.now()){const b=document.createElement("span");b.className="slime-bubble";b.textContent=row.message;node.appendChild(b)}
+const ac=accessory(p);if(ac){const a=document.createElement("span");a.className="slime-accessory";a.textContent=ac;node.appendChild(a)}
+const n=document.createElement("span");n.className="slime-name";n.textContent=p?p.username:"Slime";node.appendChild(n);
+const body=document.createElement("div");body.className="slime-body";const face=document.createElement("div");face.className="slime-face";for(let i=0;i<2;i++){const eye=document.createElement("i");eye.className="slime-eye";face.appendChild(eye)}const mouth=document.createElement("i");mouth.className="slime-mouth";face.appendChild(mouth);body.appendChild(face);if(mine&&S.jump>0)body.style.transform="translateY("+(-S.jump)+"px)";node.appendChild(body);
+if(row.emote&&new Date(row.emote_until||0).getTime()>Date.now()){const em=document.createElement("span");em.className="slime-accessory";em.style.bottom="82px";em.textContent=row.emote;node.appendChild(em)}
+if(!mine)node.addEventListener("click",()=>playerCard(id));return node}
+function renderPlayers(){const host=$("#players-layer");if(!host||!S.user)return;const online=Array.from(S.players.entries()).filter(([,r])=>Date.now()-Number(r.ms||0)<70000);if(!online.some(([id])=>id===S.user.id))online.push([S.user.id,{x:S.x,y:S.y,ms:Date.now()}]);host.replaceChildren(...online.map(([id,r])=>playerNode(id,r)));$("#online-count").textContent=online.length}
+async function loadPresence(){const {data,error}=await db.from("park_presence").select("*");if(error)throw error;S.players.clear();(data||[]).forEach(r=>{const ms=new Date(r.updated_at).getTime();if(Date.now()-ms<70000)S.players.set(r.user_id,Object.assign({},r,{ms}))});renderPlayers()}
+async function writePresence(){if(!S.user||!S.profile||Date.now()-S.lastWrite<350)return;S.lastWrite=Date.now();const now=Date.now(),r={user_id:S.user.id,x:Math.round(S.x*10)/10,y:Math.round(S.y*10)/10,message:S.bubbleEnd>now?S.bubble:null,message_until:S.bubbleEnd?new Date(S.bubbleEnd).toISOString():null,emote:S.emoteEnd>now?S.emote:null,emote_until:S.emoteEnd?new Date(S.emoteEnd).toISOString():null,updated_at:new Date(now).toISOString()};const {error}=await db.from("park_presence").upsert(r,{onConflict:"user_id"});if(error)console.warn("Presence update failed",error);else{S.players.set(S.user.id,Object.assign({},r,{ms:now}));renderPlayers()}}
+function heartbeat(){clearInterval(S.heartbeat);writePresence();S.heartbeat=setInterval(()=>{writePresence();if(S.view==="park")db.rpc("award_presence_point").then(({data,error})=>{if(error)console.warn(error);else if(data&&data.awarded){loadProfile().catch(console.warn);toast("You earned 1 petal point for being here. 🌸")}})},60000)}
+function loop(){if(S.frame)return;let before=performance.now();const tick=now=>{if(!S.user){S.frame=null;return}const dt=Math.min((now-before)/1000,.05);before=now;const dx=((S.keys.has("arrowright")||S.keys.has("d"))?1:0)-((S.keys.has("arrowleft")||S.keys.has("a"))?1:0)+S.joy.x,dy=((S.keys.has("arrowdown")||S.keys.has("s"))?1:0)-((S.keys.has("arrowup")||S.keys.has("w"))?1:0)+S.joy.y,l=Math.hypot(dx,dy)||1;if(dx||dy){S.x=Math.max(5,Math.min(95,S.x+dx/l*22*dt));S.y=Math.max(30,Math.min(88,S.y+dy/l*18*dt))}if(S.jump>0||S.jv>0){S.jump+=S.jv*dt;S.jv-=880*dt;if(S.jump<0){S.jump=0;S.jv=0}}if(S.bubbleEnd&&now>S.bubbleEnd){S.bubble="";S.bubbleEnd=0}if(S.emoteEnd&&now>S.emoteEnd){S.emote="";S.emoteEnd=0;S.dancing=false}const selfNode=$(".slime-player.self");if(selfNode){selfNode.style.left=S.x+"%";selfNode.style.top=S.y+"%";const body=selfNode.querySelector(".slime-body");if(body)body.style.transform=S.jump>0?"translateY("+(-S.jump)+"px)":""}if(now-S.lastWrite>3000)writePresence();S.frame=requestAnimationFrame(tick)};S.frame=requestAnimationFrame(tick)}
+function jump(){if(S.jump<=0)S.jv=340}
+function emote(icon,text){S.emote=icon;S.emoteEnd=Date.now()+2200;if(text){S.bubble=text;S.bubbleEnd=Date.now()+3500}writePresence();renderPlayers()}
+async function loadGlobal(){const {data,error}=await db.from("chat_messages").select("id,user_id,body,created_at").order("created_at",{ascending:false}).limit(35);if(error)throw error;renderGlobal((data||[]).reverse())}
+function bubbles(host,rows,direct){host.replaceChildren();if(!rows.length){const p=document.createElement("p");p.className="empty-message";p.textContent=direct?"Say a kind hello to your friend.":"The park is quiet. Start the conversation.";host.appendChild(p);return}rows.forEach(r=>{const div=document.createElement("div");div.className="message-bubble"+(r.user_id===S.user.id?" mine":"");const who=document.createElement("strong");who.textContent=(prof(r.user_id)||{}).username||"Slime";const body=document.createElement("span");body.textContent=r.body;const time=document.createElement("small");time.textContent=new Date(r.created_at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});div.append(who,body,time);host.appendChild(div)});host.scrollTop=host.scrollHeight}
+function renderGlobal(rows){const preview=$("#park-chat-preview");preview.replaceChildren();const recent=rows.slice(-5);if(!recent.length){const p=document.createElement("p");p.className="tiny-note";p.textContent="Be the first to say hello.";preview.appendChild(p)}recent.forEach(r=>{const p=document.createElement("p");p.className="chat-line";const b=document.createElement("strong");b.textContent=(prof(r.user_id)||{}).username||"Slime";p.append(b,document.createTextNode(": "+r.body));preview.appendChild(p)});if(S.mode==="global")bubbles($("#messages-list"),rows,false)}
+async function sendGlobal(text){const body=text.trim();if(!body)return;const {error}=await db.from("chat_messages").insert({user_id:S.user.id,body});if(error)throw error;S.bubble=body.slice(0,55);S.bubbleEnd=Date.now()+5000;writePresence()}
+async function loadDm(){if(!S.dm){bubbles($("#messages-list"),[],true);return}const id=S.user.id,friend=S.dm;const {data,error}=await db.from("dm_messages").select("id,sender_id,recipient_id,body,created_at").or("sender_id.eq."+id+",recipient_id.eq."+id).order("created_at").limit(100);if(error)throw error;const rows=(data||[]).filter(m=>(m.sender_id===id&&m.recipient_id===friend)||(m.sender_id===friend&&m.recipient_id===id)).map(m=>Object.assign({},m,{user_id:m.sender_id}));bubbles($("#messages-list"),rows,true)}
+async function sendDm(text){if(!S.dm||!S.friends.has(S.dm))throw Error("You can only message a friend. Add them again to reopen DMs.");const {error}=await db.from("dm_messages").insert({sender_id:S.user.id,recipient_id:S.dm,body:text.trim()});if(error)throw error}
+function picker(){const host=$("#dm-friend-picker");host.replaceChildren();host.classList.toggle("hidden",S.mode!=="dm");S.friends.forEach(id=>{const b=document.createElement("button");b.textContent=(prof(id)||{}).username||"Friend";b.classList.toggle("active",S.dm===id);b.addEventListener("click",()=>{S.dm=id;picker();loadDm().catch(e=>toast(msg(e)))});host.appendChild(b)});if(S.mode==="dm"&&!S.friends.size){const s=document.createElement("span");s.className="tiny-note";s.textContent="Add a friend to start a private conversation.";host.appendChild(s)}}
+function setMode(mode){S.mode=mode;$("#global-tab").classList.toggle("active",mode==="global");$("#dm-tab").classList.toggle("active",mode==="dm");$("#social-chat-input").placeholder=mode==="dm"?"Message your friend…":"Write a message…";$("#dm-note").textContent=mode==="dm"?"Only you and your selected friend can read this conversation.":"Direct messages are available to friends only.";picker();(mode==="global"?loadGlobal():loadDm()).catch(e=>toast(msg(e)))}
+async function loadFriends(){if(!S.user)return;const {data:fr,error}=await db.from("friendships").select("friend_id").eq("user_id",S.user.id);if(error)throw error;S.friends=new Set((fr||[]).map(x=>x.friend_id));const {data:req,error:er}=await db.from("friend_requests").select("id,requester_id,created_at").eq("recipient_id",S.user.id).eq("status","pending").order("created_at",{ascending:false});if(er)throw er;const rh=$("#friend-requests");rh.replaceChildren();if(!req||!req.length){const p=document.createElement("p");p.className="tiny-note";p.textContent="No new friend requests.";rh.appendChild(p)}(req||[]).forEach(r=>{const p=prof(r.requester_id),row=document.createElement("div");row.className="request-row";row.append(avatar(p),userInfo(p,"Wants to be friends"));const b=document.createElement("button");b.className="small-button accept";b.textContent="Accept";b.onclick=async()=>{b.disabled=true;const {error}=await db.rpc("respond_friend_request",{request_id:r.id,accept_request:true});if(error){b.disabled=false;toast(msg(error))}else{await loadFriends();toast("Friend request accepted. ♡")}};row.appendChild(b);rh.appendChild(row)});
+const host=$("#friends-list");host.replaceChildren();if(!S.friends.size){const p=document.createElement("p");p.className="tiny-note";p.textContent="Your friend list is waiting for its first bloom.";host.appendChild(p)}S.friends.forEach(id=>{const p=prof(id),row=document.createElement("div");row.className="friend-row";row.append(avatar(p),userInfo(p,"Friend"));const dm=document.createElement("button");dm.className="small-button";dm.textContent="Message";dm.onclick=()=>{S.dm=id;setMode("dm");openView("social")};const rm=document.createElement("button");rm.className="small-button";rm.textContent="Remove";rm.onclick=async()=>{const {error}=await db.rpc("remove_friend",{friend_user_id:id});if(error)toast(msg(error));else{await loadFriends();toast("Friend removed.")}};row.append(dm,rm);host.appendChild(row)});picker()}
+async function searchUsers(q){const v=q.trim();if(!/^[A-Za-z0-9_]{1,24}$/.test(v))throw Error("Enter a username using letters, numbers, or underscores.");const {data,error}=await db.from("profiles").select("id,username,profile_picture,role").ilike("username",v).neq("id",S.user.id).limit(12);if(error)throw error;const host=$("#search-results");host.replaceChildren();if(!data||!data.length){const p=document.createElement("p");p.className="tiny-note";p.textContent="No one found with that username.";host.appendChild(p);return}data.forEach(p=>{S.profiles.set(p.id,p);const row=document.createElement("div");row.className="user-result";row.append(avatar(p),userInfo(p,p.role==="admin"?"Admin":"Park visitor"));const b=document.createElement("button");b.className="small-button";b.textContent=S.friends.has(p.id)?"Friend":"Add friend";b.disabled=S.friends.has(p.id);b.onclick=async()=>{b.disabled=true;const {error}=await db.rpc("send_friend_request",{target_username:p.username});if(error){b.disabled=false;toast(msg(error))}else{b.textContent="Requested";toast("Friend request sent. ♡")}};row.appendChild(b);host.appendChild(row)})}
+async function playerCard(id){const p=prof(id);if(!p)return;const host=$("#player-dialog-content"),wrap=document.createElement("div");wrap.className="dialog-profile";wrap.append(avatar(p));const h=document.createElement("h3");h.textContent=p.username;const sub=document.createElement("p");sub.className="tiny-note";sub.textContent=title(p,id)||"Park visitor";wrap.append(h,sub);const actions=document.createElement("div");actions.className="dialog-actions";const b=document.createElement("button");b.className="button primary";b.textContent=S.friends.has(id)?"Message":"Add friend";b.onclick=async()=>{if(S.friends.has(id)){S.dm=id;setMode("dm");openView("social")}else{const {error}=await db.rpc("send_friend_request",{target_username:p.username});if(error)toast(msg(error));else toast("Friend request sent. ♡")}$("#player-dialog").close()};actions.append(b);wrap.append(actions);host.replaceChildren(wrap);$("#player-dialog").showModal()}
+async function loadMarket(){const {data,error}=await db.from("marketplace_items").select("*").order("price");if(error)throw error;S.items=data||[];renderMarket();renderPlayers()}
+function renderMarket(){const host=$("#market-items");if(!host)return;host.replaceChildren();S.items.filter(i=>S.category==="all"||i.category===S.category).forEach(item=>{const card=document.createElement("article");card.className="market-item";const art=document.createElement("div");art.className="item-art";art.textContent=item.emoji||"✨";const owned=(S.profile.owned_item_ids||[]).includes(item.id),equipped=(S.profile.equipped_item_ids||[]).includes(item.id);if(equipped){const badge=document.createElement("span");badge.className="equipped-badge";badge.textContent="Wearing";art.appendChild(badge)}const h=document.createElement("h4");h.textContent=item.name;const d=document.createElement("p");d.textContent=item.description||"A little something special.";const price=document.createElement("span");price.className="item-price";price.textContent=Number(item.price).toLocaleString()+" ✿";const actions=document.createElement("div");actions.className="item-actions";const t=document.createElement("button");t.className="button outline";t.textContent="Try on";t.onclick=()=>{S.preview=item.id;renderMarket()};const b=document.createElement("button");b.className="button "+(owned?"secondary":"primary");b.textContent=owned?(equipped?"Unequip":"Equip"):"Get";b.onclick=()=>owned?equip(item,equipped):buy(item,b);actions.append(t,b);card.append(art,h,d,price,actions);host.appendChild(card)});preview()}
+function preview(){const item=S.items.find(i=>i.id===S.preview),slime=$("#preview-slime"),acc=$("#preview-accessory"),owned=(S.profile.equipped_item_ids||[]).map(id=>S.items.find(i=>i.id===id)).filter(Boolean);slime.classList.remove("icy","dark");acc.textContent="";if(item){$("#preview-name").textContent=item.name;$("#preview-description").textContent=item.description||"Just trying it on.";if(item.category==="skin"){if(/icy|white|glow|starlight/i.test(item.name))slime.classList.add("icy");if(/dark|black|shadow/i.test(item.name))slime.classList.add("dark")}if(item.category==="accessory")acc.textContent=item.emoji||"✨"}else{$("#preview-name").textContent=S.profile.username;$("#preview-description").textContent="Choose an item to see it on your slime.";const skin=owned.find(i=>i.category==="skin");if(skin&&/icy|white|glow|starlight/i.test(skin.name))slime.classList.add("icy");if(skin&&/dark|black|shadow/i.test(skin.name))slime.classList.add("dark");const a=owned.find(i=>i.category==="accessory");if(a)acc.textContent=a.emoji}}
+async function buy(item,button){button.disabled=true;const {error}=await db.rpc("purchase_market_item",{item_id:item.id});button.disabled=false;if(error)return toast(msg(error));await loadProfile();renderMarket();toast(item.name+" is yours. ✨")}
+async function equip(item,on){const {error}=await db.rpc("set_item_equipped",{item_id:item.id,equipped:!on});if(error)return toast(msg(error));await loadProfile();renderMarket();toast(on?"Look updated.":"Item equipped. ✨")}
+function memoryStart(){const icons=["🌸","🦋","🍡","🌙","🍓","🍵"],deck=icons.concat(icons).map(x=>({icon:x})).sort(()=>Math.random()-.5);S.memory={deck,first:null,lock:false,matches:0,active:true};$("#memory-status").textContent="Find the matching pairs.";$("#memory-start").textContent="Restart";const host=$("#memory-board");host.replaceChildren();deck.forEach((c,i)=>{const b=document.createElement("button");b.className="memory-tile";b.textContent="✿";b.onclick=()=>flip(i,b);host.appendChild(b)})}
+async function flip(i,b){const g=S.memory;if(!g||!g.active||g.lock||b.classList.contains("revealed")||b.classList.contains("matched"))return;b.textContent=g.deck[i].icon;b.classList.add("revealed");if(g.first===null){g.first=i;return}const j=g.first,a=$("#memory-board").children[j];g.first=null;if(g.deck[j].icon===g.deck[i].icon){a.classList.add("matched");b.classList.add("matched");a.classList.remove("revealed");b.classList.remove("revealed");if(++g.matches===6){g.active=false;$("#memory-status").textContent="Saving your reward…";const {data,error}=await db.rpc("claim_memory_reward");if(error){$("#memory-status").textContent=msg(error);toast(msg(error))}else if(data.awarded){await loadProfile();$("#memory-status").textContent="You earned 3 points. 🌸";toast("You earned 3 petal points!")}else $("#memory-status").textContent="Today's memory reward was already claimed."}}else{g.lock=true;setTimeout(()=>{a.textContent="✿";b.textContent="✿";a.classList.remove("revealed");b.classList.remove("revealed");g.lock=false},700)}}
+function petalStart(){petalStop();const field=$("#petal-field");field.querySelectorAll(".falling-petal").forEach(x=>x.remove());$("#petal-countdown").classList.add("hidden");const g={caught:0,spawned:0,timer:null,finished:false};S.petal=g;$("#petal-status").textContent="Caught 0 of 50 petals.";$("#petal-start").textContent="Playing…";$("#petal-start").disabled=true;g.timer=setInterval(()=>{if(g.spawned>=50){clearInterval(g.timer);g.timer=null;setTimeout(()=>petalFinish(g),3800);return}petalSpawn(g);g.spawned++},430)}
+function petalSpawn(g){const field=$("#petal-field"),b=document.createElement("button");b.className="falling-petal";b.textContent=["🌸","🌺","🌷"][Math.random()*3|0];b.style.left=(5+Math.random()*88)+"%";b.style.animationDuration=(2.4+Math.random()*1.2)+"s";b.onclick=()=>{if(g.finished)return;g.caught=Math.min(50,g.caught+1);$("#petal-status").textContent="Caught "+g.caught+" of 50 petals.";b.remove()};field.appendChild(b);setTimeout(()=>{b.remove();if(g.spawned>=50&&!field.querySelector(".falling-petal"))petalFinish(g)},3900)}
+async function petalFinish(g){if(g.finished||S.petal!==g)return;g.finished=true;if(g.timer)clearInterval(g.timer);$("#petal-start").disabled=false;$("#petal-start").textContent="Retry";$("#petal-countdown").classList.remove("hidden");const expected=Math.floor(Math.min(50,g.caught)/10)*5;if(!expected){$("#petal-countdown").textContent="No petals caught this round — try again!";$("#petal-status").textContent="Catch 10 petals to earn 5 points.";return}$("#petal-countdown").textContent="Saving your reward…";const {data,error}=await db.rpc("claim_petal_reward",{petals_caught:g.caught});if(error){$("#petal-countdown").textContent="Reward not saved";toast(msg(error))}else if(data.awarded){await loadProfile();$("#petal-countdown").textContent="You earned "+data.points+" points. 🌸";toast("Petals collected — "+data.points+" points!")}else $("#petal-countdown").textContent="Today's petal reward was already claimed."}
+function petalStop(){if(S.petal&&S.petal.timer)clearInterval(S.petal.timer);S.petal=null}
+function joystick(){const j=$("#joystick"),k=$("#joystick-knob");let id=null;function move(e){if(id!==e.pointerId)return;const r=j.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),max=r.width*.32,l=Math.hypot(dx,dy)||1,s=Math.min(1,max/l),x=dx*s,y=dy*s;k.style.transform="translate("+x+"px,"+y+"px)";S.joy={x:x/max,y:y/max}}j.onpointerdown=e=>{e.preventDefault();id=e.pointerId;j.setPointerCapture(id);move(e)};j.onpointermove=move;const up=()=>{id=null;S.joy={x:0,y:0};k.style.transform=""};j.onpointerup=up;j.onpointercancel=up}
+async function loadMusic(){const {data,error}=await db.from("app_settings").select("music_enabled,music_track").eq("id",true).maybeSingle();if(error){console.warn(error);return}if(data){S.music={enabled:data.music_enabled,track:data.music_track};$("#music-enabled").checked=!!data.music_enabled;$("#music-track-select").value=data.music_track||"sakura";if(data.music_enabled)musicStart()}}
+function musicStart(){if(!S.music.enabled)return;try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!S.audio)S.audio=new C();if(S.audio.state==="suspended")S.audio.resume();if(S.musicTimer)return;const scales={sakura:[523,659,784,659,587,698,784,698],moonlight:[392,494,587,494,440,523,659,523],rain:[349,440,523,440,392,494,587,494]};let n=0;S.musicTimer=setInterval(()=>{if(!S.music.enabled)return;const o=S.audio.createOscillator(),g=S.audio.createGain();o.type="sine";o.frequency.value=scales[S.music.track][n++%8];g.gain.setValueAtTime(.0001,S.audio.currentTime);g.gain.exponentialRampToValueAtTime(.03,S.audio.currentTime+.18);g.gain.exponentialRampToValueAtTime(.0001,S.audio.currentTime+1);o.connect(g);g.connect(S.audio.destination);o.start();o.stop(S.audio.currentTime+1.05)},1050)}catch(e){console.warn(e)}}
+function musicStop(){clearInterval(S.musicTimer);S.musicTimer=null}
+async function toggleMusic(){const enabled=!S.music.enabled;const {error}=await db.rpc("set_park_music",{music_enabled:enabled,music_track:S.music.track});if(error)throw error;S.music.enabled=enabled;if(enabled)musicStart();else musicStop();toast(enabled?"Park music is on.":"Park music is off.")}
+async function saveMusic(){const enabled=$("#music-enabled").checked,track=$("#music-track-select").value,{error}=await db.rpc("set_park_music",{music_enabled:enabled,music_track:track});if(error)return toast(msg(error));S.music={enabled,track};enabled?musicStart():musicStop();toast("Park music settings updated.")}
+async function moderate(){const username=$("#moderation-username").value.trim(),action=$("#moderation-action").value;if(!/^[A-Za-z0-9_]{3,24}$/.test(username))return toast("Enter a valid target username.");if(action==="delete"&&!confirm("Permanently delete "+username+"'s account? This cannot be undone."))return;const seconds=action==="mute"?Math.max(60,Math.min(2592000,Number($("#mute-duration").value||60)*60)):null;const {data,error}=await db.rpc("moderate_user",{target_username:username,moderation_action:action,mute_seconds:seconds});if(error)return toast(msg(error));toast(data.message||"Action complete.");await loadProfiles()}
+async function adjustPoints(){const username=$("#moderation-username").value.trim(),amount=Number($("#points-adjustment").value);if(!/^[A-Za-z0-9_]{3,24}$/.test(username)||!Number.isInteger(amount)||!amount)return toast("Enter a username and a non-zero whole number.");const {data,error}=await db.rpc("adjust_user_points",{target_username:username,amount});if(error)return toast(msg(error));toast(data.message||"Points updated.");if(username.toLowerCase()===(S.profile.username||"").toLowerCase())await loadProfile()}
+function realtime(){stopRealtime();S.channel=db.channel("sakura-"+S.user.id).on("postgres_changes",{event:"*",schema:"public",table:"park_presence"},p=>{if(p.eventType==="DELETE"){S.players.delete(p.old.user_id)}else if(p.new){const ms=new Date(p.new.updated_at).getTime();if(Date.now()-ms<70000)S.players.set(p.new.user_id,Object.assign({},p.new,{ms}));else S.players.delete(p.new.user_id)}renderPlayers()}).on("postgres_changes",{event:"INSERT",schema:"public",table:"chat_messages"},()=>{loadGlobal().catch(console.warn)}).on("postgres_changes",{event:"INSERT",schema:"public",table:"dm_messages"},()=>{if(S.mode==="dm")loadDm().catch(console.warn)}).on("postgres_changes",{event:"*",schema:"public",table:"friend_requests"},()=>loadFriends().catch(console.warn)).on("postgres_changes",{event:"*",schema:"public",table:"friendships"},()=>loadFriends().catch(console.warn)).on("postgres_changes",{event:"UPDATE",schema:"public",table:"profiles"},p=>{if(p.new)updateProfile(p.new)}).on("postgres_changes",{event:"UPDATE",schema:"public",table:"app_settings"},p=>{if(p.new){S.music={enabled:p.new.music_enabled,track:p.new.music_track};if(S.music.enabled)musicStart();else musicStop()}}).subscribe(s=>{if(s==="CHANNEL_ERROR"||s==="TIMED_OUT")console.warn("Realtime",s)})}
+function stopRealtime(){if(S.channel){db.removeChannel(S.channel);S.channel=null}}
+function stopAll(){stopRealtime();clearInterval(S.heartbeat);S.heartbeat=null;musicStop();petalStop();if(S.frame)cancelAnimationFrame(S.frame);S.frame=null}
+async function saveProfile(e){e.preventDefault();const f=e.currentTarget,u=f.elements.username.value.trim(),pic=f.elements.profile_picture.value.trim();if(!/^[A-Za-z0-9_]{3,24}$/.test(u))return note("profile-notice","Username must be 3–24 letters, numbers, or underscores.",true);const {data,error}=await db.from("profiles").update({username:u,profile_picture:pic||null}).eq("id",S.user.id).select("*").single();if(error)return note("profile-notice",msg(error),true);updateProfile(data);note("profile-notice","Profile saved.");toast("Profile updated. 🌸")}
+async function adminStyle(){const {error}=await db.rpc("set_admin_style",{enabled:!S.profile.admin_style_enabled});if(error)return toast(msg(error));await loadProfile();toast("Admin look updated.")}
+function bind(){ $$(".auth-tab").forEach(b=>b.onclick=()=>authTab(b.dataset.authTab));$("#signin-form").onsubmit=signin;$("#signup-form").onsubmit=signup;$("#signout-button").onclick=async()=>{stopAll();const {error}=await db.auth.signOut();if(error)toast(msg(error))};$$("[data-view-link]").forEach(b=>b.onclick=e=>{e.preventDefault();openView(b.dataset.viewLink)});
+$("#profile-form").onsubmit=saveProfile;$("#admin-style-button").onclick=adminStyle;
+$("#dev-form").onsubmit=e=>{e.preventDefault();if($("#dev-passcode").value!==DEV_CODE)return note("dev-notice","That passcode is not right.",true);S.dev=true;$("#dev-lock-button").classList.remove("hidden");note("dev-notice",S.profile.role==="developer"?"Developer look unlocked.":"Icy look unlocked. Server privileges require the developer role on your profile.");updateProfile(S.profile);renderPlayers()};
+$("#dev-lock-button").onclick=()=>{S.dev=false;$("#dev-lock-button").classList.add("hidden");$("#dev-passcode").value="";note("dev-notice","Developer look turned off.");updateProfile(S.profile)};
+$("#moderation-action").onchange=()=>$("#mute-duration-wrap").classList.toggle("hidden",$("#moderation-action").value!=="mute");$("#moderate-button").onclick=moderate;$("#adjust-points-button").onclick=adjustPoints;$("#save-music-button").onclick=saveMusic;
+$("#dance-button").onclick=()=>{S.dancing=true;emote("💃","Dancing!")};$("#wave-button").onclick=()=>emote("👋","Hi there!");$("#music-button").onclick=()=>{if(!staff())return toast("Park music can be changed by Admins and Developers.");toggleMusic().catch(e=>toast(msg(e)))};
+$("#jump-button").onpointerdown=e=>{e.preventDefault();jump()};$("#global-chat-form").onsubmit=async e=>{e.preventDefault();const i=$("#global-chat-input");try{await sendGlobal(i.value);i.value=""}catch(x){toast(msg(x))}};$("#social-chat-form").onsubmit=async e=>{e.preventDefault();const i=$("#social-chat-input");try{S.mode==="global"?await sendGlobal(i.value):await sendDm(i.value);i.value=""}catch(x){toast(msg(x))}};
+$("#global-tab").onclick=()=>setMode("global");$("#dm-tab").onclick=()=>setMode("dm");$("#user-search-form").onsubmit=async e=>{e.preventDefault();try{await searchUsers($("#user-search-input").value)}catch(x){toast(msg(x))}};
+$("#market-categories").onclick=e=>{const b=e.target.closest("[data-category]");if(!b)return;S.category=b.dataset.category;$$(".category-tab").forEach(x=>x.classList.toggle("active",x===b));renderMarket()};$("#clear-preview").onclick=()=>{S.preview=null;renderMarket()};$("#memory-start").onclick=memoryStart;$("#petal-start").onclick=petalStart;$("#close-player-dialog").onclick=()=>$("#player-dialog").close();joystick();
+window.addEventListener("keydown",e=>{const k=e.key.toLowerCase();if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(k)&&!e.target.matches("input,textarea,select"))e.preventDefault();if(k===" ")jump();S.keys.add(k)});window.addEventListener("keyup",e=>S.keys.delete(e.key.toLowerCase()));window.addEventListener("blur",()=>{S.keys.clear();S.joy={x:0,y:0}});document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.user){writePresence();loadPresence().catch(console.warn)}});window.addEventListener("online",()=>{if(S.user)realtime()});window.addEventListener("beforeunload",()=>{if(S.user)db.from("park_presence").delete().eq("user_id",S.user.id)})}
+bind();db.auth.getSession().then(({data,error})=>{if(error){console.error(error);showAuth()}else enter(data.session&&data.session.user)});db.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT"){stopAll();S.user=null;S.profile=null;S.players.clear();showAuth()}else if(session&&session.user&&(!S.user||S.user.id!==session.user.id))enter(session.user)});
+})();
