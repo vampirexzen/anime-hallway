@@ -1,81 +1,490 @@
-/* Slime Park frontend. Supabase credentials are public browser credentials; protect all data with RLS/RPC. */
+// --- SUPABASE CONFIGURATION ---
 const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJydnlqZHRueHpqbHVuZ2puIiwiaWF0IjoxNzkyNTEwMDI3LCJleHAiOjIxMDgwODYwMjd9.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
-// Correct URL/key pair must match the Supabase project dashboard. If your key differs, paste the dashboard's anon/publishable key here.
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const state = {user:null,profile:null,authMode:'signin',view:'park',category:'all',selectedItem:null,previewItems:[],friends:[],dmFriend:null,channel:null,players:{},position:50,moving:false,dev:false,patelCount:0,patelRound:0,memoryCards:[],memoryOpen:[],memoryMatches:0,gameId:null,chatMuted:false,music:null};
-const ITEMS = [
-{id:'skin-mint',name:'Minty',category:'avatar',price:500,icon:'🟢',description:'A fresh mint slime.',color:'#8df3d1'},
-{id:'skin-peach',name:'Peach Pop',category:'avatar',price:800,icon:'🩷',description:'Sweet peachy pastel.',color:'#ffacd0'},
-{id:'skin-lavender',name:'Lavender Dream',category:'avatar',price:1200,icon:'🟣',description:'Soft violet vibes.',color:'#b6a0ff'},
-{id:'skin-ocean',name:'Ocean Jelly',category:'avatar',price:1800,icon:'🔵',description:'A cool ocean blue.',color:'#82d8ff'},
-{id:'skin-sunshine',name:'Sunshine',category:'avatar',price:2500,icon:'🟡',description:'A little sunny glow.',color:'#ffe27d'},
-{id:'skin-night',name:'Midnight',category:'avatar',price:4000,icon:'🌑',description:'Deep night purple.',color:'#7770c9'},
-{id:'frame-cloud',name:'Cloud Frame',category:'frame',price:500,icon:'☁️',description:'A soft cloud border.'},
-{id:'frame-star',name:'Star Frame',category:'frame',price:1500,icon:'🌟',description:'A little starlight.'},
-{id:'hat-crown',name:'Tiny Crown',category:'hat',price:900,icon:'👑',description:'Royal, but tiny.'},
-{id:'hat-spikes',name:'Spike Hair',category:'hat',price:1300,icon:'⚡',description:'Energetic little spikes.'},
-{id:'hat-bow',name:'Bow Tie',category:'accessory',price:750,icon:'🎀',description:'Dress up for the park.'},
-{id:'hat-cap',name:'Sleepy Beanie',category:'hat',price:1100,icon:'🧢',description:'Cozy headwear.'},
-{id:'acc-glasses',name:'Star Glasses',category:'accessory',price:1600,icon:'🤓',description:'See the world in stars.'},
-{id:'acc-wings',name:'Tiny Wings',category:'accessory',price:3200,icon:'🪽',description:'A flutter of fancy.'},
-{id:'aura-mint',name:'Mint Spark Aura',category:'aura',price:5000,icon:'✨',description:'A gentle glowing aura.',glow:'#8df3d1'},
-{id:'aura-rose',name:'Rosefire Aura',category:'aura',price:7500,icon:'💖',description:'Rose-colored radiance.',glow:'#ff6cae'},
-{id:'aura-cosmic',name:'Cosmic Nova',category:'aura',price:10000,icon:'🌌',description:'A bright cosmic halo.',glow:'#a58bff'},
-{id:'aura-ice',name:'Glacial Crown',category:'aura',price:15000,icon:'❄️',description:'A brilliant icy-blue glow.',glow:'#73dfff'},
-{id:'title-dreamer',name:'Dreamer',category:'title',price:2000,icon:'☾',description:'A dreamy little title.'},
-{id:'title-stargazer',name:'Stargazer',category:'title',price:3500,icon:'✦',description:'For sky-watchers.'},
-{id:'title-sweetheart',name:'Sweetheart',category:'title',price:4500,icon:'♡',description:'A warm-hearted title.'}
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// --- GLOBAL APP STATE ---
+let currentUser = null;
+let userProfile = null;
+let activeChatTab = 'global';
+let activeDMRecipient = null;
+let parkPlayers = {};
+let marketplaceItems = [
+    // Skins (500 to 15,000 Pts)
+    { id: 'pink_sakura', name: 'Sakura Pink Slime', type: 'skin', price: 500, color: '#ffb7c5', glow: null },
+    { id: 'mint_leaf', name: 'Mint Leaf Slime', type: 'skin', price: 1500, color: '#98ff98', glow: null },
+    { id: 'golden_glow', name: 'Golden Aura Slime', type: 'skin', price: 7500, color: '#ffd700', glow: '#ffea00' },
+    { id: 'icy_cosmic', name: 'Cosmic Ice Slime', type: 'skin', price: 15000, color: '#00ffff', glow: '#00ffff' },
+    // Accessories
+    { id: 'hat_cap', name: 'Cherry Cap', type: 'accessory', price: 800, icon: '🧢' },
+    { id: 'spiky_hair', name: 'Spiky Hair', type: 'accessory', price: 2000, icon: '🦔' },
+    { id: 'bow_tie', name: 'Fancy Bowtie', type: 'accessory', price: 3500, icon: '🎀' },
+    // Titles
+    { id: 'title_bloomer', name: 'Sakura Bloomer', type: 'title', price: 1000, titleText: 'Sakura Bloomer' },
+    { id: 'title_legend', name: 'Park Legend', type: 'title', price: 10000, titleText: 'Park Legend' },
+    // Frames
+    { id: 'frame_blossom', name: 'Blossom Border', type: 'frame', price: 1200, borderStyle: '3px solid #ffb7c5' }
 ];
-const itemById = id => ITEMS.find(x=>x.id===id);
-function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.add('hidden'),2800);}
-function message(sel,msg){$(sel).textContent=msg;}
-function openModal(html){$('#modal-content').innerHTML=html;$('#modal-backdrop').classList.remove('hidden');}
-function closeModal(){$('#modal-backdrop').classList.add('hidden');}
-function showAuth(){ $('#auth-view').classList.remove('hidden');$('#game-view').classList.add('hidden');$('#signout-btn').classList.add('hidden'); }
-function showGame(){ $('#auth-view').classList.add('hidden');$('#game-view').classList.remove('hidden');$('#signout-btn').classList.remove('hidden'); }
-function setView(view){state.view=view;$$('.view-panel').forEach(x=>x.classList.add('hidden'));$('#view-'+view)?.classList.remove('hidden');$$('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.view===view));if(view==='market')renderMarket();if(view==='friends')loadFriends();if(view==='messages')renderDmPeople();if(view==='settings')fillSettings();if(view==='park')loadPark();window.scrollTo({top:0,behavior:'smooth'});}
-function setAuthMode(mode){state.authMode=mode;$$('.auth-tab').forEach(b=>b.classList.toggle('active',b.dataset.auth===mode));$('#auth-title').textContent=mode==='signin'?'Welcome back!':'Find your place in the park';$('#auth-subtitle').textContent=mode==='signin'?'Your park is waiting for you.':'A username, an email, and you are in.';$('#auth-submit').innerHTML=mode==='signin'?'Sign in <span>→</span>':'Create account <span>→</span>';$('#email-label').classList.toggle('hidden',mode==='signin');$('#auth-email').required=mode==='signup';$('#auth-username').placeholder=mode==='signin'?'Username or email':'Choose a username';message('#auth-message','');}
-async function authSubmit(e){e.preventDefault();const username=$('#auth-username').value.trim(),email=$('#auth-email').value.trim(),password=$('#auth-password').value;if(password.length<8)return message('#auth-message','Use a password with at least 8 characters.');message('#auth-message','Working…');let result;
- if(state.authMode==='signup'){if(!/^[a-zA-Z0-9_]{3,20}$/.test(username))return message('#auth-message','Username must be 3–20 characters: letters, numbers, underscore.');result=await supabaseClient.auth.signUp({email,password,options:{data:{username}}});}
- else {const isEmail=username.includes('@');let loginEmail=username;if(!isEmail){const {data,error}=await supabaseClient.rpc('email_for_username',{p_username:username.toLowerCase()});if(error||!data)return message('#auth-message','Could not find that username. Try your account email.');loginEmail=data;}result=await supabaseClient.auth.signInWithPassword({email:loginEmail,password});}
- if(result.error)return message('#auth-message',result.error.message);if(state.authMode==='signup'&&!result.data.session){message('#auth-message','Account created! Check your email to confirm, then sign in.');return;}await loadSession(); }
-async function loadSession(){const {data:{session}}=await supabaseClient.auth.getSession();if(!session){state.user=null;showAuth();return;}state.user=session.user;let {data,error}=await supabaseClient.from('profiles').select('*').eq('id',state.user.id).maybeSingle();if(error)console.warn(error);if(!data){const username=(state.user.user_metadata?.username||'slime'+state.user.id.slice(0,5)).toLowerCase();const ins=await supabaseClient.from('profiles').insert({id:state.user.id,username,display_name:username,avatar:'☺'}).select().single();data=ins.data;if(ins.error){console.error(ins.error);toast('Profile setup failed. Apply supabase.sql first.');return;}}state.profile=data;state.dev=!!data.is_developer;showGame();$('#connection-status').textContent='Connected';await refreshProfile();await loadPark();subscribeRealtime();startLobbyRewards();}
-async function refreshProfile(){const {data,error}=await supabaseClient.from('profiles').select('*').eq('id',state.user.id).single();if(error)return;state.profile=data;$('#points').textContent=data.points??0;$('#market-points').textContent=data.points??0;$('#my-username').textContent=data.display_name||data.username;$('#preview-name').textContent=data.display_name||data.username;$('#my-title').textContent=data.is_developer?'DEV':data.is_admin?'Admin':data.equipped_title||'Park visitor';$('#my-slime-small').style.background=data.is_developer?'#fff':data.is_admin?'#080b12':(data.equipped_skin_color||'#8df3d1');$('#my-slime-small').style.boxShadow=data.is_developer?'0 0 18px #73dfff':data.is_admin?'0 0 18px #ff334d':'inset -9px -7px 13px #0002';$('#profile-open').textContent=data.avatar||'☺';$('#admin-panel').classList.toggle('hidden',!(data.is_admin||data.is_developer));$('#music-url').value='';renderPreview();}
-function subscribeRealtime(){if(state.channel)supabaseClient.removeChannel(state.channel);state.channel=supabaseClient.channel('park-live').on('postgres_changes',{event:'*',schema:'public',table:'park_messages'},()=>loadPark()).on('postgres_changes',{event:'*',schema:'public',table:'profiles'},()=>loadPark()).on('postgres_changes',{event:'*',schema:'public',table:'friendships'},()=>{if(state.view==='friends')loadFriends();}).on('postgres_changes',{event:'*',schema:'public',table:'direct_messages'},()=>{if(state.dmFriend)loadDm(state.dmFriend);}).subscribe();}
-async function loadPark(){if(!state.user)return;const [{data:profiles},{data:msgs}] = await Promise.all([supabaseClient.from('profiles').select('id,username,display_name,avatar,points,is_admin,is_developer,equipped_skin_color,equipped_title,position_x,last_seen').gte('last_seen',new Date(Date.now()-120000).toISOString()).limit(80),supabaseClient.from('park_messages').select('id,user_id,body,created_at').order('created_at',{ascending:false}).limit(40)]);const people=profiles||[];$('#online-count').textContent='● '+people.length;$('#scene-online').textContent=`${people.length} slime${people.length===1?'':'s'} hopping around`;renderPlayers(people);renderChat(msgs||[],people);}
-function renderPlayers(people){const layer=$('#players-layer');layer.innerHTML='';people.forEach((p,i)=>{const el=document.createElement('button');el.className='player';const x=p.id===state.user.id?state.position:(Number.isFinite(p.position_x)?p.position_x:12+(i*17)%75);const y=58+(i%3)*7;el.style.left=x+'%';el.style.top=y+'%';const title=p.is_developer?'DEV':p.is_admin?'Admin':p.equipped_title||'';const color=p.is_developer?'#fff':p.is_admin?'#080b12':p.equipped_skin_color||'#8df3d1';const glow=p.is_developer?'#73dfff':p.is_admin?'#ff334d':'';el.innerHTML=`<div class="slime" style="background:${color};${glow?`box-shadow:0 0 22px ${glow},inset -9px -7px 13px #0002`:''}">${p.avatar?`<span style="position:absolute;top:-7px;z-index:2;font-size:13px">${escapeHtml(p.avatar)}</span>`:''}<span class="face">◡</span></div><span class="player-title" style="color:${p.is_developer?'#9ce9ff':p.is_admin?'#ff4d68':'#ffe1a5'}">${escapeHtml(title)}</span><span class="player-name">${escapeHtml(p.display_name||p.username)}</span>`;el.title='Click to view profile';el.addEventListener('click',()=>openPerson(p));layer.appendChild(el);});}
-function renderChat(msgs,people){const feed=$('#chat-feed');if(!msgs.length){feed.innerHTML='<div class="empty-state">The park is quiet… say hello!</div>';return;}const byId=Object.fromEntries(people.map(p=>[p.id,p]));feed.innerHTML=msgs.slice().reverse().map(m=>{const p=byId[m.user_id]||{username:'slime',avatar:'☺'};return `<div class="chat-line"><div class="chat-avatar">${escapeHtml(p.avatar||'☺')}</div><div><b>${escapeHtml(p.display_name||p.username)}</b><p>${escapeHtml(m.body)}</p></div></div>`;}).join('');feed.scrollTop=feed.scrollHeight;}
-async function sendChat(){if(!state.user)return;const body=$('#chat-input').value.trim();if(!body)return;if(state.profile.chat_muted_until&&new Date(state.profile.chat_muted_until)>new Date())return toast('You are muted until '+new Date(state.profile.chat_muted_until).toLocaleString());const {error}=await supabaseClient.from('park_messages').insert({user_id:state.user.id,body});if(error)toast(error.message);else{$('#chat-input').value='';loadPark();}}
-function openPerson(p){if(p.id===state.user.id){setView('settings');return;}openModal(`<div class="person-avatar" style="width:65px;height:65px;font-size:30px;margin-bottom:15px">${escapeHtml(p.avatar||'☺')}</div><h2>${escapeHtml(p.display_name||p.username)}</h2><p class="muted">${p.is_developer?'✦ Developer':p.is_admin?'✦ Admin':escapeHtml(p.equipped_title||'Park visitor')}</p><div class="person-actions"><button class="secondary-btn" id="modal-add-friend">♡ Add friend</button><button class="secondary-btn" id="modal-view-friends">Friends</button></div><p id="modal-person-msg" class="form-message"></p>`);$('#modal-add-friend').onclick=async()=>{const {error}=await supabaseClient.from('friendships').insert({requester_id:state.user.id,addressee_id:p.id,status:'pending'});message('#modal-person-msg',error?(error.code==='23505'?'Friend request already exists.':error.message):'Friend request sent!');};$('#modal-view-friends').onclick=()=>{closeModal();setView('friends');};}
-async function searchUsers(){const q=$('#user-search').value.trim();if(q.length<2)return message('#search-results','Enter at least 2 characters.');const {data,error}=await supabaseClient.from('profiles').select('id,username,display_name,avatar,is_admin,is_developer,equipped_title').ilike('username',`%${q}%`).neq('id',state.user.id).limit(20);if(error)return message('#search-results',error.message);$('#search-results').innerHTML=(data||[]).map(p=>personRow(p,'search')).join('')||'<div class="empty-state">No slimes found.</div>';wirePersonActions();}
-function personRow(p,mode){return `<div class="person-row" data-person="${p.id}"><div class="person-avatar">${escapeHtml(p.avatar||'☺')}</div><div class="person-meta"><b>${escapeHtml(p.display_name||p.username)}</b><small>${p.is_developer?'DEV':p.is_admin?'Admin':escapeHtml(p.equipped_title||'Park visitor')}</small></div><div class="person-actions">${mode==='friend'?'<button class="secondary-btn" data-dm="'+p.id+'">Message</button><button class="ghost-btn" data-unfriend="'+p.id+'">Unfriend</button>':'<button class="secondary-btn" data-add="'+p.id+'">♡ Add friend</button>'}</div></div>`;}
-function wirePersonActions(){$$('[data-add]').forEach(b=>b.onclick=async()=>{const id=b.dataset.add;const {error}=await supabaseClient.from('friendships').insert({requester_id:state.user.id,addressee_id:id,status:'pending'});if(error)toast(error.code==='23505'?'Request already exists.':error.message);else{toast('Friend request sent!');b.textContent='Sent';b.disabled=true;}});$$('[data-dm]').forEach(b=>b.onclick=()=>{state.dmFriend=b.dataset.dm;setView('messages');loadDm(state.dmFriend);});$$('[data-unfriend]').forEach(b=>b.onclick=async()=>{const id=b.dataset.unfriend;const {error}=await supabaseClient.rpc('remove_friend',{p_other_user:id});if(error)toast(error.message);else{toast('Friend removed.');loadFriends();}});}
-async function loadFriends(){const {data,error}=await supabaseClient.from('friendships').select('id,requester_id,addressee_id,status,created_at').or(`requester_id.eq.${state.user.id},addressee_id.eq.${state.user.id}`).limit(100);if(error){$('#friends-list').textContent=error.message;return;}const rel=data||[], accepted=rel.filter(r=>r.status==='accepted'), incoming=rel.filter(r=>r.status==='pending'&&r.addressee_id===state.user.id), ids=[...new Set(accepted.map(r=>r.requester_id===state.user.id?r.addressee_id:r.requester_id).concat(incoming.map(r=>r.requester_id)))];state.friends=accepted.map(r=>r.requester_id===state.user.id?r.addressee_id:r.requester_id);$('#friend-count').textContent=state.friends.length;let profiles=[];if(ids.length){const r=await supabaseClient.from('profiles').select('id,username,display_name,avatar,equipped_title,is_admin,is_developer').in('id',ids);profiles=r.data||[];}const requests=incoming.map(r=>`<div class="person-row"><div class="person-avatar">♡</div><div class="person-meta"><b>Friend request</b><small>From ${escapeHtml(profiles.find(p=>p.id===r.requester_id)?.username||'a slime')}</small></div><div class="person-actions"><button class="primary-btn" data-accept="${r.id}">Accept</button><button class="ghost-btn" data-decline="${r.id}">Decline</button></div></div>`).join('');$('#friends-list').innerHTML=requests+profiles.filter(p=>state.friends.includes(p.id)).map(p=>personRow(p,'friend')).join('')||'<div class="empty-state">Your circle starts with one hello.</div>';$$('[data-accept]').forEach(b=>b.onclick=async()=>{const {error}=await supabaseClient.from('friendships').update({status:'accepted'}).eq('id',b.dataset.accept);if(error)toast(error.message);else loadFriends();});$$('[data-decline]').forEach(b=>b.onclick=async()=>{const {error}=await supabaseClient.from('friendships').delete().eq('id',b.dataset.decline);if(error)toast(error.message);else loadFriends();});wirePersonActions();}
-async function renderDmPeople(){const {data}=await supabaseClient.from('friendships').select('requester_id,addressee_id,status').eq('status','accepted').or(`requester_id.eq.${state.user.id},addressee_id.eq.${state.user.id}`);const ids=(data||[]).map(r=>r.requester_id===state.user.id?r.addressee_id:r.requester_id);state.friends=ids;const res=ids.length?await supabaseClient.from('profiles').select('id,username,display_name,avatar').in('id',ids):{data:[]};const people=res.data||[];$('#dm-people').innerHTML=people.map(p=>`<button class="person-row" style="width:100%;text-align:left;border:0;color:inherit" data-open-dm="${p.id}"><div class="person-avatar">${escapeHtml(p.avatar||'☺')}</div><div class="person-meta"><b>${escapeHtml(p.display_name||p.username)}</b><small>Friend</small></div></button>`).join('')||'<div class="empty-state">Add friends to start chatting.</div>';$$('[data-open-dm]').forEach(b=>b.onclick=()=>{state.dmFriend=b.dataset.openDm;loadDm(state.dmFriend);});if(state.dmFriend&&ids.includes(state.dmFriend))loadDm(state.dmFriend);}
-async function loadDm(other){if(!state.friends.includes(other)){const {data}=await supabaseClient.from('friendships').select('id').eq('status','accepted').or(`and(requester_id.eq.${state.user.id},addressee_id.eq.${other}),and(requester_id.eq.${other},addressee_id.eq.${state.user.id})`).maybeSingle();if(!data){$('#dm-input').disabled=true;$('#dm-send').disabled=true;return message('#dm-heading','<h3>Friendship required</h3>');}}
- const {data:p}=await supabaseClient.from('profiles').select('username,display_name,avatar').eq('id',other).single();$('#dm-heading').innerHTML=`<h3>${escapeHtml(p?.display_name||p?.username||'Friend')}</h3>`;$('#dm-input').disabled=false;$('#dm-send').disabled=false;const {data,error}=await supabaseClient.from('direct_messages').select('id,sender_id,body,created_at').or(`and(sender_id.eq.${state.user.id},recipient_id.eq.${other}),and(sender_id.eq.${other},recipient_id.eq.${state.user.id})`).order('created_at').limit(100);$('#dm-feed').innerHTML=error?`<div class="empty-state">${escapeHtml(error.message)}</div>`:(data||[]).map(m=>`<div class="dm-message ${m.sender_id===state.user.id?'mine':''}">${escapeHtml(m.body)}</div>`).join('')||'<div class="empty-state">Say hello to your friend.</div>';$('#dm-feed').scrollTop=$('#dm-feed').scrollHeight;}
-async function sendDm(e){e.preventDefault();const body=$('#dm-input').value.trim();if(!body||!state.dmFriend)return;const {error}=await supabaseClient.from('direct_messages').insert({sender_id:state.user.id,recipient_id:state.dmFriend,body});if(error)toast(error.message);else{$('#dm-input').value='';loadDm(state.dmFriend);}}
-function renderMarket(){const grid=$('#market-grid');const owned=state.profile?.inventory||[];const filtered=ITEMS.filter(i=>state.category==='all'||i.category===state.category);grid.innerHTML=filtered.map(i=>`<article class="item-card ${state.selectedItem===i.id?'selected':''}" data-item="${i.id}"><div class="item-art ${i.glow?'glow':''}" style="${i.glow?`box-shadow:inset 0 0 30px ${i.glow}22`:''}">${i.icon}</div><h4>${i.name}</h4><p>${i.description}</p><div class="item-card-foot"><span>✧ ${i.price.toLocaleString()}</span><button class="secondary-btn">${owned.includes(i.id)?'Owned':'Try on'}</button></div></article>`).join('');$$('[data-item]').forEach(el=>el.onclick=()=>selectItem(el.dataset.item));}
-function selectItem(id){state.selectedItem=id;const item=itemById(id);if(!item)return;state.previewItems=state.previewItems.filter(x=>x.category!==item.category);state.previewItems.push(item);renderPreview();renderMarket();$('#buy-item').disabled=!!(state.profile.inventory||[]).includes(id);$('#buy-item').textContent=(state.profile.inventory||[]).includes(id)?'Already owned':`Buy for ${item.price.toLocaleString()} pts`;message('#market-message',`Trying on ${item.name} — purchase when you're ready.`);}
-function renderPreview(){const slime=$('#preview-slime');if(!slime||!state.profile)return;const equipped=state.previewItems.length?state.previewItems:[];const skin=equipped.find(x=>x.category==='avatar');const aura=equipped.find(x=>x.category==='aura');slime.style.background=skin?.color||state.profile.equipped_skin_color||'#8df3d1';slime.style.boxShadow=aura?`0 0 30px ${aura.glow},0 0 55px ${aura.glow}66,inset -9px -7px 13px #0002`:'inset -9px -7px 13px #0002';let art=slime.querySelector('.cosmetic-overlay');if(art)art.remove();const overlay=document.createElement('span');overlay.className='cosmetic-overlay';overlay.style.cssText='position:absolute;top:-23px;font-size:26px;filter:drop-shadow(0 3px 5px #0005)';overlay.textContent=equipped.filter(x=>['hat','accessory','frame'].includes(x.category)).map(x=>x.icon).join(' ');slime.appendChild(overlay);const title=equipped.find(x=>x.category==='title');$('#preview-name').textContent=title?title.name:(state.profile.display_name||state.profile.username);}
-async function buySelected(){const item=itemById(state.selectedItem);if(!item)return;const {data,error}=await supabaseClient.rpc('buy_market_item',{p_item_id:item.id});if(error){message('#market-message',error.message);return;}toast(`${item.name} added to your collection!`);await refreshProfile();state.profile.inventory=[...(state.profile.inventory||[]),item.id];renderMarket();$('#buy-item').disabled=true;message('#market-message','Purchased! Equip it from your preview/profile soon.');}
-async function saveProfile(){const username=$('#settings-username').value.trim().toLowerCase(),avatar=$('#settings-avatar').value.trim()||'☺';if(!/^[a-zA-Z0-9_]{3,20}$/.test(username))return message('#settings-message','Username must be 3–20 letters, numbers, or underscores.');const {error}=await supabaseClient.from('profiles').update({username,display_name:username,avatar}).eq('id',state.user.id);if(error)message('#settings-message',error.code==='23505'?'That username is already taken.':error.message);else{message('#settings-message','Profile saved!');await refreshProfile();toast('Profile updated.');}}
-function fillSettings(){if(!state.profile)return;$('#settings-username').value=state.profile.username||'';$('#settings-avatar').value=state.profile.avatar||'☺';}
-async function openDevPrompt(){openModal(`<h2>Developer access ✦</h2><p class="muted">Enter the developer access code.</p><label>Access code<input id="dev-code" type="password" inputmode="numeric" placeholder="••••"></label><button id="dev-activate" class="primary-btn full">Enable developer mode</button><p class="form-message" id="dev-message"></p>`);$('#dev-activate').onclick=async()=>{const code=$('#dev-code').value;const {data,error}=await supabaseClient.rpc('enable_developer_mode',{p_code:code});if(error||!data){message('#dev-message',error?.message||'Code rejected.');return;}closeModal();await refreshProfile();toast('Developer mode enabled.');};}
-async function runAdminAction(){const target=$('#admin-target').value.trim(),action=$('#admin-action').value,amount=Number($('#admin-amount').value)||15;if(!target)return message('#admin-message','Enter a username.');const {data,error}=await supabaseClient.rpc('moderate_user',{p_username:target,p_action:action,p_amount:amount});if(error)message('#admin-message',error.message);else{message('#admin-message',data||'Action completed.');toast('Moderation action completed.');loadPark();}}
-async function saveMusic(){if(!(state.profile.is_admin||state.profile.is_developer))return toast('Only admins and developers can change music.');const url=$('#music-url').value.trim();const {error}=await supabaseClient.rpc('set_park_music',{p_url:url});if(error)toast(error.message);else{toast('Park music setting saved.');loadMusic();}}
-async function loadMusic(){const {data}=await supabaseClient.from('park_settings').select('value').eq('key','music_url').maybeSingle();if(data?.value){state.music=new Audio(data.value);state.music.loop=true;state.music.volume=.25;}}
-function startLobbyRewards(){if(state.rewardTimer)clearInterval(state.rewardTimer);state.rewardTimer=setInterval(async()=>{if(!state.user)return;const {error}=await supabaseClient.rpc('claim_lobby_point');if(!error){await refreshProfile();toast('+1 park point — thanks for hanging out!');}},15*60*1000);supabaseClient.rpc('touch_presence',{p_position:state.position});setInterval(()=>{if(state.user)supabaseClient.rpc('touch_presence',{p_position:state.position});},45000);}
-function startMemory(){const symbols=['♡','✦','☁','☾','✿','♬','★','❀'];state.memoryCards=[...symbols,...symbols].sort(()=>Math.random()-.5);state.memoryOpen=[];state.memoryMatches=0;state.gameId=crypto.randomUUID();renderMemory();message('#memory-status','Find all 8 pairs to complete the round.');}
-function renderMemory(){const board=$('#memory-board');board.innerHTML=state.memoryCards.map((s,i)=>`<button class="memory-card ${state.memoryOpen.includes(i)?'revealed':''}" data-card="${i}">${state.memoryOpen.includes(i)||state.memoryCards[i]===null?s:'?'}</button>`).join('');$$('[data-card]').forEach(b=>b.onclick=()=>flipMemory(Number(b.dataset.card)));}
-function flipMemory(i){if(state.memoryCards[i]===null||state.memoryOpen.includes(i)||state.memoryOpen.length===2)return;state.memoryOpen.push(i);renderMemory();if(state.memoryOpen.length===2){const [a,b]=state.memoryOpen;if(state.memoryCards[a]===state.memoryCards[b]){state.memoryCards[a]=state.memoryCards[b]=null;state.memoryMatches++;state.memoryOpen=[];renderMemory();if(state.memoryMatches===8)finishMemory();}else setTimeout(()=>{state.memoryOpen=[];renderMemory();},650);}}
-async function finishMemory(){const {data,error}=await supabaseClient.rpc('complete_minigame',{p_game:'memories',p_game_id:state.gameId,p_score:8});if(error)message('#memory-status',error.message);else{message('#memory-status','You did it! +3 points ✧');await refreshProfile();toast('+3 points earned!');}}
-function startPatels(){state.patelCount=0;state.patelRound++;$('#patel-board').classList.remove('hidden');$('#patel-retry').classList.add('hidden');$('#patel-start').classList.add('hidden');message('#patel-status','Tap the bugs! Catch 10 to earn 5 points.');renderPatels();}
-function renderPatels(){const board=$('#patel-board');board.innerHTML=Array.from({length:50},(_,i)=>`<button class="patel-target" data-patel="${i}">${i<state.patelCount?'✧':'🪲'}</button>`).join('');$('#patel-count').textContent=`${state.patelCount} / 50 caught`;$('#patel-progress-fill').style.width=(state.patelCount/50*100)+'%';$$('[data-patel]').forEach(b=>b.onclick=()=>{if(Number(b.dataset.patel)<state.patelCount)return;state.patelCount++;renderPatels();if(state.patelCount===50)finishPatels();});}
-async function finishPatels(){const {data,error}=await supabaseClient.rpc('complete_minigame',{p_game:'patels',p_game_id:crypto.randomUUID(),p_score:state.patelCount});if(error)message('#patel-status',error.message);else{message('#patel-status',`Round complete! ${state.patelCount>=50?'+25 points!':state.patelCount>=10?'+5 points!':'No points this time — try again!'}`);await refreshProfile();}$('#patel-retry').classList.remove('hidden');$('#patel-start').classList.add('hidden');}
-function move(dir){state.position=Math.max(5,Math.min(95,state.position+dir*4));$('#players-layer').querySelectorAll('.player').forEach(el=>{if(el.dataset?.self)el.style.left=state.position+'%'});const own=[...$('#players-layer').children].find(el=>el.querySelector('.player-name')?.textContent===(state.profile.display_name||state.profile.username));if(own){own.style.left=state.position+'%';own.querySelector('.slime').animate([{transform:'translateY(0)'},{transform:'translateY(-24px)'},{transform:'translateY(0)'}],{duration:380,easing:'ease-out'});}supabaseClient.rpc('touch_presence',{p_position:state.position});}
-function bindEvents(){$$('.auth-tab').forEach(b=>b.onclick=()=>setAuthMode(b.dataset.auth));$('#auth-form').onsubmit=authSubmit;$('#signout-btn').onclick=async()=>{await supabaseClient.auth.signOut();if(state.channel)supabaseClient.removeChannel(state.channel);state.user=null;state.profile=null;showAuth();};$$('.nav-btn').forEach(b=>b.onclick=()=>setView(b.dataset.view));$$('[data-goto]').forEach(b=>b.onclick=()=>setView(b.dataset.goto));$('#chat-send').onclick=sendChat;$('#chat-input').onkeydown=e=>{if(e.key==='Enter')sendChat();};$('#refresh-park').onclick=loadPark;$('#search-btn').onclick=searchUsers;$('#user-search').onkeydown=e=>{if(e.key==='Enter')searchUsers();};$('#dm-form').onsubmit=sendDm;$('#profile-edit').onclick=()=>setView('settings');$('#profile-open').onclick=()=>setView('settings');$('#save-profile').onclick=saveProfile;$('#dev-open').onclick=openDevPrompt;$('#settings-dev-open').onclick=openDevPrompt;$('#admin-run').onclick=runAdminAction;$('#save-music').onclick=saveMusic;$('#buy-item').onclick=buySelected;$('#reset-preview').onclick=()=>{state.previewItems=[];state.selectedItem=null;renderPreview();renderMarket();$('#buy-item').disabled=true;message('#market-message','Preview reset.');};$$('[data-category]').forEach(b=>b.onclick=()=>{state.category=b.dataset.category;$$('[data-category]').forEach(x=>x.classList.toggle('active',x===b));renderMarket();});$('#memory-start').onclick=startMemory;$('#patel-start').onclick=startPatels;$('#patel-retry').onclick=startPatels;$('#move-left').onclick=()=>move(-1);$('#move-right').onclick=()=>move(1);$('#jump-btn').onclick=()=>{const own=[...$('#players-layer').children].find(el=>el.querySelector('.player-name')?.textContent===(state.profile.display_name||state.profile.username));if(own)own.querySelector('.slime').animate([{transform:'translateY(0) rotate(0)'},{transform:'translateY(-45px) rotate(-8deg)'},{transform:'translateY(0) rotate(0)'}],{duration:500,easing:'ease-out'});};$('#music-toggle').onclick=()=>{if(!state.music)return toast('No park music is configured yet.');if(state.music.paused)state.music.play().catch(()=>toast('Tap again to allow music playback.'));else state.music.pause();};$('#modal-close').onclick=closeModal;$('#modal-backdrop').onclick=e=>{if(e.target.id==='modal-backdrop')closeModal();};}
-bindEvents();supabaseClient.auth.onAuthStateChange((_event,session)=>{if(session&&!state.user)loadSession();});loadSession().then(loadMusic).catch(console.error);
+let selectedMarketItem = null;
+let activeMarketTab = 'skins';
+
+// Game Canvas Engine Variables
+let canvas, ctx;
+let playerX = 400, playerY = 300, playerVelocityY = 0, isJumping = false, bounceOffset = 0;
+let keysPressed = {};
+
+// --- INITIALIZATION ---
+window.addEventListener('DOMContentLoaded', () => {
+    initCanvas();
+    setupEventListeners();
+    startPassivePointsTimer();
+});
+
+function initCanvas() {
+    canvas = document.getElementById('parkCanvas');
+    ctx = canvas.getContext('2d');
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    requestAnimationFrame(gameLoop);
+}
+
+function resizeCanvas() {
+    const wrapper = canvas.parentElement;
+    canvas.width = wrapper.clientWidth;
+    canvas.height = wrapper.clientHeight;
+}
+
+// --- AUTHENTICATION MODULE ---
+function switchAuthMode(mode) {
+    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+    document.getElementById('auth-btn').innerText = mode === 'login' ? 'Enter Sakura Park' : 'Create Account';
+    document.getElementById('auth-form').dataset.mode = mode;
+}
+
+async function handleAuth(e) {
+    e.preventDefault();
+    const username = document.getElementById('auth-username').value.trim();
+    const password = document.getElementById('auth-password').value.trim();
+    const mode = document.getElementById('auth-form').dataset.mode || 'login';
+    const errorDiv = document.getElementById('auth-error');
+    errorDiv.innerText = '';
+
+    if (!username || !password) return;
+
+    if (mode === 'signup') {
+        const { data: existing } = await supabaseClient.from('profiles').select('id').eq('username', username).single();
+        if (existing) return errorDiv.innerText = 'Username already exists.';
+
+        const { data, error } = await supabaseClient.from('profiles').insert([{ username, password_hash: password }]).select().single();
+        if (error) return errorDiv.innerText = error.message;
+        
+        userProfile = data;
+        finishLogin();
+    } else {
+        const { data, error } = await supabaseClient.from('profiles').select('*').eq('username', username).eq('password_hash', password).single();
+        if (error || !data) return errorDiv.innerText = 'Invalid username or password.';
+        if (data.is_banned) return errorDiv.innerText = 'This account has been banned.';
+
+        userProfile = data;
+        finishLogin();
+    }
+}
+
+function finishLogin() {
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('app-screen').classList.remove('hidden');
+    updateUIProfile();
+    setupRealtimeSubscriptions();
+    fetchFriendsList();
+    fetchGlobalMessages();
+}
+
+function handleSignOut() {
+    location.reload();
+}
+
+function updateUIProfile() {
+    document.getElementById('header-points').innerHTML = `<i class="fa-solid fa-coins"></i> ${userProfile.points} Pts`;
+    document.getElementById('profile-display-name').innerText = userProfile.username;
+    document.getElementById('profile-title').innerText = userProfile.equipped_title || 'Cherry Novice';
+    document.getElementById('profile-role-badge').innerText = userProfile.role.toUpperCase();
+    document.getElementById('profile-avatar-img').src = userProfile.avatar_url;
+    
+    // Toggle Admin/Dev Specific Panels
+    const isDev = userProfile.role === 'developer';
+    const isAdmin = userProfile.role === 'admin' || isDev;
+    document.getElementById('dev-panel-btn').classList.toggle('hidden', !isAdmin);
+    document.getElementById('admin-skin-toggle').classList.toggle('hidden', userProfile.role !== 'admin');
+    document.getElementById('dev-only-controls').classList.toggle('hidden', !isDev);
+}
+
+// --- REALTIME PRESENCE & CHAT MODULE ---
+function setupRealtimeSubscriptions() {
+    // Park Presence Channel
+    const presenceChannel = supabaseClient.channel('park_room');
+    
+    presenceChannel.on('broadcast', { event: 'player_move' }, ({ payload }) => {
+        parkPlayers[payload.user_id] = payload;
+    }).subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+            broadcastMovement();
+        }
+    });
+
+    // Global Chat Realtime
+    supabaseClient.channel('global_chat_channel')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_chat' }, payload => {
+            appendGlobalMessage(payload.new);
+        }).subscribe();
+
+    // Direct Messages Realtime
+    supabaseClient.channel('dm_channel')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'direct_messages' }, payload => {
+            if (payload.new.receiver_id === userProfile.id || payload.new.sender_id === userProfile.id) {
+                appendDMMessage(payload.new);
+            }
+        }).subscribe();
+}
+
+function broadcastMovement(speech = '', emote = '') {
+    supabaseClient.channel('park_room').send({
+        type: 'broadcast',
+        event: 'player_move',
+        payload: {
+            user_id: userProfile.id,
+            username: userProfile.username,
+            role: userProfile.role,
+            x: playerX,
+            y: playerY,
+            skin: userProfile.equipped_skin,
+            accessory: userProfile.equipped_accessory,
+            title: userProfile.equipped_title,
+            speech_bubble: speech,
+            emote: emote
+        }
+    });
+}
+
+// --- CANVAS GAME LOOP & GRAPHICS ---
+function gameLoop() {
+    updatePlayerMovement();
+    renderPark();
+    requestAnimationFrame(gameLoop);
+}
+
+function updatePlayerMovement() {
+    const speed = 4;
+    let moved = false;
+
+    if (keysPressed['ArrowUp'] || keysPressed['KeyW']) { playerY -= speed; moved = true; }
+    if (keysPressed['ArrowDown'] || keysPressed['KeyS']) { playerY += speed; moved = true; }
+    if (keysPressed['ArrowLeft'] || keysPressed['KeyA']) { playerX -= speed; moved = true; }
+    if (keysPressed['ArrowRight'] || keysPressed['KeyD']) { playerX += speed; moved = true; }
+
+    if (moved) {
+        bounceOffset = Math.abs(Math.sin(Date.now() / 100)) * 10;
+        broadcastMovement();
+    } else {
+        bounceOffset = 0;
+    }
+
+    if (isJumping) {
+        playerY -= playerVelocityY;
+        playerVelocityY -= 0.8;
+        if (playerVelocityY < -10) { isJumping = false; }
+    }
+}
+
+function renderPark() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Render Sakura Blossom Park Background
+    ctx.fillStyle = '#2b1736';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw decorative Sakura Trees
+    ctx.fillStyle = '#ffb7c5';
+    ctx.beginPath(); ctx.arc(100, 100, 60, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(canvas.width - 100, 120, 80, 0, Math.PI * 2); ctx.fill();
+
+    // Render Self Slime
+    drawSlime(playerX, playerY - bounceOffset, userProfile.equipped_skin, userProfile.equipped_accessory, userProfile.username, userProfile.equipped_title, userProfile.role);
+
+    // Render Other Realtime Players
+    Object.values(parkPlayers).forEach(p => {
+        if (p.user_id !== userProfile.id) {
+            drawSlime(p.x, p.y, p.skin, p.accessory, p.username, p.title, p.role, p.speech_bubble, p.emote);
+        }
+    });
+}
+
+function drawSlime(x, y, skinId, accessoryId, username, title, role, speech = '', emote = '') {
+    ctx.save();
+    
+    // Check Glow / Aura
+    let skinData = marketplaceItems.find(i => i.id === skinId) || { color: '#ffb7c5' };
+    
+    if (role === 'developer') {
+        skinData = { color: '#ffffff', glow: '#00ffff' };
+        title = 'DEV';
+    } else if (role === 'admin' && skinId === 'admin_black') {
+        skinData = { color: '#111111', glow: '#ff0000' };
+        title = 'Admin';
+    }
+
+    if (skinData.glow) {
+        ctx.shadowColor = skinData.glow;
+        ctx.shadowBlur = 15;
+    }
+
+    // Draw Slime Body
+    ctx.fillStyle = skinData.color;
+    ctx.beginPath();
+    ctx.ellipse(x, y, 25, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw Eyes
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(x - 8, y - 4, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + 8, y - 4, 3, 0, Math.PI * 2); ctx.fill();
+
+    // Draw Accessories
+    if (accessoryId === 'hat_cap') { ctx.fillText('🧢', x - 8, y - 20); }
+    if (accessoryId === 'spiky_hair') { ctx.fillText('🦔', x - 8, y - 20); }
+    if (accessoryId === 'bow_tie') { ctx.fillText('🎀', x - 8, y + 10); }
+
+    // Draw Username and Title
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    
+    if (title) {
+        ctx.fillStyle = role === 'developer' ? '#00ffff' : (role === 'admin' ? '#ff3333' : '#ffb7c5');
+        ctx.fillText(`[${title}]`, x, y - 35);
+    }
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(username, x, y - 22);
+
+    // Draw Speech Bubble
+    if (speech) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(x - 40, y - 60, 80, 20);
+        ctx.fillStyle = 'black';
+        ctx.fillText(speech, x, y - 46);
+    }
+
+    ctx.restore();
+}
+
+// --- CONTROLS LISTENERS ---
+function setupEventListeners() {
+    window.addEventListener('keydown', e => keysPressed[e.code] = true);
+    window.addEventListener('keyup', e => keysPressed[e.code] = false);
+
+    document.getElementById('jump-btn').addEventListener('click', () => {
+        if (!isJumping) { isJumping = true; playerVelocityY = 10; }
+    });
+}
+
+// --- CHAT SYSTEM ---
+async function sendGlobalMessage() {
+    if (userProfile.is_muted) return alert('You are currently muted.');
+    const input = document.getElementById('global-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    await supabaseClient.from('global_chat').insert([{
+        user_id: userProfile.id,
+        username: userProfile.username,
+        role: userProfile.role,
+        message: msg
+    }]);
+    input.value = '';
+}
+
+function appendGlobalMessage(data) {
+    const list = document.getElementById('global-messages');
+    const div = document.createElement('div');
+    div.className = `chat-msg ${data.role}`;
+    div.innerHTML = `<span class="sender" onclick="openUserAction('${data.username}')">${data.username}:</span> ${data.message}`;
+    list.appendChild(div);
+    list.scrollTop = list.scrollHeight;
+}
+
+// --- FRIENDS & DM SYSTEM ---
+async function fetchFriendsList() {
+    const { data } = await supabaseClient.from('friendships')
+        .select('user2_id, profiles!friendships_user2_id_fkey(username)')
+        .eq('user1_id', userProfile.id);
+
+    const listDiv = document.getElementById('friends-list');
+    listDiv.innerHTML = '';
+    (data || []).forEach(f => {
+        const item = document.createElement('div');
+        item.className = 'form-group inline';
+        item.innerHTML = `
+            <span>${f.profiles.username}</span>
+            <button class="btn-secondary" onclick="startDM('${f.user2_id}', '${f.profiles.username}')">DM</button>
+            <button class="btn-primary" style="background:#cc0000;" onclick="removeFriend('${f.user2_id}')">Unfriend</button>
+        `;
+        listDiv.appendChild(item);
+    });
+}
+
+async function searchAndAddFriend() {
+    const name = document.getElementById('search-user-input').value.trim();
+    const { data: target } = await supabaseClient.from('profiles').select('id, username').eq('username', name).single();
+    if (!target) return alert('User not found.');
+
+    await supabaseClient.from('friendships').insert([{ user1_id: userProfile.id, user2_id: target.id }]);
+    alert(`Added ${target.username} as friend!`);
+    fetchFriendsList();
+}
+
+async function removeFriend(targetId) {
+    await supabaseClient.from('friendships').delete().eq('user1_id', userProfile.id).eq('user2_id', targetId);
+    fetchFriendsList();
+}
+
+function startDM(userId, username) {
+    activeDMRecipient = { id: userId, username };
+    document.getElementById('dm-target-name').innerText = `DM with ${username}`;
+    document.getElementById('dm-input').disabled = false;
+    document.getElementById('dm-send-btn').disabled = false;
+    switchChatTab('dm');
+}
+
+async function sendDirectMessage() {
+    if (!activeDMRecipient) return;
+    const input = document.getElementById('dm-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    await supabaseClient.from('direct_messages').insert([{
+        sender_id: userProfile.id,
+        receiver_id: activeDMRecipient.id,
+        message: msg
+    }]);
+    input.value = '';
+}
+
+function appendDMMessage(data) {
+    const list = document.getElementById('dm-messages');
+    const div = document.createElement('div');
+    div.className = 'chat-msg';
+    div.innerHTML = `<span class="sender">${data.sender_id === userProfile.id ? 'Me' : activeDMRecipient.username}:</span> ${data.message}`;
+    list.appendChild(div);
+    list.scrollTop = list.scrollHeight;
+}
+
+// --- MARKETPLACE MODULE ---
+function switchMarketTab(tab) {
+    activeMarketTab = tab;
+    renderMarketCatalog();
+}
+
+function renderMarketCatalog() {
+    const grid = document.getElementById('market-items-grid');
+    grid.innerHTML = '';
+    const filtered = marketplaceItems.filter(i => i.type === activeMarketTab.slice(0, -1) || i.type === activeMarketTab);
+
+    filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `market-item-card ${selectedMarketItem?.id === item.id ? 'selected' : ''}`;
+        card.innerHTML = `<h4>${item.name}</h4><p>${item.price} Pts</p>`;
+        card.onclick = () => {
+            selectedMarketItem = item;
+            renderMarketCatalog();
+            document.getElementById('preview-item-name').innerText = item.name;
+            document.getElementById('preview-item-price').innerText = `${item.price} Pts`;
+            document.getElementById('buy-item-btn').disabled = false;
+        };
+        grid.appendChild(card);
+    });
+}
+
+async function buySelectedItem() {
+    if (!selectedMarketItem) return;
+    if (userProfile.points < selectedMarketItem.price) return alert('Not enough points!');
+
+    const newPoints = userProfile.points - selectedMarketItem.price;
+    await supabaseClient.from('profiles').update({
+        points: newPoints,
+        [`equipped_${selectedMarketItem.type}`]: selectedMarketItem.id
+    }).eq('id', userProfile.id);
+
+    userProfile.points = newPoints;
+    userProfile[`equipped_${selectedMarketItem.type}`] = selectedMarketItem.id;
+    updateUIProfile();
+    alert(`Purchased ${selectedMarketItem.name}!`);
+}
+
+// --- PASSIVE POINTS & MINIGAMES ---
+function startPassivePointsTimer() {
+    setInterval(async () => {
+        if (userProfile) {
+            userProfile.points += 1;
+            await supabaseClient.from('profiles').update({ points: userProfile.points }).eq('id', userProfile.id);
+            updateUIProfile();
+        }
+    }, 15 * 60 * 1000); // 15 Minutes
+}
+
+// --- DEVELOPER & ADMIN CONTROLS ---
+function toggleDevMode(enable) {
+    const code = document.getElementById('dev-passcode-input').value;
+    if (enable && code === '1357') {
+        userProfile.role = 'developer';
+        alert('Developer Mode Activated!');
+    } else if (!enable) {
+        userProfile.role = 'user';
+        alert('Developer Mode Deactivated!');
+    } else {
+        return alert('Incorrect Passcode');
+    }
+    updateUIProfile();
+    broadcastMovement();
+}
+
+async function adminAction(actionType) {
+    const targetName = document.getElementById('admin-target-username').value.trim();
+    if (!targetName) return;
+
+    if (actionType === 'make_admin') {
+        await supabaseClient.from('profiles').update({ role: 'admin' }).eq('username', targetName);
+    } else if (actionType === 'revoke_admin') {
+        await supabaseClient.from('profiles').update({ role: 'user' }).eq('username', targetName);
+    } else if (actionType === 'ban') {
+        await supabaseClient.from('profiles').update({ is_banned: true }).eq('username', targetName);
+    } else if (actionType === 'unban') {
+        await supabaseClient.from('profiles').update({ is_banned: false }).eq('username', targetName);
+    } else if (actionType === 'delete') {
+        await supabaseClient.from('profiles').delete().eq('username', targetName);
+    }
+    alert(`Action ${actionType} performed on ${targetName}`);
+}
+
+async function adminSendPoints() {
+    const targetName = document.getElementById('admin-target-username').value.trim();
+    const amount = parseInt(document.getElementById('admin-points-amount').value);
+    
+    const { data: target } = await supabaseClient.from('profiles').select('points').eq('username', targetName).single();
+    if (target) {
+        await supabaseClient.from('profiles').update({ points: target.points + amount }).eq('username', targetName);
+        alert(`Updated ${targetName}'s points by ${amount}`);
+    }
+}
+
+// UI HELPER FUNCTIONS
+function toggleModal(modalId) {
+    document.getElementById(modalId).classList.toggle('hidden');
+}
+
+function switchChatTab(tab) {
+    document.getElementById('global-chat-panel').classList.toggle('hidden', tab !== 'global');
+    document.getElementById('dm-chat-panel').classList.toggle('hidden', tab !== 'dm');
+    document.getElementById('tab-global-chat').classList.toggle('active', tab === 'global');
+    document.getElementById('tab-dm-chat').classList.toggle('active', tab === 'dm');
+}
