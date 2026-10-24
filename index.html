@@ -1,1265 +1,1047 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sakura Garden - Online Lounge & Chat</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase JS Client v2 -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maze Quest Online - Multiplayer Arcade Maze Game</title>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        sakura: {
-                            50: '#fff5f7',
-                            100: '#ffe6ec',
-                            200: '#fccad6',
-                            300: '#f79fb5',
-                            400: '#f1688c',
-                            500: '#e53b68',
-                            600: '#d11d4d',
-                            700: '#b0103a',
-                            800: '#921134',
-                            900: '#7b1331',
-                        },
-                        night: {
-                            900: '#120b18',
-                            800: '#1e1329',
-                            700: '#2c1b3d',
-                            600: '#3e2654',
-                        }
-                    },
-                    fontFamily: {
-                        fredoka: ['Fredoka', 'sans-serif'],
-                        nunito: ['Nunito', 'sans-serif'],
-                    }
-                }
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            },
+            arcade: {
+              neon: '#00ffcc',
+              pink: '#ff007f',
+              purple: '#8a2be2',
+              dark: '#0a0a16',
+              card: '#121226'
             }
+          },
+          animation: {
+            'pulse-glow': 'pulseGlow 2s infinite alternate',
+            'bounce-short': 'bounceShort 0.5s ease-out 1',
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%': { boxShadow: '0 0 10px rgba(0, 255, 204, 0.3)' },
+              '100%': { boxShadow: '0 0 25px rgba(0, 255, 204, 0.8), 0 0 10px rgba(255, 0, 127, 0.5)' }
+            },
+            bounceShort: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-6px)' }
+            }
+          }
         }
-    </script>
+      }
+    }
+  </script>
 
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #120b18;
-            color: #f1688c;
-            overflow-x: hidden;
-        }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-        /* Glassmorphism utility */
-        .glass-panel {
-            background: rgba(30, 19, 41, 0.72);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(247, 159, 181, 0.18);
-        }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
 
-        .glass-panel-light {
-            background: rgba(255, 230, 236, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-        }
+    .font-arcade {
+      font-family: 'Orbitron', sans-serif;
+    }
 
-        .glass-input {
-            background: rgba(18, 11, 24, 0.6);
-            border: 1px solid rgba(247, 159, 181, 0.3);
-            color: #fff;
-        }
-        .glass-input:focus {
-            outline: none;
-            border-color: #f79fb5;
-            box-shadow: 0 0 12px rgba(247, 159, 181, 0.3);
-        }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(18, 11, 24, 0.5);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(247, 159, 181, 0.4);
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(247, 159, 181, 0.7);
-        }
+    .grid-bg {
+      background-size: 30px 30px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
 
-        /* Sakura Petal Animation */
-        #petalCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
+    .glass-panel {
+      background: rgba(18, 18, 38, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-        /* Interactive Garden Canvas */
-        #gameCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            cursor: pointer;
-        }
+    .glow-border {
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
+    }
 
-        /* Pulse glowing dot */
-        .online-badge {
-            box-shadow: 0 0 8px #10B981;
-        }
-
-        /* Animated music vinyl / disc spin */
-        @keyframes spinSlow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-            animation: spinSlow 12s linear infinite;
-        }
-
-        /* Chat bubbles on game */
-        .speech-bubble {
-            position: absolute;
-            transform: translate(-50%, -100%);
-            background: rgba(255, 255, 255, 0.95);
-            color: #2c1b3d;
-            padding: 6px 12px;
-            border-radius: 14px;
-            font-size: 12px;
-            font-weight: 700;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            pointer-events: none;
-            white-space: nowrap;
-            max-width: 180px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            z-index: 25;
-            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .speech-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 6px 6px 0;
-            border-style: solid;
-            border-color: rgba(255, 255, 255, 0.95) transparent;
-            display: block;
-            width: 0;
-        }
-
-        @keyframes popIn {
-            0% { opacity: 0; transform: translate(-50%, -80%) scale(0.6); }
-            100% { opacity: 1; transform: translate(-50%, -100%) scale(1); }
-        }
-    </style>
+    /* Touch Controls Active State */
+    .dpad-btn:active {
+      transform: scale(0.92);
+      background-color: rgba(99, 102, 241, 0.5) !important;
+    }
+  </style>
 </head>
-<body class="h-screen w-screen overflow-hidden select-none bg-night-900 text-slate-100 flex flex-col">
+<body class="h-full overflow-hidden bg-slate-950 text-slate-100 grid-bg">
 
-    <!-- Falling Petals Overhead Layer -->
-    <canvas id="petalCanvas"></canvas>
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
-    <!-- AUTHENTICATION OVERLAY MODAL -->
-    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night-900/80 backdrop-blur-md transition-opacity duration-300">
-        <div class="glass-panel w-full max-w-md p-8 rounded-3xl shadow-2xl border border-sakura-300/30 text-center relative overflow-hidden">
-            <!-- Decorative Glow -->
-            <div class="absolute -top-20 -right-20 w-40 h-40 bg-sakura-500/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-sakura-300/20 rounded-full blur-3xl pointer-events-none"></div>
+  <!-- AUTH MODAL / OVERLAY -->
+  <div id="auth-modal" class="fixed inset-0 z-40 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl border border-indigo-500/30 relative overflow-hidden">
+      <div class="absolute -top-24 -left-24 w-48 h-48 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-            <!-- Header Header -->
-            <div class="mb-6">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sakura-500/20 text-sakura-300 mb-3 border border-sakura-400/30">
-                    <i class="fa-solid font-fredoka fa-leaf text-3xl animate-bounce"></i>
-                </div>
-                <h1 class="text-3xl font-fredoka font-bold text-white tracking-wide">Sakura Garden</h1>
-                <p class="text-xs text-sakura-200 mt-1 font-medium">Relaxing Online Lounge & Chat</p>
+      <!-- Header -->
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 mb-3 shadow-lg">
+          <i data-lucide="gamepad-2" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-2xl font-black tracking-wider font-arcade text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-pink-400 to-cyan-400">
+          MAZE QUEST ONLINE
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">Multiplayer Arcade Challenge & Chat</p>
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="flex border-b border-slate-800 mb-6">
+        <button id="tab-signin-btn" onclick="switchAuthTab('signin')" class="flex-1 pb-3 text-sm font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all">
+          Sign In
+        </button>
+        <button id="tab-signup-btn" onclick="switchAuthTab('signup')" class="flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all">
+          Sign Up
+        </button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="signin-form" onsubmit="handleSignIn(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
+            <input type="email" id="signin-email" required placeholder="player@example.com" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
+            <input type="password" id="signin-password" required placeholder="••••••••" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
+          </div>
+        </div>
+        <button type="submit" id="signin-submit-btn" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all transform active:scale-95 flex items-center justify-center gap-2">
+          <span>Enter Game</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="signup-form" onsubmit="handleSignUp(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Display Username</label>
+          <div class="relative">
+            <i data-lucide="user" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
+            <input type="text" id="signup-username" required minlength="3" maxlength="15" placeholder="CyberRunner" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
+            <input type="email" id="signup-email" required placeholder="player@example.com" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
+            <input type="password" id="signup-password" required minlength="6" placeholder="At least 6 characters" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
+          </div>
+        </div>
+        <button type="submit" id="signup-submit-btn" class="w-full py-3 bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-pink-600/20 transition-all transform active:scale-95 flex items-center justify-center gap-2">
+          <span>Create Account</span>
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+        </button>
+      </form>
+
+      <!-- Guest Play Option -->
+      <div class="mt-6 pt-4 border-t border-slate-800/80 text-center">
+        <button onclick="playAsGuest()" class="text-xs text-slate-400 hover:text-indigo-300 underline underline-offset-4 transition-colors">
+          Or play directly in Offline Guest Mode &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP WRAPPER -->
+  <div class="h-screen w-screen flex flex-col overflow-hidden">
+    
+    <!-- TOP NAVIGATION BAR -->
+    <header class="h-16 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md px-4 md:px-6 flex items-center justify-between shrink-0 z-20">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+          <i data-lucide="grid" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="font-arcade text-lg font-bold tracking-wider text-slate-100 flex items-center gap-2">
+            MAZE QUEST <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-sans">v2.0</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Player Controls / Profile Bar -->
+      <div class="flex items-center gap-3">
+        <!-- Audio Toggle -->
+        <button onclick="toggleAudio()" id="audio-btn" class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white transition-colors border border-slate-700/50" title="Toggle Sound Effects">
+          <i data-lucide="volume-2" id="audio-icon" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Profile / Auth Info -->
+        <div class="flex items-center gap-2 pl-2 border-l border-slate-800">
+          <div class="relative">
+            <div id="user-avatar" class="w-9 h-9 rounded-full bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 flex items-center justify-center font-bold text-sm uppercase">
+              ?
             </div>
+            <span id="user-status-dot" class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-slate-900"></span>
+          </div>
+          <div class="hidden sm:block text-left">
+            <div id="user-display-name" class="text-xs font-bold text-slate-200">Guest Player</div>
+            <div id="user-status-text" class="text-[10px] text-indigo-400 font-medium">Offline Mode</div>
+          </div>
+          <button id="logout-btn" onclick="handleLogout()" class="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors ml-2" title="Sign Out">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </header>
 
-            <!-- Tab Switcher -->
-            <div class="flex bg-night-800/80 p-1 rounded-2xl mb-6 border border-sakura-500/20">
-                <button id="tabSigninBtn" onclick="switchAuthTab('signin')" class="flex-1 py-2 rounded-xl font-bold text-xs transition-all duration-200 bg-sakura-500 text-white shadow-md">Sign In</button>
-                <button id="tabSignupBtn" onclick="switchAuthTab('signup')" class="flex-1 py-2 rounded-xl font-bold text-xs transition-all duration-200 text-sakura-200 hover:text-white">Sign Up</button>
+    <!-- CENTER GAME + SIDEBAR CONTAINER -->
+    <div class="flex-1 flex overflow-hidden relative">
+      
+      <!-- MAIN GAME CANVAS PANEL -->
+      <main class="flex-1 flex flex-col bg-slate-950 relative overflow-hidden p-3 md:p-6 items-center justify-center">
+        
+        <!-- GAME STATUS HEADER BAR -->
+        <div class="w-full max-w-2xl mb-3 flex items-center justify-between bg-slate-900/90 border border-slate-800/80 rounded-2xl px-4 py-2.5 shadow-lg backdrop-blur">
+          <div class="flex items-center gap-4">
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Level</span>
+              <span id="game-level-display" class="font-arcade text-lg text-amber-400 font-bold">1</span>
             </div>
+            <div class="h-6 w-px bg-slate-800"></div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Timer</span>
+              <span id="game-timer-display" class="font-arcade text-lg text-emerald-400 font-bold">00:00</span>
+            </div>
+            <div class="h-6 w-px bg-slate-800"></div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Moves</span>
+              <span id="game-moves-display" class="font-arcade text-lg text-cyan-400 font-bold">0</span>
+            </div>
+          </div>
 
-            <!-- Auth Form -->
-            <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4 text-left">
-                <div id="usernameGroup" class="hidden">
-                    <label class="block text-xs font-semibold text-sakura-200 mb-1">Display Name / Avatar Name</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-sakura-300/60 text-sm"></i>
-                        <input type="text" id="authUsername" placeholder="CherryBlossom42" class="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm transition">
-                    </div>
-                </div>
+          <div class="flex items-center gap-2">
+            <button onclick="resetCurrentLevel()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1.5">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Reset</span>
+            </button>
+            <button onclick="nextLevel()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold border border-indigo-500 shadow-md shadow-indigo-600/30 transition-all flex items-center gap-1.5">
+              <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Skip</span>
+            </button>
+          </div>
+        </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-sakura-200 mb-1">Email Address</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-sakura-300/60 text-sm"></i>
-                        <input type="email" id="authEmail" required placeholder="user@sakura.lounge" class="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm transition">
-                    </div>
-                </div>
+        <!-- CANVAS GAME CONTAINER -->
+        <div class="relative flex-1 w-full max-w-2xl max-h-[600px] flex items-center justify-center">
+          <div id="canvas-wrapper" class="relative rounded-2xl overflow-hidden border-2 border-indigo-500/40 shadow-2xl shadow-indigo-500/10 bg-slate-900/90 flex items-center justify-center p-2">
+            <canvas id="mazeCanvas" class="block rounded-lg cursor-pointer transition-all"></canvas>
 
-                <div>
-                    <label class="block text-xs font-semibold text-sakura-200 mb-1">Password</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-sakura-300/60 text-sm"></i>
-                        <input type="password" id="authPassword" required placeholder="••••••••" class="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm transition">
-                    </div>
-                </div>
-
-                <!-- Avatar Select on Signup -->
-                <div id="avatarSelectGroup" class="hidden">
-                    <label class="block text-xs font-semibold text-sakura-200 mb-2">Choose Avatar Sprite</label>
-                    <div class="grid grid-cols-5 gap-2" id="avatarPickerContainer">
-                        <!-- Dynamic avatar options -->
-                    </div>
-                </div>
-
-                <!-- Feedback Message -->
-                <div id="authMsg" class="text-xs p-3 rounded-xl hidden text-center font-medium"></div>
-
-                <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-gradient-to-r from-sakura-500 to-sakura-600 hover:from-sakura-400 hover:to-sakura-500 text-white font-fredoka font-semibold rounded-xl transition duration-200 shadow-lg shadow-sakura-500/30 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-right-to-bracket"></i>
-                    <span id="authBtnText">Sign In to Garden</span>
+            <!-- WIN LEVEL OVERLAY -->
+            <div id="win-overlay" class="absolute inset-0 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center opacity-0 pointer-events-none transition-opacity duration-300 z-10">
+              <div class="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center mb-3 animate-bounce-short">
+                <i data-lucide="trophy" class="w-8 h-8"></i>
+              </div>
+              <h3 class="font-arcade text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 mb-1">
+                MAZE COMPLETED!
+              </h3>
+              <p class="text-xs text-slate-300 mb-4" id="win-summary">Completed Level 1 in 12s with 34 moves!</p>
+              
+              <div class="flex gap-3">
+                <button onclick="nextLevel()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 flex items-center gap-2 transition-all transform active:scale-95">
+                  <span>Next Level</span>
+                  <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MOBILE TOUCH CONTROLS (D-PAD) -->
+        <div class="w-full max-w-2xl mt-3 flex items-center justify-between sm:hidden">
+          <div class="text-[11px] text-slate-500">Touch D-Pad or Swipe to move</div>
+          <div class="grid grid-cols-3 gap-1.5 w-36 h-36">
+            <div></div>
+            <button onclick="movePlayer(0, -1)" class="dpad-btn bg-slate-800 border border-slate-700/80 rounded-xl flex items-center justify-center text-slate-200">
+              <i data-lucide="chevron-up" class="w-6 h-6"></i>
+            </button>
+            <div></div>
+            <button onclick="movePlayer(-1, 0)" class="dpad-btn bg-slate-800 border border-slate-700/80 rounded-xl flex items-center justify-center text-slate-200">
+              <i data-lucide="chevron-left" class="w-6 h-6"></i>
+            </button>
+            <div class="bg-slate-900/50 rounded-xl border border-slate-800 flex items-center justify-center">
+              <div class="w-3 h-3 rounded-full bg-indigo-500/40"></div>
+            </div>
+            <button onclick="movePlayer(1, 0)" class="dpad-btn bg-slate-800 border border-slate-700/80 rounded-xl flex items-center justify-center text-slate-200">
+              <i data-lucide="chevron-right" class="w-6 h-6"></i>
+            </button>
+            <div></div>
+            <button onclick="movePlayer(0, 1)" class="dpad-btn bg-slate-800 border border-slate-700/80 rounded-xl flex items-center justify-center text-slate-200">
+              <i data-lucide="chevron-down" class="w-6 h-6"></i>
+            </button>
+            <div></div>
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT SIDEBAR (CHAT & FRIENDS) -->
+      <aside class="w-full md:w-80 lg:w-96 border-l border-slate-800/80 bg-slate-900/60 backdrop-blur-md flex flex-col shrink-0">
+        
+        <!-- TAB SELECTOR -->
+        <div class="flex border-b border-slate-800/80 bg-slate-900/90 p-1.5 gap-1">
+          <button id="tab-chat-btn" onclick="switchSidebarTab('chat')" class="flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-indigo-600 text-white shadow-md transition-all">
+            <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+            <span>Global Chat</span>
+          </button>
+          <button id="tab-friends-btn" onclick="switchSidebarTab('friends')" class="flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
+            <i data-lucide="users" class="w-3.5 h-3.5"></i>
+            <span>Friends</span>
+            <span id="friend-count-badge" class="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-300">0</span>
+          </button>
+        </div>
+
+        <!-- CHAT TAB CONTENT -->
+        <div id="tab-chat-content" class="flex-1 flex flex-col overflow-hidden">
+          <!-- Chat Messages Scroll List -->
+          <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3.5">
+            <div class="text-center py-6 text-slate-500 text-xs">
+              <i data-lucide="shield-alert" class="w-6 h-6 mx-auto mb-2 text-indigo-400/50"></i>
+              Welcome to Global Maze Chat!<br>Say hello to fellow runners.
+            </div>
+          </div>
+
+          <!-- Chat Input Bar -->
+          <form onsubmit="handleSendChatMessage(event)" class="p-3 border-t border-slate-800/80 bg-slate-900/90 flex gap-2">
+            <input type="text" id="chat-input" placeholder="Type a message..." maxlength="150" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
+            <button type="submit" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            </button>
+          </form>
+        </div>
+
+        <!-- FRIENDS TAB CONTENT -->
+        <div id="tab-friends-content" class="flex-1 flex flex-col overflow-hidden hidden">
+          <!-- Add Friend Input Bar -->
+          <div class="p-3 border-b border-slate-800/80 bg-slate-900/50">
+            <form onsubmit="handleAddFriend(event)" class="flex gap-2">
+              <input type="text" id="friend-search-input" placeholder="Enter username or ID..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+              <button type="submit" class="px-3 py-2 bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1 transition-all">
+                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                <span>Add</span>
+              </button>
             </form>
+          </div>
 
-            <div class="mt-4 text-center">
-                <button type="button" onclick="guestLogin()" class="text-xs text-sakura-300/70 hover:text-sakura-200 underline transition">
-                    Continue as Guest (Instant Access)
-                </button>
+          <!-- Friends List -->
+          <div id="friends-list" class="flex-1 overflow-y-auto p-3 space-y-2">
+            <div class="text-center py-8 text-xs text-slate-500">
+              No friends added yet.<br>Add friends using their username!
             </div>
+          </div>
         </div>
+
+      </aside>
+
     </div>
+  </div>
 
-    <!-- MAIN APP WRAPPER -->
-    <div id="mainApp" class="flex-1 flex flex-col h-full w-full relative overflow-hidden hidden">
+  <!-- SUPABASE & APPLICATION SCRIPT -->
+  <script>
+    // -------------------------------------------------------------
+    // SUPABASE CONFIGURATION
+    // -------------------------------------------------------------
+    const SUPABASE_URL = "https://brvyjdtnxzjlrhukngjn.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE";
 
-        <!-- TOP NAVBAR -->
-        <header class="h-16 glass-panel border-b border-sakura-500/20 px-4 flex items-center justify-between z-30 relative shrink-0">
-            <!-- Brand -->
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sakura-500 to-sakura-300 flex items-center justify-center text-white shadow-md shadow-sakura-500/20">
-                    <i class="fa-solid fa-tree text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="font-fredoka font-bold text-white text-base leading-tight tracking-wide flex items-center gap-2">
-                        Sakura Lounge <span class="bg-sakura-500/20 text-sakura-300 text-[10px] px-2 py-0.5 rounded-full border border-sakura-400/30 font-sans">LIVE</span>
-                    </h1>
-                    <p class="text-xs text-sakura-200/70 flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
-                        <span id="onlineCountText">1 online</span>
-                    </p>
-                </div>
-            </div>
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            <!-- Music Player Widget Compact -->
-            <div class="hidden md:flex items-center glass-panel-light px-3 py-1.5 rounded-full gap-3 border border-sakura-300/20">
-                <button id="playMusicBtn" onclick="toggleMusic()" class="w-8 h-8 rounded-full bg-sakura-500 hover:bg-sakura-400 text-white flex items-center justify-center transition shadow-md">
-                    <i class="fa-solid fa-play text-xs" id="musicIcon"></i>
-                </button>
-                <div class="text-xs w-36 overflow-hidden">
-                    <div id="trackTitle" class="font-bold text-white whitespace-nowrap animate-marquee">Sakura Chill Lofi</div>
-                    <div id="trackArtist" class="text-[10px] text-sakura-200">Ambient Soundscape</div>
-                </div>
-                <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" oninput="changeVolume(this.value)" class="w-16 accent-sakura-400 cursor-pointer">
-            </div>
+    // STATE MANAGEMENT
+    let currentUser = null;
+    let friendsList = [];
+    let isAudioMuted = false;
+    let chatChannel = null;
 
-            <!-- User Menu & Actions -->
-            <div class="flex items-center gap-2">
-                <!-- Avatar Preview -->
-                <div class="flex items-center gap-2 pl-2 pr-3 py-1 glass-panel-light rounded-full">
-                    <div id="navAvatarSprite" class="text-2xl leading-none">🌸</div>
-                    <span id="navUsername" class="text-xs font-bold text-white max-w-[100px] truncate">Guest</span>
-                </div>
+    // AUDIO SYSTEM (Web Audio API Synthesis)
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
 
-                <!-- Customization button -->
-                <button onclick="toggleAvatarCustomizer()" title="Change Avatar" class="p-2.5 glass-panel-light hover:bg-sakura-500/30 text-sakura-200 rounded-xl transition">
-                    <i class="fa-solid fa-shirt"></i>
-                </button>
+    function playSound(type) {
+      if (isAudioMuted) return;
+      try {
+        if (!audioCtx) audioCtx = new AudioCtx();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
 
-                <!-- Sign Out Button -->
-                <button onclick="handleSignOut()" title="Sign Out" class="p-2.5 glass-panel-light hover:bg-red-500/30 text-red-300 rounded-xl transition">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </button>
-            </div>
-        </header>
+        const now = audioCtx.currentTime;
 
-        <!-- MAIN CONTENT AREA: Canvas Game + Side Panels -->
-        <div class="flex-1 flex overflow-hidden relative">
+        if (type === 'move') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.exponentialRampToValueAtTime(150, now + 0.05);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'win') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+          osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+        } else if (type === 'message') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        }
+      } catch (e) {
+        console.warn('Audio play error:', e);
+      }
+    }
 
-            <!-- GAME CANVAS SECTION -->
-            <div class="flex-1 relative bg-night-900 overflow-hidden flex flex-col justify-end">
-                
-                <!-- Speech Bubbles Container Overhead -->
-                <div id="speechBubblesLayer" class="absolute inset-0 pointer-events-none z-20"></div>
+    function toggleAudio() {
+      isAudioMuted = !isAudioMuted;
+      const icon = document.getElementById('audio-icon');
+      if (isAudioMuted) {
+        icon.setAttribute('data-lucide', 'volume-x');
+      } else {
+        icon.setAttribute('data-lucide', 'volume-2');
+      }
+      lucide.createIcons();
+      showToast(isAudioMuted ? 'Sound Muted' : 'Sound Enabled', 'info');
+    }
 
-                <!-- Main Game Canvas -->
-                <canvas id="gameCanvas"></canvas>
+    // TOAST NOTIFICATIONS SYSTEM
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const bgColors = {
+        info: 'bg-slate-900/90 border-indigo-500/50 text-indigo-200',
+        success: 'bg-slate-900/90 border-emerald-500/50 text-emerald-200',
+        error: 'bg-slate-900/90 border-red-500/50 text-red-200'
+      };
 
-                <!-- Canvas Controls Overlay -->
-                <div class="absolute top-4 left-4 z-20 flex flex-col gap-2">
-                    <div class="glass-panel px-3 py-2 rounded-2xl text-xs text-sakura-200 flex items-center gap-2 shadow-lg">
-                        <i class="fa-solid fa-location-crosshairs text-sakura-400"></i>
-                        <span>Click/Tap anywhere in the garden to walk</span>
-                    </div>
-                </div>
-
-                <!-- Dynamic Quick Emote Bar -->
-                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 glass-panel p-2 rounded-full flex items-center gap-1.5 shadow-2xl border border-sakura-400/30">
-                    <button onclick="sendEmote('🌸')" class="w-9 h-9 text-lg rounded-full hover:bg-sakura-500/30 transition flex items-center justify-center">🌸</button>
-                    <button onclick="sendEmote('🍵')" class="w-9 h-9 text-lg rounded-full hover:bg-sakura-500/30 transition flex items-center justify-center">🍵</button>
-                    <button onclick="sendEmote('💖')" class="w-9 h-9 text-lg rounded-full hover:bg-sakura-500/30 transition flex items-center justify-center">💖</button>
-                    <button onclick="sendEmote('🎶')" class="w-9 h-9 text-lg rounded-full hover:bg-sakura-500/30 transition flex items-center justify-center">🎶</button>
-                    <button onclick="sendEmote('✨')" class="w-9 h-9 text-lg rounded-full hover:bg-sakura-500/30 transition flex items-center justify-center">✨</button>
-                    <button onclick="sendEmote('🍡')" class="w-9 h-9 text-lg rounded-full hover:bg-sakura-500/30 transition flex items-center justify-center">🍡</button>
-                    <button onclick="sendEmote('🐱')" class="w-9 h-9 text-lg rounded-full hover:bg-sakura-500/30 transition flex items-center justify-center">🐱</button>
-                </div>
-            </div>
-
-            <!-- RIGHT SIDEBAR (Chat & Friends Toggle Tabs) -->
-            <div id="sidebarPanel" class="w-80 md:w-96 glass-panel border-l border-sakura-500/20 flex flex-col z-30 transition-all duration-300">
-                
-                <!-- Sidebar Header Tabs -->
-                <div class="flex border-b border-sakura-500/20 p-2 gap-2 bg-night-900/40">
-                    <button id="tabChatBtn" onclick="switchSidebarTab('chat')" class="flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-sakura-500 text-white shadow">
-                        <i class="fa-solid fa-comments"></i> Global Chat
-                    </button>
-                    <button id="tabFriendsBtn" onclick="switchSidebarTab('friends')" class="flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-sakura-200 hover:text-white hover:bg-sakura-500/20">
-                        <i class="fa-solid fa-user-group"></i> Friends <span id="friendCountBadge" class="bg-sakura-400 text-night-900 text-[10px] px-1.5 py-0.2 rounded-full font-extrabold">0</span>
-                    </button>
-                </div>
-
-                <!-- GLOBAL CHAT TAB CONTENT -->
-                <div id="chatTabContent" class="flex-1 flex flex-col overflow-hidden">
-                    <!-- Chat History -->
-                    <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3">
-                        <div class="text-center my-4">
-                            <span class="text-[11px] bg-sakura-500/10 text-sakura-300 px-3 py-1 rounded-full border border-sakura-500/20">
-                                Welcome to the Sakura Garden Chat 🌸
-                            </span>
-                        </div>
-                        <!-- Messages dynamically inserted here -->
-                    </div>
-
-                    <!-- Chat Input Box -->
-                    <form id="chatForm" onsubmit="handleSendChatMessage(event)" class="p-3 border-t border-sakura-500/20 flex gap-2 bg-night-900/60">
-                        <input type="text" id="chatInput" placeholder="Say something lovely..." maxlength="200" required class="flex-1 glass-input px-3.5 py-2.5 rounded-xl text-xs">
-                        <button type="submit" class="px-4 bg-sakura-500 hover:bg-sakura-400 text-white rounded-xl transition flex items-center justify-center shadow-md">
-                            <i class="fa-solid fa-paper-plane text-xs"></i>
-                        </button>
-                    </form>
-                </div>
-
-                <!-- FRIENDS MANAGER TAB CONTENT -->
-                <div id="friendsTabContent" class="flex-1 flex flex-col overflow-hidden hidden">
-                    <!-- Add Friend Bar -->
-                    <div class="p-3 border-b border-sakura-500/20 bg-night-900/40">
-                        <form onsubmit="handleAddFriend(event)" class="flex gap-2">
-                            <input type="text" id="friendSearchInput" placeholder="Enter friend's name..." required class="flex-1 glass-input px-3 py-2 rounded-xl text-xs">
-                            <button type="submit" class="px-3 bg-sakura-500 hover:bg-sakura-400 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition shadow">
-                                <i class="fa-solid fa-user-plus"></i> Add
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Friends List -->
-                    <div class="flex-1 p-3 overflow-y-auto space-y-2" id="friendsList">
-                        <!-- Dynamic Friend List -->
-                    </div>
-                </div>
-
-            </div>
+      toast.className = `pointer-events-auto flex items-center justify-between p-3.5 rounded-xl border ${bgColors[type]} shadow-xl text-xs backdrop-blur-md transition-all duration-300 transform translate-x-10 opacity-0`;
+      toast.innerHTML = `
+        <div class="flex items-center gap-2">
+          <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info'}" class="w-4 h-4 shrink-0"></i>
+          <span>${message}</span>
         </div>
-    </div>
+      `;
 
-    <!-- AVATAR CUSTOMIZER MODAL -->
-    <div id="customizerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-night-900/80 backdrop-blur-md hidden">
-        <div class="glass-panel w-full max-w-sm p-6 rounded-3xl text-center relative border border-sakura-400/30">
-            <button onclick="toggleAvatarCustomizer()" class="absolute top-4 right-4 text-sakura-200 hover:text-white">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <h2 class="text-xl font-fredoka font-bold text-white mb-1">Customize Avatar</h2>
-            <p class="text-xs text-sakura-200 mb-4">Pick your garden appearance & color</p>
+      container.appendChild(toast);
+      lucide.createIcons();
 
-            <!-- Sprite Select -->
-            <div class="mb-4 text-left">
-                <label class="block text-xs font-semibold text-sakura-200 mb-2">Avatar Character</label>
-                <div class="grid grid-cols-5 gap-2" id="modalAvatarPicker">
-                    <!-- Options populated JS -->
-                </div>
-            </div>
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-x-10', 'opacity-0');
+      });
 
-            <!-- Color Palette Select -->
-            <div class="mb-6 text-left">
-                <label class="block text-xs font-semibold text-sakura-200 mb-2">Aura Color</label>
-                <div class="flex justify-between gap-2" id="colorPickerContainer">
-                    <!-- Colors populated JS -->
-                </div>
-            </div>
+      setTimeout(() => {
+        toast.classList.add('translate-x-10', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
 
-            <button onclick="saveAvatarCustomization()" class="w-full py-2.5 bg-sakura-500 hover:bg-sakura-400 text-white font-bold rounded-xl text-xs shadow-lg transition">
-                Save Changes
-            </button>
-        </div>
-    </div>
+    // -------------------------------------------------------------
+    // MAZE GAME ENGINE (Canvas DFS Procedural Maze)
+    // -------------------------------------------------------------
+    let canvas, ctx;
+    let grid = [];
+    let cols = 10, rows = 10;
+    let cellSize = 40;
+    let player = { x: 0, y: 0 };
+    let goal = { x: 0, y: 0 };
+    let currentLevel = 1;
+    let moveCount = 0;
+    let gameTimer = 0;
+    let timerInterval = null;
+    let gameActive = false;
 
-    <!-- AUDIO STREAM ENGINE -->
-    <audio id="audioPlayer" loop preload="none">
-        <!-- Relaxing Ambient Lofi Stream -->
-        <source src="https://stream.zeno.fm/f3wvbbqmdg8uv" type="audio/mpeg">
-    </audio>
+    // Cell Constructor
+    function Cell(i, j) {
+      this.i = i;
+      this.j = j;
+      // Walls: top, right, bottom, left
+      this.walls = [true, true, true, true];
+      this.visited = false;
+    }
 
-    <script>
-        /* ==========================================================================
-           1. SUPABASE CLIENT CONFIGURATION
-           ========================================================================== */
-        const SUPABASE_URL = "https://brvyjdtnxzjlrhukngjn.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE";
+    function initMaze() {
+      canvas = document.getElementById('mazeCanvas');
+      ctx = canvas.getContext('2d');
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      // Adjust grid size based on level
+      cols = 8 + (currentLevel - 1) * 2;
+      rows = 8 + (currentLevel - 1) * 2;
+      
+      // Calculate responsive cell size
+      const maxCanvasSize = Math.min(window.innerWidth - 40, 520);
+      cellSize = Math.floor(maxCanvasSize / cols);
+      canvas.width = cols * cellSize;
+      canvas.height = rows * cellSize;
 
-        /* ==========================================================================
-           2. GLOBAL STATE & CONSTANTS
-           ========================================================================== */
-        const AVATAR_SPRITES = ['🌸', '🦊', '🐱', '🍡', '🍵', '🐰', '🐼', '🎏', '🎎', '⛩️'];
-        const AURA_COLORS = ['#f1688c', '#60a5fa', '#34d399', '#a78bfa', '#fbbf24'];
+      grid = [];
+      for (let j = 0; j < rows; j++) {
+        for (let i = 0; i < cols; i++) {
+          grid.push(new Cell(i, j));
+        }
+      }
 
-        let currentUser = null;
-        let userProfile = {
-            id: null,
-            name: 'Guest Sakura',
-            avatar: '🌸',
-            color: '#f1688c',
-            x: 0.5,
-            y: 0.6
-        };
+      // Generate Maze using DFS Recursive Backtracker
+      generateMazeDFS();
 
-        let activeAuthMode = 'signin'; // 'signin' or 'signup'
-        let onlineUsers = new Map(); // Store state of players in garden
-        let friends = []; // User's friend list
-        let localChatHistory = [];
-        let realtimeChannel = null;
+      // Reset Player & Goal
+      player = { x: 0, y: 0 };
+      goal = { x: cols - 1, y: rows - 1 };
+      moveCount = 0;
+      gameTimer = 0;
+      gameActive = true;
 
-        /* ==========================================================================
-           3. INITIALIZATION & AUTH PERSISTENCE
-           ========================================================================== */
-        window.addEventListener('DOMContentLoaded', async () => {
-            initPetalsCanvas();
-            initGameCanvas();
-            renderAvatarPickers();
+      document.getElementById('game-level-display').innerText = currentLevel;
+      document.getElementById('game-moves-display').innerText = moveCount;
+      document.getElementById('win-overlay').classList.add('opacity-0', 'pointer-events-none');
 
-            // Check Supabase session
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                handleUserSession(session.user);
-            } else {
-                // Check local storage for persistent guest
-                const localGuest = localStorage.getItem('sakura_guest_profile');
-                if (localGuest) {
-                    try {
-                        const parsed = JSON.parse(localGuest);
-                        setupGuestSession(parsed);
-                    } catch (e) {}
-                }
-            }
+      startTimer();
+      drawMaze();
+    }
 
-            // Listen for Supabase Auth state changes
-            supabase.auth.onAuthStateChange((event, session) => {
-                if (event === 'SIGNED_IN' && session) {
-                    handleUserSession(session.user);
-                } else if (event === 'SIGNED_OUT') {
-                    currentUser = null;
-                    document.getElementById('authModal').classList.remove('hidden');
-                    document.getElementById('mainApp').classList.add('hidden');
-                    if (realtimeChannel) realtimeChannel.unsubscribe();
-                }
-            });
+    function getCellIndex(i, j) {
+      if (i < 0 || j < 0 || i >= cols || j >= rows) return -1;
+      return i + j * cols;
+    }
+
+    function generateMazeDFS() {
+      let stack = [];
+      let current = grid[0];
+      current.visited = true;
+
+      while (true) {
+        let next = getUnvisitedNeighbor(current);
+        if (next) {
+          next.visited = true;
+          stack.push(current);
+          removeWalls(current, next);
+          current = next;
+        } else if (stack.length > 0) {
+          current = stack.pop();
+        } else {
+          break;
+        }
+      }
+    }
+
+    function getUnvisitedNeighbor(cell) {
+      let neighbors = [];
+      let top = grid[getCellIndex(cell.i, cell.j - 1)];
+      let right = grid[getCellIndex(cell.i + 1, cell.j)];
+      let bottom = grid[getCellIndex(cell.i, cell.j + 1)];
+      let left = grid[getCellIndex(cell.i - 1, cell.j)];
+
+      if (top && !top.visited) neighbors.push(top);
+      if (right && !right.visited) neighbors.push(right);
+      if (bottom && !bottom.visited) neighbors.push(bottom);
+      if (left && !left.visited) neighbors.push(left);
+
+      if (neighbors.length > 0) {
+        let r = Math.floor(Math.random() * neighbors.length);
+        return neighbors[r];
+      }
+      return undefined;
+    }
+
+    function removeWalls(a, b) {
+      let x = a.i - b.i;
+      if (x === 1) { a.walls[3] = false; b.walls[1] = false; }
+      else if (x === -1) { a.walls[1] = false; b.walls[3] = false; }
+      let y = a.j - b.j;
+      if (y === 1) { a.walls[0] = false; b.walls[2] = false; }
+      else if (y === -1) { a.walls[2] = false; b.walls[0] = false; }
+    }
+
+    function drawMaze() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Grid & Walls
+      ctx.strokeStyle = '#6366f1';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+
+      for (let i = 0; i < grid.length; i++) {
+        let cell = grid[i];
+        let x = cell.i * cellSize;
+        let y = cell.j * cellSize;
+
+        if (cell.walls[0]) drawLine(x, y, x + cellSize, y); // Top
+        if (cell.walls[1]) drawLine(x + cellSize, y, x + cellSize, y + cellSize); // Right
+        if (cell.walls[2]) drawLine(x + cellSize, y + cellSize, x, y + cellSize); // Bottom
+        if (cell.walls[3]) drawLine(x, y + cellSize, x, y); // Left
+      }
+
+      // Draw Goal (Glow Orb)
+      const gx = goal.x * cellSize + cellSize / 2;
+      const gy = goal.y * cellSize + cellSize / 2;
+      ctx.fillStyle = '#ff007f';
+      ctx.shadowColor = '#ff007f';
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.arc(gx, gy, cellSize * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0; // Reset Shadow
+
+      // Draw Player
+      const px = player.x * cellSize + cellSize / 2;
+      const py = player.y * cellSize + cellSize / 2;
+      ctx.fillStyle = '#00ffcc';
+      ctx.shadowColor = '#00ffcc';
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.arc(px, py, cellSize * 0.32, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    function drawLine(x1, y1, x2, y2) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    function movePlayer(dx, dy) {
+      if (!gameActive) return;
+
+      const currentCell = grid[getCellIndex(player.x, player.y)];
+      let canMove = false;
+
+      if (dx === 0 && dy === -1 && !currentCell.walls[0]) canMove = true; // Up
+      if (dx === 1 && dy === 0 && !currentCell.walls[1]) canMove = true;  // Right
+      if (dx === 0 && dy === 1 && !currentCell.walls[2]) canMove = true;  // Down
+      if (dx === -1 && dy === 0 && !currentCell.walls[3]) canMove = true; // Left
+
+      if (canMove) {
+        player.x += dx;
+        player.y += dy;
+        moveCount++;
+        document.getElementById('game-moves-display').innerText = moveCount;
+        playSound('move');
+        drawMaze();
+
+        // Check Win Condition
+        if (player.x === goal.x && player.y === goal.y) {
+          handleWin();
+        }
+      }
+    }
+
+    function handleWin() {
+      gameActive = false;
+      clearInterval(timerInterval);
+      playSound('win');
+
+      // Trigger Confetti
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      document.getElementById('win-summary').innerText = 
+        `Completed Level ${currentLevel} in ${gameTimer}s using ${moveCount} moves!`;
+      
+      document.getElementById('win-overlay').classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function resetCurrentLevel() {
+      initMaze();
+    }
+
+    function nextLevel() {
+      currentLevel++;
+      initMaze();
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      gameTimer = 0;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        gameTimer++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(gameTimer / 60).toString().padStart(2, '0');
+      const secs = (gameTimer % 60).toString().padStart(2, '0');
+      document.getElementById('game-timer-display').innerText = `${mins}:${secs}`;
+    }
+
+    // Keyboard Controller
+    window.addEventListener('keydown', (e) => {
+      if (['ArrowUp', 'KeyW'].includes(e.code)) { movePlayer(0, -1); e.preventDefault(); }
+      if (['ArrowDown', 'KeyS'].includes(e.code)) { movePlayer(0, 1); e.preventDefault(); }
+      if (['ArrowLeft', 'KeyA'].includes(e.code)) { movePlayer(-1, 0); e.preventDefault(); }
+      if (['ArrowRight', 'KeyD'].includes(e.code)) { movePlayer(1, 0); e.preventDefault(); }
+    });
+
+    // -------------------------------------------------------------
+    // SUPABASE AUTHENTICATION & SESSION PERSISTENCE
+    // -------------------------------------------------------------
+    function switchAuthTab(tab) {
+      const signinForm = document.getElementById('signin-form');
+      const signupForm = document.getElementById('signup-form');
+      const tabSigninBtn = document.getElementById('tab-signin-btn');
+      const tabSignupBtn = document.getElementById('tab-signup-btn');
+
+      if (tab === 'signin') {
+        signinForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+        tabSigninBtn.className = "flex-1 pb-3 text-sm font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all";
+        tabSignupBtn.className = "flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all";
+      } else {
+        signupForm.classList.remove('hidden');
+        signinForm.classList.add('hidden');
+        tabSignupBtn.className = "flex-1 pb-3 text-sm font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all";
+        tabSigninBtn.className = "flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all";
+      }
+    }
+
+    async function initAuthSession() {
+      // Listen to Auth Changes
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session && session.user) {
+          currentUser = session.user;
+          updateProfileUI(currentUser);
+          closeAuthModal();
+          initGlobalChatChannel();
+        } else {
+          currentUser = null;
+        }
+      });
+
+      // Check current session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && session.user) {
+        currentUser = session.user;
+        updateProfileUI(currentUser);
+        closeAuthModal();
+        initGlobalChatChannel();
+      }
+    }
+
+    async function handleSignIn(e) {
+      e.preventDefault();
+      const email = document.getElementById('signin-email').value;
+      const password = document.getElementById('signin-password').value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        showToast(error.message, 'error');
+      } else {
+        showToast('Signed in successfully!', 'success');
+        currentUser = data.user;
+        updateProfileUI(currentUser);
+        closeAuthModal();
+        initGlobalChatChannel();
+      }
+    }
+
+    async function handleSignUp(e) {
+      e.preventDefault();
+      const username = document.getElementById('signup-username').value.trim();
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: username }
+        }
+      });
+
+      if (error) {
+        showToast(error.message, 'error');
+      } else {
+        showToast('Account created successfully!', 'success');
+        currentUser = data.user;
+        updateProfileUI(currentUser);
+        closeAuthModal();
+        initGlobalChatChannel();
+      }
+    }
+
+    async function handleLogout() {
+      await supabase.auth.signOut();
+      currentUser = null;
+      document.getElementById('auth-modal').classList.remove('opacity-0', 'pointer-events-none');
+      updateProfileUI(null);
+      showToast('Logged out of session', 'info');
+    }
+
+    function playAsGuest() {
+      closeAuthModal();
+      showToast('Entered as Guest Player', 'info');
+      initGlobalChatChannel();
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function updateProfileUI(user) {
+      const avatar = document.getElementById('user-avatar');
+      const displayName = document.getElementById('user-display-name');
+      const statusText = document.getElementById('user-status-text');
+
+      if (user) {
+        const name = user.user_metadata?.display_name || user.email.split('@')[0];
+        avatar.innerText = name.charAt(0).toUpperCase();
+        displayName.innerText = name;
+        statusText.innerText = 'Online';
+      } else {
+        avatar.innerText = '?';
+        displayName.innerText = 'Guest Player';
+        statusText.innerText = 'Offline Mode';
+      }
+    }
+
+    // -------------------------------------------------------------
+    // REAL-TIME GLOBAL CHAT & BROADCAST CHANNEL
+    // -------------------------------------------------------------
+    function initGlobalChatChannel() {
+      if (chatChannel) return;
+
+      chatChannel = supabase.channel('global_chat', {
+        config: { broadcast: { self: true } }
+      });
+
+      chatChannel.on('broadcast', { event: 'message' }, (payload) => {
+        renderChatMessage(payload.payload);
+      }).subscribe();
+    }
+
+    function handleSendChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      const senderName = currentUser 
+        ? (currentUser.user_metadata?.display_name || currentUser.email.split('@')[0])
+        : 'Guest_' + Math.floor(Math.random() * 899 + 100);
+
+      const msgPayload = {
+        id: Date.now(),
+        sender: senderName,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      if (chatChannel) {
+        chatChannel.send({
+          type: 'broadcast',
+          event: 'message',
+          payload: msgPayload
         });
-
-        function handleUserSession(user) {
-            currentUser = user;
-            const meta = user.user_metadata || {};
-            userProfile.id = user.id;
-            userProfile.name = meta.username || user.email.split('@')[0];
-            userProfile.avatar = meta.avatar || '🌸';
-            userProfile.color = meta.color || '#f1688c';
-
-            updateUserInterface();
-            initRealtimeGarden();
-            loadFriendList();
-        }
-
-        function setupGuestSession(guestData = null) {
-            if (!guestData) {
-                const randomId = 'guest_' + Math.random().toString(36).substring(2, 9);
-                guestData = {
-                    id: randomId,
-                    name: 'Guest_' + Math.floor(1000 + Math.random() * 9000),
-                    avatar: AVATAR_SPRITES[Math.floor(Math.random() * AVATAR_SPRITES.length)],
-                    color: AURA_COLORS[Math.floor(Math.random() * AURA_COLORS.length)]
-                };
-                localStorage.setItem('sakura_guest_profile', JSON.stringify(guestData));
-            }
-
-            userProfile.id = guestData.id;
-            userProfile.name = guestData.name;
-            userProfile.avatar = guestData.avatar;
-            userProfile.color = guestData.color;
-
-            updateUserInterface();
-            initRealtimeGarden();
-            loadFriendList();
-        }
-
-        function guestLogin() {
-            setupGuestSession();
-        }
-
-        function updateUserInterface() {
-            document.getElementById('authModal').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('navUsername').textContent = userProfile.name;
-            document.getElementById('navAvatarSprite').textContent = userProfile.avatar;
-            
-            // Random start position on canvas
-            userProfile.x = 0.2 + Math.random() * 0.6;
-            userProfile.y = 0.4 + Math.random() * 0.4;
-        }
-
-        /* ==========================================================================
-           4. AUTHENTICATION HANDLERS
-           ========================================================================== */
-        function switchAuthTab(mode) {
-            activeAuthMode = mode;
-            const signinBtn = document.getElementById('tabSigninBtn');
-            const signupBtn = document.getElementById('tabSignupBtn');
-            const usernameGroup = document.getElementById('usernameGroup');
-            const avatarGroup = document.getElementById('avatarSelectGroup');
-            const submitBtnText = document.getElementById('authBtnText');
-
-            if (mode === 'signup') {
-                signupBtn.className = "flex-1 py-2 rounded-xl font-bold text-xs transition-all duration-200 bg-sakura-500 text-white shadow-md";
-                signinBtn.className = "flex-1 py-2 rounded-xl font-bold text-xs transition-all duration-200 text-sakura-200 hover:text-white";
-                usernameGroup.classList.remove('hidden');
-                avatarGroup.classList.remove('hidden');
-                submitBtnText.textContent = "Create Garden Account";
-            } else {
-                signinBtn.className = "flex-1 py-2 rounded-xl font-bold text-xs transition-all duration-200 bg-sakura-500 text-white shadow-md";
-                signupBtn.className = "flex-1 py-2 rounded-xl font-bold text-xs transition-all duration-200 text-sakura-200 hover:text-white";
-                usernameGroup.classList.add('hidden');
-                avatarGroup.classList.add('hidden');
-                submitBtnText.textContent = "Sign In to Garden";
-            }
-        }
-
-        async function handleAuthSubmit(e) {
-            e.preventDefault();
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value;
-            const username = document.getElementById('authUsername').value.trim() || 'Sakura Lover';
-            const msgEl = document.getElementById('authMsg');
-
-            msgEl.classList.add('hidden');
-
-            try {
-                if (activeAuthMode === 'signup') {
-                    const { data, error } = await supabase.auth.signUp({
-                        email,
-                        password,
-                        options: {
-                            data: {
-                                username,
-                                avatar: userProfile.avatar,
-                                color: userProfile.color
-                            }
-                        }
-                    });
-                    if (error) throw error;
-                    showAuthMsg('Account created! Logging in...', 'success');
-                } else {
-                    const { data, error } = await supabase.auth.signInWithPassword({
-                        email,
-                        password
-                    });
-                    if (error) throw error;
-                    showAuthMsg('Welcome back!', 'success');
-                }
-            } catch (err) {
-                showAuthMsg(err.message || 'Authentication error', 'error');
-            }
-        }
-
-        function showAuthMsg(msg, type) {
-            const msgEl = document.getElementById('authMsg');
-            msgEl.textContent = msg;
-            msgEl.className = `text-xs p-3 rounded-xl text-center font-medium block ${
-                type === 'error' ? 'bg-red-500/20 text-red-200 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30'
-            }`;
-        }
-
-        async function handleSignOut() {
-            localStorage.removeItem('sakura_guest_profile');
-            await supabase.auth.signOut();
-            window.location.reload();
-        }
-
-        /* ==========================================================================
-           5. SUPABASE REALTIME PRESENCE & CHAT
-           ========================================================================== */
-        function initRealtimeGarden() {
-            // Setup Supabase Realtime channel for lounge presence and chat
-            realtimeChannel = supabase.channel('sakura_lounge_room', {
-                config: {
-                    presence: {
-                        key: userProfile.id,
-                    },
-                },
-            });
-
-            // Track Presence (Online Users)
-            realtimeChannel
-                .on('presence', { event: 'sync' }, () => {
-                    const presenceState = realtimeChannel.presenceState();
-                    onlineUsers.clear();
-                    let count = 0;
-
-                    for (const id in presenceState) {
-                        const userState = presenceState[id][0];
-                        if (userState) {
-                            onlineUsers.set(id, userState);
-                            count++;
-                        }
-                    }
-
-                    // Always add self to presence map locally
-                    onlineUsers.set(userProfile.id, {
-                        user_id: userProfile.id,
-                        name: userProfile.name,
-                        avatar: userProfile.avatar,
-                        color: userProfile.color,
-                        x: userProfile.x,
-                        y: userProfile.y,
-                        targetX: userProfile.x,
-                        targetY: userProfile.y
-                    });
-
-                    document.getElementById('onlineCountText').textContent = `${Math.max(1, count)} online`;
-                })
-                .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-                    const p = newPresences[0];
-                    if (p && p.name && p.user_id !== userProfile.id) {
-                        appendSystemChatMessage(`${p.name} entered the garden 🌸`);
-                    }
-                })
-                .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-                    const p = leftPresences[0];
-                    if (p && p.name) {
-                        appendSystemChatMessage(`${p.name} left the garden`);
-                    }
-                })
-                // Broadcast Chat Messages & Movement
-                .on('broadcast', { event: 'chat' }, (payload) => {
-                    renderChatMessage(payload.payload);
-                    showSpeechBubble(payload.payload.userId, payload.payload.message);
-                })
-                .on('broadcast', { event: 'move' }, (payload) => {
-                    const { userId, x, y } = payload.payload;
-                    if (onlineUsers.has(userId)) {
-                        const u = onlineUsers.get(userId);
-                        u.targetX = x;
-                        u.targetY = y;
-                    }
-                })
-                .subscribe(async (status) => {
-                    if (status === 'SUBSCRIBED') {
-                        await realtimeChannel.track({
-                            user_id: userProfile.id,
-                            name: userProfile.name,
-                            avatar: userProfile.avatar,
-                            color: userProfile.color,
-                            x: userProfile.x,
-                            y: userProfile.y,
-                            targetX: userProfile.x,
-                            targetY: userProfile.y
-                        });
-                    }
-                });
-        }
-
-        /* Send Chat Message */
-        function handleSendChatMessage(e) {
-            e.preventDefault();
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const chatData = {
-                id: Math.random().toString(36).substr(2, 9),
-                userId: userProfile.id,
-                name: userProfile.name,
-                avatar: userProfile.avatar,
-                color: userProfile.color,
-                message: text,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-
-            // Send via Realtime Broadcast
-            if (realtimeChannel) {
-                realtimeChannel.send({
-                    type: 'broadcast',
-                    event: 'chat',
-                    payload: chatData
-                });
-            }
-
-            // Render locally
-            renderChatMessage(chatData);
-            showSpeechBubble(userProfile.id, text);
-
-            input.value = '';
-        }
-
-        function sendEmote(emoji) {
-            document.getElementById('chatInput').value = emoji;
-            handleSendChatMessage(new Event('submit'));
-        }
-
-        function renderChatMessage(msg) {
-            const chatBox = document.getElementById('chatMessages');
-            const isSelf = msg.userId === userProfile.id;
-
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `flex gap-2.5 ${isSelf ? 'flex-row-reverse' : 'flex-row'} items-start`;
-
-            msgDiv.innerHTML = `
-                <div class="w-8 h-8 rounded-full flex items-center justify-center text-base shrink-0 shadow" style="background-color: ${msg.color}40; border: 1px solid ${msg.color}">
-                    ${msg.avatar}
-                </div>
-                <div class="max-w-[75%]">
-                    <div class="flex items-center gap-2 mb-0.5 ${isSelf ? 'justify-end' : ''}">
-                        <span class="text-[11px] font-bold text-white">${msg.name}</span>
-                        <span class="text-[9px] text-sakura-200/60">${msg.timestamp}</span>
-                    </div>
-                    <div class="p-2.5 rounded-2xl text-xs leading-relaxed shadow-sm ${
-                        isSelf 
-                        ? 'bg-sakura-500 text-white rounded-tr-none' 
-                        : 'glass-panel text-slate-100 rounded-tl-none border border-sakura-400/20'
-                    }">
-                        ${escapeHtml(msg.message)}
-                    </div>
-                </div>
-            `;
-
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function appendSystemChatMessage(text) {
-            const chatBox = document.getElementById('chatMessages');
-            const sysDiv = document.createElement('div');
-            sysDiv.className = "text-center my-2";
-            sysDiv.innerHTML = `<span class="text-[10px] bg-night-800 text-sakura-300/80 px-2.5 py-0.5 rounded-full border border-sakura-500/10">${text}</span>`;
-            chatBox.appendChild(sysDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        /* ==========================================================================
-           6. FRIEND MANAGEMENT SYSTEM
-           ========================================================================== */
-        function loadFriendList() {
-            const saved = localStorage.getItem(`sakura_friends_${userProfile.id}`);
-            if (saved) {
-                try { friends = JSON.parse(saved); } catch (e) { friends = []; }
-            } else {
-                // Default friendly bots/starter friends
-                friends = [
-                    { id: 'f1', name: 'Mochi_San', avatar: '🐱', status: 'Online' },
-                    { id: 'f2', name: 'Sakura_Lover', avatar: '🌸', status: 'Offline' }
-                ];
-                saveFriends();
-            }
-            renderFriendsList();
-        }
-
-        function saveFriends() {
-            localStorage.setItem(`sakura_friends_${userProfile.id}`, JSON.stringify(friends));
-            renderFriendsList();
-        }
-
-        function handleAddFriend(e) {
-            e.preventDefault();
-            const input = document.getElementById('friendSearchInput');
-            const name = input.value.trim();
-            if (!name) return;
-
-            // Check if already friends
-            if (friends.some(f => f.name.toLowerCase() === name.toLowerCase())) {
-                alert('User is already on your friends list!');
-                return;
-            }
-
-            const newFriend = {
-                id: 'friend_' + Math.random().toString(36).substr(2, 7),
-                name: name,
-                avatar: AVATAR_SPRITES[Math.floor(Math.random() * AVATAR_SPRITES.length)],
-                status: 'Online'
-            };
-
-            friends.push(newFriend);
-            saveFriends();
-            input.value = '';
-            appendSystemChatMessage(`Added ${name} as a friend! 💖`);
-        }
-
-        function removeFriend(id) {
-            friends = friends.filter(f => f.id !== id);
-            saveFriends();
-        }
-
-        function renderFriendsList() {
-            const listEl = document.getElementById('friendsList');
-            const badge = document.getElementById('friendCountBadge');
-            badge.textContent = friends.length;
-
-            if (friends.length === 0) {
-                listEl.innerHTML = `
-                    <div class="text-center py-8 text-sakura-200/50 text-xs">
-                        <i class="fa-solid fa-user-group text-2xl mb-2 opacity-40"></i>
-                        <p>No friends added yet.</p>
-                        <p class="text-[10px] mt-1">Add friends above using their username!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            listEl.innerHTML = friends.map(f => `
-                <div class="glass-panel p-2.5 rounded-2xl flex items-center justify-between border border-sakura-500/10 hover:border-sakura-400/30 transition">
-                    <div class="flex items-center gap-2.5">
-                        <div class="relative w-9 h-9 rounded-xl bg-night-800 flex items-center justify-center text-lg shadow">
-                            ${f.avatar}
-                            <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${f.status === 'Online' ? 'bg-emerald-400 online-badge' : 'bg-slate-500'} border-2 border-night-900"></span>
-                        </div>
-                        <div>
-                            <div class="text-xs font-bold text-white">${f.name}</div>
-                            <div class="text-[10px] ${f.status === 'Online' ? 'text-emerald-400' : 'text-slate-400'}">${f.status}</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <button onclick="sendPrivateWave('${f.name}')" title="Wave to Friend" class="p-2 hover:bg-sakura-500/20 text-sakura-300 rounded-lg transition text-xs">
-                            <i class="fa-solid fa-hand-wave"></i>
-                        </button>
-                        <button onclick="removeFriend('${f.id}')" title="Remove Friend" class="p-2 hover:bg-red-500/20 text-red-300 rounded-lg transition text-xs">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function sendPrivateWave(name) {
-            document.getElementById('chatInput').value = `Waves softly at @${name} 👋🌸`;
-            switchSidebarTab('chat');
-        }
-
-        /* ==========================================================================
-           7. INTERACTIVE GARDEN CANVAS & AVATAR ANIMATION ENGINE
-           ========================================================================== */
-        let gameCanvas, gameCtx;
-        let petalsCanvas, petalsCtx;
-        let petals = [];
-
-        function initPetalsCanvas() {
-            petalsCanvas = document.getElementById('petalCanvas');
-            petalsCtx = petalsCanvas.getContext('2d');
-            resizePetalCanvas();
-
-            window.addEventListener('resize', resizePetalCanvas);
-
-            // Generate Sakura Petals
-            petals = Array.from({ length: 45 }, () => ({
-                x: Math.random() * petalsCanvas.width,
-                y: Math.random() * petalsCanvas.height,
-                size: Math.random() * 6 + 4,
-                speedY: Math.random() * 1.2 + 0.6,
-                speedX: Math.random() * 0.8 - 0.4,
-                rotation: Math.random() * 360,
-                rotSpeed: (Math.random() - 0.5) * 2,
-                opacity: Math.random() * 0.6 + 0.4
-            }));
-
-            animatePetals();
-        }
-
-        function resizePetalCanvas() {
-            petalsCanvas.width = window.innerWidth;
-            petalsCanvas.height = window.innerHeight;
-        }
-
-        function animatePetals() {
-            petalsCtx.clearRect(0, 0, petalsCanvas.width, petalsCanvas.height);
-
-            petals.forEach(p => {
-                p.y += p.speedY;
-                p.x += p.speedX + Math.sin(p.y * 0.01) * 0.3;
-                p.rotation += p.rotSpeed;
-
-                if (p.y > petalsCanvas.height + 20) {
-                    p.y = -20;
-                    p.x = Math.random() * petalsCanvas.width;
-                }
-
-                petalsCtx.save();
-                petalsCtx.translate(p.x, p.y);
-                petalsCtx.rotate((p.rotation * Math.PI) / 180);
-                petalsCtx.globalAlpha = p.opacity;
-
-                // Draw Blossom Petal Shape
-                petalsCtx.fillStyle = '#fccad6';
-                petalsCtx.beginPath();
-                petalsCtx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
-                petalsCtx.fill();
-
-                petalsCtx.restore();
-            });
-
-            requestAnimationFrame(animatePetals);
-        }
-
-        function initGameCanvas() {
-            gameCanvas = document.getElementById('gameCanvas');
-            gameCtx = gameCanvas.getContext('2d');
-            resizeGameCanvas();
-
-            window.addEventListener('resize', resizeGameCanvas);
-
-            // Canvas Click to move avatar
-            gameCanvas.addEventListener('click', (e) => {
-                const rect = gameCanvas.getBoundingClientRect();
-                const clickX = (e.clientX - rect.left) / gameCanvas.width;
-                const clickY = (e.clientY - rect.top) / gameCanvas.height;
-
-                // Set target position
-                userProfile.x = clickX;
-                userProfile.y = clickY;
-
-                // Broadcast move to other online users
-                if (realtimeChannel) {
-                    realtimeChannel.send({
-                        type: 'broadcast',
-                        event: 'move',
-                        payload: {
-                            userId: userProfile.id,
-                            x: clickX,
-                            y: clickY
-                        }
-                    });
-                }
-            });
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        function resizeGameCanvas() {
-            const container = gameCanvas.parentElement;
-            gameCanvas.width = container.clientWidth;
-            gameCanvas.height = container.clientHeight;
-        }
-
-        function gameLoop() {
-            gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-
-            // 1. Draw Garden Background Scene
-            drawGardenEnvironment();
-
-            // 2. Smoothly update positions and draw online avatars
-            onlineUsers.forEach((user, id) => {
-                // Smooth interpolation to target coords
-                if (user.targetX !== undefined) {
-                    user.x += (user.targetX - user.x) * 0.08;
-                    user.y += (user.targetY - user.y) * 0.08;
-                }
-
-                drawAvatar(user);
-            });
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        function drawGardenEnvironment() {
-            const w = gameCanvas.width;
-            const h = gameCanvas.height;
-
-            // Night Garden Ambient Gradient
-            const bgGrad = gameCtx.createLinearGradient(0, 0, 0, h);
-            bgGrad.addColorStop(0, '#1a0c27');
-            bgGrad.addColorStop(0.5, '#2a1638');
-            bgGrad.addColorStop(1, '#150d20');
-            gameCtx.fillStyle = bgGrad;
-            gameCtx.fillRect(0, 0, w, h);
-
-            // Winding Stone Path
-            gameCtx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-            gameCtx.beginPath();
-            gameCtx.moveTo(w * 0.2, h);
-            gameCtx.bezierCurveTo(w * 0.3, h * 0.7, w * 0.6, h * 0.6, w * 0.5, h * 0.2);
-            gameCtx.lineWidth = 60;
-            gameCtx.strokeStyle = 'rgba(70, 50, 85, 0.4)';
-            gameCtx.stroke();
-
-            // Serene Koi Pond Canvas Object
-            gameCtx.fillStyle = 'rgba(30, 70, 90, 0.5)';
-            gameCtx.beginPath();
-            gameCtx.ellipse(w * 0.8, h * 0.75, w * 0.15, h * 0.12, Math.PI / 6, 0, Math.PI * 2);
-            gameCtx.fill();
-            gameCtx.strokeStyle = 'rgba(140, 210, 230, 0.3)';
-            gameCtx.lineWidth = 3;
-            gameCtx.stroke();
-
-            // Draw Stylized Sakura Trees on Side Flanks
-            drawSakuraTree(w * 0.1, h * 0.3, 0.8);
-            drawSakuraTree(w * 0.88, h * 0.25, 1.0);
-            drawSakuraTree(w * 0.05, h * 0.8, 1.1);
-
-            // Soft Wooden Deck Bench
-            gameCtx.fillStyle = '#3a232f';
-            gameCtx.fillRect(w * 0.45, h * 0.45, 90, 20);
-            gameCtx.fillStyle = '#4a2d3d';
-            gameCtx.fillRect(w * 0.43, h * 0.43, 94, 6);
-        }
-
-        function drawSakuraTree(x, y, scale) {
-            gameCtx.save();
-            gameCtx.translate(x, y);
-            gameCtx.scale(scale, scale);
-
-            // Trunk
-            gameCtx.strokeStyle = '#2d1810';
-            gameCtx.lineWidth = 14;
-            gameCtx.beginPath();
-            gameCtx.moveTo(0, 60);
-            gameCtx.quadraticCurveTo(-10, 20, 0, 0);
-            gameCtx.stroke();
-
-            // Soft Foliage Canopy Layers
-            const colors = ['#e53b68', '#f1688c', '#fccad6'];
-            colors.forEach((col, idx) => {
-                gameCtx.fillStyle = col + 'cc';
-                gameCtx.beginPath();
-                gameCtx.arc(-20 + idx * 10, -20 - idx * 5, 45 - idx * 5, 0, Math.PI * 2);
-                gameCtx.arc(20 - idx * 5, -15 - idx * 5, 40 - idx * 5, 0, Math.PI * 2);
-                gameCtx.arc(0, -40 - idx * 5, 50 - idx * 5, 0, Math.PI * 2);
-                gameCtx.fill();
-            });
-
-            gameCtx.restore();
-        }
-
-        function drawAvatar(user) {
-            const px = user.x * gameCanvas.width;
-            const py = user.y * gameCanvas.height;
-
-            gameCtx.save();
-            gameCtx.translate(px, py);
-
-            // Shadow
-            gameCtx.fillStyle = 'rgba(0,0,0,0.3)';
-            gameCtx.beginPath();
-            gameCtx.ellipse(0, 18, 18, 8, 0, 0, Math.PI * 2);
-            gameCtx.fill();
-
-            // Dynamic Aura Glow ring
-            gameCtx.strokeStyle = user.color || '#f1688c';
-            gameCtx.lineWidth = 3;
-            gameCtx.beginPath();
-            gameCtx.ellipse(0, 18, 22, 10, 0, 0, Math.PI * 2);
-            gameCtx.stroke();
-
-            // Emoji / Sprite Rendering
-            gameCtx.font = '28px sans-serif';
-            gameCtx.textAlign = 'center';
-            gameCtx.textBaseline = 'middle';
-            gameCtx.fillText(user.avatar || '🌸', 0, 0);
-
-            // Name Tag Pill
-            gameCtx.font = 'bold 11px Nunito, sans-serif';
-            const nameWidth = gameCtx.measureText(user.name).width;
-
-            gameCtx.fillStyle = 'rgba(18, 11, 24, 0.85)';
-            gameCtx.beginPath();
-            gameCtx.roundRect(-nameWidth/2 - 8, -34, nameWidth + 16, 18, 8);
-            gameCtx.fill();
-            gameCtx.strokeStyle = 'rgba(247, 159, 181, 0.3)';
-            gameCtx.lineWidth = 1;
-            gameCtx.stroke();
-
-            // Name Text
-            gameCtx.fillStyle = '#ffffff';
-            gameCtx.fillText(user.name, 0, -25);
-
-            gameCtx.restore();
-
-            // Reposition overhead dynamic HTML speech bubble if active
-            updateSpeechBubblePos(user.user_id || user.id, px, py);
-        }
-
-        /* Dynamic Floating Speech Bubbles Overlay */
-        function showSpeechBubble(userId, text) {
-            const container = document.getElementById('speechBubblesLayer');
-            let bubble = document.getElementById(`bubble_${userId}`);
-
-            if (!bubble) {
-                bubble = document.createElement('div');
-                bubble.id = `bubble_${userId}`;
-                bubble.className = 'speech-bubble';
-                container.appendChild(bubble);
-            }
-
-            bubble.textContent = text;
-
-            // Auto-hide bubble after 4 seconds
-            clearTimeout(bubble.timeout);
-            bubble.timeout = setTimeout(() => {
-                if (bubble.parentElement) bubble.parentElement.removeChild(bubble);
-            }, 4000);
-        }
-
-        function updateSpeechBubblePos(userId, px, py) {
-            const bubble = document.getElementById(`bubble_${userId}`);
-            if (bubble) {
-                bubble.style.left = `${px}px`;
-                bubble.style.top = `${py - 40}px`;
-            }
-        }
-
-        /* ==========================================================================
-           8. LO-FI / AMBIENT MUSIC PLAYER
-           ========================================================================== */
-        let isPlayingMusic = false;
-        const audioPlayer = document.getElementById('audioPlayer');
-
-        function toggleMusic() {
-            const btnIcon = document.getElementById('musicIcon');
-            if (isPlayingMusic) {
-                audioPlayer.pause();
-                btnIcon.className = "fa-solid fa-play text-xs";
-                isPlayingMusic = false;
-            } else {
-                audioPlayer.play().then(() => {
-                    btnIcon.className = "fa-solid fa-pause text-xs";
-                    isPlayingMusic = true;
-                }).catch(err => {
-                    console.log("Audio playback error:", err);
-                });
-            }
-        }
-
-        function changeVolume(val) {
-            audioPlayer.volume = val;
-        }
-
-        /* ==========================================================================
-           9. UI HELPERS & CUSTOMIZATION MODAL
-           ========================================================================== */
-        function switchSidebarTab(tab) {
-            const chatBtn = document.getElementById('tabChatBtn');
-            const friendsBtn = document.getElementById('tabFriendsBtn');
-            const chatContent = document.getElementById('chatTabContent');
-            const friendsContent = document.getElementById('friendsTabContent');
-
-            if (tab === 'chat') {
-                chatBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-sakura-500 text-white shadow";
-                friendsBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-sakura-200 hover:text-white hover:bg-sakura-500/20";
-                chatContent.classList.remove('hidden');
-                friendsContent.classList.add('hidden');
-            } else {
-                friendsBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-sakura-500 text-white shadow";
-                chatBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-sakura-200 hover:text-white hover:bg-sakura-500/20";
-                friendsContent.classList.remove('hidden');
-                chatContent.classList.add('hidden');
-            }
-        }
-
-        function renderAvatarPickers() {
-            const containers = [
-                document.getElementById('avatarPickerContainer'),
-                document.getElementById('modalAvatarPicker')
-            ];
-
-            containers.forEach(cont => {
-                if (!cont) return;
-                cont.innerHTML = AVATAR_SPRITES.map(s => `
-                    <button type="button" onclick="selectAvatarSprite('${s}')" class="w-10 h-10 rounded-xl bg-night-800 border border-sakura-500/20 hover:border-sakura-400 text-xl flex items-center justify-center transition">
-                        ${s}
-                    </button>
-                `).join('');
-            });
-
-            // Color Picker in Modal
-            const colorCont = document.getElementById('colorPickerContainer');
-            if (colorCont) {
-                colorCont.innerHTML = AURA_COLORS.map(c => `
-                    <button type="button" onclick="selectAuraColor('${c}')" class="w-8 h-8 rounded-full border-2 border-white/20 transition transform hover:scale-110 shadow" style="background-color: ${c}"></button>
-                `).join('');
-            }
-        }
-
-        function selectAvatarSprite(sprite) {
-            userProfile.avatar = sprite;
-            document.getElementById('navAvatarSprite').textContent = sprite;
-        }
-
-        function selectAuraColor(color) {
-            userProfile.color = color;
-        }
-
-        function toggleAvatarCustomizer() {
-            const modal = document.getElementById('customizerModal');
-            modal.classList.toggle('hidden');
-        }
-
-        function saveAvatarCustomization() {
-            toggleAvatarCustomizer();
-            
-            // Save state & re-track presence
-            if (currentUser) {
-                supabase.auth.updateUser({
-                    data: { avatar: userProfile.avatar, color: userProfile.color }
-                });
-            } else {
-                localStorage.setItem('sakura_guest_profile', JSON.stringify(userProfile));
-            }
-
-            if (realtimeChannel) {
-                realtimeChannel.track({
-                    user_id: userProfile.id,
-                    name: userProfile.name,
-                    avatar: userProfile.avatar,
-                    color: userProfile.color,
-                    x: userProfile.x,
-                    y: userProfile.y
-                });
-            }
-        }
-    </script>
+      } else {
+        renderChatMessage(msgPayload);
+      }
+
+      input.value = '';
+    }
+
+    function renderChatMessage(msg) {
+      const container = document.getElementById('chat-messages');
+      const msgEl = document.createElement('div');
+      msgEl.className = 'flex items-start gap-2.5 text-xs animate-fade-in';
+
+      msgEl.innerHTML = `
+        <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-indigo-300 shrink-0 uppercase">
+          ${msg.sender.charAt(0)}
+        </div>
+        <div class="flex-1 bg-slate-900/90 border border-slate-800/80 rounded-2xl p-2.5 shadow-sm">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-bold text-slate-200">${msg.sender}</span>
+            <span class="text-[10px] text-slate-500">${msg.time}</span>
+          </div>
+          <p class="text-slate-300 leading-relaxed">${escapeHtml(msg.text)}</p>
+        </div>
+      `;
+
+      container.appendChild(msgEl);
+      container.scrollTop = container.scrollHeight;
+      playSound('message');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // -------------------------------------------------------------
+    // FRIEND SYSTEM
+    // -------------------------------------------------------------
+    function switchSidebarTab(tab) {
+      const chatBtn = document.getElementById('tab-chat-btn');
+      const friendsBtn = document.getElementById('tab-friends-btn');
+      const chatContent = document.getElementById('tab-chat-content');
+      const friendsContent = document.getElementById('tab-friends-content');
+
+      if (tab === 'chat') {
+        chatContent.classList.remove('hidden');
+        friendsContent.classList.add('hidden');
+        chatBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-indigo-600 text-white shadow-md transition-all";
+        friendsBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all";
+      } else {
+        friendsContent.classList.remove('hidden');
+        chatContent.classList.add('hidden');
+        friendsBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-pink-600 text-white shadow-md transition-all";
+        chatBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all";
+      }
+    }
+
+    function handleAddFriend(e) {
+      e.preventDefault();
+      const input = document.getElementById('friend-search-input');
+      const friendName = input.value.trim();
+
+      if (!friendName) return;
+
+      if (friendsList.some(f => f.name.toLowerCase() === friendName.toLowerCase())) {
+        showToast('Friend is already in your list!', 'error');
+        return;
+      }
+
+      const newFriend = {
+        id: Date.now(),
+        name: friendName,
+        status: Math.random() > 0.3 ? 'Online' : 'Offline'
+      };
+
+      friendsList.push(newFriend);
+      input.value = '';
+      showToast(`Added ${friendName} to friends!`, 'success');
+      renderFriendsList();
+    }
+
+    function removeFriend(id) {
+      friendsList = friendsList.filter(f => f.id !== id);
+      renderFriendsList();
+      showToast('Friend removed', 'info');
+    }
+
+    function renderFriendsList() {
+      const container = document.getElementById('friends-list');
+      const badge = document.getElementById('friend-count-badge');
+      badge.innerText = friendsList.length;
+
+      if (friendsList.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-xs text-slate-500">
+            No friends added yet.<br>Add friends using their username!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = friendsList.map(f => `
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/90 border border-slate-800/80">
+          <div class="flex items-center gap-2.5">
+            <div class="relative">
+              <div class="w-8 h-8 rounded-full bg-indigo-600/30 text-indigo-300 flex items-center justify-center font-bold text-xs uppercase border border-indigo-500/40">
+                ${f.name.charAt(0)}
+              </div>
+              <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full ${f.status === 'Online' ? 'bg-emerald-500' : 'bg-slate-600'} ring-2 ring-slate-900"></span>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-200">${f.name}</div>
+              <div class="text-[10px] text-slate-400">${f.status}</div>
+            </div>
+          </div>
+          <button onclick="removeFriend(${f.id})" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">
+            <i data-lucide="user-x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    // INITIALIZATION ON LOAD
+    window.onload = function() {
+      lucide.createIcons();
+      initMaze();
+      initAuthSession();
+    };
+
+    window.onresize = function() {
+      if (canvas && grid.length) {
+        const maxCanvasSize = Math.min(window.innerWidth - 40, 520);
+        cellSize = Math.floor(maxCanvasSize / cols);
+        canvas.width = cols * cellSize;
+        canvas.height = rows * cellSize;
+        drawMaze();
+      }
+    };
+  </script>
 </body>
 </html>
