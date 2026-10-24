@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const SB_URL="https://brvyjdtnxzjlrhukngjn.supabase.co";
-const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJicnZ5amR0bnh6amxyaHVrbmdqbiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzkyNTEwMDI3LCJleHAiOjIxMDgwODYwMjN9.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE";
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE";
 const DEV_CODE="1357", $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const db=window.supabase.createClient(SB_URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const S={user:null,profile:null,profiles:new Map(),players:new Map(),items:[],friends:new Set(),view:"park",dev:false,category:"all",preview:null,mode:"global",dm:null,channel:null,heartbeat:null,frame:null,lastWrite:0,x:50,y:61,jump:0,jv:0,keys:new Set(),joy:{x:0,y:0},bubble:"",bubbleEnd:0,emote:"",emoteEnd:0,dancing:false,memory:null,petal:null,audio:null,musicTimer:null,music:{enabled:false,track:"sakura"},toast:null};
