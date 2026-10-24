@@ -1,836 +1,115 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PulseChat - Realtime Supabase Chat</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Supabase JS Client v2 CDN -->
+  <title>Supabase Chat Room</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(156, 163, 175, 0.4);
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(156, 163, 175, 0.7);
-    }
-    /* Smooth transitions */
-    .chat-bubble-enter {
-      animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-    @keyframes popIn {
-      0% { opacity: 0; transform: scale(0.95) translateY(8px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    #chat-container { width: 100%; max-width: 500px; height: 90vh; background: #1e1e1e; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; }
+    #header { padding: 15px; background: #292929; border-bottom: 1px solid #333; text-align: center; font-weight: bold; }
+    #messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .message { max-width: 80%; padding: 10px 14px; border-radius: 8px; background: #2a2a2a; word-wrap: break-word; }
+    .message .username { font-size: 0.75rem; color: #3ecf8e; margin-bottom: 4px; font-weight: bold; }
+    .message .text { font-size: 0.95rem; }
+    #form { display: flex; padding: 10px; background: #292929; border-top: 1px solid #333; gap: 8px; }
+    #username-input { width: 30%; padding: 10px; border-radius: 4px; border: 1px solid #444; background: #121212; color: #fff; }
+    #message-input { flex: 1; padding: 10px; border-radius: 4px; border: 1px solid #444; background: #121212; color: #fff; }
+    button { padding: 10px 16px; border: none; border-radius: 4px; background: #3ecf8e; color: #000; font-weight: bold; cursor: pointer; }
+    button:hover { background: #34b27b; }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 font-sans h-screen flex flex-col overflow-hidden transition-colors duration-200">
+<body>
 
-  <!-- Setup Username Modal -->
-  <div id="usernameModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-md w-full p-6 transition-all transform">
-      <div class="text-center mb-6">
-        <div class="inline-flex p-3 rounded-full bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 mb-3">
-          <i data-lucide="message-square" class="w-8 h-8"></i>
-        </div>
-        <h2 class="text-2xl font-bold">Welcome to PulseChat</h2>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Set up your profile to join the conversation</p>
-      </div>
-
-      <form id="usernameForm" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Display Name</label>
-          <div class="relative">
-            <i data-lucide="user" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            <input type="text" id="usernameInput" required maxlength="25" placeholder="e.g. Alex Cloud"
-              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm transition">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Choose Avatar Color</label>
-          <div class="flex items-center justify-between gap-2" id="colorPickerContainer">
-            <!-- Dynamic color buttons JS injected -->
-          </div>
-        </div>
-
-        <button type="submit"
-          class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-lg shadow-brand-500/30 transition transform active:scale-95 flex items-center justify-center gap-2">
-          <span>Start Chatting</span>
-          <i data-lucide="arrow-right" class="w-4 h-4"></i>
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- SQL Guide Modal -->
-  <div id="sqlModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-2xl w-full p-6 max-h-[90vh] flex flex-col">
-      <div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
-        <div class="flex items-center gap-2">
-          <i data-lucide="database" class="w-5 h-5 text-brand-500"></i>
-          <h3 class="font-bold text-lg">Supabase Database Setup</h3>
-        </div>
-        <button id="closeSqlModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      
-      <div class="py-4 space-y-3 overflow-y-auto text-sm text-gray-600 dark:text-gray-300">
-        <p>If real-time database messages are not saving or showing an error, ensure your Supabase database table <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-brand-600 dark:text-brand-400 font-mono">messages</code> is created.</p>
-        <p>Run the following SQL script in your <a href="https://supabase.com/dashboard" target="_blank" class="text-brand-500 hover:underline inline-flex items-center gap-1">Supabase SQL Editor <i data-lucide="external-link" class="w-3 h-3"></i></a>:</p>
-        
-        <div class="relative">
-          <pre id="sqlSnippet" class="bg-gray-900 text-gray-100 p-4 rounded-xl text-xs font-mono overflow-x-auto leading-relaxed border border-gray-800">
-CREATE TABLE public.messages (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    username VARCHAR NOT NULL,
-    user_color VARCHAR DEFAULT '#6366f1',
-    content TEXT NOT NULL,
-    room VARCHAR DEFAULT 'general' NOT NULL
-);
-
--- Enable Row Level Security (RLS)
-ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
-
--- Allow public read & write access
-CREATE POLICY "Allow public read access" ON public.messages FOR SELECT USING (true);
-CREATE POLICY "Allow public insert access" ON public.messages FOR INSERT WITH CHECK (true);
-
--- Enable Realtime for messages table
-ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
-          </pre>
-          <button id="copySqlBtn" class="absolute top-2 right-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg text-xs flex items-center gap-1 border border-gray-700">
-            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-            <span id="copySqlText">Copy SQL</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-end">
-        <button id="closeSqlModalFooterBtn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl text-sm font-medium">Got it!</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main App Shell -->
-  <div class="flex-1 flex overflow-hidden">
-
-    <!-- Mobile Sidebar Backdrop -->
-    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden"></div>
-
-    <!-- Left Sidebar: Channels & User Profile -->
-    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-30 w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0">
-      <!-- App Header -->
-      <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold shadow-md shadow-brand-500/20">
-            <i data-lucide="zap" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h1 class="font-bold text-base leading-tight">PulseChat</h1>
-            <div class="flex items-center gap-1.5">
-              <span id="supabaseStatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
-              <span id="supabaseStatusText" class="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Connecting...</span>
-            </div>
-          </div>
-        </div>
-
-        <button id="themeToggleBtn" class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition" title="Toggle Light/Dark Theme">
-          <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
-          <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
-        </button>
-      </div>
-
-      <!-- Channels List -->
-      <div class="flex-1 overflow-y-auto p-3 space-y-4">
-        <div>
-          <div class="flex items-center justify-between text-xs font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">
-            <span>Rooms & Channels</span>
-            <button id="addRoomBtn" class="p-1 hover:text-brand-500 transition" title="Create New Channel">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-            </button>
-          </div>
-          <nav id="roomsContainer" class="space-y-1">
-            <!-- Rooms rendered dynamically -->
-          </nav>
-        </div>
-
-        <!-- Setup Guide Trigger -->
-        <div class="pt-2">
-          <button id="openSqlModalBtn" class="w-full text-left p-2.5 rounded-xl bg-gray-50 dark:bg-gray-700/30 hover:bg-gray-100 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-300 transition">
-            <i data-lucide="database" class="w-4 h-4 text-brand-500 shrink-0"></i>
-            <div class="truncate">
-              <p class="font-semibold leading-tight">Database Table Setup</p>
-              <p class="text-[10px] text-gray-400">View SQL Schema / Config</p>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      <!-- User Info Footer -->
-      <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
-        <div class="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600/50 shadow-sm">
-          <div class="flex items-center gap-2.5 min-w-0">
-            <div id="currentUserAvatar" class="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-white text-xs shrink-0 bg-brand-600">
-              U
-            </div>
-            <div class="min-w-0">
-              <p id="currentUsername" class="text-xs font-bold truncate text-gray-800 dark:text-gray-100">Guest</p>
-              <p class="text-[10px] text-green-500 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span> Online
-              </p>
-            </div>
-          </div>
-          <button id="editProfileBtn" class="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition" title="Edit Profile">
-            <i data-lucide="settings" class="w-4 h-4"></i>
-          </button>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Main Chat Area -->
-    <main class="flex-1 flex flex-col min-w-0 bg-white dark:bg-gray-900 relative">
-      
-      <!-- Chat Room Header -->
-      <header class="h-16 px-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-10">
-        <div class="flex items-center gap-3">
-          <button id="toggleMobileSidebar" class="md:hidden p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl">
-            <i data-lucide="menu" class="w-5 h-5"></i>
-          </button>
-          <div>
-            <div class="flex items-center gap-2">
-              <i data-lucide="hash" class="w-5 h-5 text-brand-500"></i>
-              <h2 id="currentRoomTitle" class="font-bold text-gray-800 dark:text-gray-100 text-lg leading-none">general</h2>
-            </div>
-            <p id="currentRoomSubtitle" class="text-xs text-gray-400 mt-1">Real-time public discussion</p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <!-- Fallback Banner Alert (if Supabase table missing) -->
-          <div id="fallbackNotice" class="hidden items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-full text-xs font-medium">
-            <i data-lucide="info" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">Simulation Mode Active</span>
-          </div>
-          <button id="clearChatBtn" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition" title="Clear View">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
-          </button>
-        </div>
-      </header>
-
-      <!-- Message Container -->
-      <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
-        <!-- Messages rendered here -->
-      </div>
-
-      <!-- Typing Indicator -->
-      <div id="typingIndicator" class="px-6 py-1 h-5 text-[11px] text-gray-400 flex items-center gap-1.5 opacity-0 transition-opacity">
-        <span class="flex gap-1">
-          <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-          <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-          <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
-        </span>
-        <span id="typingText">Someone is typing...</span>
-      </div>
-
-      <!-- Message Input Bar -->
-      <div class="p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-        <form id="messageForm" class="flex items-center gap-2">
-          <div class="relative flex-1">
-            <input type="text" id="messageInput" placeholder="Message #general..." autocomplete="off"
-              class="w-full pl-4 pr-10 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm transition">
-          </div>
-          <button type="submit" id="sendBtn"
-            class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-medium shadow-md shadow-brand-500/20 transition transform active:scale-95 flex items-center justify-center shrink-0">
-            <i data-lucide="send" class="w-4 h-4"></i>
-          </button>
-        </form>
-      </div>
-    </main>
+  <div id="chat-container">
+    <div id="header">Supabase Chat Room</div>
+    <div id="messages"></div>
+    <form id="form">
+      <input type="text" id="username-input" placeholder="Name" required>
+      <input type="text" id="message-input" placeholder="Type a message..." required autocomplete="off">
+      <button type="submit">Send</button>
+    </form>
   </div>
 
   <script>
-    // ==========================================
-    // SUPABASE CONFIGURATION
-    // ==========================================
-    const SUPABASE_URL = "https://brvyjdtnxzjlrhukngjn.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE";
+    const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Initialize Supabase Client
-    let supabase = null;
-    let realtimeChannel = null;
+    const messagesDiv = document.getElementById('messages');
+    const form = document.getElementById('form');
+    const usernameInput = document.getElementById('username-input');
+    const messageInput = document.getElementById('message-input');
 
-    try {
-      if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }
-    } catch (e) {
-      console.warn("Supabase initialization issue, using fallback mode:", e);
+    if (localStorage.getItem('chat_username')) {
+      usernameInput.value = localStorage.getItem('chat_username');
     }
 
-    // ==========================================
-    // STATE MANAGEMENT
-    // ==========================================
-    const AVATAR_COLORS = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
-    
-    let state = {
-      user: {
-        name: localStorage.getItem('pulse_username') || '',
-        color: localStorage.getItem('pulse_usercolor') || AVATAR_COLORS[0]
-      },
-      currentRoom: 'general',
-      rooms: ['general', 'random', 'tech-talk', 'lounge'],
-      messages: [],
-      isFallbackMode: false,
-      isSubscribed: false
-    };
-
-    // DOM Elements
-    const elements = {
-      usernameModal: document.getElementById('usernameModal'),
-      usernameForm: document.getElementById('usernameForm'),
-      usernameInput: document.getElementById('usernameInput'),
-      colorPickerContainer: document.getElementById('colorPickerContainer'),
+    function appendMessage(msg) {
+      const msgElement = document.createElement('div');
+      msgElement.className = 'message';
       
-      sqlModal: document.getElementById('sqlModal'),
-      openSqlModalBtn: document.getElementById('openSqlModalBtn'),
-      closeSqlModalBtn: document.getElementById('closeSqlModalBtn'),
-      closeSqlModalFooterBtn: document.getElementById('closeSqlModalFooterBtn'),
-      copySqlBtn: document.getElementById('copySqlBtn'),
-      copySqlText: document.getElementById('copySqlText'),
-      sqlSnippet: document.getElementById('sqlSnippet'),
-
-      sidebar: document.getElementById('sidebar'),
-      sidebarBackdrop: document.getElementById('sidebarBackdrop'),
-      toggleMobileSidebar: document.getElementById('toggleMobileSidebar'),
-      themeToggleBtn: document.getElementById('themeToggleBtn'),
-
-      roomsContainer: document.getElementById('roomsContainer'),
-      addRoomBtn: document.getElementById('addRoomBtn'),
-
-      currentRoomTitle: document.getElementById('currentRoomTitle'),
-      messagesContainer: document.getElementById('messagesContainer'),
-      messageForm: document.getElementById('messageForm'),
-      messageInput: document.getElementById('messageInput'),
+      const userElement = document.createElement('div');
+      userElement.className = 'username';
+      userElement.textContent = msg.username || 'Anonymous';
       
-      currentUserAvatar: document.getElementById('currentUserAvatar'),
-      currentUsername: document.getElementById('currentUsername'),
-      editProfileBtn: document.getElementById('editProfileBtn'),
+      const textElement = document.createElement('div');
+      textElement.className = 'text';
+      textElement.textContent = msg.content || msg.message;
 
-      supabaseStatusDot: document.getElementById('supabaseStatusDot'),
-      supabaseStatusText: document.getElementById('supabaseStatusText'),
-      fallbackNotice: document.getElementById('fallbackNotice'),
-      typingIndicator: document.getElementById('typingIndicator'),
-      clearChatBtn: document.getElementById('clearChatBtn')
-    };
+      msgElement.appendChild(userElement);
+      msgElement.appendChild(textElement);
+      messagesDiv.appendChild(msgElement);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
 
-    // ==========================================
-    // INITIALIZATION & EVENT LISTENERS
-    // ==========================================
-    window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      initTheme();
-      renderColorPicker();
-      renderRooms();
+    async function loadMessages() {
+      const { data, error } = await supabaseClient
+        .from('messages')
+        .select('*')
+        .order('created_at', { ascending: true });
 
-      if (!state.user.name) {
-        elements.usernameModal.classList.remove('hidden');
-      } else {
-        elements.usernameModal.classList.add('hidden');
-        updateUserProfileUI();
+      if (error) {
+        console.error('Error fetching messages:', error);
+      } else if (data) {
+        messagesDiv.innerHTML = '';
+        data.forEach(appendMessage);
       }
+    }
 
-      initSupabaseConnection();
+    function subscribeToMessages() {
+      supabaseClient
+        .channel('public:messages')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+          appendMessage(payload.new);
+        })
+        .subscribe();
+    }
 
-      // Event Listeners
-      elements.usernameForm.addEventListener('submit', handleProfileSave);
-      elements.messageForm.addEventListener('submit', handleSendMessage);
-      elements.addRoomBtn.addEventListener('click', handleCreateRoom);
-      elements.themeToggleBtn.addEventListener('click', toggleTheme);
-      
-      elements.toggleMobileSidebar.addEventListener('click', toggleMobileSidebar);
-      elements.sidebarBackdrop.addEventListener('click', toggleMobileSidebar);
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = usernameInput.value.trim();
+      const content = messageInput.value.trim();
 
-      elements.openSqlModalBtn.addEventListener('click', () => elements.sqlModal.classList.remove('hidden'));
-      elements.closeSqlModalBtn.addEventListener('click', () => elements.sqlModal.classList.add('hidden'));
-      elements.closeSqlModalFooterBtn.addEventListener('click', () => elements.sqlModal.classList.add('hidden'));
-      elements.copySqlBtn.addEventListener('click', copySqlToClipboard);
-      elements.editProfileBtn.addEventListener('click', () => {
-        elements.usernameInput.value = state.user.name;
-        elements.usernameModal.classList.remove('hidden');
-      });
-      elements.clearChatBtn.addEventListener('click', () => {
-        state.messages = [];
-        renderMessages();
-      });
+      if (!content || !username) return;
 
-      // Typing simulation listener
-      let typingTimeout;
-      elements.messageInput.addEventListener('input', () => {
-        if (realtimeChannel && !state.isFallbackMode) {
-          realtimeChannel.send({
-            type: 'broadcast',
-            event: 'typing',
-            payload: { username: state.user.name }
-          });
-        }
-      });
+      localStorage.setItem('chat_username', username);
+      messageInput.value = '';
+
+      const { error } = await supabaseClient
+        .from('messages')
+        .insert([{ username, content }]);
+
+      if (error) {
+        console.error('Error sending message:', error);
+      }
     });
 
-    // ==========================================
-    // THEME HANDLING
-    // ==========================================
-    function initTheme() {
-      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-
-    function toggleTheme() {
-      if (document.documentElement.classList.contains('dark')) {
-        document.documentElement.classList.remove('dark');
-        localStorage.theme = 'light';
-      } else {
-        document.documentElement.classList.add('dark');
-        localStorage.theme = 'dark';
-      }
-    }
-
-    // ==========================================
-    // USER PROFILE & COLOR PICKER
-    // ==========================================
-    function renderColorPicker() {
-      elements.colorPickerContainer.innerHTML = AVATAR_COLORS.map(color => `
-        <button type="button" 
-          data-color="${color}"
-          onclick="selectAvatarColor('${color}')"
-          style="background-color: ${color}"
-          class="avatar-color-btn w-9 h-9 rounded-full flex items-center justify-center text-white transition transform hover:scale-110 focus:outline-none ${state.user.color === color ? 'ring-4 ring-offset-2 ring-brand-500 dark:ring-offset-gray-800' : ''}">
-          ${state.user.color === color ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
-        </button>
-      `).join('');
-      lucide.createIcons();
-    }
-
-    window.selectAvatarColor = function(color) {
-      state.user.color = color;
-      renderColorPicker();
-    };
-
-    function handleProfileSave(e) {
-      e.preventDefault();
-      const newName = elements.usernameInput.value.trim();
-      if (!newName) return;
-
-      state.user.name = newName;
-      localStorage.setItem('pulse_username', state.user.name);
-      localStorage.setItem('pulse_usercolor', state.user.color);
-
-      updateUserProfileUI();
-      elements.usernameModal.classList.add('hidden');
-    }
-
-    function updateUserProfileUI() {
-      elements.currentUsername.textContent = state.user.name || 'Guest';
-      elements.currentUserAvatar.textContent = (state.user.name[0] || 'U').toUpperCase();
-      elements.currentUserAvatar.style.backgroundColor = state.user.color;
-    }
-
-    // ==========================================
-    // ROOM MANAGEMENT
-    // ==========================================
-    function renderRooms() {
-      elements.roomsContainer.innerHTML = state.rooms.map(room => {
-        const isActive = state.currentRoom === room;
-        return `
-          <button onclick="switchRoom('${room}')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition ${
-            isActive 
-              ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-semibold' 
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200'
-          }">
-            <i data-lucide="hash" class="w-4 h-4 ${isActive ? 'text-brand-500' : 'text-gray-400'}"></i>
-            <span class="truncate">${room}</span>
-          </button>
-        `;
-      }).join('');
-      lucide.createIcons();
-    }
-
-    window.switchRoom = function(roomName) {
-      if (state.currentRoom === roomName) return;
-      state.currentRoom = roomName;
-      elements.currentRoomTitle.textContent = roomName;
-      elements.messageInput.placeholder = `Message #${roomName}...`;
-      renderRooms();
-
-      // Close sidebar on mobile after switching
-      elements.sidebar.classList.add('-translate-x-full');
-      elements.sidebarBackdrop.classList.add('hidden');
-
-      // Fetch or reset messages for new room
-      fetchMessages();
-      subscribeToRoomRealtime();
-    };
-
-    function handleCreateRoom() {
-      const roomName = prompt("Enter new room name:")?.toLowerCase().trim().replace(/[^a-z0-9-]/g, '');
-      if (roomName && !state.rooms.includes(roomName)) {
-        state.rooms.push(roomName);
-        switchRoom(roomName);
-      }
-    }
-
-    function toggleMobileSidebar() {
-      const isHidden = elements.sidebar.classList.contains('-translate-x-full');
-      if (isHidden) {
-        elements.sidebar.classList.remove('-translate-x-full');
-        elements.sidebarBackdrop.classList.remove('hidden');
-      } else {
-        elements.sidebar.classList.add('-translate-x-full');
-        elements.sidebarBackdrop.classList.add('hidden');
-      }
-    }
-
-    // ==========================================
-    // SUPABASE DATA & REALTIME SYNC
-    // ==========================================
-    async function initSupabaseConnection() {
-      if (!supabase) {
-        enableFallbackMode("Supabase SDK Client failed to load.");
-        return;
-      }
-
-      setConnectionStatus('connecting', 'Connecting...');
-
-      // Test database availability
-      try {
-        const { data, error } = await supabase
-          .from('messages')
-          .select('count', { count: 'exact', head: true });
-
-        if (error) {
-          console.warn("Messages table unavailable:", error.message);
-          enableFallbackMode("Table 'messages' not found. Local simulation mode active.");
-        } else {
-          setConnectionStatus('online', 'Connected to Supabase');
-          state.isFallbackMode = false;
-          elements.fallbackNotice.classList.add('hidden');
-          fetchMessages();
-          subscribeToRoomRealtime();
-        }
-      } catch (err) {
-        console.warn("Supabase network error:", err);
-        enableFallbackMode("Network error. Local simulation active.");
-      }
-    }
-
-    function enableFallbackMode(reason) {
-      console.log("Fallback activated:", reason);
-      state.isFallbackMode = true;
-      setConnectionStatus('fallback', 'Local Simulation');
-      elements.fallbackNotice.classList.remove('hidden');
-      elements.fallbackNotice.classList.add('flex');
-
-      // Add mock welcome message
-      state.messages = [
-        {
-          id: 'system-1',
-          username: 'System Bot',
-          user_color: '#10b981',
-          content: `Welcome to PulseChat! 🚀\nNote: Running in **Simulation Mode** because your database table isn't created yet or RLS policies are pending. Click "Database Table Setup" in the sidebar to configure your Supabase backend.`,
-          created_at: new Date().toISOString(),
-          room: state.currentRoom
-        }
-      ];
-      renderMessages();
-    }
-
-    function setConnectionStatus(type, label) {
-      elements.supabaseStatusText.textContent = label;
-      elements.supabaseStatusDot.className = 'w-2 h-2 rounded-full inline-block ';
-      
-      if (type === 'online') {
-        elements.supabaseStatusDot.classList.add('bg-green-500', 'shadow-[0_0_8px_rgba(34,197,94,0.6)]');
-      } else if (type === 'connecting') {
-        elements.supabaseStatusDot.classList.add('bg-yellow-500', 'animate-pulse');
-      } else {
-        elements.supabaseStatusDot.classList.add('bg-amber-500');
-      }
-    }
-
-    async function fetchMessages() {
-      if (state.isFallbackMode) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('messages')
-          .select('*')
-          .eq('room', state.currentRoom)
-          .order('created_at', { ascending: true })
-          .limit(100);
-
-        if (error) {
-          console.error("Fetch messages error:", error);
-          return;
-        }
-
-        state.messages = data || [];
-        renderMessages();
-      } catch (e) {
-        console.error("Error fetching messages:", e);
-      }
-    }
-
-    function subscribeToRoomRealtime() {
-      if (state.isFallbackMode || !supabase) return;
-
-      // Unsubscribe from previous channel if exists
-      if (realtimeChannel) {
-        supabase.removeChannel(realtimeChannel);
-      }
-
-      // Create new Supabase Realtime channel for Postgres changes + Broadcast
-      realtimeChannel = supabase.channel(`room:${state.currentRoom}`)
-        // Listen for Postgres INSERTs
-        .on('postgres_changes', {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `room=eq.${state.currentRoom}`
-        }, (payload) => {
-          appendSingleMessage(payload.new);
-        })
-        // Broadcast event for typing indicators
-        .on('broadcast', { event: 'typing' }, (payload) => {
-          if (payload.payload.username !== state.user.name) {
-            showTypingIndicator(payload.payload.username);
-          }
-        })
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            state.isSubscribed = true;
-          }
-        });
-    }
-
-    // ==========================================
-    // SENDING MESSAGES & FALLBACK SIMULATION
-    // ==========================================
-    async function handleSendMessage(e) {
-      e.preventDefault();
-      const content = elements.messageInput.value.trim();
-      if (!content) return;
-
-      elements.messageInput.value = '';
-
-      const newMessage = {
-        username: state.user.name || 'Anonymous',
-        user_color: state.user.color,
-        content: content,
-        room: state.currentRoom,
-        created_at: new Date().toISOString()
-      };
-
-      if (!state.isFallbackMode) {
-        try {
-          const { error } = await supabase.from('messages').insert([newMessage]);
-          if (error) {
-            console.error("Failed to send message:", error);
-            // Fallback render locally if insert failed
-            appendSingleMessage({ ...newMessage, id: 'temp-' + Date.now() });
-          }
-        } catch (err) {
-          console.error("Insert error:", err);
-          appendSingleMessage({ ...newMessage, id: 'temp-' + Date.now() });
-        }
-      } else {
-        // Local simulation handling
-        const simulatedMsg = { ...newMessage, id: 'sim-' + Date.now() };
-        appendSingleMessage(simulatedMsg);
-
-        // Trigger bot auto-reply in fallback mode
-        triggerSimulatedReply(content);
-      }
-    }
-
-    function triggerSimulatedReply(userQuery) {
-      setTimeout(() => {
-        const botNames = ['Echo Bot', 'Pulse Assistant', 'Dev Helper'];
-        const randomBot = botNames[Math.floor(Math.random() * botNames.length)];
-        const botColor = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
-
-        const botReplies = [
-          `Got your message: "${userQuery}". You're testing in simulation mode!`,
-          `Hey ${state.user.name}! To enable full multiplayer database chat, click "Database Table Setup" to run the SQL in Supabase.`,
-          `Message received loud and clear in #${state.currentRoom}! ⚡`,
-          `Looking good! Supabase Realtime handles Postgres streaming seamlessly once configured.`
-        ];
-
-        const botMessage = {
-          id: 'bot-' + Date.now(),
-          username: randomBot,
-          user_color: botColor,
-          content: botReplies[Math.floor(Math.random() * botReplies.length)],
-          created_at: new Date().toISOString(),
-          room: state.currentRoom
-        };
-
-        appendSingleMessage(botMessage);
-      }, 1000);
-    }
-
-    // ==========================================
-    // UI RENDERING & MESSAGES
-    // ==========================================
-    function renderMessages() {
-      elements.messagesContainer.innerHTML = '';
-      if (state.messages.length === 0) {
-        elements.messagesContainer.innerHTML = `
-          <div class="h-full flex flex-col items-center justify-center text-center text-gray-400 p-8">
-            <div class="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
-              <i data-lucide="message-square-plus" class="w-6 h-6 text-gray-400"></i>
-            </div>
-            <p class="font-medium text-sm text-gray-600 dark:text-gray-300">No messages in #${state.currentRoom} yet</p>
-            <p class="text-xs text-gray-400 mt-1">Be the first to break the silence!</p>
-          </div>
-        `;
-        lucide.createIcons();
-        return;
-      }
-
-      state.messages.forEach(msg => {
-        const msgNode = createMessageElement(msg);
-        elements.messagesContainer.appendChild(msgNode);
-      });
-
-      scrollToBottom();
-    }
-
-    function appendSingleMessage(msg) {
-      // Avoid duplicate appending if postgres subscription returns same message
-      if (state.messages.some(m => m.id && m.id === msg.id)) return;
-
-      state.messages.push(msg);
-      
-      // If container was empty, clear placeholder
-      if (elements.messagesContainer.querySelector('.text-center')) {
-        elements.messagesContainer.innerHTML = '';
-      }
-
-      const msgNode = createMessageElement(msg);
-      elements.messagesContainer.appendChild(msgNode);
-      scrollToBottom();
-    }
-
-    function createMessageElement(msg) {
-      const isSelf = msg.username === state.user.name;
-      const formattedTime = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const avatarInitial = (msg.username || 'A')[0].toUpperCase();
-      const avatarBg = msg.user_color || '#6366f1';
-
-      const wrapper = document.createElement('div');
-      wrapper.className = `flex items-end gap-2.5 chat-bubble-enter ${isSelf ? 'flex-row-reverse' : 'flex-row'}`;
-
-      wrapper.innerHTML = `
-        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm" style="background-color: ${avatarBg}">
-          ${avatarInitial}
-        </div>
-        <div class="max-w-[80%] sm:max-w-[70%] flex flex-col ${isSelf ? 'items-end' : 'items-start'}">
-          <div class="flex items-center gap-2 mb-1 px-1">
-            <span class="text-xs font-semibold text-gray-600 dark:text-gray-300">${isSelf ? 'You' : escapeHtml(msg.username)}</span>
-            <span class="text-[10px] text-gray-400">${formattedTime}</span>
-          </div>
-          <div class="p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm break-words whitespace-pre-wrap ${
-            isSelf 
-              ? 'bg-brand-600 text-white rounded-br-xs' 
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200/50 dark:border-gray-700/50 rounded-bl-xs'
-          }">
-            ${escapeHtml(msg.content)}
-          </div>
-        </div>
-      `;
-
-      return wrapper;
-    }
-
-    function scrollToBottom() {
-      elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
-    }
-
-    function showTypingIndicator(username) {
-      document.getElementById('typingText').textContent = `${username} is typing...`;
-      elements.typingIndicator.classList.remove('opacity-0');
-      
-      clearTimeout(window.typingTimer);
-      window.typingTimer = setTimeout(() => {
-        elements.typingIndicator.classList.add('opacity-0');
-      }, 2000);
-    }
-
-    // Utility: Copy SQL snippet
-    function copySqlToClipboard() {
-      const code = elements.sqlSnippet.textContent;
-      navigator.clipboard.writeText(code).then(() => {
-        elements.copySqlText.textContent = "Copied!";
-        setTimeout(() => {
-          elements.copySqlText.textContent = "Copy SQL";
-        }, 2000);
-      }).catch(() => {
-        elements.copySqlText.textContent = "Failed";
-      });
-    }
-
-    // Utility: Escape HTML preventing XSS
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/[&<>"']/g, function(m) {
-        return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#039;'
-        }[m];
-      });
-    }
+    loadMessages();
+    subscribeToMessages();
   </script>
 </body>
 </html>
