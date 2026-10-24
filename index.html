@@ -1,352 +1,84 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>SlimePark 🌸</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<style>
-:root{--bg:#ffe9f1;--card:#fff8fb;--card2:#ffe3ed;--tx:#5a2a43;--mu:#a06a85;--ac:#ff7eb0;--bd:#f5b8cf}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,Segoe UI,sans-serif;overflow:hidden;touch-action:none}
-button,input,select{font:inherit;color:var(--tx)}
-button{background:var(--card2);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;cursor:pointer}
-button:hover{filter:brightness(1.2)}button.pri{background:linear-gradient(135deg,#ff7eb0,#ff9ec5);color:#fff;border:0;font-weight:700;text-shadow:0 1px 2px #c2527a66}button.dng{background:#d94444;border:0}
-input{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:10px;width:100%}
-[hidden]{display:none!important}
-#auth{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 30% 20%,#ffd1e3,#fff0f6 70%)}
-.box{background:var(--card);padding:26px;border-radius:20px;width:min(360px,92vw);display:grid;gap:10px;box-shadow:0 20px 60px #c2527a44;text-align:center}
-.box h1{margin:0}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
-header{position:fixed;top:0;left:0;right:0;height:52px;background:#fff0f6e6;backdrop-filter:blur(8px);display:flex;align-items:center;gap:6px;padding:0 8px;z-index:5;overflow-x:auto}
-header button{flex:none;padding:6px 10px}header b{flex:none}#pts{flex:none;background:#ffd6e5;border-radius:20px;padding:5px 12px;font-weight:700;color:#b0306a}
-#cv{position:fixed;top:52px;left:0;width:100%;height:calc(100% - 52px);display:block}
-#joy{position:fixed;left:22px;bottom:28px;width:120px;height:120px;border-radius:50%;background:#ffffff66;border:2px solid #ff7eb0aa;z-index:3;touch-action:none}
-#knob{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:#ff7eb0dd}
-#jump{position:fixed;right:24px;bottom:40px;width:84px;height:84px;border-radius:50%;background:#ff7eb0;color:#fff;font-weight:800;box-shadow:0 6px 18px #c2527a66;border:0;z-index:3}
-aside{position:fixed;top:52px;right:0;bottom:0;width:390px;max-width:100%;background:var(--card);z-index:6;display:flex;flex-direction:column;box-shadow:-10px 0 40px #c2527a44}
-#pbody{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
-@media(max-width:700px){aside{top:auto;height:68%;border-radius:18px 18px 0 0}}
-.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:6px;min-height:120px}
-.msg{display:flex;gap:8px;background:var(--card2);padding:7px 9px;border-radius:12px;font-size:14px}.msg.staff{border:1px solid #ff4d4d99;background:#ffe0e6}.msg.dev{border:1px solid #7fdcffaa;background:#e0f4ff}
-.av{flex:none;width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:19px;cursor:pointer}
-.tag{font-size:11px;font-weight:800;padding:1px 6px;border-radius:6px;margin-left:5px;background:#2b1a33}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.item{background:var(--card2);border-radius:12px;padding:10px;display:grid;gap:6px;font-size:14px}.item small{color:var(--mu)}
-.tabs{display:flex;gap:5px;flex-wrap:wrap}.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
-#modal{position:fixed;inset:0;background:#5a2a4388;display:grid;place-items:center;z-index:20}
-.card{background:var(--card);border-radius:18px;padding:20px;width:min(340px,92vw);display:grid;gap:10px;text-align:center}
-#game{position:fixed;inset:52px 0 0 0;background:#fff0f6f4;z-index:15;display:flex;flex-direction:column;align-items:center;padding:14px;gap:10px;overflow:hidden}
-.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:min(340px,92vw)}.mem div{aspect-ratio:1;background:var(--card2);border-radius:12px;display:grid;place-items:center;font-size:32px;cursor:pointer}.mem .up{background:#ffb3cf}
-.petal{position:absolute;top:-40px;font-size:32px;cursor:pointer;animation:fall 4s linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
-#pbody>*{flex-shrink:0}#pbody>.msgs{flex-shrink:1}.sp{position:fixed;top:-30px;z-index:2;pointer-events:none;animation:pf linear infinite;opacity:.85}@keyframes pf{to{transform:translate(80px,112vh) rotate(540deg)}}
-h3{margin:4px 0}.mu{color:var(--mu);font-size:13px}
-header{background:linear-gradient(90deg,#fff0f6f2,#ffdbe9f2);border-bottom:1px solid var(--bd)}
-button{transition:transform .1s,filter .15s}button:active{transform:scale(.94)}
-aside{animation:sl .2s ease}@keyframes sl{from{transform:translateY(14px);opacity:0}}
-#px{position:absolute;top:6px;right:8px;z-index:2;padding:2px 10px}#pbody{padding-top:38px}
-.item,.msg{transition:transform .12s}.item:hover{transform:translateY(-2px)}
-#emo{position:fixed;right:34px;bottom:136px;width:58px;height:58px;border-radius:50%;font-size:26px;z-index:3;padding:0}
-#emw{position:fixed;right:100px;bottom:128px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--card);padding:8px;border-radius:16px;z-index:4;box-shadow:0 10px 30px #0008}#emw button{font-size:24px}
-#toast{position:fixed;left:50%;bottom:170px;transform:translateX(-50%);background:#000d;padding:10px 18px;border-radius:20px;z-index:30;opacity:0;transition:.3s;pointer-events:none;max-width:88vw;text-align:center}#toast.on{opacity:1}
-@media(max-width:700px){#emo{right:20px;bottom:134px}#emw{right:84px}}
-</style></head><body>
-<div id="auth"><div class="box"><h1>🌸 SlimePark</h1><div class="mu">Bounce, chat, collect &amp; dress your slime</div>
-<input id="au" placeholder="Username" autocomplete="username"><input id="ap" type="password" placeholder="Password (6+)" autocomplete="current-password">
-<div class="row"><button class="pri" onclick="signIn()">Sign in</button><button onclick="signUp()">Sign up</button></div><div id="aerr" class="mu"></div></div></div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a2b">
+  <title>Slime Park — Hang out, play, collect</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#"><span class="brand-mark">✦</span><span>SLIME<span class="brand-muted"> PARK</span><small>your little corner of the internet</small></span></a>
+      <div class="top-actions"><span id="points-pill" class="points-pill">✧ <b id="points">—</b> pts</span><button id="music-toggle" class="icon-btn" title="Toggle music">♫</button><button id="profile-open" class="avatar-mini" title="Profile">☺</button><button id="signout-btn" class="ghost-btn hidden">Sign out</button></div>
+    </header>
 
-<div id="app" hidden>
-<header><b>🌸 SlimePark</b><span id="pts"></span><span id="online" class="mu" style="flex:none">🟢 1</span>
-<button onclick="showPanel('chat')">💬</button><button onclick="showPanel('friends')">👥</button><button onclick="showPanel('market')">🛒</button><button onclick="showPanel('games')">🎮</button><button id="bstaff" onclick="showPanel('staff')" hidden>🛡</button><button onclick="showPanel('profile')">👤</button><button id="bmusic" onclick="toggleMusic()">🎵</button><button onclick="signOut()">⎋</button></header>
-<canvas id="cv"></canvas>
-<div id="joy"><i id="knob"></i></div><button id="jump">JUMP</button><button id="emo" title="Emotes">😀</button><div id="emw" hidden></div>
-<aside id="panel" hidden><button id="px" onclick="showPanel(cur.p)">✕</button><div id="pbody"></div></aside>
-</div>
-<div id="modal" hidden></div><div id="game" hidden></div><audio id="aud" loop></audio>
+    <main id="auth-view" class="auth-layout">
+      <section class="hero-card">
+        <div class="hero-orb orb-one"></div><div class="hero-orb orb-two"></div>
+        <div class="eyebrow">A COZY MULTIPLAYER HANGOUT</div>
+        <h1>Find your people.<br><span>Be a little slime.</span></h1>
+        <p>Hop around the park, make friends, collect cute looks, and leave a little sparkle wherever you go.</p>
+        <div class="hero-stats"><span>✦ A shared park</span><span>♡ Friends & DMs</span><span>✧ Collectible style</span></div>
+        <div class="hero-slimes"><div class="hero-slime slime-pink">♡</div><div class="hero-slime slime-blue">✦</div><div class="hero-slime slime-lime">♪</div></div>
+      </section>
+      <section class="auth-card">
+        <div class="auth-tabs"><button class="auth-tab active" data-auth="signin">Sign in</button><button class="auth-tab" data-auth="signup">Create account</button></div>
+        <h2 id="auth-title">Welcome back!</h2><p id="auth-subtitle" class="muted">Your park is waiting for you.</p>
+        <form id="auth-form">
+          <label>Username <input id="auth-username" autocomplete="username" placeholder="Your park name" maxlength="20" required></label>
+          <label id="email-label">Email <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" required></label>
+          <label>Password <input id="auth-password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required></label>
+          <button class="primary-btn full" type="submit" id="auth-submit">Sign in <span>→</span></button>
+        </form><p class="fine-print">Be kind, keep your password private, and have fun.</p><p id="auth-message" class="form-message"></p>
+      </section>
+    </main>
 
-<script>
-// --- SUPABASE CONFIGURATION ---
-const SUPABASE_URL='https://brvyjdtnxzjlrhukngjn.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const $=id=>document.getElementById(id),W=900,H=560,DEVCODE='1357';
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    <main id="game-view" class="game-layout hidden">
+      <aside class="sidebar">
+        <div class="user-card"><div id="my-slime-small" class="slime slime-small"><span class="face">◡</span></div><div class="user-card-text"><b id="my-username">Your slime</b><span id="my-title" class="muted">Park visitor</span></div><button id="profile-edit" class="tiny-btn">Edit</button></div>
+        <nav class="main-nav">
+          <button class="nav-btn active" data-view="park"><span>⌂</span> Park <i id="online-count">●</i></button>
+          <button class="nav-btn" data-view="friends"><span>♡</span> Friends <i id="friend-count">0</i></button>
+          <button class="nav-btn" data-view="messages"><span>✉</span> Messages</button>
+          <button class="nav-btn" data-view="market"><span>✧</span> Marketplace</button>
+          <button class="nav-btn" data-view="games"><span>🎮</span> Mini-games</button>
+          <button class="nav-btn" data-view="settings"><span>⚙</span> Settings</button>
+        </nav>
+        <div class="sidebar-bottom"><div class="earn-card"><span class="earn-icon">✧</span><div><b>Earn park points</b><small>Hang out, play, collect!</small></div></div><button id="dev-open" class="text-btn">Developer access</button></div>
+      </aside>
 
-// --- ITEMS: [id,type,name,price,value,glow] ---
-const ITEMS=[
-['green','skin','Classic Green',0,'#6fdc6f'],['blue','skin','Ocean Blue',500,'#5aa9ff'],['pink','skin','Bubblegum',500,'#ff8fc8'],
-['yellow','skin','Lemon',700,'#ffe45e'],['purple','skin','Grape',900,'#b278ff'],['orange','skin','Tangerine',1200,'#ffa24d'],['teal','skin','Mint',1500,'#4fe3c1'],
-['lava','skin','Lava Aura',6000,'#ff5a2a','#ff7a30'],['aqua','skin','Aqua Aura',7500,'#2fd0ff','#66ffff'],['gold','skin','Golden Aura',10000,'#ffd23f','#ffcc33'],
-['galaxy','skin','Galaxy Aura',12500,'#6a3df0','#b58cff'],['rainbow','skin','Rainbow Aura',15000,'#ff6ad5','#ffffff'],
-['tuft','hair','Grass Tuft',600,'tuft'],['spike','hair','Spike Hair',1000,'spike'],['mohawk','hair','Mohawk',2000,'mohawk'],
-['cap','hat','Red Cap',800,'cap'],['party','hat','Party Hat',1200,'party'],['tophat','hat','Top Hat',1800,'tophat'],['wizard','hat','Wizard Hat',3000,'wizard'],['crown','hat','Crown',5000,'crown'],['halo','hat','Halo',9000,'halo'],
-['bowtie','bow','Bow Tie',700,'bowtie'],['ribbon','bow','Ribbon',900,'ribbon'],['tie','bow','Necktie',1500,'tie'],
-['t1','title','Bouncy',1500,'Bouncy'],['t2','title','Gooey',3000,'Gooey'],['t3','title','Slimelord',8000,'Slimelord'],['t4','title','Goo Legend',15000,'Goo Legend'],
-['a1','avatar','Cat',500,'🐱'],['a2','avatar','Frog',700,'🐸'],['a3','avatar','Fox',1000,'🦊'],['a4','avatar','Dragon',3000,'🐉'],['a5','avatar','Alien',5000,'👽'],
-['f1','frame','Gold Ring',2000,'#ffd23f'],['f2','frame','Ruby Ring',3500,'#ff3b3b'],['f3','frame','Ice Ring',5000,'#7fdcff'],['f4','frame','Neon Ring',7000,'#b6ff3b'],['f5','frame','Royal Ring',12000,'#c07bff']];
-const SEC={skin:'Slime Skins',hat:'Hats',hair:'Hair',bow:'Bows & Ties',title:'Titles',avatar:'Avatars',frame:'Frames'};
-const SK={};ITEMS.filter(i=>i[1]=='skin').forEach(i=>SK[i[0]]=[i[4],i[5]]);
-SK.dev=['#ffffff','#7fdcff'];SK.admin=['#15151a','#ff2020'];
-const tcol=t=>t=='DEV'?'#7fdcff':t=='Admin'?'#ff4040':'#ffd23f';
-const look=p=>({n:p.username,t:p.title,skin:p.skin,hat:p.hat,hair:p.hair,bow:p.bow});
-const isDev=()=>me&&me.dev_on,isStaff=()=>me&&(me.dev_on||me.role=='admin');
+      <section class="content-area">
+        <div id="view-park" class="view-panel">
+          <div class="section-heading"><div><div class="eyebrow">WELCOME TO YOUR HAPPY PLACE</div><h1>Moonlit Park <span class="live-dot"></span></h1><p class="muted">A little hop, a little hello. The park is better together.</p></div><button id="refresh-park" class="ghost-btn">↻ Refresh</button></div>
+          <div class="park-scene" id="park-scene">
+            <div class="moon"></div><div class="cloud cloud-a"></div><div class="cloud cloud-b"></div><div class="hill hill-back"></div><div class="hill hill-front"></div>
+            <div class="park-decor decor-tree tree-a">♣</div><div class="park-decor decor-tree tree-b">♣</div><div class="park-decor decor-flower flower-a">✿</div><div class="park-decor decor-flower flower-b">✿</div><div class="park-decor decor-lamp">♧</div>
+            <div id="players-layer"></div>
+            <div class="scene-label"><span class="live-dot"></span> THE COMMONS <small id="scene-online">1 slime hopping around</small></div>
+            <div class="speech-entry"><input id="chat-input" maxlength="180" placeholder="Say something kind to the park…"><button id="chat-send" class="primary-btn">Send ↗</button></div>
+            <div class="mobile-controls"><button id="move-left" aria-label="Move left">←</button><button id="jump-btn" aria-label="Jump">↑</button><button id="move-right" aria-label="Move right">→</button></div>
+          </div>
+          <div class="park-bottom-grid"><section class="panel chat-panel"><div class="panel-title"><h3>Park chat</h3><span class="muted">Be nice ✿</span></div><div id="chat-feed" class="chat-feed"><div class="empty-state">The park is quiet… say hello!</div></div></section><section class="panel"><div class="panel-title"><h3>Park activities</h3><span class="muted">Earn points</span></div><div class="activity-row"><span class="activity-icon">☁</span><div><b>Chill in the park</b><small>1 point every 15 minutes</small></div><span class="reward">+1</span></div><div class="activity-row"><span class="activity-icon">🧠</span><div><b>Slime Memories</b><small>Match the pairs</small></div><span class="reward">+3</span></div><div class="activity-row"><span class="activity-icon">🪲</span><div><b>Catch the Patels</b><small>Catch all 50 for up to 25 points</small></div><span class="reward">+5 / 10</span></div><button class="secondary-btn full" data-goto="games">Play a mini-game →</button></section></div>
+        </div>
 
-// --- STATE ---
-let emoK='',emoT=0,me=null,ch,others={},friendIds=[],cur={p:null,chat:null},mk={tab:'skin',try:{}},bub='',bubT=0,mins=0,msgSub,setSub;
-const P={x:450,y:330,z:0,vz:0,mv:false},keys={},joy={x:0,y:0};
+        <div id="view-friends" class="view-panel hidden"><div class="section-heading"><div><div class="eyebrow">YOUR LITTLE CIRCLE</div><h1>Friends ♡</h1><p class="muted">Friends can message each other privately.</p></div></div><div class="panel search-panel"><label class="search-box">⌕ <input id="user-search" placeholder="Search by username…"><button id="search-btn" class="secondary-btn">Search</button></label><div id="search-results"></div></div><div class="panel"><div class="panel-title"><h3>Your friends</h3></div><div id="friends-list" class="people-list"><div class="empty-state">Your circle starts with one hello.</div></div></div></div>
 
-// --- AUTH ---
-const mail=u=>u.toLowerCase()+'@slimepark.app';
-const err=t=>$('aerr').textContent=t;
-async function signUp(){const u=$('au').value.trim(),p=$('ap').value;
- if(!/^[A-Za-z0-9_]{3,16}$/.test(u))return err('Username: 3-16 letters, numbers or _');if(p.length<6)return err('Password needs 6+ characters');
- const{data:ex}=await db.from('profiles').select('id').ilike('username',u).maybeSingle();if(ex)return err('Username taken');
- const{data,error}=await db.auth.signUp({email:mail(u),password:p});if(error)return err(error.message);
- if(!data.session){const r=await db.auth.signInWithPassword({email:mail(u),password:p});if(r.error)return err('Disable "Confirm email" in Supabase Auth settings');}
- const{data:s}=await db.auth.getSession();const{error:e2}=await db.from('profiles').insert({id:s.session.user.id,username:u});if(e2)return err(e2.message);boot();}
-async function signIn(){const u=$('au').value.trim(),p=$('ap').value;const{error}=await db.auth.signInWithPassword({email:mail(u),password:p});if(error)return err('Wrong username or password');boot();}
-async function signOut(){await db.auth.signOut();location.reload();}
-async function loadMe(quiet){const{data:s}=await db.auth.getSession();if(!s.session)return false;
- const{data}=await db.from('profiles').select('*').eq('id',s.session.user.id).maybeSingle();
- if(!data||data.banned){await db.auth.signOut();alert(data?'Your account is banned.':'This account was deleted.');location.reload();return false}
- me=data;hud();return true}
-function hud(){$('pts').textContent='⭐ '+me.points;$('bstaff').hidden=!isStaff()}
+        <div id="view-messages" class="view-panel hidden"><div class="section-heading"><div><div class="eyebrow">JUST BETWEEN FRIENDS</div><h1>Messages ✉</h1><p class="muted">Add someone as a friend before sending a DM.</p></div></div><div class="panel dm-layout"><div id="dm-people" class="dm-people"><div class="empty-state">Your friends will appear here.</div></div><div class="dm-conversation"><div id="dm-heading" class="panel-title"><h3>Choose a friend</h3></div><div id="dm-feed" class="dm-feed"><div class="empty-state">A friendly message can brighten someone's day.</div></div><form id="dm-form" class="dm-compose"><input id="dm-input" maxlength="1000" placeholder="Write a message…" disabled><button class="primary-btn" disabled id="dm-send">Send</button></form></div></div></div>
 
-// --- BOOT ---
-async function boot(){if(!await loadMe())return;$('auth').hidden=true;$('app').hidden=false;if(ch)return;
- await loadFriends();
- ch=db.channel('park');ch.on('broadcast',{event:'p'},({payload:p})=>{const o=others[p.id];others[p.id]={...p,x:o?o.x:p.x,y:o?o.y:p.y,tx:p.x,ty:p.y,seen:Date.now()}}).subscribe();
- setInterval(()=>ch.send({type:'broadcast',event:'p',payload:{id:me.id,x:P.x,y:P.y,z:P.z,mv:P.mv,b:Date.now()<bubT?bub:'',e:Date.now()<emoT?emoK:'',u:look(me)}}),100);
- msgSub=db.channel('m').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},({new:m})=>onMsg(m)).subscribe();
- const{data:st}=await db.from('settings').select('v').eq('k','music').maybeSingle();setMusic(st?.v);
- db.channel('s').on('postgres_changes',{event:'*',schema:'public',table:'settings'},({new:r})=>r&&r.k=='music'&&setMusic(r.v)).subscribe();
- setInterval(()=>{mins++;if(mins%15==0)addPts(1)},60000);setInterval(()=>loadMe(),20000);
- requestAnimationFrame(loop);}
-(async()=>{if(await loadMe())boot()})();
+        <div id="view-market" class="view-panel hidden"><div class="section-heading"><div><div class="eyebrow">A LITTLE PERSONALITY</div><h1>Slime Market ✧</h1><p class="muted">Try things on your slime before you spend points.</p></div><span class="points-pill">✧ <b id="market-points">—</b> pts</span></div><div class="market-layout"><div class="panel preview-panel"><div class="preview-stage"><div id="preview-slime" class="slime preview-slime"><span class="face">◡</span></div><span id="preview-name">Your slime</span></div><p class="muted center">Your live outfit preview</p><button id="reset-preview" class="secondary-btn full">Reset preview</button><button id="buy-item" class="primary-btn full" disabled>Buy selected item</button><p id="market-message" class="form-message"></p></div><div class="market-items-wrap"><div id="market-categories" class="category-tabs"><button class="category-tab active" data-category="all">All</button><button class="category-tab" data-category="avatar">Slime skins</button><button class="category-tab" data-category="frame">Frames</button><button class="category-tab" data-category="hat">Hats & hair</button><button class="category-tab" data-category="accessory">Accessories</button><button class="category-tab" data-category="aura">Auras</button><button class="category-tab" data-category="title">Titles</button></div><div id="market-grid" class="market-grid"></div></div></div></div>
 
-async function addPts(n){me.points=Math.max(0,me.points+n);hud();await db.from('profiles').update({points:me.points}).eq('id',me.id)}
+        <div id="view-games" class="view-panel hidden"><div class="section-heading"><div><div class="eyebrow">PLAY A LITTLE, EARN A LITTLE</div><h1>Mini-games 🎮</h1><p class="muted">Points are awarded by the server, not by your browser.</p></div></div><div class="games-grid"><article class="game-card"><div class="game-art memory-art">▦ <span>♡</span> ▦</div><h3>Slime Memories</h3><p>Flip cards and match every pair.</p><button id="memory-start" class="primary-btn full">Start game · +3 pts</button><div id="memory-board" class="memory-board"></div><p id="memory-status" class="muted"></p></article><article class="game-card"><div class="game-art patel-art">✿ 🪲 ✿</div><h3>Catch the Patels</h3><p>Catch 10 bugs for 5 points. Catch all 50 for the full reward.</p><div class="patel-progress"><span id="patel-progress-fill"></span></div><p id="patel-count" class="muted">0 / 50 caught</p><button id="patel-start" class="primary-btn full">Start catching</button><div id="patel-board" class="patel-board hidden"></div><button id="patel-retry" class="secondary-btn full hidden">Retry game ↻</button><p id="patel-status" class="muted"></p></article></div></div>
 
-// --- MUSIC ---
-function setMusic(u){const a=$('aud');if(a.dataset.u==u)return;a.dataset.u=u||'';a.src=u||'';if(!u)a.pause()}
-function toggleMusic(){const a=$('aud');if(!a.src)return alert('No music set yet');a.paused?a.play():a.pause()}
-
-// --- FRIENDS / USERS ---
-const av=(e,f,uid)=>`<span class="av" ${uid?`onclick="userCard('${uid}')"`:''} style="${f?`box-shadow:0 0 0 3px ${f},0 0 10px ${f}`:''}">${esc(e||'🟢')}</span>`;
-async function loadFriends(){const{data}=await db.from('friends').select('b').eq('a',me.id);friendIds=(data||[]).map(r=>r.b)}
-async function addFriend(id){if(id==me.id)return;await db.from('friends').upsert([{a:me.id,b:id},{a:id,b:me.id}]);await loadFriends();closeModal();if(cur.p=='friends')friendsP()}
-async function unfriend(id){await db.from('friends').delete().or(`and(a.eq.${me.id},b.eq.${id}),and(a.eq.${id},b.eq.${me.id})`);await loadFriends();closeModal();if(cur.p=='friends')friendsP();else if(cur.p=='chat'&&cur.chat==id)chatP(null)}
-async function userCard(id){const{data:u}=await db.from('profiles').select('*').eq('id',id).maybeSingle();if(!u)return;const f=friendIds.includes(id);
- $('modal').hidden=false;$('modal').onclick=e=>e.target.id=='modal'&&closeModal();
- $('modal').innerHTML=`<div class="card"><canvas id="uc" width="160" height="120" style="margin:auto"></canvas>${av(u.avatar,u.frame)}
- <div><b>${esc(u.username)}</b>${u.title?`<span class="tag" style="color:${tcol(u.title)}">${esc(u.title)}</span>`:''}</div><div class="mu">${u.role=='admin'?'Admin':''}</div>
- ${id==me.id?'':f?`<button class="pri" onclick="closeModal();showPanel('chat');chatP('${id}')">💬 Message</button><button class="dng" onclick="unfriend('${id}')">Unfriend</button>`:`<button class="pri" onclick="addFriend('${id}')">➕ Add friend</button>`}
- <button onclick="closeModal()">Close</button></div>`;
- const c=$('uc').getContext('2d'),L=look(u),t0=performance.now();(function d(){if(!$('uc'))return;c.clearRect(0,0,160,120);slime(c,80,100,L,performance.now(),false,0);requestAnimationFrame(d)})()}
-function closeModal(){$('modal').hidden=true;$('modal').innerHTML=''}
-
-// --- PANELS ---
-function showPanel(n){const pn=$('panel');if(!pn.hidden&&cur.p==n){pn.hidden=true;cur.p=null;return}pn.hidden=false;cur.p=n;
- ({chat:()=>chatP(null),friends:friendsP,market:marketP,games:gamesP,staff:staffP,profile:profileP})[n]()}
-const msgHTML=m=>{const st=m.title=='Admin'?'staff':m.title=='DEV'?'dev':'';return`<div class="msg ${st}">${av(m.av,m.fr,m.uid)}<div><b>${esc(m.username)}</b>${m.title?`<span class="tag" style="color:${tcol(m.title)}">${esc(m.title)}</span>`:''}${m.body.startsWith('[s]')?`<div style="font-size:44px;line-height:1.1">${esc(m.body.slice(3))}</div>`:`<div>${esc(m.body)}</div>`}</div></div>`};
-async function chatP(w){cur.chat=w;let name='Global chat';if(w){const{data}=await db.from('profiles').select('username').eq('id',w).maybeSingle();name='💬 '+esc(data?.username)}
- $('pbody').innerHTML=`<div class="row"><h3>${name}</h3>${w?'<button onclick="chatP(null)" style="flex:none">Global</button>':''}</div><div class="msgs" id="msgs"></div><div class="row"><input id="ci" maxlength="200" placeholder="Say something…" onkeydown="event.key=='Enter'&&sendMsg()"><button style="flex:none" onclick="stickerPick()">😺</button><button class="pri" style="flex:none" onclick="sendMsg()">Send</button></div>`;
- let q=db.from('messages').select('*').order('created_at',{ascending:false}).limit(60);
- q=w?q.or(`and(uid.eq.${me.id},to_uid.eq.${w}),and(uid.eq.${w},to_uid.eq.${me.id})`):q.is('to_uid',null);
- const{data}=await q;$('msgs').innerHTML=(data||[]).reverse().map(msgHTML).join('');$('msgs').scrollTop=1e9}
-function onMsg(m){if(cur.p!='chat'||!$('msgs'))return;const w=cur.chat;
- const ok=w?(m.to_uid&&((m.uid==me.id&&m.to_uid==w)||(m.uid==w&&m.to_uid==me.id))):!m.to_uid;
- if(ok){$('msgs').insertAdjacentHTML('beforeend',msgHTML(m));$('msgs').scrollTop=1e9}}
-async function sendMsg(st){const t=st?'[s]'+st:$('ci').value.trim();if(!t)return;
- if(me.muted_until&&new Date(me.muted_until)>new Date())return alert('You are muted until '+new Date(me.muted_until).toLocaleString());
- const w=cur.chat;if(w&&!friendIds.includes(w))return alert('You must be friends to message this user');
- $('ci').value='';await db.from('messages').insert({uid:me.id,username:me.username,title:me.title,av:me.avatar,fr:me.frame,body:t,to_uid:w});
- if(!w){bub=t.replace('[s]','').slice(0,50);bubT=Date.now()+6000}}
-async function friendsP(){$('pbody').innerHTML=`<h3>Find players</h3><div class="row"><input id="fs" placeholder="Search username" onkeydown="event.key=='Enter'&&findU()"><button class="pri" style="flex:none" onclick="findU()">Search</button></div><div id="fr"></div><h3>Friends</h3><div id="fl" class="mu">Loading…</div>`;
- if(!friendIds.length)return $('fl').textContent='No friends yet. Click a slime or chat avatar to add one.';
- const{data}=await db.from('profiles').select('id,username,avatar,frame,title').in('id',friendIds);
- $('fl').innerHTML=(data||[]).map(u=>`<div class="msg">${av(u.avatar,u.frame,u.id)}<b style="flex:1">${esc(u.username)}</b><button onclick="chatP('${u.id}')">💬</button><button class="dng" onclick="unfriend('${u.id}')">✕</button></div>`).join('')}
-async function findU(){const q=$('fs').value.trim();if(!q)return;const{data}=await db.from('profiles').select('id,username,avatar,frame').ilike('username','%'+q+'%').neq('id',me.id).limit(10);
- $('fr').innerHTML=(data||[]).map(u=>`<div class="msg">${av(u.avatar,u.frame,u.id)}<b style="flex:1">${esc(u.username)}</b>${friendIds.includes(u.id)?'<span class="mu">Friend</span>':`<button class="pri" onclick="addFriend('${u.id}')">Add</button>`}</div>`).join('')||'<div class="mu">No users found</div>'}
-
-// --- MARKET ---
-const owns=i=>i[3]==0||me.owned.includes(i[0]);
-const slot={skin:'skin',hat:'hat',hair:'hair',bow:'bow',title:'title',avatar:'avatar',frame:'frame'};
-const eqd=i=>me[slot[i[1]]]==i[4]||(i[1]=='skin'&&me.skin==i[0]);
-function marketP(){const items=ITEMS.filter(i=>i[1]==mk.tab);const L={...look(me),...mk.try},t=mk.try;
- $('pbody').innerHTML=`<div class="row"><canvas id="pv" width="180" height="150" style="background:#ffeaf2;border-radius:14px;flex:none;max-width:180px"></canvas><div style="text-align:center">${av(t.avatar||me.avatar,t.frame||me.frame)}<div class="mu">Preview / try on</div><button onclick="mk.try={};marketP()">Reset</button></div></div>
- <div class="tabs">${Object.keys(SEC).map(k=>`<button class="${k==mk.tab?'on':''}" onclick="mk.tab='${k}';marketP()">${SEC[k]}</button>`).join('')}</div>
- <div class="grid">${items.map(i=>`<div class="item"><b>${i[1]=='skin'?`<span class="dot" style="background:${i[4]};box-shadow:0 0 8px ${i[5]||'transparent'}"></span>`:i[1]=='avatar'?i[4]+' ':''}${i[2]}</b><small>${i[3]?'⭐ '+i[3].toLocaleString():'Free'}</small>
- <button onclick="tryOn('${i[0]}')">👁 Try</button>${owns(i)?(i[1]=='sticker'?'<small>Owned ✓</small>':eqd(i)?(i[1]=='skin'||i[1]=='avatar'?'<small>Equipped ✓</small>':`<button onclick="eq('${i[0]}',1)">Unequip</button>`):`<button class="pri" onclick="eq('${i[0]}')">Equip</button>`):`<button class="pri" onclick="buy('${i[0]}')">Buy</button>`}</div>`).join('')}</div>`}
-function tryOn(id){const i=ITEMS.find(x=>x[0]==id);if(i[1]=='sticker')return alert('Sticker preview: '+i[4]);const k={skin:'skin',hat:'hat',hair:'hair',bow:'bow',title:'t',avatar:'avatar',frame:'frame'}[i[1]];mk.try[k]=i[4]=='tuft'?i[4]:(i[1]=='skin'?i[0]:i[4]);marketP()}
-async function buy(id){const i=ITEMS.find(x=>x[0]==id);if(me.points<i[3])return alert('Not enough points!');me.owned=[...me.owned,id];me.points-=i[3];
- await db.from('profiles').update({owned:me.owned,points:me.points}).eq('id',me.id);hud();i[1]=='sticker'?marketP():await eq(id)}
-async function eq(id,un){const i=ITEMS.find(x=>x[0]==id),c=slot[i[1]],v=un?null:(i[1]=='skin'?i[0]:i[4]);me[c]=v;
- const u={[c]:v};if(i[1]=='skin'&&isDev()&&0)u.skin=v;await db.from('profiles').update(u).eq('id',me.id);marketP()}
-
-// --- PROFILE / DEV MODE ---
-function profileP(){const avs=['🟢',...ITEMS.filter(i=>i[1]=='avatar'&&owns(i)).map(i=>i[4])];
- $('pbody').innerHTML=`<h3>Profile</h3><div style="text-align:center">${av(me.avatar,me.frame)}<div><b>${esc(me.username)}</b>${me.title?`<span class="tag" style="color:${tcol(me.title)}">${esc(me.title)}</span>`:''}</div></div>
- <label class="mu">Change username</label><div class="row"><input id="nu" value="${esc(me.username)}" maxlength="16"><button class="pri" style="flex:none" onclick="saveName()">Save</button></div>
- <label class="mu">Profile picture (owned avatars)</label><div class="tabs">${avs.map(a=>`<button onclick="setAv('${a}')">${a}</button>`).join('')}</div>
- ${me.role=='admin'?`<button onclick="toggleAdminSkin()">${me.skin=='admin'?'Unequip':'Equip'} Admin skin &amp; title</button>`:''}
- <label class="mu">Developer mode</label>${me.dev_on?`<button class="dng" onclick="devOff()">Disable dev mode</button>`:`<div class="row"><input id="dc" type="password" placeholder="Passcode"><button onclick="devOn()" style="flex:none">Enable</button></div>`}`}
-async function saveName(){const n=$('nu').value.trim();if(!/^[A-Za-z0-9_]{3,16}$/.test(n))return alert('3-16 letters, numbers or _');
- const{error}=await db.from('profiles').update({username:n}).eq('id',me.id);if(error)return alert(error.code=='23505'?'Username taken':error.message);me.username=n;alert('Saved');profileP()}
-async function setAv(a){me.avatar=a;await db.from('profiles').update({avatar:a}).eq('id',me.id);profileP()}
-async function devOn(){if($('dc').value!=DEVCODE)return alert('Wrong passcode');Object.assign(me,{dev_on:true,skin:'dev',title:'DEV'});await db.from('profiles').update({dev_on:true,skin:'dev',title:'DEV'}).eq('id',me.id);hud();profileP()}
-async function devOff(){const u={dev_on:false,skin:me.role=='admin'&&0?'admin':'green',title:null};Object.assign(me,u);await db.from('profiles').update(u).eq('id',me.id);hud();if(cur.p=='staff')$('panel').hidden=true;profileP()}
-async function toggleAdminSkin(){const on=me.skin!='admin',u=on?{skin:'admin',title:'Admin'}:{skin:'green',title:null};Object.assign(me,u);await db.from('profiles').update(u).eq('id',me.id);profileP()}
-
-// --- STAFF PANEL ---
-function staffP(){const d=isDev();$('pbody').innerHTML=`<h3>${d?'Developer':'Admin'} panel</h3><input id="tu" placeholder="Target username">
- <div class="mu">Moderation</div><div class="tabs"><button class="dng" onclick="sact('ban')">Ban</button><button onclick="sact('unban')">Unban</button><button class="dng" onclick="sact('del')">Delete account</button></div>
- <div class="row"><input id="mm" type="number" placeholder="Mute minutes"><button onclick="sact('mute')" style="flex:none">Mute</button><button onclick="sact('unmute')" style="flex:none">Unmute</button></div>
- ${d?`<div class="mu">Roles</div><div class="tabs"><button class="pri" onclick="sact('admin')">Make admin</button><button onclick="sact('revoke')">Revoke admin</button></div>
- <div class="row"><input id="pp" type="number" placeholder="Points"><button onclick="sact('add')" style="flex:none">Send</button><button onclick="sact('sub')" style="flex:none">Deduct</button></div>`:''}
- <div class="mu">Music URL (mp3 link, empty to stop)</div><div class="row"><input id="mu" placeholder="https://…mp3"><button onclick="setMusicUrl()" style="flex:none">Set</button></div>`}
-async function setMusicUrl(){await db.from('settings').upsert({k:'music',v:$('mu').value.trim()});alert('Music updated')}
-async function sact(a){if(!isStaff())return;const n=$('tu').value.trim();const{data:t}=await db.from('profiles').select('*').ilike('username',n).maybeSingle();if(!t)return alert('User not found');
- if(t.id==me.id)return alert("Can't target yourself");if(t.dev_on)return alert("Can't target a developer");
- const d=isDev(),up=async u=>{await db.from('profiles').update(u).eq('id',t.id);alert('Done')};
- if(a=='ban')return up({banned:true});if(a=='unban')return up({banned:false});
- if(a=='del'){if(!confirm('Delete '+t.username+'?'))return;await db.from('profiles').delete().eq('id',t.id);await db.from('friends').delete().or(`a.eq.${t.id},b.eq.${t.id}`);return alert('Deleted')}
- if(a=='mute'){const m=+$('mm').value;if(!m)return alert('Enter minutes');return up({muted_until:new Date(Date.now()+m*60000).toISOString()})}
- if(a=='unmute')return up({muted_until:null});
- if(!d)return;const amt=Math.abs(+$('pp').value||0);
- if(a=='admin')return up({role:'admin'});
- if(a=='revoke')return up({role:'user',...(t.skin=='admin'?{skin:'green'}:{}),...(t.title=='Admin'?{title:null}:{})});
- if(a=='add')return up({points:t.points+amt});if(a=='sub')return up({points:Math.max(0,t.points-amt)})}
-
-// --- GAMES ---
-function gamesP(){$('pbody').innerHTML=`<h3>Games</h3><div class="item"><b>🧠 Slime Memories</b><small>Match all pairs → +3 points</small><button class="pri" onclick="memory()">Play</button></div>
- <div class="item"><b>🌸 Catch the Petals</b><small>50 petals fall. Every 10 caught = 1 point (max 5)</small><button class="pri" onclick="petals()">Play</button></div>
- <div class="item"><b>⏱ Park time</b><small>Stay in the park: +1 point every 15 minutes (${mins%15}/15 min)</small></div>`}
-function gameEnd(msg){const g=$('game');g.insertAdjacentHTML('beforeend',`<h2>${msg}</h2>`)}
-const gameShell=(t,body)=>{$('game').hidden=false;$('game').innerHTML=`<div class="row" style="flex:none;width:min(340px,92vw)"><h3>${t}</h3><button onclick="$('game').hidden=true;$('game').innerHTML=''" style="flex:none">✕ Close</button></div>${body}`};
-function memory(){const E=['🍎','🍌','🍇','🍓','🍉','🍒','🥝','🍋'];const c=[...E,...E].sort(()=>Math.random()-.5);let a=null,lock=false,found=0;
- gameShell('🧠 Slime Memories','<div class="mem" id="mm2"></div><div id="gr"></div>');
- const g=$('mm2');c.forEach((e,i)=>{const d=document.createElement('div');d.textContent='❓';d.onclick=()=>{if(lock||d.classList.contains('up'))return;d.classList.add('up');d.textContent=e;
-  if(!a){a=d;return}const b=a;a=null;if(b.textContent==e){if(++found==8){addPts(3);$('gr').innerHTML='<h2>🎉 +3 points!</h2><button class="pri" onclick="memory()">Play again</button>'}}
-  else{lock=true;setTimeout(()=>{[b,d].forEach(x=>{x.classList.remove('up');x.textContent='❓'});lock=false},700)}};g.appendChild(d)})}
-function petals(){let n=0,got=0;gameShell('🌸 Catch the Petals','<div id="pc">Caught: 0 / 50</div><div id="gr"></div>');const G=$('game');
- const iv=setInterval(()=>{if(n>=50){clearInterval(iv);setTimeout(()=>{const p=Math.min(5,Math.floor(got/10));if(p)addPts(p);if($('gr'))$('gr').innerHTML=`<h2>Caught ${got}/50 → +${p} points</h2><button class="pri" onclick="petals()">Retry</button>`},4200);return}
-  n++;const d=document.createElement('div');d.className='petal';d.textContent='🌸';d.style.left=(5+Math.random()*85)+'%';d.style.animationDuration=(2.5+Math.random()*2)+'s';
-  d.onpointerdown=()=>{if(d.dataset.c)return;d.dataset.c=1;d.remove();got++;const pc=$('pc');if(pc)pc.textContent='Caught: '+got+' / 50'};G.appendChild(d)},550)}
-
-// --- SLIME RENDERER ---
-function slime(c,x,y,u,t,mv,z,bubble,emo){
- const s=SK[u.skin]||SK.green;let col=s[0],gl=s[1];if(u.skin=='rainbow')col=gl=`hsl(${t/8%360},85%,65%)`;
- let hop=mv?Math.abs(Math.sin(t/130))*16:0,sq=mv?Math.sin(t/65)*.09:Math.sin(t/450)*.03,rot=0,sx=1;if(emo=='dance'){hop=Math.abs(Math.sin(t/140))*22;rot=Math.sin(t/140)*.3}if(emo=='spin')sx=Math.cos(t/120);if(emo=='sleep')sq=.1+Math.sin(t/500)*.06;if(emo=='laugh')hop=Math.abs(Math.sin(t/70))*7;const rx=26*(1+sq),ry=20*(1-sq);
- c.save();c.fillStyle='rgba(0,0,0,.22)';c.beginPath();c.ellipse(x,y+2,Math.max(8,24-(hop+z)/6),6,0,0,7);c.fill();
- c.translate(x,y-hop-z-ry+2);c.rotate(rot);c.scale(sx,1);
- if(gl){c.globalAlpha=.22+.08*Math.sin(t/300);c.fillStyle=gl;c.beginPath();c.ellipse(0,0,rx+10,ry+10,0,0,7);c.fill();c.globalAlpha=1;c.shadowColor=gl;c.shadowBlur=26}
- c.fillStyle=col;c.beginPath();c.ellipse(0,0,rx,ry,0,0,7);c.fill();c.shadowBlur=0;
- c.fillStyle='#fff5';c.beginPath();c.ellipse(-11,-9,6,3,-.5,0,7);c.fill();
- [-9,9].forEach(ex=>{c.fillStyle='#fff';c.beginPath();c.arc(ex,-2,5,0,7);c.fill();c.fillStyle='#111';c.beginPath();c.arc(ex+1,-1,2.5,0,7);c.fill()});
- c.strokeStyle=u.skin=='admin'?'#f55':'#222';c.lineWidth=2;c.beginPath();c.arc(0,5,5,.15*Math.PI,.85*Math.PI);c.stroke();
- const F=(col,pts)=>{c.fillStyle=col;c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fill()},T=-ry;
- if(u.hair=='spike')[-14,-5,4,13].forEach((h,i)=>F('#2b2b3a',[[h-5,T+4],[h,T-16-(i%2)*4],[h+5,T+4]]));
- if(u.hair=='mohawk')[-10,-4,2,8].forEach(h=>F('#ff3b6b',[[h-4,T+3],[h,T-18],[h+4,T+3]]));
- if(u.hair=='tuft'){c.strokeStyle='#2fa84f';c.lineWidth=3;c.beginPath();c.moveTo(0,T+2);c.quadraticCurveTo(-8,T-14,-2,T-16);c.moveTo(0,T+2);c.quadraticCurveTo(8,T-12,6,T-14);c.stroke()}
- if(u.hat=='tophat'){F('#222',[[-14,T+2],[-14,T-24],[14,T-24],[14,T+2]]);F('#222',[[-21,T+3],[-21,T-2],[21,T-2],[21,T+3]]);F('#c33',[[-14,T-4],[-14,T-9],[14,T-9],[14,T-4]])}
- if(u.hat=='cap'){F('#e33',[[-16,T+4],[-12,T-10],[12,T-10],[16,T+4]]);F('#a11',[[-4,T+3],[26,T+3],[26,T+7],[-4,T+7]])}
- if(u.hat=='crown'){F('#ffd23f',[[-14,T+3],[-16,T-16],[-7,T-8],[0,T-20],[7,T-8],[16,T-16],[14,T+3]])}
- if(u.hat=='wizard'){F('#5a3dc8',[[-18,T+3],[0,T-38],[18,T+3]]);F('#ffd23f',[[0,T-26],[3,T-19],[-3,T-19]])}
- if(u.hat=='party'){F('#ff5fb0',[[-12,T+3],[0,T-30],[12,T+3]]);c.fillStyle='#ffe45e';c.beginPath();c.arc(0,T-31,3,0,7);c.fill()}
- if(u.hat=='flower'){for(let k=0;k<5;k++){c.fillStyle='#ff9ec5';c.beginPath();c.arc(12+Math.cos(k*1.256)*6,T+Math.sin(k*1.256)*6,4.5,0,7);c.fill()}c.fillStyle='#ffe45e';c.beginPath();c.arc(12,T,3,0,7);c.fill()}
- if(u.hat=='halo'){c.strokeStyle='#ffd23f';c.lineWidth=3;c.shadowColor='#ffd23f';c.shadowBlur=10;c.beginPath();c.ellipse(0,T-12,15,4,0,0,7);c.stroke();c.shadowBlur=0}
- if(u.bow=='bowtie'){F('#e22',[[0,ry-6],[-12,ry-13],[-12,ry-1]]);F('#e22',[[0,ry-6],[12,ry-13],[12,ry-1]])}
- if(u.bow=='ribbon'){F('#ff7ac0',[[0,ry-6],[-13,ry-14],[-10,ry-2]]);F('#ff7ac0',[[0,ry-6],[13,ry-14],[10,ry-2]])}
- if(u.bow=='obi'){F('#d6336c',[[-15,ry-15],[15,ry-15],[15,ry-3],[-15,ry-3]]);F('#ffd23f',[[-4,ry-15],[4,ry-15],[4,ry-3],[-4,ry-3]])}
- if(u.bow=='tie')F('#2a6bff',[[-4,ry-12],[4,ry-12],[6,ry+4],[0,ry+8],[-6,ry+4]]);
- c.restore();
- const EI={dance:'🎵',wave:'👋',heart:'❤️',laugh:'😂',sleep:'💤',spin:'💫'};if(emo&&EI[emo]){c.font='20px serif';c.textAlign='center';c.globalAlpha=.9;c.fillText(EI[emo],x+(emo=='wave'?30+Math.sin(t/90)*5:30),y-hop-z-ry*2-4-((t/20)%12));c.globalAlpha=1}
- const ny=y-hop-z-ry*2-30;c.textAlign='center';c.font='bold 13px system-ui';c.lineWidth=3;c.strokeStyle='#000b';c.fillStyle='#fff';c.strokeText(u.n||'',x,ny);c.fillText(u.n||'',x,ny);
- if(u.t){c.font='bold 11px system-ui';c.fillStyle=tcol(u.t);c.strokeText(u.t,x,ny-14);c.fillText(u.t,x,ny-14)}
- if(bubble){c.font='12px system-ui';const w=c.measureText(bubble).width+16,by=ny-(u.t?26:14)-24;c.fillStyle='#fff';c.beginPath();c.roundRect(x-w/2,by,w,22,9);c.fill();c.beginPath();c.moveTo(x-5,by+22);c.lineTo(x,by+29);c.lineTo(x+5,by+22);c.fill();c.fillStyle='#111';c.fillText(bubble,x,by+15)}}
-
-// --- PARK ---
-const TREES=[[60,130],[150,90],[300,110],[620,100],[760,120],[850,160],[70,420],[180,500],[800,470],[860,380],[420,90]],FL=Array.from({length:60},(_,i)=>[(i*131)%880+10,(i*89)%440+110,['#ff8fc8','#ffe45e','#fff','#b278ff'][i%4]]);
-function park(c,t){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#7fd88a');g.addColorStop(1,'#4fb36a');c.fillStyle=g;c.fillRect(0,0,W,H);
- c.fillStyle='#e8d9a8';c.beginPath();c.moveTo(0,330);c.bezierCurveTo(250,260,500,420,W,320);c.lineTo(W,370);c.bezierCurveTo(500,470,250,310,0,380);c.fill();
- c.fillStyle='#5ec8f0';c.beginPath();c.ellipse(700,440,110,50,0,0,7);c.fill();c.strokeStyle='#ffffff88';c.lineWidth=2;c.beginPath();c.ellipse(700,440,80+Math.sin(t/500)*6,32,0,0,7);c.stroke();
- FL.forEach(f=>{c.fillStyle=f[2];c.beginPath();c.arc(f[0],f[1],3,0,7);c.fill()});
- c.fillStyle='#fff';c.font='bold 18px system-ui';c.textAlign='center';c.fillText('🌳 SlimePark 🌳',W/2,40)}
-function tree(c,x,y){c.fillStyle='#0002';c.beginPath();c.ellipse(x,y+4,28,8,0,0,7);c.fill();c.fillStyle='#6b4a3a';c.fillRect(x-6,y-40,12,44);[[0,-64,30,'#ffb7d0'],[-18,-48,22,'#ff9ec0'],[18,-48,22,'#ffc9dc'],[0,-48,20,'#ffd9e6']].forEach(a=>{c.fillStyle=a[3];c.beginPath();c.arc(x+a[0],y+a[1],a[2],0,7);c.fill()})}
-const cv=$('cv'),cx=cv.getContext('2d');let S=1,OX=0,OY=0,last=performance.now();
-function resize(){const d=devicePixelRatio||1;cv.width=Math.round(cv.clientWidth*d);cv.height=Math.round(cv.clientHeight*d);S=Math.min(cv.width/W,cv.height/H);OX=(cv.width-W*S)/2;OY=(cv.height-H*S)/2}
-addEventListener('resize',resize);resize();
-function loop(now){if(!cv.clientWidth){requestAnimationFrame(loop);return}if(cv.width!==Math.round(cv.clientWidth*(devicePixelRatio||1))||cv.height!==Math.round(cv.clientHeight*(devicePixelRatio||1)))resize();const dt=Math.min(.05,(now-last)/1000);last=now;
- let dx=(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0)+joy.x,dy=(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0)+joy.y;const m=Math.hypot(dx,dy);
- P.mv=m>.15;if(P.mv){const k=Math.min(1,m)/m;P.x=Math.max(30,Math.min(W-30,P.x+dx*k*190*dt));P.y=Math.max(110,Math.min(H-15,P.y+dy*k*190*dt))}
- if(P.z>0||P.vz>0){P.z+=P.vz*dt;P.vz-=1300*dt;if(P.z<=0){P.z=0;P.vz=0}}
- cx.setTransform(1,0,0,1,0,0);cx.fillStyle='#a9dfa8';cx.fillRect(0,0,cv.width,cv.height);cx.setTransform(S,0,0,S,OX,OY);park(cx,now);
- const L=[];TREES.forEach(t=>L.push([t[1],()=>tree(cx,t[0],t[1])]));
- for(const id in others){const o=others[id];if(Date.now()-o.seen>4000){delete others[id];continue}o.x+=(o.tx-o.x)*.3;o.y+=(o.ty-o.y)*.3;L.push([o.y,()=>slime(cx,o.x,o.y,o.u,now,o.mv,o.z||0,o.b,o.e)])}
- L.push([P.y,()=>slime(cx,P.x,P.y,look(me),now,P.mv&&P.z==0,P.z,Date.now()<bubT?bub:'',Date.now()<emoT?emoK:'')]);L.sort((a,b)=>a[0]-b[0]).forEach(l=>l[1]());
- const pv=$('pv');if(pv){const c=pv.getContext('2d');c.clearRect(0,0,180,150);c.fillStyle='#ffeaf2';c.fillRect(0,0,180,150);slime(c,90,120,{...look(me),...mk.try},now,false,0)}
- requestAnimationFrame(loop)}
-cv.addEventListener('click',e=>{const r=cv.getBoundingClientRect(),d=devicePixelRatio||1,wx=((e.clientX-r.left)*d-OX)/S,wy=((e.clientY-r.top)*d-OY)/S;
- for(const id in others){const o=others[id];if(Math.hypot(o.x-wx,o.y-20-wy)<32)return userCard(id)}if(Math.hypot(P.x-wx,P.y-20-wy)<32)userCard(me.id)});
-
-// --- CONTROLS ---
-const typing=()=>/INPUT|TEXTAREA/.test(document.activeElement.tagName);
-addEventListener('keydown',e=>{if(typing())return;const k=e.key.length>1?e.key:e.key.toLowerCase();keys[k]=1;if(e.code=='Space'){e.preventDefault();jump()}});
-addEventListener('keyup',e=>{const k=e.key.length>1?e.key:e.key.toLowerCase();keys[k]=0});
-function jump(){if(P.z==0){P.vz=430}}
-$('jump').addEventListener('pointerdown',e=>{e.preventDefault();jump()});
-const jy=$('joy'),kn=$('knob');let jd=false;
-function jm(e){const r=jy.getBoundingClientRect();let x=e.clientX-r.left-60,y=e.clientY-r.top-60;const m=Math.hypot(x,y),R=45;if(m>R){x*=R/m;y*=R/m}kn.style.left=35+x+'px';kn.style.top=35+y+'px';joy.x=x/R;joy.y=y/R}
-jy.addEventListener('pointerdown',e=>{jd=true;jy.setPointerCapture(e.pointerId);jm(e)});jy.addEventListener('pointermove',e=>jd&&jm(e));
-['pointerup','pointercancel'].forEach(v=>jy.addEventListener(v,()=>{jd=false;joy.x=joy.y=0;kn.style.left=kn.style.top='35px'}));
-</script>
-<script>
-// ===== v2 additions: emotes, stickers, toast, leaderboard, prettier park =====
-document.body.insertAdjacentHTML('beforeend','<div id="toast"></div>');
-let _tt;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('on'),2600)}
-window.alert=toast;
-// Emotes (also keys 1-6)
-const EM=[['dance','💃','Dance'],['wave','👋','Wave'],['heart','❤️','Love'],['laugh','😂','Laugh'],['sleep','😴','Sleep'],['spin','🌀','Spin']];
-$('emw').innerHTML=EM.map((e,i)=>`<button onclick="doEmote('${e[0]}')" title="${e[2]} (${i+1})">${e[1]}</button>`).join('');
-$('emo').onclick=()=>$('emw').hidden=!$('emw').hidden;
-function doEmote(k){emoK=k;emoT=Date.now()+6000;$('emw').hidden=true}
-addEventListener('keydown',e=>{if(typing())return;const i=+e.key-1;if(EM[i])doEmote(EM[i][0])});
-setInterval(()=>{if(P.mv)emoT=0;$('online').textContent='🟢 '+(Object.keys(others).length+1)+' online'},250);
-// Stickers
-const FREE_ST=['👍','❤️','😂','😮','😢','🎉'];SEC.sticker='Stickers';
-ITEMS.push(['s1','sticker','Slime Love',500,'🥰'],['s2','sticker','Fire',800,'🔥'],['s3','sticker','Party Slime',1200,'🥳'],['s4','sticker','Cool',1800,'😎'],['s5','sticker','Ghost',2500,'👻'],['s6','sticker','Rainbow',3500,'🌈'],['s7','sticker','Unicorn',5000,'🦄']);
-function stickerPick(){const d=$('stk');if(d)return d.remove();const L=[...FREE_ST,...ITEMS.filter(i=>i[1]=='sticker'&&owns(i)).map(i=>i[4])];
- $('msgs').insertAdjacentHTML('afterend',`<div id="stk" class="tabs" style="max-height:110px;overflow:auto">${L.map(s=>`<button style="font-size:26px" onclick="sendMsg('${s}')">${s}</button>`).join('')}<small class="mu" style="align-self:center">More in 🛒 Market</small></div>`)}
-// Games panel + leaderboard
-function gamesP(){$('pbody').innerHTML=`<h3>Games</h3><div class="item"><b>🧠 Slime Memories</b><small>Match all pairs → +3 points</small><button class="pri" onclick="memory()">Play</button></div>
- <div class="item"><b>🌸 Catch the Petals</b><small>50 petals fall. Every 10 caught = 1 point (max 5)</small><button class="pri" onclick="petals()">Play</button></div>
- <div class="item"><b>⏱ Park time</b><small>Stay in the park: +1 point every 15 minutes (${mins%15}/15 min)</small></div>
- <div class="item"><b>🏆 Leaderboard</b><button onclick="lb()">Show top players</button></div><div id="lbx"></div>`}
-async function lb(){const{data}=await db.from('profiles').select('username,points,avatar,frame').order('points',{ascending:false}).limit(10);
- $('lbx').innerHTML=(data||[]).map((u,i)=>`<div class="msg"><b>${['🥇','🥈','🥉'][i]||i+1}</b>${av(u.avatar,u.frame)}<b style="flex:1">${esc(u.username)}</b>⭐ ${u.points}</div>`).join('')}
-// Prettier park: fountain, bench, lamps, butterflies, night mode by local time
-function park(c,t){const h=new Date().getHours(),night=h>=19||h<6;
- const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,night?'#3d5a63':'#c4eab4');g.addColorStop(1,night?'#2a4452':'#8fd39f');c.fillStyle=g;c.fillRect(0,0,W,H);
- c.fillStyle=night?'#8c7480':'#f8dce5';c.beginPath();c.moveTo(0,330);c.bezierCurveTo(250,260,500,420,W,320);c.lineTo(W,370);c.bezierCurveTo(500,470,250,310,0,380);c.fill();
- c.fillStyle='#9fdcf5';c.beginPath();c.ellipse(720,450,115,50,0,0,7);c.fill();c.strokeStyle='#fff9';c.lineWidth=2;c.beginPath();c.ellipse(720,450,82+Math.sin(t/500)*6,30,0,0,7);c.stroke();
- for(let i=0;i<2;i++){const a=t/1500+i*3;c.fillStyle=i?'#ff8a3d':'#fff';c.beginPath();c.ellipse(720+Math.cos(a)*70,450+Math.sin(a)*24,9,4,a+1.57,0,7);c.fill()}
- c.fillStyle='#ffc2d9';for(let i=0;i<7;i++){c.beginPath();c.ellipse(650+i*25,430+(i%3)*18,5,3,i,0,7);c.fill()}
- c.strokeStyle='#c0392b';c.lineWidth=8;c.beginPath();c.moveTo(625,452);c.quadraticCurveTo(720,405,815,452);c.stroke();
- FL.forEach(f=>{c.fillStyle=f[2];c.beginPath();c.arc(f[0],f[1],3,0,7);c.fill()});
- c.fillStyle='#d6352b';c.fillRect(402,82,10,76);c.fillRect(488,82,10,76);c.fillRect(384,70,132,10);c.fillRect(400,94,100,6);c.fillStyle='#222';c.fillRect(380,64,140,7);
- [[190,300],[690,300]].forEach(([x,y])=>{c.fillStyle='#9a9aa5';c.fillRect(x-3,y-34,6,34);c.fillRect(x-12,y-6,24,6);c.fillStyle=night?'#ffe9a0':'#d9d4ca';c.fillRect(x-8,y-44,16,10);c.fillStyle='#8a8a95';c.beginPath();c.moveTo(x-17,y-44);c.lineTo(x,y-58);c.lineTo(x+17,y-44);c.fill();
-  if(night){const r=c.createRadialGradient(x,y-40,2,x,y-40,70);r.addColorStop(0,'#ffe9a0aa');r.addColorStop(1,'#ffe9a000');c.fillStyle=r;c.fillRect(x-70,y-110,140,140)}});
- for(let i=0;i<6;i++){const bx=450+Math.sin(t/1700+i*2)*380,by=310+Math.cos(t/1300+i*3)*150;
-  if(night){c.fillStyle='#ffff9acc';c.shadowColor='#ffff66';c.shadowBlur=10;c.beginPath();c.arc(bx,by,2.5,0,7);c.fill();c.shadowBlur=0}
-  else{c.fillStyle=['#ff8fc8','#ffe45e','#b278ff'][i%3];const w=Math.abs(Math.sin(t/70+i))*5+1;c.beginPath();c.ellipse(bx-3,by,3,w,0,0,7);c.ellipse(bx+3,by,3,w,0,0,7);c.fill()}}
- c.fillStyle='#ffb7d0cc';for(let i=0;i<30;i++){const px=((i*113)+t*.02*(1+i%3)+Math.sin(t/700+i)*20)%W,py=((i*71)+t*.03*(1+i%4))%H;c.beginPath();c.ellipse(px,py,4.5,2.6,t/400+i,0,7);c.fill()}
- c.fillStyle=night?'#fff':'#a8325f';c.font='bold 18px system-ui';c.textAlign='center';c.fillText('🌸 Sakura Park 🌸',W/2,40)}
-
-// ===== v3: sakura items, safety wrappers, UI petals =====
-[['sakura','skin','Sakura Aura',8500,'#ffb7d0','#ff7aa8'],['blossom','skin','Blossom Glow',13500,'#ffe0ec','#ffffff'],['h_fl','hat','Sakura Flower',2500,'flower'],['b_obi','bow','Obi Sash',1800,'obi'],
- ['t5','title','Sakura Princess',6000,'Sakura Princess'],['a6','avatar','Blossom',1500,'🌸'],['a7','avatar','Koi',2200,'🎏'],['f6','frame','Sakura Ring',4500,'#ff9ec5'],
- ['s8','sticker','Sakura',1000,'🌸'],['s9','sticker','Onigiri',1500,'🍙']].forEach(i=>{ITEMS.push(i);if(i[1]=='skin')SK[i[0]]=[i[4],i[5]]});
-const _L=loop;loop=function(n){try{_L(n)}catch(e){console.error(e);requestAnimationFrame(loop)}};
-const _SP=showPanel;showPanel=function(n){try{_SP(n)}catch(e){console.error(e);$('pbody').innerHTML='<div class="mu">Something went wrong: '+esc(e.message)+'</div>'}};
-const _MP=marketP;marketP=function(){try{_MP()}catch(e){console.error(e);$('pbody').innerHTML='<div class="mu">Market error: '+esc(e.message)+'</div>'}};
-addEventListener('error',e=>toast('Error: '+e.message));
-for(let i=0;i<16;i++){const p=document.createElement('span');p.className='sp';p.textContent='🌸';p.style.cssText=`left:${Math.random()*100}%;font-size:${14+Math.random()*14}px;animation-duration:${10+Math.random()*10}s;animation-delay:-${Math.random()*15}s`;document.body.appendChild(p)}
-</script></body></html>
+        <div id="view-settings" class="view-panel hidden"><div class="section-heading"><div><div class="eyebrow">MAKE IT YOURS</div><h1>Profile & settings ⚙</h1><p class="muted">Your name, picture, and park preferences.</p></div></div><div class="panel settings-form"><label>Username <input id="settings-username" maxlength="20" placeholder="Username"></label><label>Profile picture / emoji <input id="settings-avatar" maxlength="8" placeholder="☺"></label><button id="save-profile" class="primary-btn">Save profile</button><p id="settings-message" class="form-message"></p><div class="divider"></div><h3>Music</h3><p class="muted">Use your own royalty-free audio file; music controls are available to admins and developers.</p><label>Music URL (admin / developer only) <input id="music-url" placeholder="https://…/music.mp3"></label><button id="save-music" class="secondary-btn">Save music setting</button><div class="divider"></div><h3>Developer mode</h3><p class="muted">Enter the access code to request developer access. For production, move this permission into a secure server-side role; never rely on a frontend passcode alone.</p><button id="settings-dev-open" class="secondary-btn">Enter developer code</button></div><div id="admin-panel" class="panel admin-panel hidden"><div class="panel-title"><h3>✦ Park moderation console</h3><span class="admin-badge">PRIVILEGED</span></div><p class="muted">Only server-authorized admins can run moderation actions.</p><div class="admin-grid"><label>Username <input id="admin-target" placeholder="Exact username"></label><label>Action <select id="admin-action"><option value="make_admin">Make admin (developer only)</option><option value="revoke_admin">Revoke admin (developer only)</option><option value="add_points">Add points (developer only)</option><option value="deduct_points">Deduct points (developer only)</option><option value="mute">Mute chat</option><option value="unmute">Unmute chat</option><option value="ban">Ban login</option><option value="unban">Unban login</option><option value="delete_account">Delete account (developer only)</option></select></label><label>Amount / mute minutes <input id="admin-amount" type="number" min="1" value="15"></label><button id="admin-run" class="primary-btn">Run action</button></div><p id="admin-message" class="form-message"></p></div></div>
+      </section>
+    </main>
+    <footer><span>SLIME PARK</span><span>Made for soft-hearted little blobs ✦</span><span id="connection-status">Connecting…</span></footer>
+  </div>
+  <div id="modal-backdrop" class="modal-backdrop hidden"><section class="modal-card"><button id="modal-close" class="modal-close">×</button><div id="modal-content"></div></section></div>
+  <div id="toast" class="toast hidden"></div>
+</body>
+</html>
