@@ -6,110 +6,186 @@
   <title>Supabase Chat Room</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-    body { background: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    #chat-container { width: 100%; max-width: 500px; height: 90vh; background: #1e1e1e; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; }
-    #header { padding: 15px; background: #292929; border-bottom: 1px solid #333; text-align: center; font-weight: bold; }
-    #messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    .message { max-width: 80%; padding: 10px 14px; border-radius: 8px; background: #2a2a2a; word-wrap: break-word; }
-    .message .username { font-size: 0.75rem; color: #3ecf8e; margin-bottom: 4px; font-weight: bold; }
-    .message .text { font-size: 0.95rem; }
-    #form { display: flex; padding: 10px; background: #292929; border-top: 1px solid #333; gap: 8px; }
-    #username-input { width: 30%; padding: 10px; border-radius: 4px; border: 1px solid #444; background: #121212; color: #fff; }
-    #message-input { flex: 1; padding: 10px; border-radius: 4px; border: 1px solid #444; background: #121212; color: #fff; }
-    button { padding: 10px 16px; border: none; border-radius: 4px; background: #3ecf8e; color: #000; font-weight: bold; cursor: pointer; }
-    button:hover { background: #34b27b; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; height: 100vh; display: flex; justify-content: center; align-items: center; }
+    
+    #app { width: 100%; max-width: 800px; height: 90vh; background: #1e293b; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    
+    /* Login Overlay */
+    #login-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; padding: 20px; gap: 15px; text-align: center; }
+    #login-screen h1 { color: #38bdf8; font-size: 2rem; }
+    #login-screen input { width: 100%; max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; outline: none; font-size: 1rem; }
+    #login-screen button { width: 100%; max-width: 300px; padding: 12px; border-radius: 6px; border: none; background: #0284c7; color: white; font-weight: bold; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+    #login-screen button:hover { background: #0369a1; }
+
+    /* Chat Interface */
+    #chat-screen { display: none; flex-direction: column; height: 100%; }
+    
+    header { background: #0f172a; padding: 15px 20px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+    header h2 { font-size: 1.2rem; color: #38bdf8; }
+    header .user-info { font-size: 0.9rem; color: #94a3b8; }
+
+    #messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    
+    .message { max-width: 70%; padding: 10px 14px; border-radius: 8px; background: #334155; position: relative; word-break: break-word; }
+    .message.self { align-self: flex-end; background: #0284c7; }
+    .message .sender { font-size: 0.75rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; }
+    .message.self .sender { color: #e0f2fe; }
+    .message .text { font-size: 0.95rem; line-height: 1.4; }
+    .message .time { font-size: 0.65rem; color: #cbd5e1; text-align: right; margin-top: 4px; opacity: 0.8; }
+
+    form { display: flex; padding: 15px; background: #0f172a; border-top: 1px solid #334155; gap: 10px; }
+    form input { flex: 1; padding: 12px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #fff; outline: none; font-size: 1rem; }
+    form button { padding: 12px 24px; border-radius: 6px; border: none; background: #0284c7; color: white; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    form button:hover { background: #0369a1; }
+    
+    .system-msg { text-align: center; color: #64748b; font-size: 0.8rem; margin: 5px 0; }
   </style>
 </head>
 <body>
 
-  <div id="chat-container">
-    <div id="header">Supabase Chat Room</div>
-    <div id="messages"></div>
-    <form id="form">
-      <input type="text" id="username-input" placeholder="Name" required>
-      <input type="text" id="message-input" placeholder="Type a message..." required autocomplete="off">
-      <button type="submit">Send</button>
-    </form>
+  <div id="app">
+    <!-- Login Screen -->
+    <div id="login-screen">
+      <h1>Join Chat Room</h1>
+      <p style="color: #94a3b8;">Enter a username to start chatting</p>
+      <input type="text" id="username-input" placeholder="Your username..." maxlength="20" autofocus>
+      <button id="join-btn">Join Chat</button>
+    </div>
+
+    <!-- Chat Screen -->
+    <div id="chat-screen">
+      <header>
+        <h2>Global Chat Room</h2>
+        <div class="user-info">Logged in as: <strong id="current-user-display" style="color:#f8fafc;"></strong></div>
+      </header>
+      
+      <div id="messages-container"></div>
+
+      <form id="chat-form">
+        <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+        <button type="submit">Send</button>
+      </form>
+    </div>
   </div>
 
   <script>
+    // Initialize Supabase Client
     const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
-    
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const messagesDiv = document.getElementById('messages');
-    const form = document.getElementById('form');
+    // DOM Elements
+    const loginScreen = document.getElementById('login-screen');
+    const chatScreen = document.getElementById('chat-screen');
     const usernameInput = document.getElementById('username-input');
+    const joinBtn = document.getElementById('join-btn');
+    const currentUserDisplay = document.getElementById('current-user-display');
+    const messagesContainer = document.getElementById('messages-container');
+    const chatForm = document.getElementById('chat-form');
     const messageInput = document.getElementById('message-input');
 
-    if (localStorage.getItem('chat_username')) {
-      usernameInput.value = localStorage.getItem('chat_username');
+    let currentUser = '';
+
+    // Handle Login
+    joinBtn.addEventListener('click', () => {
+      const username = usernameInput.value.trim();
+      if (!username) return alert('Please enter a username');
+      
+      currentUser = username;
+      currentUserDisplay.textContent = currentUser;
+      
+      loginScreen.style.display = 'none';
+      chatScreen.style.display = 'flex';
+      
+      initChat();
+    });
+
+    usernameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') joinBtn.click();
+    });
+
+    async function initChat() {
+      // Load initial history
+      await fetchMessages();
+
+      // Subscribe to Realtime Inserts
+      supabase
+        .channel('public:messages')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+          renderMessage(payload.new);
+          scrollToBottom();
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('Connected to realtime channel');
+          }
+        });
     }
 
-    function appendMessage(msg) {
-      const msgElement = document.createElement('div');
-      msgElement.className = 'message';
-      
-      const userElement = document.createElement('div');
-      userElement.className = 'username';
-      userElement.textContent = msg.username || 'Anonymous';
-      
-      const textElement = document.createElement('div');
-      textElement.className = 'text';
-      textElement.textContent = msg.content || msg.message;
-
-      msgElement.appendChild(userElement);
-      msgElement.appendChild(textElement);
-      messagesDiv.appendChild(msgElement);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-
-    async function loadMessages() {
-      const { data, error } = await supabaseClient
+    // Fetch messages from Supabase
+    async function fetchMessages() {
+      const { data, error } = await supabase
         .from('messages')
         .select('*')
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: true })
+        .limit(100);
 
       if (error) {
         console.error('Error fetching messages:', error);
-      } else if (data) {
-        messagesDiv.innerHTML = '';
-        data.forEach(appendMessage);
+        messagesContainer.innerHTML = `<div class="system-msg">Error loading messages. Make sure a "messages" table exists.</div>`;
+        return;
       }
+
+      messagesContainer.innerHTML = '';
+      data.forEach(msg => renderMessage(msg));
+      scrollToBottom();
     }
 
-    function subscribeToMessages() {
-      supabaseClient
-        .channel('public:messages')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-          appendMessage(payload.new);
-        })
-        .subscribe();
+    // Render single message to UI
+    function renderMessage(msg) {
+      const isSelf = msg.username === currentUser;
+      const msgEl = document.createElement('div');
+      msgEl.className = `message ${isSelf ? 'self' : ''}`;
+      
+      const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+      msgEl.innerHTML = `
+        <div class="sender">${escapeHTML(msg.username || 'Anonymous')}</div>
+        <div class="text">${escapeHTML(msg.content)}</div>
+        <div class="time">${timeStr}</div>
+      `;
+
+      messagesContainer.appendChild(msgEl);
     }
 
-    form.addEventListener('submit', async (e) => {
+    // Send new message
+    chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const username = usernameInput.value.trim();
       const content = messageInput.value.trim();
+      if (!content) return;
 
-      if (!content || !username) return;
-
-      localStorage.setItem('chat_username', username);
       messageInput.value = '';
 
-      const { error } = await supabaseClient
+      const { error } = await supabase
         .from('messages')
-        .insert([{ username, content }]);
+        .insert([{ username: currentUser, content: content }]);
 
       if (error) {
         console.error('Error sending message:', error);
+        alert('Failed to send message: ' + error.message);
       }
     });
 
-    loadMessages();
-    subscribeToMessages();
+    function scrollToBottom() {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
   </script>
 </body>
 </html>
