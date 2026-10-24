@@ -1,19 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maze Quest Online - Multiplayer Arcade Maze Game</title>
-
+  <title>PulseChat - Realtime Supabase Chat</title>
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Lucide Icons CDN -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Canvas Confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -26,28 +19,6 @@
               500: '#6366f1',
               600: '#4f46e5',
               700: '#4338ca',
-              900: '#312e81',
-            },
-            arcade: {
-              neon: '#00ffcc',
-              pink: '#ff007f',
-              purple: '#8a2be2',
-              dark: '#0a0a16',
-              card: '#121226'
-            }
-          },
-          animation: {
-            'pulse-glow': 'pulseGlow 2s infinite alternate',
-            'bounce-short': 'bounceShort 0.5s ease-out 1',
-          },
-          keyframes: {
-            pulseGlow: {
-              '0%': { boxShadow: '0 0 10px rgba(0, 255, 204, 0.3)' },
-              '100%': { boxShadow: '0 0 25px rgba(0, 255, 204, 0.8), 0 0 10px rgba(255, 0, 127, 0.5)' }
-            },
-            bounceShort: {
-              '0%, 100%': { transform: 'translateY(0)' },
-              '50%': { transform: 'translateY(-6px)' }
             }
           }
         }
@@ -55,993 +26,811 @@
     }
   </script>
 
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Supabase JS Client v2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .font-arcade {
-      font-family: 'Orbitron', sans-serif;
-    }
-
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
+      background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-      background: #334155;
+      background: rgba(156, 163, 175, 0.4);
       border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #475569;
+      background: rgba(156, 163, 175, 0.7);
     }
-
-    .grid-bg {
-      background-size: 30px 30px;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    /* Smooth transitions */
+    .chat-bubble-enter {
+      animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
-
-    .glass-panel {
-      background: rgba(18, 18, 38, 0.75);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .glow-border {
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
-    }
-
-    /* Touch Controls Active State */
-    .dpad-btn:active {
-      transform: scale(0.92);
-      background-color: rgba(99, 102, 241, 0.5) !important;
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(8px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
     }
   </style>
 </head>
-<body class="h-full overflow-hidden bg-slate-950 text-slate-100 grid-bg">
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 font-sans h-screen flex flex-col overflow-hidden transition-colors duration-200">
 
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
-
-  <!-- AUTH MODAL / OVERLAY -->
-  <div id="auth-modal" class="fixed inset-0 z-40 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300">
-    <div class="glass-panel w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl border border-indigo-500/30 relative overflow-hidden">
-      <div class="absolute -top-24 -left-24 w-48 h-48 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
-
-      <!-- Header -->
+  <!-- Setup Username Modal -->
+  <div id="usernameModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-md w-full p-6 transition-all transform">
       <div class="text-center mb-6">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 mb-3 shadow-lg">
-          <i data-lucide="gamepad-2" class="w-8 h-8"></i>
+        <div class="inline-flex p-3 rounded-full bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 mb-3">
+          <i data-lucide="message-square" class="w-8 h-8"></i>
         </div>
-        <h2 class="text-2xl font-black tracking-wider font-arcade text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-pink-400 to-cyan-400">
-          MAZE QUEST ONLINE
-        </h2>
-        <p class="text-xs text-slate-400 mt-1">Multiplayer Arcade Challenge & Chat</p>
+        <h2 class="text-2xl font-bold">Welcome to PulseChat</h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Set up your profile to join the conversation</p>
       </div>
 
-      <!-- Auth Tabs -->
-      <div class="flex border-b border-slate-800 mb-6">
-        <button id="tab-signin-btn" onclick="switchAuthTab('signin')" class="flex-1 pb-3 text-sm font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all">
-          Sign In
-        </button>
-        <button id="tab-signup-btn" onclick="switchAuthTab('signup')" class="flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all">
-          Sign Up
-        </button>
-      </div>
+      <form id="usernameForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Display Name</label>
+          <div class="relative">
+            <i data-lucide="user" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="text" id="usernameInput" required maxlength="25" placeholder="e.g. Alex Cloud"
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm transition">
+          </div>
+        </div>
 
-      <!-- Sign In Form -->
-      <form id="signin-form" onsubmit="handleSignIn(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
-          <div class="relative">
-            <i data-lucide="mail" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-            <input type="email" id="signin-email" required placeholder="player@example.com" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Choose Avatar Color</label>
+          <div class="flex items-center justify-between gap-2" id="colorPickerContainer">
+            <!-- Dynamic color buttons JS injected -->
           </div>
         </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
-          <div class="relative">
-            <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-            <input type="password" id="signin-password" required placeholder="••••••••" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
-          </div>
-        </div>
-        <button type="submit" id="signin-submit-btn" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all transform active:scale-95 flex items-center justify-center gap-2">
-          <span>Enter Game</span>
+
+        <button type="submit"
+          class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-lg shadow-brand-500/30 transition transform active:scale-95 flex items-center justify-center gap-2">
+          <span>Start Chatting</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </button>
       </form>
-
-      <!-- Sign Up Form -->
-      <form id="signup-form" onsubmit="handleSignUp(event)" class="space-y-4 hidden">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Display Username</label>
-          <div class="relative">
-            <i data-lucide="user" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-            <input type="text" id="signup-username" required minlength="3" maxlength="15" placeholder="CyberRunner" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
-          <div class="relative">
-            <i data-lucide="mail" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-            <input type="email" id="signup-email" required placeholder="player@example.com" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
-          <div class="relative">
-            <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-3 text-slate-500"></i>
-            <input type="password" id="signup-password" required minlength="6" placeholder="At least 6 characters" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
-          </div>
-        </div>
-        <button type="submit" id="signup-submit-btn" class="w-full py-3 bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-pink-600/20 transition-all transform active:scale-95 flex items-center justify-center gap-2">
-          <span>Create Account</span>
-          <i data-lucide="sparkles" class="w-4 h-4"></i>
-        </button>
-      </form>
-
-      <!-- Guest Play Option -->
-      <div class="mt-6 pt-4 border-t border-slate-800/80 text-center">
-        <button onclick="playAsGuest()" class="text-xs text-slate-400 hover:text-indigo-300 underline underline-offset-4 transition-colors">
-          Or play directly in Offline Guest Mode &rarr;
-        </button>
-      </div>
     </div>
   </div>
 
-  <!-- MAIN APP WRAPPER -->
-  <div class="h-screen w-screen flex flex-col overflow-hidden">
-    
-    <!-- TOP NAVIGATION BAR -->
-    <header class="h-16 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md px-4 md:px-6 flex items-center justify-between shrink-0 z-20">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-          <i data-lucide="grid" class="w-5 h-5"></i>
+  <!-- SQL Guide Modal -->
+  <div id="sqlModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-2xl w-full p-6 max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center gap-2">
+          <i data-lucide="database" class="w-5 h-5 text-brand-500"></i>
+          <h3 class="font-bold text-lg">Supabase Database Setup</h3>
         </div>
-        <div>
-          <h1 class="font-arcade text-lg font-bold tracking-wider text-slate-100 flex items-center gap-2">
-            MAZE QUEST <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-sans">v2.0</span>
-          </h1>
-        </div>
-      </div>
-
-      <!-- Player Controls / Profile Bar -->
-      <div class="flex items-center gap-3">
-        <!-- Audio Toggle -->
-        <button onclick="toggleAudio()" id="audio-btn" class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white transition-colors border border-slate-700/50" title="Toggle Sound Effects">
-          <i data-lucide="volume-2" id="audio-icon" class="w-4 h-4"></i>
+        <button id="closeSqlModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
         </button>
-
-        <!-- Profile / Auth Info -->
-        <div class="flex items-center gap-2 pl-2 border-l border-slate-800">
-          <div class="relative">
-            <div id="user-avatar" class="w-9 h-9 rounded-full bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 flex items-center justify-center font-bold text-sm uppercase">
-              ?
-            </div>
-            <span id="user-status-dot" class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-slate-900"></span>
-          </div>
-          <div class="hidden sm:block text-left">
-            <div id="user-display-name" class="text-xs font-bold text-slate-200">Guest Player</div>
-            <div id="user-status-text" class="text-[10px] text-indigo-400 font-medium">Offline Mode</div>
-          </div>
-          <button id="logout-btn" onclick="handleLogout()" class="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors ml-2" title="Sign Out">
-            <i data-lucide="log-out" class="w-4 h-4"></i>
-          </button>
-        </div>
       </div>
-    </header>
-
-    <!-- CENTER GAME + SIDEBAR CONTAINER -->
-    <div class="flex-1 flex overflow-hidden relative">
       
-      <!-- MAIN GAME CANVAS PANEL -->
-      <main class="flex-1 flex flex-col bg-slate-950 relative overflow-hidden p-3 md:p-6 items-center justify-center">
+      <div class="py-4 space-y-3 overflow-y-auto text-sm text-gray-600 dark:text-gray-300">
+        <p>If real-time database messages are not saving or showing an error, ensure your Supabase database table <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-brand-600 dark:text-brand-400 font-mono">messages</code> is created.</p>
+        <p>Run the following SQL script in your <a href="https://supabase.com/dashboard" target="_blank" class="text-brand-500 hover:underline inline-flex items-center gap-1">Supabase SQL Editor <i data-lucide="external-link" class="w-3 h-3"></i></a>:</p>
         
-        <!-- GAME STATUS HEADER BAR -->
-        <div class="w-full max-w-2xl mb-3 flex items-center justify-between bg-slate-900/90 border border-slate-800/80 rounded-2xl px-4 py-2.5 shadow-lg backdrop-blur">
-          <div class="flex items-center gap-4">
-            <div>
-              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Level</span>
-              <span id="game-level-display" class="font-arcade text-lg text-amber-400 font-bold">1</span>
-            </div>
-            <div class="h-6 w-px bg-slate-800"></div>
-            <div>
-              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Timer</span>
-              <span id="game-timer-display" class="font-arcade text-lg text-emerald-400 font-bold">00:00</span>
-            </div>
-            <div class="h-6 w-px bg-slate-800"></div>
-            <div>
-              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Moves</span>
-              <span id="game-moves-display" class="font-arcade text-lg text-cyan-400 font-bold">0</span>
-            </div>
-          </div>
+        <div class="relative">
+          <pre id="sqlSnippet" class="bg-gray-900 text-gray-100 p-4 rounded-xl text-xs font-mono overflow-x-auto leading-relaxed border border-gray-800">
+CREATE TABLE public.messages (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    username VARCHAR NOT NULL,
+    user_color VARCHAR DEFAULT '#6366f1',
+    content TEXT NOT NULL,
+    room VARCHAR DEFAULT 'general' NOT NULL
+);
 
-          <div class="flex items-center gap-2">
-            <button onclick="resetCurrentLevel()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1.5">
-              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-              <span class="hidden sm:inline">Reset</span>
-            </button>
-            <button onclick="nextLevel()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold border border-indigo-500 shadow-md shadow-indigo-600/30 transition-all flex items-center gap-1.5">
-              <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i>
-              <span class="hidden sm:inline">Skip</span>
-            </button>
-          </div>
-        </div>
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 
-        <!-- CANVAS GAME CONTAINER -->
-        <div class="relative flex-1 w-full max-w-2xl max-h-[600px] flex items-center justify-center">
-          <div id="canvas-wrapper" class="relative rounded-2xl overflow-hidden border-2 border-indigo-500/40 shadow-2xl shadow-indigo-500/10 bg-slate-900/90 flex items-center justify-center p-2">
-            <canvas id="mazeCanvas" class="block rounded-lg cursor-pointer transition-all"></canvas>
+-- Allow public read & write access
+CREATE POLICY "Allow public read access" ON public.messages FOR SELECT USING (true);
+CREATE POLICY "Allow public insert access" ON public.messages FOR INSERT WITH CHECK (true);
 
-            <!-- WIN LEVEL OVERLAY -->
-            <div id="win-overlay" class="absolute inset-0 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center opacity-0 pointer-events-none transition-opacity duration-300 z-10">
-              <div class="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center mb-3 animate-bounce-short">
-                <i data-lucide="trophy" class="w-8 h-8"></i>
-              </div>
-              <h3 class="font-arcade text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 mb-1">
-                MAZE COMPLETED!
-              </h3>
-              <p class="text-xs text-slate-300 mb-4" id="win-summary">Completed Level 1 in 12s with 34 moves!</p>
-              
-              <div class="flex gap-3">
-                <button onclick="nextLevel()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 flex items-center gap-2 transition-all transform active:scale-95">
-                  <span>Next Level</span>
-                  <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- MOBILE TOUCH CONTROLS (D-PAD) -->
-        <div class="w-full max-w-2xl mt-3 flex items-center justify-between sm:hidden">
-          <div class="text-[11px] text-slate-500">Touch D-Pad or Swipe to move</div>
-          <div class="grid grid-cols-3 gap-1.5 w-36 h-36">
-            <div></div>
-            <button onclick="movePlayer(0, -1)" class="dpad-btn bg-slate-800 border border-slate-700/80 rounded-xl flex items-center justify-center text-slate-200">
-              <i data-lucide="chevron-up" class="w-6 h-6"></i>
-            </button>
-            <div></div>
-            <button onclick="movePlayer(-1, 0)" class="dpad-btn bg-slate-800 border border-slate-700/80 rounded-xl flex items-center justify-center text-slate-200">
-              <i data-lucide="chevron-left" class="w-6 h-6"></i>
-            </button>
-            <div class="bg-slate-900/50 rounded-xl border border-slate-800 flex items-center justify-center">
-              <div class="w-3 h-3 rounded-full bg-indigo-500/40"></div>
-            </div>
-            <button onclick="movePlayer(1, 0)" class="dpad-btn bg-slate-800 border border-slate-700/80 rounded-xl flex items-center justify-center text-slate-200">
-              <i data-lucide="chevron-right" class="w-6 h-6"></i>
-            </button>
-            <div></div>
-            <button onclick="movePlayer(0, 1)" class="dpad-btn bg-slate-800 border border-slate-700/80 rounded-xl flex items-center justify-center text-slate-200">
-              <i data-lucide="chevron-down" class="w-6 h-6"></i>
-            </button>
-            <div></div>
-          </div>
-        </div>
-      </main>
-
-      <!-- RIGHT SIDEBAR (CHAT & FRIENDS) -->
-      <aside class="w-full md:w-80 lg:w-96 border-l border-slate-800/80 bg-slate-900/60 backdrop-blur-md flex flex-col shrink-0">
-        
-        <!-- TAB SELECTOR -->
-        <div class="flex border-b border-slate-800/80 bg-slate-900/90 p-1.5 gap-1">
-          <button id="tab-chat-btn" onclick="switchSidebarTab('chat')" class="flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-indigo-600 text-white shadow-md transition-all">
-            <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
-            <span>Global Chat</span>
-          </button>
-          <button id="tab-friends-btn" onclick="switchSidebarTab('friends')" class="flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-            <i data-lucide="users" class="w-3.5 h-3.5"></i>
-            <span>Friends</span>
-            <span id="friend-count-badge" class="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-300">0</span>
+-- Enable Realtime for messages table
+ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+          </pre>
+          <button id="copySqlBtn" class="absolute top-2 right-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg text-xs flex items-center gap-1 border border-gray-700">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span id="copySqlText">Copy SQL</span>
           </button>
         </div>
+      </div>
 
-        <!-- CHAT TAB CONTENT -->
-        <div id="tab-chat-content" class="flex-1 flex flex-col overflow-hidden">
-          <!-- Chat Messages Scroll List -->
-          <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3.5">
-            <div class="text-center py-6 text-slate-500 text-xs">
-              <i data-lucide="shield-alert" class="w-6 h-6 mx-auto mb-2 text-indigo-400/50"></i>
-              Welcome to Global Maze Chat!<br>Say hello to fellow runners.
-            </div>
-          </div>
-
-          <!-- Chat Input Bar -->
-          <form onsubmit="handleSendChatMessage(event)" class="p-3 border-t border-slate-800/80 bg-slate-900/90 flex gap-2">
-            <input type="text" id="chat-input" placeholder="Type a message..." maxlength="150" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
-            <button type="submit" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center">
-              <i data-lucide="send" class="w-3.5 h-3.5"></i>
-            </button>
-          </form>
-        </div>
-
-        <!-- FRIENDS TAB CONTENT -->
-        <div id="tab-friends-content" class="flex-1 flex flex-col overflow-hidden hidden">
-          <!-- Add Friend Input Bar -->
-          <div class="p-3 border-b border-slate-800/80 bg-slate-900/50">
-            <form onsubmit="handleAddFriend(event)" class="flex gap-2">
-              <input type="text" id="friend-search-input" placeholder="Enter username or ID..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-              <button type="submit" class="px-3 py-2 bg-pink-600 hover:bg-pink-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1 transition-all">
-                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-                <span>Add</span>
-              </button>
-            </form>
-          </div>
-
-          <!-- Friends List -->
-          <div id="friends-list" class="flex-1 overflow-y-auto p-3 space-y-2">
-            <div class="text-center py-8 text-xs text-slate-500">
-              No friends added yet.<br>Add friends using their username!
-            </div>
-          </div>
-        </div>
-
-      </aside>
-
+      <div class="pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+        <button id="closeSqlModalFooterBtn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-xl text-sm font-medium">Got it!</button>
+      </div>
     </div>
   </div>
 
-  <!-- SUPABASE & APPLICATION SCRIPT -->
+  <!-- Main App Shell -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden"></div>
+
+    <!-- Left Sidebar: Channels & User Profile -->
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-30 w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0">
+      <!-- App Header -->
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold shadow-md shadow-brand-500/20">
+            <i data-lucide="zap" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-base leading-tight">PulseChat</h1>
+            <div class="flex items-center gap-1.5">
+              <span id="supabaseStatusDot" class="w-2 h-2 rounded-full bg-yellow-500"></span>
+              <span id="supabaseStatusText" class="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Connecting...</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="themeToggleBtn" class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition" title="Toggle Light/Dark Theme">
+          <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+          <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+        </button>
+      </div>
+
+      <!-- Channels List -->
+      <div class="flex-1 overflow-y-auto p-3 space-y-4">
+        <div>
+          <div class="flex items-center justify-between text-xs font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">
+            <span>Rooms & Channels</span>
+            <button id="addRoomBtn" class="p-1 hover:text-brand-500 transition" title="Create New Channel">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <nav id="roomsContainer" class="space-y-1">
+            <!-- Rooms rendered dynamically -->
+          </nav>
+        </div>
+
+        <!-- Setup Guide Trigger -->
+        <div class="pt-2">
+          <button id="openSqlModalBtn" class="w-full text-left p-2.5 rounded-xl bg-gray-50 dark:bg-gray-700/30 hover:bg-gray-100 dark:hover:bg-gray-700/60 border border-gray-200 dark:border-gray-700/60 flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-300 transition">
+            <i data-lucide="database" class="w-4 h-4 text-brand-500 shrink-0"></i>
+            <div class="truncate">
+              <p class="font-semibold leading-tight">Database Table Setup</p>
+              <p class="text-[10px] text-gray-400">View SQL Schema / Config</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- User Info Footer -->
+      <div class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+        <div class="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600/50 shadow-sm">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div id="currentUserAvatar" class="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-white text-xs shrink-0 bg-brand-600">
+              U
+            </div>
+            <div class="min-w-0">
+              <p id="currentUsername" class="text-xs font-bold truncate text-gray-800 dark:text-gray-100">Guest</p>
+              <p class="text-[10px] text-green-500 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span> Online
+              </p>
+            </div>
+          </div>
+          <button id="editProfileBtn" class="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition" title="Edit Profile">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Chat Area -->
+    <main class="flex-1 flex flex-col min-w-0 bg-white dark:bg-gray-900 relative">
+      
+      <!-- Chat Room Header -->
+      <header class="h-16 px-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-10">
+        <div class="flex items-center gap-3">
+          <button id="toggleMobileSidebar" class="md:hidden p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+          <div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="hash" class="w-5 h-5 text-brand-500"></i>
+              <h2 id="currentRoomTitle" class="font-bold text-gray-800 dark:text-gray-100 text-lg leading-none">general</h2>
+            </div>
+            <p id="currentRoomSubtitle" class="text-xs text-gray-400 mt-1">Real-time public discussion</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Fallback Banner Alert (if Supabase table missing) -->
+          <div id="fallbackNotice" class="hidden items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-full text-xs font-medium">
+            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Simulation Mode Active</span>
+          </div>
+          <button id="clearChatBtn" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition" title="Clear View">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Message Container -->
+      <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Messages rendered here -->
+      </div>
+
+      <!-- Typing Indicator -->
+      <div id="typingIndicator" class="px-6 py-1 h-5 text-[11px] text-gray-400 flex items-center gap-1.5 opacity-0 transition-opacity">
+        <span class="flex gap-1">
+          <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+          <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+          <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+        </span>
+        <span id="typingText">Someone is typing...</span>
+      </div>
+
+      <!-- Message Input Bar -->
+      <div class="p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <form id="messageForm" class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <input type="text" id="messageInput" placeholder="Message #general..." autocomplete="off"
+              class="w-full pl-4 pr-10 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm transition">
+          </div>
+          <button type="submit" id="sendBtn"
+            class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-medium shadow-md shadow-brand-500/20 transition transform active:scale-95 flex items-center justify-center shrink-0">
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
   <script>
-    // -------------------------------------------------------------
+    // ==========================================
     // SUPABASE CONFIGURATION
-    // -------------------------------------------------------------
+    // ==========================================
     const SUPABASE_URL = "https://brvyjdtnxzjlrhukngjn.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE";
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Initialize Supabase Client
+    let supabase = null;
+    let realtimeChannel = null;
 
+    try {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch (e) {
+      console.warn("Supabase initialization issue, using fallback mode:", e);
+    }
+
+    // ==========================================
     // STATE MANAGEMENT
-    let currentUser = null;
-    let friendsList = [];
-    let isAudioMuted = false;
-    let chatChannel = null;
+    // ==========================================
+    const AVATAR_COLORS = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+    
+    let state = {
+      user: {
+        name: localStorage.getItem('pulse_username') || '',
+        color: localStorage.getItem('pulse_usercolor') || AVATAR_COLORS[0]
+      },
+      currentRoom: 'general',
+      rooms: ['general', 'random', 'tech-talk', 'lounge'],
+      messages: [],
+      isFallbackMode: false,
+      isSubscribed: false
+    };
 
-    // AUDIO SYSTEM (Web Audio API Synthesis)
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    let audioCtx = null;
-
-    function playSound(type) {
-      if (isAudioMuted) return;
-      try {
-        if (!audioCtx) audioCtx = new AudioCtx();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        const now = audioCtx.currentTime;
-
-        if (type === 'move') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(300, now);
-          osc.frequency.exponentialRampToValueAtTime(150, now + 0.05);
-          gain.gain.setValueAtTime(0.08, now);
-          gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
-          osc.start(now);
-          osc.stop(now + 0.05);
-        } else if (type === 'win') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(523.25, now); // C5
-          osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-          osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-          osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
-          gain.gain.setValueAtTime(0.2, now);
-          gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
-          osc.start(now);
-          osc.stop(now + 0.5);
-        } else if (type === 'message') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(800, now);
-          osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
-          gain.gain.setValueAtTime(0.05, now);
-          gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
-          osc.start(now);
-          osc.stop(now + 0.08);
-        }
-      } catch (e) {
-        console.warn('Audio play error:', e);
-      }
-    }
-
-    function toggleAudio() {
-      isAudioMuted = !isAudioMuted;
-      const icon = document.getElementById('audio-icon');
-      if (isAudioMuted) {
-        icon.setAttribute('data-lucide', 'volume-x');
-      } else {
-        icon.setAttribute('data-lucide', 'volume-2');
-      }
-      lucide.createIcons();
-      showToast(isAudioMuted ? 'Sound Muted' : 'Sound Enabled', 'info');
-    }
-
-    // TOAST NOTIFICATIONS SYSTEM
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
+    // DOM Elements
+    const elements = {
+      usernameModal: document.getElementById('usernameModal'),
+      usernameForm: document.getElementById('usernameForm'),
+      usernameInput: document.getElementById('usernameInput'),
+      colorPickerContainer: document.getElementById('colorPickerContainer'),
       
-      const bgColors = {
-        info: 'bg-slate-900/90 border-indigo-500/50 text-indigo-200',
-        success: 'bg-slate-900/90 border-emerald-500/50 text-emerald-200',
-        error: 'bg-slate-900/90 border-red-500/50 text-red-200'
+      sqlModal: document.getElementById('sqlModal'),
+      openSqlModalBtn: document.getElementById('openSqlModalBtn'),
+      closeSqlModalBtn: document.getElementById('closeSqlModalBtn'),
+      closeSqlModalFooterBtn: document.getElementById('closeSqlModalFooterBtn'),
+      copySqlBtn: document.getElementById('copySqlBtn'),
+      copySqlText: document.getElementById('copySqlText'),
+      sqlSnippet: document.getElementById('sqlSnippet'),
+
+      sidebar: document.getElementById('sidebar'),
+      sidebarBackdrop: document.getElementById('sidebarBackdrop'),
+      toggleMobileSidebar: document.getElementById('toggleMobileSidebar'),
+      themeToggleBtn: document.getElementById('themeToggleBtn'),
+
+      roomsContainer: document.getElementById('roomsContainer'),
+      addRoomBtn: document.getElementById('addRoomBtn'),
+
+      currentRoomTitle: document.getElementById('currentRoomTitle'),
+      messagesContainer: document.getElementById('messagesContainer'),
+      messageForm: document.getElementById('messageForm'),
+      messageInput: document.getElementById('messageInput'),
+      
+      currentUserAvatar: document.getElementById('currentUserAvatar'),
+      currentUsername: document.getElementById('currentUsername'),
+      editProfileBtn: document.getElementById('editProfileBtn'),
+
+      supabaseStatusDot: document.getElementById('supabaseStatusDot'),
+      supabaseStatusText: document.getElementById('supabaseStatusText'),
+      fallbackNotice: document.getElementById('fallbackNotice'),
+      typingIndicator: document.getElementById('typingIndicator'),
+      clearChatBtn: document.getElementById('clearChatBtn')
+    };
+
+    // ==========================================
+    // INITIALIZATION & EVENT LISTENERS
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initTheme();
+      renderColorPicker();
+      renderRooms();
+
+      if (!state.user.name) {
+        elements.usernameModal.classList.remove('hidden');
+      } else {
+        elements.usernameModal.classList.add('hidden');
+        updateUserProfileUI();
+      }
+
+      initSupabaseConnection();
+
+      // Event Listeners
+      elements.usernameForm.addEventListener('submit', handleProfileSave);
+      elements.messageForm.addEventListener('submit', handleSendMessage);
+      elements.addRoomBtn.addEventListener('click', handleCreateRoom);
+      elements.themeToggleBtn.addEventListener('click', toggleTheme);
+      
+      elements.toggleMobileSidebar.addEventListener('click', toggleMobileSidebar);
+      elements.sidebarBackdrop.addEventListener('click', toggleMobileSidebar);
+
+      elements.openSqlModalBtn.addEventListener('click', () => elements.sqlModal.classList.remove('hidden'));
+      elements.closeSqlModalBtn.addEventListener('click', () => elements.sqlModal.classList.add('hidden'));
+      elements.closeSqlModalFooterBtn.addEventListener('click', () => elements.sqlModal.classList.add('hidden'));
+      elements.copySqlBtn.addEventListener('click', copySqlToClipboard);
+      elements.editProfileBtn.addEventListener('click', () => {
+        elements.usernameInput.value = state.user.name;
+        elements.usernameModal.classList.remove('hidden');
+      });
+      elements.clearChatBtn.addEventListener('click', () => {
+        state.messages = [];
+        renderMessages();
+      });
+
+      // Typing simulation listener
+      let typingTimeout;
+      elements.messageInput.addEventListener('input', () => {
+        if (realtimeChannel && !state.isFallbackMode) {
+          realtimeChannel.send({
+            type: 'broadcast',
+            event: 'typing',
+            payload: { username: state.user.name }
+          });
+        }
+      });
+    });
+
+    // ==========================================
+    // THEME HANDLING
+    // ==========================================
+    function initTheme() {
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    function toggleTheme() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    }
+
+    // ==========================================
+    // USER PROFILE & COLOR PICKER
+    // ==========================================
+    function renderColorPicker() {
+      elements.colorPickerContainer.innerHTML = AVATAR_COLORS.map(color => `
+        <button type="button" 
+          data-color="${color}"
+          onclick="selectAvatarColor('${color}')"
+          style="background-color: ${color}"
+          class="avatar-color-btn w-9 h-9 rounded-full flex items-center justify-center text-white transition transform hover:scale-110 focus:outline-none ${state.user.color === color ? 'ring-4 ring-offset-2 ring-brand-500 dark:ring-offset-gray-800' : ''}">
+          ${state.user.color === color ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
+        </button>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    window.selectAvatarColor = function(color) {
+      state.user.color = color;
+      renderColorPicker();
+    };
+
+    function handleProfileSave(e) {
+      e.preventDefault();
+      const newName = elements.usernameInput.value.trim();
+      if (!newName) return;
+
+      state.user.name = newName;
+      localStorage.setItem('pulse_username', state.user.name);
+      localStorage.setItem('pulse_usercolor', state.user.color);
+
+      updateUserProfileUI();
+      elements.usernameModal.classList.add('hidden');
+    }
+
+    function updateUserProfileUI() {
+      elements.currentUsername.textContent = state.user.name || 'Guest';
+      elements.currentUserAvatar.textContent = (state.user.name[0] || 'U').toUpperCase();
+      elements.currentUserAvatar.style.backgroundColor = state.user.color;
+    }
+
+    // ==========================================
+    // ROOM MANAGEMENT
+    // ==========================================
+    function renderRooms() {
+      elements.roomsContainer.innerHTML = state.rooms.map(room => {
+        const isActive = state.currentRoom === room;
+        return `
+          <button onclick="switchRoom('${room}')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition ${
+            isActive 
+              ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-semibold' 
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200'
+          }">
+            <i data-lucide="hash" class="w-4 h-4 ${isActive ? 'text-brand-500' : 'text-gray-400'}"></i>
+            <span class="truncate">${room}</span>
+          </button>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    window.switchRoom = function(roomName) {
+      if (state.currentRoom === roomName) return;
+      state.currentRoom = roomName;
+      elements.currentRoomTitle.textContent = roomName;
+      elements.messageInput.placeholder = `Message #${roomName}...`;
+      renderRooms();
+
+      // Close sidebar on mobile after switching
+      elements.sidebar.classList.add('-translate-x-full');
+      elements.sidebarBackdrop.classList.add('hidden');
+
+      // Fetch or reset messages for new room
+      fetchMessages();
+      subscribeToRoomRealtime();
+    };
+
+    function handleCreateRoom() {
+      const roomName = prompt("Enter new room name:")?.toLowerCase().trim().replace(/[^a-z0-9-]/g, '');
+      if (roomName && !state.rooms.includes(roomName)) {
+        state.rooms.push(roomName);
+        switchRoom(roomName);
+      }
+    }
+
+    function toggleMobileSidebar() {
+      const isHidden = elements.sidebar.classList.contains('-translate-x-full');
+      if (isHidden) {
+        elements.sidebar.classList.remove('-translate-x-full');
+        elements.sidebarBackdrop.classList.remove('hidden');
+      } else {
+        elements.sidebar.classList.add('-translate-x-full');
+        elements.sidebarBackdrop.classList.add('hidden');
+      }
+    }
+
+    // ==========================================
+    // SUPABASE DATA & REALTIME SYNC
+    // ==========================================
+    async function initSupabaseConnection() {
+      if (!supabase) {
+        enableFallbackMode("Supabase SDK Client failed to load.");
+        return;
+      }
+
+      setConnectionStatus('connecting', 'Connecting...');
+
+      // Test database availability
+      try {
+        const { data, error } = await supabase
+          .from('messages')
+          .select('count', { count: 'exact', head: true });
+
+        if (error) {
+          console.warn("Messages table unavailable:", error.message);
+          enableFallbackMode("Table 'messages' not found. Local simulation mode active.");
+        } else {
+          setConnectionStatus('online', 'Connected to Supabase');
+          state.isFallbackMode = false;
+          elements.fallbackNotice.classList.add('hidden');
+          fetchMessages();
+          subscribeToRoomRealtime();
+        }
+      } catch (err) {
+        console.warn("Supabase network error:", err);
+        enableFallbackMode("Network error. Local simulation active.");
+      }
+    }
+
+    function enableFallbackMode(reason) {
+      console.log("Fallback activated:", reason);
+      state.isFallbackMode = true;
+      setConnectionStatus('fallback', 'Local Simulation');
+      elements.fallbackNotice.classList.remove('hidden');
+      elements.fallbackNotice.classList.add('flex');
+
+      // Add mock welcome message
+      state.messages = [
+        {
+          id: 'system-1',
+          username: 'System Bot',
+          user_color: '#10b981',
+          content: `Welcome to PulseChat! 🚀\nNote: Running in **Simulation Mode** because your database table isn't created yet or RLS policies are pending. Click "Database Table Setup" in the sidebar to configure your Supabase backend.`,
+          created_at: new Date().toISOString(),
+          room: state.currentRoom
+        }
+      ];
+      renderMessages();
+    }
+
+    function setConnectionStatus(type, label) {
+      elements.supabaseStatusText.textContent = label;
+      elements.supabaseStatusDot.className = 'w-2 h-2 rounded-full inline-block ';
+      
+      if (type === 'online') {
+        elements.supabaseStatusDot.classList.add('bg-green-500', 'shadow-[0_0_8px_rgba(34,197,94,0.6)]');
+      } else if (type === 'connecting') {
+        elements.supabaseStatusDot.classList.add('bg-yellow-500', 'animate-pulse');
+      } else {
+        elements.supabaseStatusDot.classList.add('bg-amber-500');
+      }
+    }
+
+    async function fetchMessages() {
+      if (state.isFallbackMode) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('room', state.currentRoom)
+          .order('created_at', { ascending: true })
+          .limit(100);
+
+        if (error) {
+          console.error("Fetch messages error:", error);
+          return;
+        }
+
+        state.messages = data || [];
+        renderMessages();
+      } catch (e) {
+        console.error("Error fetching messages:", e);
+      }
+    }
+
+    function subscribeToRoomRealtime() {
+      if (state.isFallbackMode || !supabase) return;
+
+      // Unsubscribe from previous channel if exists
+      if (realtimeChannel) {
+        supabase.removeChannel(realtimeChannel);
+      }
+
+      // Create new Supabase Realtime channel for Postgres changes + Broadcast
+      realtimeChannel = supabase.channel(`room:${state.currentRoom}`)
+        // Listen for Postgres INSERTs
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `room=eq.${state.currentRoom}`
+        }, (payload) => {
+          appendSingleMessage(payload.new);
+        })
+        // Broadcast event for typing indicators
+        .on('broadcast', { event: 'typing' }, (payload) => {
+          if (payload.payload.username !== state.user.name) {
+            showTypingIndicator(payload.payload.username);
+          }
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            state.isSubscribed = true;
+          }
+        });
+    }
+
+    // ==========================================
+    // SENDING MESSAGES & FALLBACK SIMULATION
+    // ==========================================
+    async function handleSendMessage(e) {
+      e.preventDefault();
+      const content = elements.messageInput.value.trim();
+      if (!content) return;
+
+      elements.messageInput.value = '';
+
+      const newMessage = {
+        username: state.user.name || 'Anonymous',
+        user_color: state.user.color,
+        content: content,
+        room: state.currentRoom,
+        created_at: new Date().toISOString()
       };
 
-      toast.className = `pointer-events-auto flex items-center justify-between p-3.5 rounded-xl border ${bgColors[type]} shadow-xl text-xs backdrop-blur-md transition-all duration-300 transform translate-x-10 opacity-0`;
-      toast.innerHTML = `
-        <div class="flex items-center gap-2">
-          <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info'}" class="w-4 h-4 shrink-0"></i>
-          <span>${message}</span>
-        </div>
-      `;
+      if (!state.isFallbackMode) {
+        try {
+          const { error } = await supabase.from('messages').insert([newMessage]);
+          if (error) {
+            console.error("Failed to send message:", error);
+            // Fallback render locally if insert failed
+            appendSingleMessage({ ...newMessage, id: 'temp-' + Date.now() });
+          }
+        } catch (err) {
+          console.error("Insert error:", err);
+          appendSingleMessage({ ...newMessage, id: 'temp-' + Date.now() });
+        }
+      } else {
+        // Local simulation handling
+        const simulatedMsg = { ...newMessage, id: 'sim-' + Date.now() };
+        appendSingleMessage(simulatedMsg);
 
-      container.appendChild(toast);
-      lucide.createIcons();
+        // Trigger bot auto-reply in fallback mode
+        triggerSimulatedReply(content);
+      }
+    }
 
-      requestAnimationFrame(() => {
-        toast.classList.remove('translate-x-10', 'opacity-0');
-      });
-
+    function triggerSimulatedReply(userQuery) {
       setTimeout(() => {
-        toast.classList.add('translate-x-10', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
-    }
+        const botNames = ['Echo Bot', 'Pulse Assistant', 'Dev Helper'];
+        const randomBot = botNames[Math.floor(Math.random() * botNames.length)];
+        const botColor = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
 
-    // -------------------------------------------------------------
-    // MAZE GAME ENGINE (Canvas DFS Procedural Maze)
-    // -------------------------------------------------------------
-    let canvas, ctx;
-    let grid = [];
-    let cols = 10, rows = 10;
-    let cellSize = 40;
-    let player = { x: 0, y: 0 };
-    let goal = { x: 0, y: 0 };
-    let currentLevel = 1;
-    let moveCount = 0;
-    let gameTimer = 0;
-    let timerInterval = null;
-    let gameActive = false;
+        const botReplies = [
+          `Got your message: "${userQuery}". You're testing in simulation mode!`,
+          `Hey ${state.user.name}! To enable full multiplayer database chat, click "Database Table Setup" to run the SQL in Supabase.`,
+          `Message received loud and clear in #${state.currentRoom}! ⚡`,
+          `Looking good! Supabase Realtime handles Postgres streaming seamlessly once configured.`
+        ];
 
-    // Cell Constructor
-    function Cell(i, j) {
-      this.i = i;
-      this.j = j;
-      // Walls: top, right, bottom, left
-      this.walls = [true, true, true, true];
-      this.visited = false;
-    }
+        const botMessage = {
+          id: 'bot-' + Date.now(),
+          username: randomBot,
+          user_color: botColor,
+          content: botReplies[Math.floor(Math.random() * botReplies.length)],
+          created_at: new Date().toISOString(),
+          room: state.currentRoom
+        };
 
-    function initMaze() {
-      canvas = document.getElementById('mazeCanvas');
-      ctx = canvas.getContext('2d');
-
-      // Adjust grid size based on level
-      cols = 8 + (currentLevel - 1) * 2;
-      rows = 8 + (currentLevel - 1) * 2;
-      
-      // Calculate responsive cell size
-      const maxCanvasSize = Math.min(window.innerWidth - 40, 520);
-      cellSize = Math.floor(maxCanvasSize / cols);
-      canvas.width = cols * cellSize;
-      canvas.height = rows * cellSize;
-
-      grid = [];
-      for (let j = 0; j < rows; j++) {
-        for (let i = 0; i < cols; i++) {
-          grid.push(new Cell(i, j));
-        }
-      }
-
-      // Generate Maze using DFS Recursive Backtracker
-      generateMazeDFS();
-
-      // Reset Player & Goal
-      player = { x: 0, y: 0 };
-      goal = { x: cols - 1, y: rows - 1 };
-      moveCount = 0;
-      gameTimer = 0;
-      gameActive = true;
-
-      document.getElementById('game-level-display').innerText = currentLevel;
-      document.getElementById('game-moves-display').innerText = moveCount;
-      document.getElementById('win-overlay').classList.add('opacity-0', 'pointer-events-none');
-
-      startTimer();
-      drawMaze();
-    }
-
-    function getCellIndex(i, j) {
-      if (i < 0 || j < 0 || i >= cols || j >= rows) return -1;
-      return i + j * cols;
-    }
-
-    function generateMazeDFS() {
-      let stack = [];
-      let current = grid[0];
-      current.visited = true;
-
-      while (true) {
-        let next = getUnvisitedNeighbor(current);
-        if (next) {
-          next.visited = true;
-          stack.push(current);
-          removeWalls(current, next);
-          current = next;
-        } else if (stack.length > 0) {
-          current = stack.pop();
-        } else {
-          break;
-        }
-      }
-    }
-
-    function getUnvisitedNeighbor(cell) {
-      let neighbors = [];
-      let top = grid[getCellIndex(cell.i, cell.j - 1)];
-      let right = grid[getCellIndex(cell.i + 1, cell.j)];
-      let bottom = grid[getCellIndex(cell.i, cell.j + 1)];
-      let left = grid[getCellIndex(cell.i - 1, cell.j)];
-
-      if (top && !top.visited) neighbors.push(top);
-      if (right && !right.visited) neighbors.push(right);
-      if (bottom && !bottom.visited) neighbors.push(bottom);
-      if (left && !left.visited) neighbors.push(left);
-
-      if (neighbors.length > 0) {
-        let r = Math.floor(Math.random() * neighbors.length);
-        return neighbors[r];
-      }
-      return undefined;
-    }
-
-    function removeWalls(a, b) {
-      let x = a.i - b.i;
-      if (x === 1) { a.walls[3] = false; b.walls[1] = false; }
-      else if (x === -1) { a.walls[1] = false; b.walls[3] = false; }
-      let y = a.j - b.j;
-      if (y === 1) { a.walls[0] = false; b.walls[2] = false; }
-      else if (y === -1) { a.walls[2] = false; b.walls[0] = false; }
-    }
-
-    function drawMaze() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw Grid & Walls
-      ctx.strokeStyle = '#6366f1';
-      ctx.lineWidth = 3;
-      ctx.lineCap = 'round';
-
-      for (let i = 0; i < grid.length; i++) {
-        let cell = grid[i];
-        let x = cell.i * cellSize;
-        let y = cell.j * cellSize;
-
-        if (cell.walls[0]) drawLine(x, y, x + cellSize, y); // Top
-        if (cell.walls[1]) drawLine(x + cellSize, y, x + cellSize, y + cellSize); // Right
-        if (cell.walls[2]) drawLine(x + cellSize, y + cellSize, x, y + cellSize); // Bottom
-        if (cell.walls[3]) drawLine(x, y + cellSize, x, y); // Left
-      }
-
-      // Draw Goal (Glow Orb)
-      const gx = goal.x * cellSize + cellSize / 2;
-      const gy = goal.y * cellSize + cellSize / 2;
-      ctx.fillStyle = '#ff007f';
-      ctx.shadowColor = '#ff007f';
-      ctx.shadowBlur = 15;
-      ctx.beginPath();
-      ctx.arc(gx, gy, cellSize * 0.3, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0; // Reset Shadow
-
-      // Draw Player
-      const px = player.x * cellSize + cellSize / 2;
-      const py = player.y * cellSize + cellSize / 2;
-      ctx.fillStyle = '#00ffcc';
-      ctx.shadowColor = '#00ffcc';
-      ctx.shadowBlur = 15;
-      ctx.beginPath();
-      ctx.arc(px, py, cellSize * 0.32, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-    }
-
-    function drawLine(x1, y1, x2, y2) {
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-    }
-
-    function movePlayer(dx, dy) {
-      if (!gameActive) return;
-
-      const currentCell = grid[getCellIndex(player.x, player.y)];
-      let canMove = false;
-
-      if (dx === 0 && dy === -1 && !currentCell.walls[0]) canMove = true; // Up
-      if (dx === 1 && dy === 0 && !currentCell.walls[1]) canMove = true;  // Right
-      if (dx === 0 && dy === 1 && !currentCell.walls[2]) canMove = true;  // Down
-      if (dx === -1 && dy === 0 && !currentCell.walls[3]) canMove = true; // Left
-
-      if (canMove) {
-        player.x += dx;
-        player.y += dy;
-        moveCount++;
-        document.getElementById('game-moves-display').innerText = moveCount;
-        playSound('move');
-        drawMaze();
-
-        // Check Win Condition
-        if (player.x === goal.x && player.y === goal.y) {
-          handleWin();
-        }
-      }
-    }
-
-    function handleWin() {
-      gameActive = false;
-      clearInterval(timerInterval);
-      playSound('win');
-
-      // Trigger Confetti
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-
-      document.getElementById('win-summary').innerText = 
-        `Completed Level ${currentLevel} in ${gameTimer}s using ${moveCount} moves!`;
-      
-      document.getElementById('win-overlay').classList.remove('opacity-0', 'pointer-events-none');
-    }
-
-    function resetCurrentLevel() {
-      initMaze();
-    }
-
-    function nextLevel() {
-      currentLevel++;
-      initMaze();
-    }
-
-    function startTimer() {
-      clearInterval(timerInterval);
-      gameTimer = 0;
-      updateTimerDisplay();
-      timerInterval = setInterval(() => {
-        gameTimer++;
-        updateTimerDisplay();
+        appendSingleMessage(botMessage);
       }, 1000);
     }
 
-    function updateTimerDisplay() {
-      const mins = Math.floor(gameTimer / 60).toString().padStart(2, '0');
-      const secs = (gameTimer % 60).toString().padStart(2, '0');
-      document.getElementById('game-timer-display').innerText = `${mins}:${secs}`;
-    }
-
-    // Keyboard Controller
-    window.addEventListener('keydown', (e) => {
-      if (['ArrowUp', 'KeyW'].includes(e.code)) { movePlayer(0, -1); e.preventDefault(); }
-      if (['ArrowDown', 'KeyS'].includes(e.code)) { movePlayer(0, 1); e.preventDefault(); }
-      if (['ArrowLeft', 'KeyA'].includes(e.code)) { movePlayer(-1, 0); e.preventDefault(); }
-      if (['ArrowRight', 'KeyD'].includes(e.code)) { movePlayer(1, 0); e.preventDefault(); }
-    });
-
-    // -------------------------------------------------------------
-    // SUPABASE AUTHENTICATION & SESSION PERSISTENCE
-    // -------------------------------------------------------------
-    function switchAuthTab(tab) {
-      const signinForm = document.getElementById('signin-form');
-      const signupForm = document.getElementById('signup-form');
-      const tabSigninBtn = document.getElementById('tab-signin-btn');
-      const tabSignupBtn = document.getElementById('tab-signup-btn');
-
-      if (tab === 'signin') {
-        signinForm.classList.remove('hidden');
-        signupForm.classList.add('hidden');
-        tabSigninBtn.className = "flex-1 pb-3 text-sm font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all";
-        tabSignupBtn.className = "flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all";
-      } else {
-        signupForm.classList.remove('hidden');
-        signinForm.classList.add('hidden');
-        tabSignupBtn.className = "flex-1 pb-3 text-sm font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all";
-        tabSigninBtn.className = "flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-200 transition-all";
-      }
-    }
-
-    async function initAuthSession() {
-      // Listen to Auth Changes
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        if (session && session.user) {
-          currentUser = session.user;
-          updateProfileUI(currentUser);
-          closeAuthModal();
-          initGlobalChatChannel();
-        } else {
-          currentUser = null;
-        }
-      });
-
-      // Check current session
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session && session.user) {
-        currentUser = session.user;
-        updateProfileUI(currentUser);
-        closeAuthModal();
-        initGlobalChatChannel();
-      }
-    }
-
-    async function handleSignIn(e) {
-      e.preventDefault();
-      const email = document.getElementById('signin-email').value;
-      const password = document.getElementById('signin-password').value;
-
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        showToast(error.message, 'error');
-      } else {
-        showToast('Signed in successfully!', 'success');
-        currentUser = data.user;
-        updateProfileUI(currentUser);
-        closeAuthModal();
-        initGlobalChatChannel();
-      }
-    }
-
-    async function handleSignUp(e) {
-      e.preventDefault();
-      const username = document.getElementById('signup-username').value.trim();
-      const email = document.getElementById('signup-email').value;
-      const password = document.getElementById('signup-password').value;
-
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { display_name: username }
-        }
-      });
-
-      if (error) {
-        showToast(error.message, 'error');
-      } else {
-        showToast('Account created successfully!', 'success');
-        currentUser = data.user;
-        updateProfileUI(currentUser);
-        closeAuthModal();
-        initGlobalChatChannel();
-      }
-    }
-
-    async function handleLogout() {
-      await supabase.auth.signOut();
-      currentUser = null;
-      document.getElementById('auth-modal').classList.remove('opacity-0', 'pointer-events-none');
-      updateProfileUI(null);
-      showToast('Logged out of session', 'info');
-    }
-
-    function playAsGuest() {
-      closeAuthModal();
-      showToast('Entered as Guest Player', 'info');
-      initGlobalChatChannel();
-    }
-
-    function closeAuthModal() {
-      document.getElementById('auth-modal').classList.add('opacity-0', 'pointer-events-none');
-    }
-
-    function updateProfileUI(user) {
-      const avatar = document.getElementById('user-avatar');
-      const displayName = document.getElementById('user-display-name');
-      const statusText = document.getElementById('user-status-text');
-
-      if (user) {
-        const name = user.user_metadata?.display_name || user.email.split('@')[0];
-        avatar.innerText = name.charAt(0).toUpperCase();
-        displayName.innerText = name;
-        statusText.innerText = 'Online';
-      } else {
-        avatar.innerText = '?';
-        displayName.innerText = 'Guest Player';
-        statusText.innerText = 'Offline Mode';
-      }
-    }
-
-    // -------------------------------------------------------------
-    // REAL-TIME GLOBAL CHAT & BROADCAST CHANNEL
-    // -------------------------------------------------------------
-    function initGlobalChatChannel() {
-      if (chatChannel) return;
-
-      chatChannel = supabase.channel('global_chat', {
-        config: { broadcast: { self: true } }
-      });
-
-      chatChannel.on('broadcast', { event: 'message' }, (payload) => {
-        renderChatMessage(payload.payload);
-      }).subscribe();
-    }
-
-    function handleSendChatMessage(e) {
-      e.preventDefault();
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-
-      if (!text) return;
-
-      const senderName = currentUser 
-        ? (currentUser.user_metadata?.display_name || currentUser.email.split('@')[0])
-        : 'Guest_' + Math.floor(Math.random() * 899 + 100);
-
-      const msgPayload = {
-        id: Date.now(),
-        sender: senderName,
-        text: text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      if (chatChannel) {
-        chatChannel.send({
-          type: 'broadcast',
-          event: 'message',
-          payload: msgPayload
-        });
-      } else {
-        renderChatMessage(msgPayload);
-      }
-
-      input.value = '';
-    }
-
-    function renderChatMessage(msg) {
-      const container = document.getElementById('chat-messages');
-      const msgEl = document.createElement('div');
-      msgEl.className = 'flex items-start gap-2.5 text-xs animate-fade-in';
-
-      msgEl.innerHTML = `
-        <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-indigo-300 shrink-0 uppercase">
-          ${msg.sender.charAt(0)}
-        </div>
-        <div class="flex-1 bg-slate-900/90 border border-slate-800/80 rounded-2xl p-2.5 shadow-sm">
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-bold text-slate-200">${msg.sender}</span>
-            <span class="text-[10px] text-slate-500">${msg.time}</span>
+    // ==========================================
+    // UI RENDERING & MESSAGES
+    // ==========================================
+    function renderMessages() {
+      elements.messagesContainer.innerHTML = '';
+      if (state.messages.length === 0) {
+        elements.messagesContainer.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center text-gray-400 p-8">
+            <div class="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
+              <i data-lucide="message-square-plus" class="w-6 h-6 text-gray-400"></i>
+            </div>
+            <p class="font-medium text-sm text-gray-600 dark:text-gray-300">No messages in #${state.currentRoom} yet</p>
+            <p class="text-xs text-gray-400 mt-1">Be the first to break the silence!</p>
           </div>
-          <p class="text-slate-300 leading-relaxed">${escapeHtml(msg.text)}</p>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      state.messages.forEach(msg => {
+        const msgNode = createMessageElement(msg);
+        elements.messagesContainer.appendChild(msgNode);
+      });
+
+      scrollToBottom();
+    }
+
+    function appendSingleMessage(msg) {
+      // Avoid duplicate appending if postgres subscription returns same message
+      if (state.messages.some(m => m.id && m.id === msg.id)) return;
+
+      state.messages.push(msg);
+      
+      // If container was empty, clear placeholder
+      if (elements.messagesContainer.querySelector('.text-center')) {
+        elements.messagesContainer.innerHTML = '';
+      }
+
+      const msgNode = createMessageElement(msg);
+      elements.messagesContainer.appendChild(msgNode);
+      scrollToBottom();
+    }
+
+    function createMessageElement(msg) {
+      const isSelf = msg.username === state.user.name;
+      const formattedTime = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const avatarInitial = (msg.username || 'A')[0].toUpperCase();
+      const avatarBg = msg.user_color || '#6366f1';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = `flex items-end gap-2.5 chat-bubble-enter ${isSelf ? 'flex-row-reverse' : 'flex-row'}`;
+
+      wrapper.innerHTML = `
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm" style="background-color: ${avatarBg}">
+          ${avatarInitial}
+        </div>
+        <div class="max-w-[80%] sm:max-w-[70%] flex flex-col ${isSelf ? 'items-end' : 'items-start'}">
+          <div class="flex items-center gap-2 mb-1 px-1">
+            <span class="text-xs font-semibold text-gray-600 dark:text-gray-300">${isSelf ? 'You' : escapeHtml(msg.username)}</span>
+            <span class="text-[10px] text-gray-400">${formattedTime}</span>
+          </div>
+          <div class="p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm break-words whitespace-pre-wrap ${
+            isSelf 
+              ? 'bg-brand-600 text-white rounded-br-xs' 
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200/50 dark:border-gray-700/50 rounded-bl-xs'
+          }">
+            ${escapeHtml(msg.content)}
+          </div>
         </div>
       `;
 
-      container.appendChild(msgEl);
-      container.scrollTop = container.scrollHeight;
-      playSound('message');
+      return wrapper;
     }
 
+    function scrollToBottom() {
+      elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+    }
+
+    function showTypingIndicator(username) {
+      document.getElementById('typingText').textContent = `${username} is typing...`;
+      elements.typingIndicator.classList.remove('opacity-0');
+      
+      clearTimeout(window.typingTimer);
+      window.typingTimer = setTimeout(() => {
+        elements.typingIndicator.classList.add('opacity-0');
+      }, 2000);
+    }
+
+    // Utility: Copy SQL snippet
+    function copySqlToClipboard() {
+      const code = elements.sqlSnippet.textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        elements.copySqlText.textContent = "Copied!";
+        setTimeout(() => {
+          elements.copySqlText.textContent = "Copy SQL";
+        }, 2000);
+      }).catch(() => {
+        elements.copySqlText.textContent = "Failed";
+      });
+    }
+
+    // Utility: Escape HTML preventing XSS
     function escapeHtml(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[m];
+      });
     }
-
-    // -------------------------------------------------------------
-    // FRIEND SYSTEM
-    // -------------------------------------------------------------
-    function switchSidebarTab(tab) {
-      const chatBtn = document.getElementById('tab-chat-btn');
-      const friendsBtn = document.getElementById('tab-friends-btn');
-      const chatContent = document.getElementById('tab-chat-content');
-      const friendsContent = document.getElementById('tab-friends-content');
-
-      if (tab === 'chat') {
-        chatContent.classList.remove('hidden');
-        friendsContent.classList.add('hidden');
-        chatBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-indigo-600 text-white shadow-md transition-all";
-        friendsBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all";
-      } else {
-        friendsContent.classList.remove('hidden');
-        chatContent.classList.add('hidden');
-        friendsBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-pink-600 text-white shadow-md transition-all";
-        chatBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all";
-      }
-    }
-
-    function handleAddFriend(e) {
-      e.preventDefault();
-      const input = document.getElementById('friend-search-input');
-      const friendName = input.value.trim();
-
-      if (!friendName) return;
-
-      if (friendsList.some(f => f.name.toLowerCase() === friendName.toLowerCase())) {
-        showToast('Friend is already in your list!', 'error');
-        return;
-      }
-
-      const newFriend = {
-        id: Date.now(),
-        name: friendName,
-        status: Math.random() > 0.3 ? 'Online' : 'Offline'
-      };
-
-      friendsList.push(newFriend);
-      input.value = '';
-      showToast(`Added ${friendName} to friends!`, 'success');
-      renderFriendsList();
-    }
-
-    function removeFriend(id) {
-      friendsList = friendsList.filter(f => f.id !== id);
-      renderFriendsList();
-      showToast('Friend removed', 'info');
-    }
-
-    function renderFriendsList() {
-      const container = document.getElementById('friends-list');
-      const badge = document.getElementById('friend-count-badge');
-      badge.innerText = friendsList.length;
-
-      if (friendsList.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-8 text-xs text-slate-500">
-            No friends added yet.<br>Add friends using their username!
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = friendsList.map(f => `
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/90 border border-slate-800/80">
-          <div class="flex items-center gap-2.5">
-            <div class="relative">
-              <div class="w-8 h-8 rounded-full bg-indigo-600/30 text-indigo-300 flex items-center justify-center font-bold text-xs uppercase border border-indigo-500/40">
-                ${f.name.charAt(0)}
-              </div>
-              <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full ${f.status === 'Online' ? 'bg-emerald-500' : 'bg-slate-600'} ring-2 ring-slate-900"></span>
-            </div>
-            <div>
-              <div class="text-xs font-bold text-slate-200">${f.name}</div>
-              <div class="text-[10px] text-slate-400">${f.status}</div>
-            </div>
-          </div>
-          <button onclick="removeFriend(${f.id})" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">
-            <i data-lucide="user-x" class="w-3.5 h-3.5"></i>
-          </button>
-        </div>
-      `).join('');
-
-      lucide.createIcons();
-    }
-
-    // INITIALIZATION ON LOAD
-    window.onload = function() {
-      lucide.createIcons();
-      initMaze();
-      initAuthSession();
-    };
-
-    window.onresize = function() {
-      if (canvas && grid.length) {
-        const maxCanvasSize = Math.min(window.innerWidth - 40, 520);
-        cellSize = Math.floor(maxCanvasSize / cols);
-        canvas.width = cols * cellSize;
-        canvas.height = rows * cellSize;
-        drawMaze();
-      }
-    };
   </script>
 </body>
 </html>
