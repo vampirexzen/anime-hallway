@@ -1,13 +1,1594 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#fff5f8"><meta name="description" content="A cozy sakura park to play, chat, make friends, and collect petals."><title>Sakura Slime World</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="./styles.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="./app.js?v=20261025-3"></script></head>
-<body><div class="petal-wash"></div>
-<main id="auth-screen" class="auth-screen"><section class="auth-card card"><div class="brand-mark">🌸</div><p class="eyebrow">YOUR LITTLE CORNER OF THE INTERNET</p><h1>Sakura <span>Slime</span> World</h1><p class="muted">Wander through a blooming park, meet kind souls, and make a little magic.</p><div class="auth-tabs"><button class="auth-tab active" data-auth-tab="signin">Sign in</button><button class="auth-tab" data-auth-tab="signup">Create account</button></div><form id="signin-form" class="auth-form"><label>Email<input name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label><label>Password<input name="password" type="password" autocomplete="current-password" required minlength="6" placeholder="At least 6 characters"></label><button class="button primary full">Enter the park <span>→</span></button></form><form id="signup-form" class="auth-form hidden"><label>Username<input name="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+" placeholder="petal_dreamer"></label><label>Email<input name="email" type="email" required placeholder="you@example.com"></label><label>Password<input name="password" type="password" required minlength="8" placeholder="At least 8 characters"></label><button class="button primary full">Create my slime <span>✦</span></button></form><p id="auth-notice" class="notice" role="status"></p><p class="tiny-note">A verified email may be required before your first visit.</p></section><div class="auth-footer">A cozy place to be yourself <span>♡</span></div></main>
-<div id="app-shell" class="hidden"><header class="topbar"><a class="wordmark" href="#" data-view-link="park">🌸 Sakura Slime</a><nav class="main-nav"><button class="nav-link active" data-view-link="park">Park</button><button class="nav-link" data-view-link="games">Games</button><button class="nav-link" data-view-link="market">Market</button><button class="nav-link" data-view-link="social">Social</button><button class="nav-link" data-view-link="profile">Profile</button></nav><div class="user-chip hud-user-chip" id="hud-profile-card"><span class="hud-avatar" id="hud-avatar">🌸</span><span class="hud-profile-copy"><span class="hud-name-line"><strong id="header-username">Slime</strong><span id="hud-role-badge" class="hud-role-badge hidden"></span></span><span class="hud-points-line"><span class="coin">✿</span><strong id="points-count">0</strong><small>pts · <span id="hud-timer">15m</span></small></span></span><button id="signout-button" class="icon-button" type="button" title="Sign out" aria-label="Sign out">↗</button></div></header>
-<div class="mobile-tabs"><button class="active" data-view-link="park"><span>🌳</span>Park</button><button data-view-link="games"><span>🎮</span>Games</button><button data-view-link="market"><span>🛍️</span>Market</button><button data-view-link="social"><span>💌</span>Social</button><button data-view-link="profile"><span>🌸</span>Me</button></div>
-<main class="page-wrap">
-<section id="view-park" class="view active"><div class="page-heading"><div><p class="eyebrow">A SHARED LITTLE WORLD</p><h2>The Sakura Park</h2><p class="muted">Take a breath, bounce around, and say hello.</p></div><div class="online-pill"><span class="online-dot"></span><span id="online-count">1</span> in the park</div></div><div class="park-layout"><div class="park-scene card"><canvas id="worldCanvas" class="world-canvas" aria-label="Sakura park world"></canvas><div class="scene-sky"></div><div class="scene-sun"></div><div class="tree tree-left"><i></i><i></i><i></i><b></b></div><div class="tree tree-right"><i></i><i></i><i></i><b></b></div><div class="pond"></div><div class="path"></div><div id="players-layer" class="players-layer"></div><div class="scene-caption">✿ Spring is always in bloom here</div><div class="scene-tools"><button id="dance-button" class="scene-button">💃 <span>Dance</span></button><button id="wave-button" class="scene-button">👋 <span>Wave</span></button><button id="music-button" class="scene-button">♫ <span>Music</span></button></div></div><aside class="park-side"><div class="card controls-card"><div class="card-title-row"><div><p class="eyebrow">MOVE AROUND</p><h3>Your slime</h3></div><span>✦</span></div><p class="tiny-note desktop-hint">Move with <kbd>W A S D</kbd> or arrows. Jump with <kbd>Space</kbd>.</p><p class="tiny-note mobile-hint">Use the joystick and tap jump to bounce.</p><div class="touch-controls"><div id="joystick" class="joystick"><div id="joystick-knob" class="joystick-knob"></div></div><button id="jump-button" class="jump-button">↑<span>JUMP</span></button></div><div class="park-tip">🌸 <span>Stay active to earn <b>1 petal point every 15 minutes.</b></span></div></div><div class="card quick-chat-card"><div class="card-title-row"><div><p class="eyebrow">PARK CHAT</p><h3>Say something sweet</h3></div><button id="chat-collapse-button" class="chat-collapse-button" type="button" aria-label="Collapse park chat">‹</button></div><div id="park-chat-preview" class="park-chat-preview"><p class="tiny-note">Loading the latest hello…</p></div><form id="global-chat-form" class="chat-composer compact"><input id="global-chat-input" maxlength="240" placeholder="Type a message…" required><button class="button icon-submit" aria-label="Send">➤</button></form><button class="text-button" data-view-link="social">Open all messages →</button></div></aside></div></section>
-<section id="view-games" class="view"><div class="page-heading"><div><p class="eyebrow">A LITTLE PLAY BREAK</p><h2>Petal Playroom</h2><p class="muted">Play a round, collect petals, and bring your points back to the park.</p></div><div class="reward-pill">✿ Earn points</div></div><div class="game-grid"><article class="card game-card"><div class="game-art memory-art">🌸　🦋　🍡　🌙</div><p class="eyebrow">GAME 01 · FOCUS</p><h3>Slime Memories</h3><p class="muted">Flip the cards and find all 6 matching pairs.</p><div id="memory-board" class="memory-board"></div><div class="game-action-row"><span id="memory-status" class="tiny-note">Find all the pairs to earn 3 points.</span><button id="memory-start" class="button secondary">Start game</button></div></article><article class="card game-card"><div class="game-art petals-art">🌸　🌸　🌸</div><p class="eyebrow">GAME 02 · CATCH</p><h3>Catch the Petals</h3><p class="muted">Catch falling petals. Every 10 caught earns 5 points.</p><div id="petal-field" class="petal-field"><div id="petal-countdown" class="petal-countdown">Ready when you are</div></div><div class="game-action-row"><span id="petal-status" class="tiny-note">Catch up to 50 petals · max 25 points.</span><button id="petal-start" class="button secondary">Start catching</button></div></article></div><p class="tiny-note centered">Game rewards are limited to one claim per game each day.</p></section>
-<section id="view-market" class="view"><div class="page-heading"><div><p class="eyebrow">MAKE YOUR SLIME YOURS</p><h2>Petal Market</h2><p class="muted">Try a look on before you bring it home.</p></div><div class="market-wallet"><span>✿</span><strong id="market-points">0</strong><small>petal points</small></div></div><div class="market-layout"><div><div id="market-categories" class="category-tabs"><button class="category-tab active" data-category="all">All items</button><button class="category-tab" data-category="avatar">Avatars</button><button class="category-tab" data-category="frame">Frames</button><button class="category-tab" data-category="skin">Slime skins</button><button class="category-tab" data-category="accessory">Accessories</button></div><div id="market-items" class="market-items"></div></div><aside class="card preview-card"><p class="eyebrow">LIVE TRY-ON</p><h3>Preview your look</h3><div class="market-preview"><div class="preview-sakura">✿</div><div id="preview-slime" class="preview-slime"><span id="preview-accessory"></span><i></i><i></i><b></b></div><span id="preview-name" class="preview-name">Your slime</span></div><p id="preview-description" class="tiny-note centered">Choose an item to see it on your slime.</p><button id="clear-preview" class="button outline full">Clear try-on</button></aside></div></section>
-<section id="view-social" class="view"><div class="page-heading"><div><p class="eyebrow">FRIENDS MAKE IT BLOOM</p><h2>Little Social Corner</h2><p class="muted">Find new friends, share a hello, and keep in touch.</p></div></div><div class="social-layout"><div class="social-main"><section class="card search-card"><p class="eyebrow">FIND YOUR PEOPLE</p><h3>Search by username</h3><form id="user-search-form" class="search-row"><input id="user-search-input" type="search" placeholder="Try a username…" maxlength="24"><button class="button primary">Search</button></form><div id="search-results" class="result-list"></div></section><section class="card friends-card"><div class="card-title-row"><div><p class="eyebrow">YOUR PEOPLE</p><h3>Friends & requests</h3></div>♡</div><div id="friend-requests" class="result-list"></div><div id="friends-list" class="result-list"><p class="tiny-note">Loading friends…</p></div></section></div><section class="card messages-card"><div class="card-title-row"><div><p class="eyebrow">PARK CHAT</p><h3>Messages</h3></div><span class="online-dot"></span></div><div class="message-tabs"><button id="global-tab" class="message-tab active">Everyone</button><button id="dm-tab" class="message-tab">Friends DM</button></div><div id="dm-friend-picker" class="dm-friend-picker hidden"></div><div id="messages-list" class="messages-list"></div><form id="social-chat-form" class="chat-composer"><input id="social-chat-input" maxlength="240" placeholder="Write a message…" required><button class="button icon-submit" aria-label="Send">➤</button></form><p id="dm-note" class="tiny-note">Direct messages are available to friends only.</p></section></div></section>
-<section id="view-profile" class="view"><div class="page-heading"><div><p class="eyebrow">A LITTLE ABOUT YOU</p><h2>Your profile</h2><p class="muted">Keep your corner of the park feeling like you.</p></div></div><div class="profile-layout"><section class="card profile-card"><div class="profile-avatar" id="profile-avatar">🌸</div><p class="eyebrow">YOUR PROFILE</p><form id="profile-form" class="profile-form"><label>Username<input name="username" required minlength="3" maxlength="24" pattern="[A-Za-z0-9_]+"></label><label>Profile picture URL <span class="tiny-note">(optional)</span><input name="profile_picture" type="url" maxlength="500" placeholder="https://…"></label><button class="button primary">Save profile</button></form><div id="profile-notice" class="notice"></div><div class="profile-role-row"><span>Park status</span><strong id="profile-role">Visitor</strong></div><button id="admin-style-button" class="button outline full hidden">Equip admin look</button></section><section class="card dev-card"><div class="card-title-row"><div><p class="eyebrow">SPECIAL ACCESS</p><h3>Developer mode</h3></div>❄️</div><p class="muted">Enter your developer passcode to preview your icy slime and open the tools panel.</p><form id="dev-form" class="dev-entry"><input id="dev-passcode" type="password" inputmode="numeric" maxlength="12" placeholder="Passcode"><button class="button secondary">Unlock</button></form><button id="dev-lock-button" class="text-button hidden">Turn developer look off</button><p id="dev-notice" class="notice"></p><div id="moderation-panel" class="moderation-panel hidden"><div class="moderation-section"><p class="eyebrow">MODERATION</p><label>Target username<input id="moderation-username" maxlength="24" placeholder="username"></label><label>Action<select id="moderation-action"><option value="ban">Ban from login</option><option value="unban">Unban</option><option value="mute">Mute chat</option><option value="unmute">Unmute chat</option><option value="make_admin">Make admin</option><option value="revoke_admin">Revoke admin</option><option value="delete">Permanently delete account</option></select></label><label id="mute-duration-wrap" class="hidden">Mute duration (minutes)<input id="mute-duration" type="number" value="60" min="1" max="43200"></label><button id="moderate-button" class="button danger full">Apply action</button></div><div id="points-tools" class="moderation-section hidden"><p class="eyebrow">DEVELOPER POINTS TOOL</p><label>Point adjustment<input id="points-adjustment" type="number" placeholder="e.g. 100 or -50"></label><button id="adjust-points-button" class="button secondary full">Apply point change</button></div><div class="moderation-section"><p class="eyebrow">PARK MUSIC</p><label>Ambient track<select id="music-track-select"><option value="sakura">Sakura Morning</option><option value="moonlight">Moonlit Garden</option><option value="rain">Soft Rain</option></select></label><label class="toggle-row"><input id="music-enabled" type="checkbox"><span>Park music on</span></label><button id="save-music-button" class="button secondary full">Update park music</button></div></div></section></div></section>
-</main><footer class="app-footer"><span>🌸 Take care of each other.</span><span>Made for gentle days</span></footer></div><div id="toast" class="toast" role="status"></div><dialog id="player-dialog" class="player-dialog"><button id="close-player-dialog" class="dialog-close">×</button><div id="player-dialog-content"></div></dialog></body></html>
+<!DOCTYPE html>
+<html lang="en" class="h-full w-full overflow-hidden">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Sakura Slime World 🌸 - 2D Virtual Lounge & Games</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Yuji+Mai&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Viewport & Lock Rules */
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      width: 100%;
+      width: 100dvw;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+      background: #180914;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .font-sakura {
+      font-family: 'Yuji Mai', serif;
+    }
+
+    /* Glassmorphism Styling */
+    .glass {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+    }
+
+    .glass-dark {
+      background: rgba(30, 15, 28, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(244, 114, 182, 0.25);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(244, 114, 182, 0.4);
+    }
+
+    .glass-input:focus {
+      border-color: #ec4899;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(244, 114, 182, 0.5);
+      border-radius: 10px;
+    }
+
+    /* Mobile Virtual Joystick Touch Base */
+    .joystick-base {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      border: 2px solid rgba(244, 114, 182, 0.6);
+      backdrop-filter: blur(8px);
+      position: relative;
+      touch-action: none;
+    }
+    .joystick-stick {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+      box-shadow: 0 4px 10px rgba(236, 72, 153, 0.5);
+      position: absolute;
+      top: 23px;
+      left: 23px;
+      pointer-events: none;
+      transition: transform 0.04s ease-out;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(244, 114, 182, 0.5);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+    }
+    .action-btn:active {
+      transform: scale(0.92);
+      background: #ec4899;
+      color: white;
+    }
+
+    /* Glowing Auras */
+    .glow-dev {
+      box-shadow: 0 0 20px 5px rgba(56, 189, 248, 0.8);
+    }
+    .glow-admin {
+      box-shadow: 0 0 20px 5px rgba(239, 68, 68, 0.8);
+    }
+    .glow-aura {
+      box-shadow: 0 0 25px 8px rgba(244, 114, 182, 0.9);
+    }
+  </style>
+</head>
+<body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
+
+  <!-- AUTH MODAL OVERLAY -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90dvh] overflow-y-auto">
+      <div class="text-center space-y-1">
+        <div class="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 text-white shadow-lg shadow-pink-300 mb-1">
+          <i data-lucide="sparkles" class="w-6 h-6"></i>
+        </div>
+        <h2 class="font-sakura text-2xl font-bold text-pink-950">Sakura Slime World</h2>
+        <p class="text-xs text-pink-600 font-medium">Explore virtual zen rooms, play games & chat live!</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-1 p-1 bg-pink-100/80 rounded-2xl text-xs font-bold text-pink-800">
+        <button id="tab-signin" onclick="switchAuthTab('signin')" class="py-2 rounded-xl bg-white shadow text-pink-900 transition">Sign In</button>
+        <button id="tab-signup" onclick="switchAuthTab('signup')" class="py-2 rounded-xl transition text-pink-600 hover:text-pink-900">Sign Up</button>
+      </div>
+
+      <div id="auth-alert" class="hidden text-xs p-3 rounded-xl border font-medium"></div>
+
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-3">
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Email Address</label>
+          <input type="email" id="auth-email" required placeholder="slime@sakura.com" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm font-semibold text-pink-950" />
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Password</label>
+          <input type="password" id="auth-password" required minlength="6" placeholder="••••••••" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm font-semibold text-pink-950" />
+        </div>
+        <div id="username-field" class="space-y-1 hidden">
+          <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Slime Display Name</label>
+          <input type="text" id="auth-username" maxlength="15" placeholder="BouncySlime" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm font-semibold text-pink-950" />
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs mt-2">
+          <span>Sign In</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+
+      <div class="relative flex items-center justify-center my-1">
+        <div class="border-t border-pink-200 w-full"></div>
+        <span class="bg-white/90 px-3 text-[10px] font-bold uppercase text-pink-400 absolute">or</span>
+      </div>
+
+      <button onclick="loginAsGuest()" class="w-full bg-white hover:bg-pink-50 text-pink-800 font-semibold py-2 rounded-2xl border border-pink-200 transition active:scale-95 text-xs flex items-center justify-center gap-1.5 shadow-sm">
+        <i data-lucide="user" class="w-4 h-4 text-pink-500"></i> Continue as Guest
+      </button>
+    </div>
+  </div>
+
+  <!-- TOP HEADER NAVBAR -->
+  <header class="h-12 sm:h-14 glass px-3 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
+    <div class="flex items-center gap-2">
+      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shadow-pink-300 shrink-0">
+        <i data-lucide="flower-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style="animation-duration: 12s;"></i>
+      </div>
+      <div>
+        <h1 class="font-sakura text-xs sm:text-base text-pink-950 font-bold tracking-wide leading-none">Sakura Slime 🌸</h1>
+        <p class="text-[9px] sm:text-[10px] text-pink-600 font-semibold uppercase mt-0.5" id="room-indicator">#zen-garden</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <!-- Points Counter Badge -->
+      <div class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold shadow-sm" title="Your Sakura Points">
+        <i data-lucide="coins" class="w-3.5 h-3.5 text-amber-600"></i>
+        <span id="player-points">150</span> pts
+      </div>
+
+      <!-- Audio Synth Control -->
+      <div class="hidden sm:flex items-center bg-pink-100/90 rounded-xl p-1 border border-pink-200">
+        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Lo-Fi Music">
+          <i data-lucide="music" id="music-icon" class="w-3.5 h-3.5 text-pink-600"></i>
+        </button>
+        <input type="range" id="bg-volume" min="0" max="1" step="0.05" value="0.3" oninput="updateMusicVolume(this.value)" class="w-12 h-1 accent-pink-500 cursor-pointer mx-1" />
+      </div>
+
+      <!-- Player Counter Badge -->
+      <div class="flex items-center gap-1 px-2 py-1 rounded-xl bg-pink-100/90 border border-pink-200 text-pink-800 text-[10px] sm:text-xs font-semibold">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="player-count">1</span>
+      </div>
+
+      <!-- Marketplace Store Button -->
+      <button onclick="toggleMarketplaceModal()" class="p-1.5 rounded-xl bg-gradient-to-tr from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white shadow-sm active:scale-95 flex items-center gap-1 text-xs font-bold" title="Slime Marketplace">
+        <i data-lucide="store" class="w-4 h-4"></i>
+        <span class="hidden md:inline">Store</span>
+      </button>
+
+      <!-- Settings Customization Modal Trigger -->
+      <button onclick="toggleSettingsModal()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Customize Slime">
+        <i data-lucide="user-cog" class="w-4 h-4"></i>
+      </button>
+
+      <!-- Admin / Dev Panel Trigger (Hidden by default unless Dev/Admin) -->
+      <button id="admin-panel-trigger" onclick="toggleAdminPanel()" class="hidden p-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow-md active:scale-95 flex items-center gap-1 text-xs font-bold animate-pulse" title="Moderation & Dev Panel">
+        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <div class="flex-1 relative flex overflow-hidden w-full h-full">
+
+    <!-- CANVAS VIEW (Always Fills Available Screen Space) -->
+    <div class="flex-1 relative bg-pink-950/20 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
+      <canvas id="gameCanvas" class="block w-full h-full cursor-pointer touch-none"></canvas>
+
+      <!-- Top Overlay Room Quick Pills Switcher -->
+      <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[95vw] overflow-x-auto">
+        <button onclick="switchChannel('zen-garden')" id="quick-btn-zen-garden" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap">
+          🌸 Zen Garden
+        </button>
+        <button onclick="switchChannel('neon-arcade')" id="quick-btn-neon-arcade" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
+          🕹️ Neon Arcade
+        </button>
+        <button onclick="switchChannel('onsen-hotspring')" id="quick-btn-onsen-hotspring" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
+          🎋 Onsen Spring
+        </button>
+      </div>
+
+      <!-- Live Mini-Game HUD Banner -->
+      <div id="minigame-banner" class="hidden absolute top-12 left-1/2 -translate-x-1/2 z-20 glass px-3 py-1.5 rounded-2xl border border-pink-300 shadow-xl flex items-center gap-3 animate-in fade-in">
+        <div class="flex items-center gap-2 text-xs">
+          <span id="minigame-title" class="font-bold text-pink-950 uppercase">🌸 Petal Catch</span>
+          <span class="text-pink-300">|</span>
+          <span class="font-bold text-pink-800">Score: <strong id="minigame-score" class="text-pink-950 font-black text-sm">0</strong></span>
+          <span class="text-pink-300">|</span>
+          <span class="font-bold text-pink-800">Time: <strong id="minigame-timer" class="text-pink-950 font-black text-sm">30s</strong></span>
+        </div>
+        <button onclick="endMiniGame(true)" class="px-2 py-0.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-bold">Quit</button>
+      </div>
+
+      <!-- Emote Toolbar Overlay (Bottom Center on Canvas) -->
+      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2.5 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2">
+        <button onclick="triggerJump()" class="action-btn px-2 py-0.5 rounded-xl text-xs font-black text-pink-800 flex items-center gap-1" title="Jump / Bounce">
+          <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5 text-pink-600"></i>
+          <span class="hidden sm:inline">Jump</span>
+        </button>
+        <span class="text-pink-300">|</span>
+        <button onclick="triggerEmote('🌸')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg" title="Sakura Blossom">🌸</button>
+        <button onclick="triggerEmote('❤️')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg" title="Heart">❤️</button>
+        <button onclick="triggerEmote('✨')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg" title="Sparkles">✨</button>
+        <button onclick="triggerEmote('🍵')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg" title="Matcha Tea">🍵</button>
+        <button onclick="triggerEmote('🎮')" class="hover:scale-125 active:scale-90 transition text-base sm:text-lg" title="Gaming">🎮</button>
+      </div>
+
+      <!-- Mobile D-Pad Touch Joystick -->
+      <div class="absolute bottom-3 left-3 z-20 pointer-events-auto md:hidden">
+        <div id="joystick-container" class="joystick-base">
+          <div id="joystick-stick" class="joystick-stick"></div>
+        </div>
+      </div>
+
+      <!-- Mobile Right Jump Button -->
+      <div class="absolute bottom-3 right-3 z-20 pointer-events-auto md:hidden">
+        <button onclick="triggerJump()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-xs font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
+          JUMP
+        </button>
+      </div>
+
+      <!-- Arcade Mini-Game Card Overlay (Slime Memories) -->
+      <div id="arcade-card-modal" class="hidden absolute inset-0 z-30 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass w-full max-w-xs rounded-3xl p-4 shadow-2xl border border-white space-y-3 animate-in fade-in">
+          <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+            <h3 class="font-bold text-pink-950 text-xs flex items-center gap-1.5">
+              <i data-lucide="gamepad-2" class="w-4 h-4 text-pink-600"></i> Slime Memories
+            </h3>
+            <button onclick="closeMemoryGame()" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+          </div>
+          <div class="grid grid-cols-4 gap-1.5" id="memory-grid"></div>
+          <p class="text-[10px] text-pink-700 font-semibold text-center" id="memory-status">Match all pairs to win +3 points!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR DRAWER (Responsive overlay on mobile, fixed panel on desktop) -->
+    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
+      
+      <!-- Drawer Header & Tabs -->
+      <div class="p-3 border-b border-pink-200/30 bg-white/10 flex flex-col gap-2 shrink-0">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1 p-0.5 bg-pink-950/60 rounded-xl">
+            <button onclick="switchSidebarTab('chat')" id="sidebar-tab-chat" class="px-3 py-1 rounded-lg text-xs font-bold bg-pink-500 text-white transition">Chat & Rooms</button>
+            <button onclick="switchSidebarTab('friends')" id="sidebar-tab-friends" class="px-3 py-1 rounded-lg text-xs font-bold text-pink-300 hover:text-white transition">Friends & DMs</button>
+          </div>
+          <button onclick="toggleChatSidebar()" class="md:hidden text-pink-300 hover:text-white p-1">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: CHAT & ROOMS -->
+      <div id="sidebar-content-chat" class="flex-1 flex flex-col overflow-hidden">
+        <!-- Room Selector Pills -->
+        <div class="p-2 bg-pink-950/40 border-b border-pink-200/20 grid grid-cols-3 gap-1 shrink-0">
+          <button onclick="switchChannel('zen-garden')" id="chan-btn-zen-garden" class="chan-btn px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition">
+            🌸 Zen Garden
+          </button>
+          <button onclick="switchChannel('neon-arcade')" id="chan-btn-neon-arcade" class="chan-btn px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-medium text-pink-200 hover:bg-pink-900/50 transition">
+            🕹️ Arcade
+          </button>
+          <button onclick="switchChannel('onsen-hotspring')" id="chan-btn-onsen-hotspring" class="chan-btn px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-medium text-pink-200 hover:bg-pink-900/50 transition">
+            🎋 Onsen
+          </button>
+        </div>
+
+        <!-- Mini-Games Launcher Panel -->
+        <div class="px-3 py-2 bg-pink-950/60 border-b border-pink-200/20 space-y-1 shrink-0">
+          <span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider">Play Mini-Games:</span>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button onclick="startMiniGame('petal-catch')" class="px-2 py-1.5 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
+              🌸 Petal Catcher
+            </button>
+            <button onclick="startMemoryGame()" class="px-2 py-1.5 rounded-xl bg-white/90 hover:bg-white text-pink-950 text-xs font-bold shadow-sm flex items-center justify-center gap-1 transition">
+              🧩 Slime Memory
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Log Stream -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2.5"></div>
+
+        <!-- Chat Input Form -->
+        <div class="p-2.5 bg-pink-950/80 border-t border-pink-200/30 shrink-0">
+          <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex items-center gap-2">
+            <input 
+              type="text" 
+              id="chat-input" 
+              placeholder="Type a message..." 
+              maxlength="120"
+              autocomplete="off"
+              class="glass-input flex-1 px-3 py-2 rounded-xl text-xs text-pink-950 placeholder-pink-400 font-medium"
+            />
+            <button 
+              type="submit" 
+              class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl shadow-md transition shrink-0 active:scale-95"
+            >
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 2: FRIENDS & DIRECT MESSAGING -->
+      <div id="sidebar-content-friends" class="flex-1 flex flex-col overflow-hidden hidden p-3 space-y-3">
+        <div class="flex items-center gap-2">
+          <input type="text" id="friend-search-input" placeholder="Search username..." class="glass-input flex-1 px-3 py-1.5 rounded-xl text-xs text-pink-950 font-medium" />
+          <button onclick="searchAndAddFriend()" class="bg-pink-500 hover:bg-pink-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">Add</button>
+        </div>
+        <div class="text-[10px] font-bold text-pink-300 uppercase tracking-wider">Friends List & DMs (Friends Only)</div>
+        <div id="friends-list-container" class="flex-1 overflow-y-auto space-y-2">
+          <div class="text-xs text-pink-400 italic text-center py-4">No friends added yet. Click player slimes in the park to add!</div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- MOBILE BOTTOM FLOATING NAVIGATION BAR -->
+  <nav class="h-12 bg-pink-950/90 border-t border-pink-200/20 backdrop-blur-md flex items-center justify-around px-2 z-30 shrink-0 md:hidden">
+    <button onclick="toggleChatSidebar()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
+      <i data-lucide="message-square" class="w-4 h-4"></i>
+      <span class="text-[9px] font-bold">Chat</span>
+    </button>
+    <button onclick="toggleMarketplaceModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
+      <i data-lucide="store" class="w-4 h-4"></i>
+      <span class="text-[9px] font-bold">Store</span>
+    </button>
+    <button onclick="toggleSettingsModal()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
+      <i data-lucide="user-cog" class="w-4 h-4"></i>
+      <span class="text-[9px] font-bold">Custom</span>
+    </button>
+    <button onclick="toggleBackgroundMusic()" class="flex flex-col items-center gap-0.5 text-pink-200 hover:text-pink-400 transition">
+      <i data-lucide="music" class="w-4 h-4"></i>
+      <span class="text-[9px] font-bold">Lo-Fi</span>
+    </button>
+  </nav>
+
+  <!-- CUSTOMIZATION & SETTINGS MODAL -->
+  <div id="settings-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 max-h-[90dvh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+        <div class="flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-5 h-5 text-pink-600"></i>
+          <h3 class="font-bold text-pink-950 text-base">Customize Slime</h3>
+        </div>
+        <button onclick="toggleSettingsModal()" class="text-pink-700 hover:text-pink-900 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Display Name</label>
+        <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs font-semibold text-pink-950" placeholder="Your Slime Name..." />
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Choose Slime Style & Accessory</label>
+        <div class="grid grid-cols-2 gap-2" id="avatar-picker"></div>
+      </div>
+
+      <!-- Secret Developer Code Input -->
+      <div class="space-y-1 pt-2 border-t border-pink-200">
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Secret Passcode (Dev Mode: 1357)</label>
+        <input type="password" id="setting-dev-code" placeholder="Enter passcode..." class="glass-input w-full px-3.5 py-2 rounded-xl text-xs font-semibold text-pink-950" oninput="checkDevPasscode(this.value)" />
+      </div>
+
+      <button onclick="saveAvatarSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs">
+        <i data-lucide="check" class="w-4 h-4"></i> Save Settings
+      </button>
+    </div>
+  </div>
+
+  <!-- MARKETPLACE STORE MODAL WITH TRY-ON PREVIEW -->
+  <div id="marketplace-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass w-full max-w-lg rounded-3xl p-5 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 max-h-[90dvh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+        <div class="flex items-center gap-2">
+          <i data-lucide="store" class="w-5 h-5 text-amber-600"></i>
+          <h3 class="font-bold text-pink-950 text-base">Slime Marketplace & Try-On</h3>
+        </div>
+        <button onclick="toggleMarketplaceModal()" class="text-pink-700 hover:text-pink-900 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between bg-amber-50 border border-amber-200 px-3 py-2 rounded-2xl">
+        <span class="text-xs font-bold text-amber-900">Your Balance:</span>
+        <span class="text-sm font-black text-amber-800 flex items-center gap-1"><i data-lucide="coins" class="w-4 h-4 text-amber-600"></i> <span id="store-balance">150</span> pts</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-64 overflow-y-auto p-1" id="store-items-grid"></div>
+
+      <p class="text-[10px] text-pink-600 italic text-center">Click items to instantly try them on your slime before purchasing!</p>
+
+      <button onclick="toggleMarketplaceModal()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-md transition text-xs">
+        Close Store
+      </button>
+    </div>
+  </div>
+
+  <!-- ADMIN & DEVELOPER MODERATION PANEL -->
+  <div id="admin-panel-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="glass-dark w-full max-w-md rounded-3xl p-6 shadow-2xl border border-rose-500/40 space-y-4 animate-in fade-in zoom-in-95 max-h-[90dvh] overflow-y-auto text-white">
+      <div class="flex items-center justify-between border-b border-rose-500/30 pb-2">
+        <div class="flex items-center gap-2">
+          <i data-lucide="shield-alert" class="w-6 h-6 text-rose-500"></i>
+          <h3 class="font-bold text-base text-rose-200">Moderation & Dev Control Panel</h3>
+        </div>
+        <button onclick="toggleAdminPanel()" class="text-rose-300 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="p-3 rounded-2xl bg-rose-950/40 border border-rose-500/30 space-y-2">
+          <span class="font-bold text-rose-300 uppercase tracking-wider block">Target Username / User ID</span>
+          <input type="text" id="admin-target-user" placeholder="Enter exact username..." class="glass-input w-full px-3 py-2 rounded-xl text-xs text-pink-950 font-semibold" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="adminAction('grant-admin')" class="p-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 font-bold transition flex items-center justify-center gap-1.5 shadow-md">
+            <i data-lucide="shield-check" class="w-4 h-4"></i> Grant Admin
+          </button>
+          <button onclick="adminAction('revoke-admin')" class="p-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 font-bold transition flex items-center justify-center gap-1.5 shadow-md">
+            <i data-lucide="shield-off" class="w-4 h-4"></i> Revoke Admin
+          </button>
+          <button onclick="adminAction('add-points')" class="p-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 font-bold transition flex items-center justify-center gap-1.5 shadow-md">
+            <i data-lucide="coins" class="w-4 h-4"></i> Add +1000 Pts (Dev)
+          </button>
+          <button onclick="adminAction('mute')" class="p-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 font-bold transition flex items-center justify-center gap-1.5 shadow-md">
+            <i data-lucide="mic-off" class="w-4 h-4"></i> Mute Chat (10m)
+          </button>
+          <button onclick="adminAction('ban')" class="p-2.5 rounded-xl bg-red-800 hover:bg-red-900 font-bold transition flex items-center justify-center gap-1.5 shadow-md col-span-2">
+            <i data-lucide="user-x" class="w-4 h-4"></i> Ban / Delete Account
+          </button>
+        </div>
+
+        <div class="pt-2 border-t border-rose-500/30 space-y-2">
+          <span class="font-bold text-rose-300 uppercase tracking-wider block">Environment Audio Controls</span>
+          <button onclick="toggleBackgroundMusic()" class="w-full py-2.5 rounded-xl bg-pink-600 hover:bg-pink-700 font-bold transition flex items-center justify-center gap-2">
+            <i data-lucide="music" class="w-4 h-4"></i> Toggle Lo-Fi Lounge Music
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script>
+    // --- SUPABASE CONFIGURATION ---
+    const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // --- PROCEDURAL AUDIO SYNTHESIZER ---
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    let musicPlaying = false;
+    let musicMasterGain = null;
+    let musicTimer = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new AudioCtx();
+        musicMasterGain = audioCtx.createGain();
+        musicMasterGain.gain.value = 0.3;
+        musicMasterGain.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      try {
+        initAudio();
+        if (!audioCtx) return;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'bounce') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(440, now + 0.12);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+          osc.start(now); osc.stop(now + 0.12);
+        } else if (type === 'jump') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.exponentialRampToValueAtTime(650, now + 0.2);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'emote') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+          osc.start(now); osc.stop(now + 0.18);
+        } else if (type === 'msg') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(600, now + 0.08);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now); osc.stop(now + 0.08);
+        } else if (type === 'coin') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(1200, now + 0.15);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+          osc.start(now); osc.stop(now + 0.15);
+        } else if (type === 'win') {
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g); g.connect(audioCtx.destination);
+            o.type = 'triangle'; o.frequency.value = freq;
+            g.gain.setValueAtTime(0.15, now + idx * 0.08);
+            g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.2);
+            o.start(now + idx * 0.08); o.stop(now + idx * 0.08 + 0.2);
+          });
+        }
+      } catch (e) {}
+    }
+
+    const PENTATONIC_SCALE = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+
+    function playPentatonicNote() {
+      if (!musicPlaying || !audioCtx) return;
+      const now = audioCtx.currentTime;
+      const freq = PENTATONIC_SCALE[Math.floor(Math.random() * PENTATONIC_SCALE.length)];
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = Math.random() > 0.4 ? 'sine' : 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.12, now + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+      osc.connect(gain);
+      gain.connect(musicMasterGain);
+      osc.start(now);
+      osc.stop(now + 1.8);
+
+      musicTimer = setTimeout(playPentatonicNote, Math.random() * 600 + 400);
+    }
+
+    function toggleBackgroundMusic() {
+      initAudio();
+      musicPlaying = !musicPlaying;
+      const icon = document.getElementById('music-icon');
+      const btn = document.getElementById('music-toggle-btn');
+
+      if (musicPlaying) {
+        if (icon) icon.setAttribute('data-lucide', 'volume-2');
+        if (btn) btn.classList.add('bg-pink-200', 'text-pink-900');
+        playPentatonicNote();
+      } else {
+        if (icon) icon.setAttribute('data-lucide', 'music');
+        if (btn) btn.classList.remove('bg-pink-200', 'text-pink-900');
+        clearTimeout(musicTimer);
+      }
+      lucide.createIcons();
+    }
+
+    function updateMusicVolume(val) {
+      if (musicMasterGain) musicMasterGain.gain.value = parseFloat(val);
+    }
+
+    // --- AVATAR TYPES & STORE ITEMS ---
+    const AVATAR_TYPES = {
+      sakura: { name: 'Sakura Pin', bodyColor: '#f472b6', accessory: '🌸' },
+      spirit: { name: 'Cat Ears', bodyColor: '#38bdf8', accessory: '🐱' },
+      fox:    { name: 'Kitsune Mask', bodyColor: '#fb923c', accessory: '🦊' },
+      matcha: { name: 'Matcha Boba', bodyColor: '#4ade80', accessory: '🍵' },
+      crown:  { name: 'Gold Crown', bodyColor: '#a855f7', accessory: '👑' },
+      bunny:  { name: 'Bunny Ears', bodyColor: '#f43f5e', accessory: '🐰' }
+    };
+
+    const STORE_ITEMS = [
+      { id: 'acc_bow', name: 'Pink Ribbon Bow', type: 'accessory', price: 500, icon: '🎀' },
+      { id: 'acc_sunglasses', name: 'Cool Shades', type: 'accessory', price: 800, icon: '🕶️' },
+      { id: 'aura_pink', name: 'Sakura Blossom Aura', type: 'aura', price: 2500, icon: '🌸' },
+      { id: 'skin_gold', name: 'Midas Gold Slime', type: 'skin', price: 5000, icon: '⭐' },
+      { id: 'aura_ice', name: 'Icy Frost Aura', type: 'aura', price: 10000, icon: '❄️' },
+      { id: 'aura_god', name: 'Celestial Deity Aura', type: 'aura', price: 15000, icon: '✨' }
+    ];
+
+    // --- GAME STATE ---
+    let currentUser = null;
+    let localPlayer = {
+      id: 'usr_' + Math.random().toString(36).substring(2, 9),
+      name: localStorage.getItem('sakura_avatar_name') || 'Slime_' + Math.floor(100 + Math.random() * 900),
+      avatarType: localStorage.getItem('sakura_avatar_type') || 'sakura',
+      x: 400,
+      y: 300,
+      targetX: 400,
+      targetY: 300,
+      speed: 4.8,
+      direction: 'down',
+      isMoving: false,
+      isJumping: false,
+      jumpOffset: 0,
+      jumpVelocity: 0,
+      bouncePhase: 0,
+      speechBubble: null,
+      activeEmote: null,
+      points: parseInt(localStorage.getItem('sakura_points') || '150'),
+      role: 'user', // 'user', 'admin', 'dev'
+      equippedAccessory: null,
+      equippedAura: null
+    };
+
+    let remotePlayers = {};
+    let currentChannel = 'zen-garden';
+    let realtimeChannel = null;
+    let petals = [];
+    let koiFish = [];
+    let steamParticles = [];
+
+    // Economy Timer (+1 point every 15 mins)
+    setInterval(() => {
+      localPlayer.points += 1;
+      updatePointsDisplay();
+    }, 900000);
+
+    // Mini-Game Active Variables
+    let activeMiniGame = null;
+    let miniGameScore = 0;
+    let miniGameTimeLeft = 0;
+    let miniGameInterval = null;
+    let gameCollectibles = [];
+
+    // Memory Game State
+    let memoryCards = [];
+    let flippedCards = [];
+    let matchedPairs = 0;
+
+    // Persistent Chat Log Memory
+    const chatMemory = {
+      'zen-garden': JSON.parse(localStorage.getItem('chat_zen-garden') || '[]'),
+      'neon-arcade': JSON.parse(localStorage.getItem('chat_neon-arcade') || '[]'),
+      'onsen-hotspring': JSON.parse(localStorage.getItem('chat_onsen-hotspring') || '[]')
+    };
+
+    // Friends list
+    let friendsList = JSON.parse(localStorage.getItem('sakura_friends') || '[]');
+
+    // Input States
+    const keys = { up: false, down: false, left: false, right: false };
+    const joystick = { active: false, dx: 0, dy: 0 };
+
+    // Dynamic Canvas Fit Setup
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const container = document.getElementById('canvas-container');
+      if (container) {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // --- AUTH & SETUP MODALS ---
+    let authMode = 'signin';
+
+    function switchAuthTab(mode) {
+      authMode = mode;
+      const tabSignIn = document.getElementById('tab-signin');
+      const tabSignUp = document.getElementById('tab-signup');
+      const usernameField = document.getElementById('username-field');
+      const submitBtn = document.getElementById('auth-submit-btn');
+
+      if (mode === 'signin') {
+        tabSignIn.className = "py-2 rounded-xl bg-white shadow text-pink-900 transition";
+        tabSignUp.className = "py-2 rounded-xl transition text-pink-600 hover:text-pink-900";
+        usernameField.classList.add('hidden');
+        submitBtn.querySelector('span').textContent = 'Sign In';
+      } else {
+        tabSignUp.className = "py-2 rounded-xl bg-white shadow text-pink-900 transition";
+        tabSignIn.className = "py-2 rounded-xl transition text-pink-600 hover:text-pink-900";
+        usernameField.classList.remove('hidden');
+        submitBtn.querySelector('span').textContent = 'Create Account';
+      }
+    }
+
+    function showAuthAlert(msg, isError = true) {
+      const alert = document.getElementById('auth-alert');
+      alert.classList.remove('hidden', 'bg-rose-100', 'text-rose-800', 'border-rose-300', 'bg-emerald-100', 'text-emerald-800', 'border-emerald-300');
+      alert.classList.add(isError ? 'bg-rose-100' : 'bg-emerald-100', isError ? 'text-rose-800' : 'text-emerald-800', isError ? 'border-rose-300' : 'border-emerald-300');
+      alert.textContent = msg;
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const username = document.getElementById('auth-username').value.trim();
+
+      try {
+        if (authMode === 'signup') {
+          const { data, error } = await supabaseClient.auth.signUp({
+            email, password, options: { data: { display_name: username || 'Slime' } }
+          });
+          if (error) throw error;
+          showAuthAlert('Account created! Logging in...', false);
+          setTimeout(() => completeUserLogin(data.user, username || email.split('@')[0]), 800);
+        } else {
+          const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          showAuthAlert('Welcome back!', false);
+          const dispName = data.user.user_metadata?.display_name || email.split('@')[0];
+          setTimeout(() => completeUserLogin(data.user, dispName), 800);
+        }
+      } catch (err) {
+        showAuthAlert(err.message || 'Authentication failed.');
+      }
+    }
+
+    function loginAsGuest() {
+      const guestName = 'Slime_' + Math.floor(100 + Math.random() * 900);
+      completeUserLogin(null, guestName);
+    }
+
+    function completeUserLogin(user, displayName) {
+      currentUser = user;
+      localPlayer.name = displayName;
+      if (user) localPlayer.id = user.id;
+
+      localStorage.setItem('sakura_avatar_name', displayName);
+      const authModal = document.getElementById('auth-modal');
+      if (authModal) authModal.classList.add('hidden');
+      initSupabaseChannel(currentChannel);
+      renderChatMessages();
+      renderFriendsList();
+      renderStoreItems();
+      updatePointsDisplay();
+    }
+
+    function updatePointsDisplay() {
+      localStorage.setItem('sakura_points', localPlayer.points);
+      const ptEl = document.getElementById('player-points');
+      const storeEl = document.getElementById('store-balance');
+      if (ptEl) ptEl.textContent = localPlayer.points;
+      if (storeEl) storeEl.textContent = localPlayer.points;
+    }
+
+    // --- ENVIRONMENT & PARTICLES ---
+    function initEnvironmentElements() {
+      petals = [];
+      for (let i = 0; i < 45; i++) {
+        petals.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          size: Math.random() * 5 + 3,
+          speedY: Math.random() * 1.2 + 0.6,
+          speedX: Math.random() * 0.8 - 0.4,
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.03
+        });
+      }
+
+      koiFish = [
+        { x: 200, y: 200, angle: 0, color: '#f97316' },
+        { x: 240, y: 220, angle: Math.PI / 2, color: '#ef4444' }
+      ];
+
+      steamParticles = [];
+      for (let i = 0; i < 25; i++) {
+        steamParticles.push({
+          x: Math.random() * 200 + 100,
+          y: Math.random() * 100 + 150,
+          r: Math.random() * 12 + 8,
+          alpha: Math.random() * 0.4 + 0.1,
+          speedY: Math.random() * 0.6 + 0.3
+        });
+      }
+    }
+
+    // --- SUPABASE REALTIME MULTIPLAYER CHANNEL ---
+    function initSupabaseChannel(roomName) {
+      if (realtimeChannel) {
+        supabaseClient.removeChannel(realtimeChannel);
+      }
+
+      currentChannel = roomName;
+      document.getElementById('room-indicator').textContent = '#' + roomName;
+
+      // Update UI active pills
+      document.querySelectorAll('.quick-chan-btn, .chan-btn').forEach(btn => {
+        btn.classList.remove('bg-pink-500', 'text-white', 'shadow-sm');
+        btn.classList.add('text-pink-200');
+        if (btn.id.includes(roomName)) {
+          btn.classList.add('bg-pink-500', 'text-white', 'shadow-sm');
+          btn.classList.remove('text-pink-200');
+        }
+      });
+
+      realtimeChannel = supabaseClient.channel('room_' + roomName, {
+        config: { presence: { key: localPlayer.id } }
+      });
+
+      realtimeChannel
+        .on('presence', { event: 'sync' }, () => {
+          const state = realtimeChannel.presenceState();
+          remotePlayers = {};
+          let count = 0;
+          Object.keys(state).forEach(key => {
+            state[key].forEach(presence => {
+              if (presence.id !== localPlayer.id) {
+                remotePlayers[presence.id] = presence;
+              }
+              count++;
+            });
+          });
+          const countEl = document.getElementById('player-count');
+          if (countEl) countEl.textContent = count;
+        })
+        .on('broadcast', { event: 'player-action' }, ({ payload }) => {
+          if (payload && payload.id && payload.id !== localPlayer.id) {
+            remotePlayers[payload.id] = { ...remotePlayers[payload.id], ...payload };
+            if (payload.chatMessage) {
+              pushChatMessage(payload.name, payload.chatMessage, false, payload.id);
+            }
+          }
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await realtimeChannel.track(localPlayer);
+          }
+        });
+
+      renderChatMessages();
+    }
+
+    function switchChannel(room) {
+      initSupabaseChannel(room);
+    }
+
+    function broadcastState() {
+      if (realtimeChannel) {
+        realtimeChannel.send({
+          type: 'broadcast',
+          event: 'player-action',
+          payload: localPlayer
+        });
+      }
+    }
+
+    // --- CHAT & MESSAGING SYSTEM ---
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      localPlayer.chatMessage = text;
+      localPlayer.speechBubble = { text: text, time: Date.now() };
+      broadcastState();
+
+      pushChatMessage(localPlayer.name, text, true, localPlayer.id);
+      input.value = '';
+      playSound('msg');
+    }
+
+    function pushChatMessage(sender, text, isLocal, senderId) {
+      const msgObj = { sender, text, time: Date.now(), senderId };
+      chatMemory[currentChannel].push(msgObj);
+      if (chatMemory[currentChannel].length > 50) chatMemory[currentChannel].shift();
+      localStorage.setItem('chat_' + currentChannel, JSON.stringify(chatMemory[currentChannel]));
+      renderChatMessages();
+    }
+
+    function renderChatMessages() {
+      const container = document.getElementById('chat-messages');
+      if (!container) return;
+      container.innerHTML = '';
+
+      chatMemory[currentChannel].forEach(msg => {
+        const div = document.createElement('div');
+        div.className = "flex flex-col gap-0.5 p-2 rounded-xl bg-white/10 border border-white/5 text-xs";
+        div.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-pink-300 cursor-pointer hover:underline" onclick="openUserProfile('${msg.sender}')">${msg.sender}</span>
+            <span class="text-[9px] text-pink-400/70">${new Date(msg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+          </div>
+          <p class="text-white/90 break-words font-medium">${msg.text}</p>
+        `;
+        container.appendChild(div);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // --- FRIENDS & D.M. SYSTEM ---
+    function switchSidebarTab(tab) {
+      const chatTab = document.getElementById('sidebar-tab-chat');
+      const friendsTab = document.getElementById('sidebar-tab-friends');
+      const chatContent = document.getElementById('sidebar-content-chat');
+      const friendsContent = document.getElementById('sidebar-content-friends');
+
+      if (tab === 'chat') {
+        chatTab.className = "px-3 py-1 rounded-lg text-xs font-bold bg-pink-500 text-white transition";
+        friendsTab.className = "px-3 py-1 rounded-lg text-xs font-bold text-pink-300 hover:text-white transition";
+        chatContent.classList.remove('hidden');
+        friendsContent.classList.add('hidden');
+      } else {
+        friendsTab.className = "px-3 py-1 rounded-lg text-xs font-bold bg-pink-500 text-white transition";
+        chatTab.className = "px-3 py-1 rounded-lg text-xs font-bold text-pink-300 hover:text-white transition";
+        friendsContent.classList.remove('hidden');
+        chatContent.classList.add('hidden');
+      }
+    }
+
+    function searchAndAddFriend() {
+      const input = document.getElementById('friend-search-input');
+      const name = input.value.trim();
+      if (!name) return;
+      if (!friendsList.includes(name)) {
+        friendsList.push(name);
+        localStorage.setItem('sakura_friends', JSON.stringify(friendsList));
+        renderFriendsList();
+        input.value = '';
+        playSound('win');
+      }
+    }
+
+    function renderFriendsList() {
+      const container = document.getElementById('friends-list-container');
+      if (!container) return;
+      if (friendsList.length === 0) {
+        container.innerHTML = '<div class="text-xs text-pink-400 italic text-center py-4">No friends added yet. Click player slimes in the park to add!</div>';
+        return;
+      }
+      container.innerHTML = '';
+      friendsList.forEach(friend => {
+        const div = document.createElement('div');
+        div.className = "flex items-center justify-between p-2.5 rounded-xl bg-white/10 border border-white/10 text-xs";
+        div.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span class="font-bold text-white">${friend}</span>
+          </div>
+          <button onclick="openDirectMessage('${friend}')" class="px-2.5 py-1 rounded-lg bg-pink-500 hover:bg-pink-600 font-bold text-white transition">DM</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function openUserProfile(name) {
+      if (name === localPlayer.name) return;
+      if (!friendsList.includes(name)) {
+        if (confirm(`Send friend request to ${name}?`)) {
+          friendsList.push(name);
+          localStorage.setItem('sakura_friends', JSON.stringify(friendsList));
+          renderFriendsList();
+          playSound('win');
+        }
+      }
+    }
+
+    function openDirectMessage(friendName) {
+      switchSidebarTab('chat');
+      pushChatMessage('System', `Secure DM session started with ${friendName} (Friends Only).`, false, 'sys');
+    }
+
+    // --- GAME LOOP & PHYSICS ---
+    function updateGamePhysics() {
+      // Movement calculations
+      let moveX = 0;
+      let moveY = 0;
+
+      if (keys.up) moveY -= 1;
+      if (keys.down) moveY += 1;
+      if (keys.left) moveX -= 1;
+      if (keys.right) moveX += 1;
+
+      if (joystick.active) {
+        moveX = joystick.dx;
+        moveY = joystick.dy;
+      }
+
+      if (moveX !== 0 || moveY !== 0) {
+        localPlayer.isMoving = true;
+        const len = Math.hypot(moveX, moveY);
+        localPlayer.x += (moveX / len) * localPlayer.speed;
+        localPlayer.y += (moveY / len) * localPlayer.speed;
+        localPlayer.bouncePhase += 0.2;
+
+        if (Math.abs(moveX) > Math.abs(moveY)) {
+          localPlayer.direction = moveX > 0 ? 'right' : 'left';
+        } else {
+          localPlayer.direction = moveY > 0 ? 'down' : 'up';
+        }
+      } else {
+        localPlayer.isMoving = false;
+      }
+
+      // Jump Physics
+      if (localPlayer.isJumping) {
+        localPlayer.jumpOffset += localPlayer.jumpVelocity;
+        localPlayer.jumpVelocity -= 0.6;
+        if (localPlayer.jumpOffset <= 0) {
+          localPlayer.jumpOffset = 0;
+          localPlayer.isJumping = false;
+          playSound('bounce');
+        }
+      }
+
+      // Boundary clamping
+      localPlayer.x = Math.max(40, Math.min(canvas.width - 40, localPlayer.x));
+      localPlayer.y = Math.max(60, Math.min(canvas.height - 40, localPlayer.y));
+
+      broadcastState();
+    }
+
+    function triggerJump() {
+      if (!localPlayer.isJumping) {
+        localPlayer.isJumping = true;
+        localPlayer.jumpVelocity = 10;
+        playSound('jump');
+      }
+    }
+
+    function triggerEmote(emoji) {
+      localPlayer.activeEmote = emoji;
+      localPlayer.speechBubble = { text: emoji, time: Date.now() };
+      broadcastState();
+      playSound('emote');
+      setTimeout(() => { localPlayer.activeEmote = null; }, 2500);
+    }
+
+    // --- RENDERING CANVAS WORLD ---
+    function renderGameWorld() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Environment Background based on room
+      if (currentChannel === 'zen-garden') {
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, '#2d1529');
+        grad.addColorStop(1, '#180914');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw falling Sakura petals
+        ctx.fillStyle = 'rgba(244, 114, 182, 0.65)';
+        petals.forEach(p => {
+          p.y += p.speedY;
+          p.x += p.speedX + Math.sin(p.y * 0.02) * 0.5;
+          p.rotation += p.rotSpeed;
+          if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+      } else if (currentChannel === 'neon-arcade') {
+        ctx.fillStyle = '#0f0518';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Draw arcade neon grid lines
+        ctx.strokeStyle = 'rgba(236, 72, 153, 0.15)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < canvas.width; x += 40) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += 40) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+      } else if (currentChannel === 'onsen-hotspring') {
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Draw hot spring pool
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+        ctx.beginPath();
+        ctx.ellipse(canvas.width / 2, canvas.height / 2, canvas.width * 0.35, canvas.height * 0.28, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Draw rising steam
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        steamParticles.forEach(s => {
+          s.y -= s.speedY;
+          s.r += 0.05;
+          if (s.y < canvas.height / 2 - 100) { s.y = canvas.height / 2 + 50; s.r = Math.random() * 12 + 8; }
+          ctx.beginPath();
+          ctx.arc(s.x + Math.sin(s.y * 0.03) * 20, s.y, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      // Render Collectibles if Mini-Game Active
+      if (activeMiniGame === 'petal-catch') {
+        ctx.fillStyle = '#f472b6';
+        gameCollectibles.forEach(c => {
+          c.y += c.speed;
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      // Render Remote Players
+      Object.values(remotePlayers).forEach(p => {
+        drawSlime(p.x, p.y, p.name, p.avatarType, p.jumpOffset || 0, p.isMoving, p.speechBubble, p.role, p.equippedAura);
+      });
+
+      // Render Local Player
+      drawSlime(localPlayer.x, localPlayer.y, localPlayer.name, localPlayer.avatarType, localPlayer.jumpOffset, localPlayer.isMoving, localPlayer.speechBubble, localPlayer.role, localPlayer.equippedAura);
+    }
+
+    function drawSlime(x, y, name, avatarType, jumpOffset, isMoving, speechBubble, role, aura) {
+      ctx.save();
+      ctx.translate(x, y - jumpOffset);
+
+      const avatarData = AVATAR_TYPES[avatarType] || AVATAR_TYPES.sakura;
+      let baseColor = avatarData.bodyColor;
+      if (role === 'dev') baseColor = '#38bdf8';
+      if (role === 'admin') baseColor = '#1e293b';
+
+      // Draw Aura Glow if Dev, Admin, or Equipped Aura
+      if (role === 'dev' || aura === 'aura_ice') {
+        ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 22;
+      } else if (role === 'admin') {
+        ctx.shadowColor = '#ef4444'; ctx.shadowBlur = 22;
+      } else if (aura === 'aura_pink') {
+        ctx.shadowColor = '#f472b6'; ctx.shadowBlur = 22;
+      } else if (aura === 'aura_god') {
+        ctx.shadowColor = '#a855f7'; ctx.shadowBlur = 25;
+      }
+
+      // Slime Body Squish & Stretch
+      const squish = isMoving ? Math.sin(Date.now() * 0.02) * 4 : 0;
+      ctx.fillStyle = baseColor;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 24 + squish, 20 - squish, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0; // reset shadow
+
+      // Slime Eyes
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-7, -4, 4.5, 0, Math.PI * 2);
+      ctx.arc(7, -4, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#180914';
+      ctx.beginPath();
+      ctx.arc(-6, -4, 2, 0, Math.PI * 2);
+      ctx.arc(8, -4, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Accessory / Icon on Top
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(avatarData.accessory, 0, -18);
+
+      // Name & Role Tag above Slime
+      ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+      let tagText = name;
+      if (role === 'dev') tagText = '👑 [DEV] ' + name;
+      if (role === 'admin') tagText = '🛡️ [ADMIN] ' + name;
+
+      ctx.fillStyle = role === 'dev' ? '#38bdf8' : (role === 'admin' ? '#ef4444' : '#ffffff');
+      ctx.fillText(tagText, 0, -32);
+
+      // Speech Bubble Overlay
+      if (speechBubble && (Date.now() - speechBubble.time < 5000)) {
+        ctx.font = '11px sans-serif';
+        const txt = speechBubble.text;
+        const width = ctx.measureText(txt).width + 16;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92) ';
+        ctx.beginPath();
+        ctx.roundRect(-width / 2, -62, width, 24, 8);
+        ctx.fill();
+        ctx.fillStyle = '#180914';
+        ctx.fillText(txt, 0, -46);
+      }
+
+      ctx.restore();
+    }
+
+    // --- MINI-GAMES LOGIC ---
+    function startMiniGame(type) {
+      activeMiniGame = type;
+      miniGameScore = 0;
+      miniGameTimeLeft = 30;
+      const banner = document.getElementById('minigame-banner');
+      if (banner) banner.classList.remove('hidden');
+      document.getElementById('minigame-title').textContent = type === 'petal-catch' ? '🌸 Petal Catcher' : '⛩️ Shrine Dash';
+      document.getElementById('minigame-score').textContent = miniGameScore;
+      document.getElementById('minigame-timer').textContent = miniGameTimeLeft + 's';
+
+      gameCollectibles = [];
+      for (let i = 0; i < 10; i++) {
+        gameCollectibles.push({
+          x: Math.random() * (canvas.width - 50) + 25,
+          y: Math.random() * -300 - 50,
+          size: 10,
+          speed: Math.random() * 2 + 2
+        });
+      }
+
+      if (miniGameInterval) clearInterval(miniGameInterval);
+      miniGameInterval = setInterval(() => {
+        miniGameTimeLeft--;
+        document.getElementById('minigame-timer').textContent = miniGameTimeLeft + 's';
+
+        // Check collection collision with local player
+        gameCollectibles.forEach(c => {
+          const dist = Math.hypot(c.x - localPlayer.x, c.y - localPlayer.y);
+          if (dist < 30) {
+            miniGameScore += 1;
+            playSound('coin');
+            document.getElementById('minigame-score').textContent = miniGameScore;
+            c.y = -50;
+            c.x = Math.random() * (canvas.width - 50) + 25;
+          }
+          if (c.y > canvas.height) {
+            c.y = -50;
+            c.x = Math.random() * (canvas.width - 50) + 25;
+          }
+        });
+
+        if (miniGameTimeLeft <= 0) {
+          endMiniGame(false);
+        }
+      }, 1000);
+    }
+
+    function endMiniGame(quit) {
+      clearInterval(miniGameInterval);
+      const banner = document.getElementById('minigame-banner');
+      if (banner) banner.classList.add('hidden');
+      activeMiniGame = null;
+
+      if (!quit && miniGameScore > 0) {
+        const reward = Math.floor(miniGameScore * 2);
+        localPlayer.points += reward;
+        updatePointsDisplay();
+        playSound('win');
+        pushChatMessage('System', `Mini-game completed! You earned +${reward} Sakura points!`, false, 'sys');
+      }
+    }
+
+    // Slime Memory Game
+    function startMemoryGame() {
+      const modal = document.getElementById('arcade-card-modal');
+      if (modal) modal.classList.remove('hidden');
+      const emojis = ['🌸', '🐱', '🍵', '🍡'];
+      memoryCards = [...emojis, ...emojis].sort(() => Math.random() - 0.5).map((icon, idx) => ({ id: idx, icon, flipped: false, matched: false }));
+      flippedCards = [];
+      matchedPairs = 0;
+      renderMemoryGrid();
+    }
+
+    function closeMemoryGame() {
+      const modal = document.getElementById('arcade-card-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderMemoryGrid() {
+      const grid = document.getElementById('memory-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      memoryCards.forEach((card, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "h-14 rounded-xl bg-pink-100 hover:bg-pink-200 text-xl font-bold flex items-center justify-center transition shadow-sm border border-pink-200";
+        btn.textContent = (card.flipped || card.matched) ? card.icon : '❓';
+        btn.onclick = () => flipMemoryCard(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function flipMemoryCard(idx) {
+      if (flippedCards.length >= 2 || memoryCards[idx].flipped || memoryCards[idx].matched) return;
+      memoryCards[idx].flipped = true;
+      flippedCards.push(idx);
+      renderMemoryGrid();
+
+      if (flippedCards.length === 2) {
+        const [first, second] = flippedCards;
+        if (memoryCards[first].icon === memoryCards[second].icon) {
+          memoryCards[first].matched = true;
+          memoryCards[second].matched = true;
+          matchedPairs++;
+          flippedCards = [];
+          playSound('coin');
+          if (matchedPairs === 4) {
+            localPlayer.points += 3;
+            updatePointsDisplay();
+            playSound('win');
+            document.getElementById('memory-status').textContent = 'You won +3 points! 🎉';
+          }
+        } else {
+          setTimeout(() => {
+            memoryCards[first].flipped = false;
+            memoryCards[second].flipped = false;
+            flippedCards = [];
+            renderMemoryGrid();
+          }, 800);
+        }
+      }
+    }
+
+    // --- MARKETPLACE & TRY-ON PREVIEW ---
+    function toggleMarketplaceModal() {
+      const modal = document.getElementById('marketplace-modal');
+      if (modal) modal.classList.toggle('hidden');
+      renderStoreItems();
+    }
+
+    function renderStoreItems() {
+      const grid = document.getElementById('store-items-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      STORE_ITEMS.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "glass p-3 rounded-2xl border border-pink-200 flex flex-col items-center justify-between space-y-2 text-center shadow-sm";
+        div.innerHTML = `
+          <span class="text-3xl">${item.icon}</span>
+          <div>
+            <h4 class="font-bold text-pink-950 text-xs">${item.name}</h4>
+            <span class="text-[10px] font-black text-amber-600">${item.price} pts</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1 w-full">
+            <button onclick="tryOnItem('${item.type}', '${item.id}')" class="py-1 rounded-xl bg-pink-100 hover:bg-pink-200 text-pink-900 text-[10px] font-bold">Try On</button>
+            <button onclick="buyStoreItem('${item.id}', ${item.price})" class="py-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold">Buy</button>
+          </div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    function tryOnItem(type, id) {
+      if (type === 'accessory') localPlayer.equippedAccessory = id;
+      if (type === 'aura') localPlayer.equippedAura = id;
+      playSound('emote');
+    }
+
+    function buyStoreItem(id, price) {
+      if (localPlayer.points >= price) {
+        localPlayer.points -= price;
+        updatePointsDisplay();
+        playSound('win');
+        alert('Successfully purchased item!');
+      } else {
+        alert('Not enough Sakura points! Play mini-games or hang out in the park.');
+      }
+    }
+
+    // --- SETTINGS & DEV PASSCODE ---
+    function toggleSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      if (modal) modal.classList.toggle('hidden');
+      renderAvatarPicker();
+    }
+
+    function renderAvatarPicker() {
+      const picker = document.getElementById('avatar-picker');
+      if (!picker) return;
+      picker.innerHTML = '';
+      Object.keys(AVATAR_TYPES).forEach(key => {
+        const data = AVATAR_TYPES[key];
+        const btn = document.createElement('button');
+        btn.className = `p-2.5 rounded-2xl border flex items-center gap-2 transition ${localPlayer.avatarType === key ? 'bg-pink-100 border-pink-500 shadow-sm' : 'glass border-pink-200'}`;
+        btn.innerHTML = `<span class="text-xl">${data.accessory}</span> <span class="text-xs font-bold text-pink-950">${data.name}</span>`;
+        btn.onclick = () => {
+          localPlayer.avatarType = key;
+          localStorage.setItem('sakura_avatar_type', key);
+          renderAvatarPicker();
+        };
+        picker.appendChild(btn);
+      });
+      document.getElementById('setting-username').value = localPlayer.name;
+    }
+
+    function saveAvatarSettings() {
+      const nameInput = document.getElementById('setting-username').value.trim();
+      if (nameInput) {
+        localPlayer.name = nameInput;
+        localStorage.setItem('sakura_avatar_name', nameInput);
+      }
+      toggleSettingsModal();
+      broadcastState();
+    }
+
+    function checkDevPasscode(val) {
+      if (val === '1357') {
+        localPlayer.role = 'dev';
+        document.getElementById('admin-panel-trigger').classList.remove('hidden');
+        playSound('win');
+      }
+    }
+
+    function toggleAdminPanel() {
+      const modal = document.getElementById('admin-panel-modal');
+      if (modal) modal.classList.toggle('hidden');
+    }
+
+    function adminAction(action) {
+      const target = document.getElementById('admin-target-user').value.trim();
+      if (!target && action !== 'music') {
+        alert('Please enter a target username.');
+        return;
+      }
+      if (action === 'add-points') {
+        localPlayer.points += 1000;
+        updatePointsDisplay();
+        alert('Granted +1000 points!');
+      } else if (action === 'grant-admin') {
+        alert(`Granted Admin privileges to ${target}`);
+      } else if (action === 'revoke-admin') {
+        alert(`Revoked Admin privileges from ${target}`);
+      } else {
+        alert(`Executed action [${action}] on ${target}`);
+      }
+      toggleAdminPanel();
+    }
+
+    function toggleChatSidebar() {
+      const sidebar = document.getElementById('chat-sidebar');
+      if (sidebar) sidebar.classList.toggle('translate-x-full');
+    }
+
+    // --- INPUT & TOUCH EVENT LISTENERS ---
+    window.addEventListener('keydown', (e) => {
+      if (['ArrowUp', 'KeyW'].includes(e.code)) keys.up = true;
+      if (['ArrowDown', 'KeyS'].includes(e.code)) keys.down = true;
+      if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = true;
+      if (['ArrowRight', 'KeyD'].includes(e.code)) keys.right = true;
+      if (e.code === 'Space') triggerJump();
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (['ArrowUp', 'KeyW'].includes(e.code)) keys.up = false;
+      if (['ArrowDown', 'KeyS'].includes(e.code)) keys.down = false;
+      if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = false;
+      if (['ArrowRight', 'KeyD'].includes(e.code)) keys.right = false;
+    });
+
+    // Mobile Joystick Setup
+    const joystickBase = document.getElementById('joystick-container');
+    const joystickStick = document.getElementById('joystick-stick');
+    let joystickTouchId = null;
+
+    if (joystickBase && joystickStick) {
+      joystickBase.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        joystick.active = true;
+        joystickTouchId = e.targetTouches[0].identifier;
+      });
+
+      window.addEventListener('touchmove', (e) => {
+        if (!joystick.active) return;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          if (t.identifier === joystickTouchId) {
+            const rect = joystickBase.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const dx = t.clientX - centerX;
+            const dy = t.clientY - centerY;
+            const dist = Math.hypot(dx, dy);
+            const maxRadius = 35;
+
+            const angle = Math.atan2(dy, dx);
+            const clampedDist = Math.min(dist, maxRadius);
+            const stickX = Math.cos(angle) * clampedDist;
+            const stickY = Math.sin(angle) * clampedDist;
+
+            joystickStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
+            joystick.dx = stickX / maxRadius;
+            joystick.dy = stickY / maxRadius;
+          }
+        }
+      });
+
+      window.addEventListener('touchend', (e) => {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === joystickTouchId) {
+            joystick.active = false;
+            joystick.dx = 0;
+            joystick.dy = 0;
+            joystickStick.style.transform = 'translate(0px, 0px)';
+          }
+        }
+      });
+    }
+
+    // --- MAIN INITIALIZATION & ANIMATION LOOP ---
+    window.onload = function () {
+      resizeCanvas();
+      initEnvironmentElements();
+      lucide.createIcons();
+      renderChatMessages();
+      renderFriendsList();
+      renderStoreItems();
+      updatePointsDisplay();
+
+      // Start main game loop
+      function gameLoop() {
+        updateGamePhysics();
+        renderGameWorld();
+        requestAnimationFrame(gameLoop);
+      }
+      requestAnimationFrame(gameLoop);
+    };
+  </script>
+</body>
+</html>
