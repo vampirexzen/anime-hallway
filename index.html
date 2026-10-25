@@ -213,7 +213,7 @@
       <!-- Player Points Badge -->
       <div class="flex items-center gap-1.5 px-3 py-1 rounded-2xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-extrabold shadow-sm">
         <span class="text-sm">🪙</span>
-        <span id="player-points-display">10,000</span>
+        <span id="player-points-display">0</span>
       </div>
 
       <!-- Music Toggle -->
@@ -235,8 +235,12 @@
         <span class="hidden sm:inline">Inventory</span>
       </button>
 
-      <button onclick="openMemoriesModal()" class="mobile-top-action p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-emerald-600 active:scale-95" title="Slime Memories">
-        <i data-lucide="brain" class="w-4 h-4"></i><span class="hidden sm:inline">Memories</span>
+      <button onclick="openGamesModal()" class="mobile-top-action p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-emerald-600 active:scale-95" title="Games">
+        <i data-lucide="gamepad-2" class="w-4 h-4"></i><span class="hidden sm:inline">Games</span>
+      </button>
+
+      <button onclick="openNoticeBoard()" class="mobile-top-action p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-amber-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-amber-600 active:scale-95" title="Notice Board">
+        <i data-lucide="scroll-text" class="w-4 h-4"></i><span class="hidden sm:inline">Notices</span>
       </button>
 
       <!-- Chat button stays in the top toolbar on mobile, next to Friends. -->
@@ -270,9 +274,6 @@
       <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[95vw] overflow-x-auto">
         <button onclick="switchChannel('sakura-lounge')" id="quick-btn-sakura-lounge" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap">
           🌸 Zen Garden
-        </button>
-        <button onclick="switchChannel('arcade-lounge')" id="quick-btn-arcade-lounge" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
-          🕹️ Neon Arcade
         </button>
         <button onclick="switchChannel('onsen-hotspring')" id="quick-btn-onsen-hotspring" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
           🎋 Onsen Spring
@@ -309,6 +310,15 @@
         <button onclick="triggerJump()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-xs font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
           JUMP
         </button>
+      </div>
+
+      <div id="player-card" class="absolute z-30 hidden w-52 rounded-2xl glass p-3 shadow-xl border border-pink-200">
+        <div class="flex items-center gap-2">
+          <div id="player-card-avatar"></div>
+          <div class="min-w-0 flex-1"><p id="player-card-name" class="truncate text-xs font-extrabold text-pink-950"></p><p id="player-card-status" class="text-[10px] text-pink-700"></p></div>
+          <button onclick="closePlayerCard()" class="text-pink-700 p-1" aria-label="Close player card">✕</button>
+        </div>
+        <button id="player-card-action" onclick="handlePlayerCardAction()" class="mt-2 w-full rounded-xl bg-sky-500 py-2 text-xs font-bold text-white"></button>
       </div>
     </div>
 
@@ -424,6 +434,13 @@
             />
           </div>
 
+          <div class="flex items-center gap-1 overflow-x-auto pb-2 shrink-0" id="inventory-category-tabs">
+            <button onclick="filterInventoryCategory('skins')" id="icat-skins" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-active">Skins</button>
+            <button onclick="filterInventoryCategory('accessories')" id="icat-accessories" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-inactive">Accessories</button>
+            <button onclick="filterInventoryCategory('titles')" id="icat-titles" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-inactive">Titles</button>
+            <button onclick="filterInventoryCategory('profile')" id="icat-profile" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-inactive">Profile</button>
+            <button onclick="filterInventoryCategory('emotes')" id="icat-emotes" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-inactive">Emotes</button>
+          </div>
           <div id="inventory-items-grid" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 flex-1"></div>
         </div>
       </div>
@@ -488,6 +505,24 @@
     </div>
   </div>
 
+  <!-- GAMES PICKER -->
+  <div id="games-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+    <div class="glass w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white">
+      <div class="flex items-center justify-between border-b border-emerald-200 pb-3">
+        <div><h3 class="font-extrabold text-emerald-950 text-lg">Slime Games</h3><p class="text-[10px] text-emerald-700">Win a game to earn 5 points.</p></div>
+        <button onclick="closeGamesModal()" class="text-emerald-800 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
+        <button onclick="openMemoriesModal()" class="rounded-2xl border border-pink-200 bg-gradient-to-br from-pink-100 to-rose-50 p-4 text-left shadow-sm hover:shadow-md">
+          <span class="text-3xl">🧠</span><span class="mt-2 block text-sm font-extrabold text-pink-950">Slime Memories</span><span class="mt-1 block text-[10px] text-pink-700">Flip cards and find all matching pairs.</span>
+        </button>
+        <button onclick="openSequenceGame()" class="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-100 to-indigo-50 p-4 text-left shadow-sm hover:shadow-md">
+          <span class="text-3xl">🔮</span><span class="mt-2 block text-sm font-extrabold text-violet-950">Slime Sequence</span><span class="mt-1 block text-[10px] text-violet-700">Watch the sticker pattern, then repeat it.</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- SLIME MEMORIES GAME -->
   <div id="memories-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
     <div class="glass w-full max-w-md rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
@@ -506,6 +541,37 @@
     </div>
   </div>
 
+  <!-- SLIME SEQUENCE GAME -->
+  <div id="sequence-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+    <div class="glass w-full max-w-md rounded-3xl p-4 sm:p-6 shadow-2xl border border-white">
+      <div class="flex items-center justify-between border-b border-violet-200 pb-3">
+        <div><h3 class="font-extrabold text-violet-950 text-base sm:text-lg">Slime Sequence</h3><p class="text-[10px] text-violet-700">Repeat the 8-step sticker pattern to win 5 points.</p></div>
+        <button onclick="closeSequenceGame()" class="text-violet-800 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <p id="sequence-status" class="py-3 text-center text-xs font-bold text-violet-900">Press Start when you are ready.</p>
+      <div id="sequence-grid" class="grid grid-cols-2 gap-3"></div>
+      <button onclick="startSequenceGame()" class="mt-4 w-full rounded-xl bg-violet-500 py-2.5 text-xs font-bold text-white">Start game</button>
+    </div>
+  </div>
+
+  <!-- SHARED NOTICE BOARD. Writers are limited by trusted Supabase app metadata and database RLS. -->
+  <div id="notice-board-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+    <div class="glass w-full max-w-xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
+      <div class="flex items-center justify-between border-b border-amber-200 pb-3">
+        <div><h3 class="font-extrabold text-amber-950 text-base sm:text-lg">Notice Board</h3><p class="text-[10px] text-amber-700">News from the Sakura Slime team</p></div>
+        <button onclick="closeNoticeBoard()" class="text-amber-800 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <p id="notice-board-status" class="py-2 text-xs text-amber-900"></p>
+      <div id="notice-board-list" class="flex-1 overflow-y-auto space-y-2"></div>
+      <form id="notice-post-form" onsubmit="postNotice(event)" class="hidden mt-4 space-y-2 border-t border-amber-200 pt-3">
+        <p class="text-[10px] font-extrabold uppercase text-amber-800">Admin / developer post</p>
+        <input id="notice-title-input" maxlength="80" required placeholder="Notice title" class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950" />
+        <textarea id="notice-body-input" maxlength="1200" required rows="3" placeholder="Write a notice for players..." class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950"></textarea>
+        <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white">Post notice</button>
+      </form>
+    </div>
+  </div>
+
   <!-- PROFILE & SETTINGS MODAL -->
   <div id="settings-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 max-h-[90dvh] overflow-y-auto">
@@ -519,19 +585,14 @@
         </button>
       </div>
 
-      <!-- Avatar Profile Picture Selection -->
-      <div class="space-y-1">
-        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Profile Icon Picture</label>
-        <div class="grid grid-cols-4 gap-2" id="pfp-picker-grid"></div>
-      </div>
-
       <div class="space-y-2">
         <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Profile Image</label>
         <div class="flex items-center gap-3 rounded-2xl border border-pink-200 bg-pink-50/80 p-2.5">
           <div id="profile-avatar-preview" class="w-12 h-12 rounded-full bg-white border-2 border-pink-200 flex items-center justify-center overflow-hidden text-2xl">🌸</div>
           <div class="min-w-0 flex-1">
             <input id="profile-image-input" type="file" accept="image/*" onchange="handleProfileImageUpload(event)" class="block w-full text-[10px] text-pink-800 file:mr-2 file:rounded-lg file:border-0 file:bg-pink-500 file:px-2 file:py-1 file:text-[10px] file:font-bold file:text-white" />
-            <button type="button" onclick="clearProfileImage()" class="mt-1 text-[10px] font-bold text-pink-600 hover:text-pink-900">Use selected sticker instead</button>
+            <p class="mt-1 text-[9px] text-pink-600">No image? Your equipped profile sticker is used automatically.</p>
+            <button type="button" onclick="clearProfileImage()" class="mt-1 text-[10px] font-bold text-pink-600 hover:text-pink-900">Use default sticker</button>
           </div>
         </div>
       </div>
@@ -610,7 +671,7 @@
       y: 600,
       vx: 0,
       vy: 0,
-      points: Number.parseInt(localStorage.getItem('sakura_points') || '10000', 10) || 0,
+      points: Number.parseInt(localStorage.getItem('sakura_points') || '0', 10) || 0,
       equippedSkin: localStorage.getItem('sakura_eq_skin') || 'skin_pink',
       equippedAcc: localStorage.getItem('sakura_eq_acc') || null,
       equippedTitle: localStorage.getItem('sakura_eq_title') || null,
@@ -630,7 +691,13 @@
     const savedSticker = PROFILE_STICKERS.find(sticker => sticker.icon === localPlayer.pfp);
     if (savedSticker && !localPlayer.inventory.includes(savedSticker.id)) localPlayer.inventory.push(savedSticker.id);
     localStorage.setItem('sakura_inv', JSON.stringify(localPlayer.inventory));
+    if (localStorage.getItem('sakura_economy_v2') !== '1') {
+      localPlayer.points = 0;
+      localStorage.setItem('sakura_points', '0');
+      localStorage.setItem('sakura_economy_v2', '1');
+    }
 
+    let authUser = null;
     let remotePlayers = {};
     const isValidUserId = value => typeof value === 'string' && value.trim() && value !== 'undefined' && value !== 'null';
     let friendList = (Array.isArray(loadStoredJson('sakura_friends', [])) ? loadStoredJson('sakura_friends', []) : []).filter(f => f && isValidUserId(f.id) && typeof f.name === 'string' && f.name.trim() && f.name !== 'undefined');
@@ -643,6 +710,7 @@
     let activeDMUserId = null;
     let currentChannel = 'sakura-lounge';
     let realtimeChannel = null;
+    let selectedPlayerId = null;
     let lastStateBroadcastAt = 0;
 
     // Keys & Joystick Input
@@ -810,8 +878,7 @@
 
     function drawZoneDecorations() {
       const garden = currentChannel === 'sakura-lounge';
-      const arcade = currentChannel === 'arcade-lounge';
-      ctx.fillStyle = garden ? '#f8e7ed' : arcade ? '#100b2d' : '#e2efd9';
+      ctx.fillStyle = garden ? '#f8e7ed' : '#c3d8a9';
       ctx.fillRect(0, 0, 2100, 2100);
 
       if (garden) {
@@ -835,18 +902,16 @@
           ctx.fillStyle='#8c6a5d';ctx.fillRect(x-22,y-5,44,10);ctx.fillRect(x-17,y+5,5,18);ctx.fillRect(x+12,y+5,5,18);
           ctx.fillStyle='#bb8e80';ctx.fillRect(x-25,y-11,50,7);
         });
-        for(let i=0;i<70;i++){const x=(i*173+91)%2050,y=(i*271+53)%2050;ctx.fillStyle='rgba(236,72,153,.27)';ctx.beginPath();ctx.ellipse(x,y,3,6,(i%7)*.3,0,Math.PI*2);ctx.fill();}
-        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(131,24,67,.55)';ctx.fillText('🌸 SAKURA ZEN PARK',75,78);
-      } else if (arcade) {
-        ctx.strokeStyle='rgba(34,211,238,.18)';ctx.lineWidth=2;
-        for(let n=0;n<=2100;n+=80){ctx.beginPath();ctx.moveTo(n,0);ctx.lineTo(n,2100);ctx.stroke();ctx.beginPath();ctx.moveTo(0,n);ctx.lineTo(2100,n);ctx.stroke();}
-        ctx.fillStyle='#28204a';ctx.fillRect(145,300,180,86);ctx.fillRect(440,300,180,86);ctx.fillRect(735,300,180,86);ctx.fillRect(1030,300,180,86);ctx.fillRect(1325,300,180,86);ctx.fillRect(1620,300,180,86);
-        const machines=[[230,343,'💖'],[525,343,'👾'],[820,343,'🛸'],[1115,343,'🎮'],[1410,343,'⭐'],[1705,343,'🍬']];
-        machines.forEach(([x,y,icon],i)=>{ctx.save();ctx.shadowColor=i%2?'#f472b6':'#22d3ee';ctx.shadowBlur=20;ctx.strokeStyle=i%2?'#f472b6':'#22d3ee';ctx.lineWidth=3;ctx.strokeRect(x-40,y-50,80,104);ctx.restore();ctx.fillStyle='#190f35';ctx.fillRect(x-34,y-44,68,43);ctx.font='25px sans-serif';ctx.textAlign='center';ctx.fillText(icon,x,y-12);ctx.fillStyle='#a78bfa';ctx.fillRect(x-30,y+8,60,8);ctx.fillStyle='#f8fafc';ctx.font='10px sans-serif';ctx.fillText('PLAY',x,y+38);});
-        ctx.fillStyle='rgba(244,114,182,.24)';ctx.fillRect(120,850,1860,28);ctx.fillRect(120,1450,1860,28);
-        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='#c4b5fd';ctx.fillText('🕹️ NEON ARCADE',75,78);
+        const petalsTime = Date.now();
+        for(let i=0;i<64;i++){
+          const y=(i*271+petalsTime*.045)%2100;
+          const x=(i*173+Math.sin(petalsTime*.001+i)*34+2100)%2100;
+          ctx.save();ctx.translate(x,y);ctx.rotate((petalsTime*.001+i)%Math.PI);
+          ctx.fillStyle=i%3===0?'rgba(255,208,220,.88)':'rgba(236,72,153,.55)';
+          ctx.beginPath();ctx.ellipse(0,0,4,8,0,0,Math.PI*2);ctx.fill();ctx.restore();
+        }
+        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(131,24,67,.55)';ctx.fillText('🌸 SAKURA ZEN GARDEN',75,78);
       } else {
-        ctx.fillStyle='#c3d8a9';ctx.fillRect(0,0,2100,2100);
         ctx.fillStyle='#d4bd91';ctx.fillRect(120,520,1860,155);ctx.fillRect(930,120,155,1860);
         ctx.strokeStyle='rgba(119,89,56,.23)';ctx.lineWidth=4;
         for(let n=130;n<1980;n+=72){ctx.beginPath();ctx.moveTo(n,520);ctx.lineTo(n,675);ctx.stroke();ctx.beginPath();ctx.moveTo(930,n);ctx.lineTo(1085,n);ctx.stroke();}
@@ -854,7 +919,7 @@
         ctx.fillStyle='rgba(255,255,255,.65)';ctx.beginPath();ctx.ellipse(1360,1205,82,19,-.2,0,Math.PI*2);ctx.fill();
         for(let i=0;i<14;i++){const x=160+(i*149)%1780,y=150+(i*263)%1780;ctx.strokeStyle='#47794b';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x,y+54);ctx.lineTo(x,y-50-(i%3)*16);ctx.stroke();for(let j=0;j<5;j++){ctx.fillStyle=j%2?'#6caa65':'#83b777';ctx.beginPath();ctx.ellipse(x+(j%2?10:-10),y-30-j*12,9,17,j%2?.6:-.6,0,Math.PI*2);ctx.fill();}}
         [[690,760],[1270,790],[680,1500],[1720,430]].forEach(([x,y])=>{ctx.fillStyle='#77796d';ctx.beginPath();ctx.ellipse(x,y,35,22,.1,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9a9b8f';ctx.beginPath();ctx.ellipse(x-5,y-7,22,11,0,0,Math.PI*2);ctx.fill();});
-        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(52,83,43,.65)';ctx.fillText('🎋 ONSEN GARDEN',75,78);
+        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(52,83,43,.65)';ctx.fillText('🎋 ONSEN SPRING',75,78);
       }
     }
 
@@ -866,8 +931,8 @@
       const inputLength = Math.hypot(dx, dy);
       if (inputLength > 1) { dx /= inputLength; dy /= inputLength; }
       const blend = Math.min(1, dt * 12);
-      localPlayer.vx += (dx * 190 - localPlayer.vx) * blend;
-      localPlayer.vy += (dy * 190 - localPlayer.vy) * blend;
+      localPlayer.vx += (dx * 260 - localPlayer.vx) * blend;
+      localPlayer.vy += (dy * 260 - localPlayer.vy) * blend;
       localPlayer.x = Math.max(50, Math.min(2050, localPlayer.x + localPlayer.vx * dt));
       localPlayer.y = Math.max(50, Math.min(2050, localPlayer.y + localPlayer.vy * dt));
       localPlayer.landingSquash = Math.max(0, localPlayer.landingSquash - dt * 4.5);
@@ -892,10 +957,21 @@
       camera.y += (localPlayer.y - canvas.height / 2 - camera.y) * Math.min(1, dt * 8);
 
       const now = performance.now();
-      if (now - lastStateBroadcastAt > 100) {
+      if (now - lastStateBroadcastAt > 50 && (Math.hypot(localPlayer.vx, localPlayer.vy) > 1.8 || localPlayer.isJumping)) {
         lastStateBroadcastAt = now;
         broadcastPlayerState();
       }
+      updateRemotePlayerMotion(dt);
+    }
+
+    function updateRemotePlayerMotion(dt) {
+      const blend = 1 - Math.exp(-dt * 20);
+      Object.values(remotePlayers).forEach(player => {
+        if (!Number.isFinite(player.displayX)) player.displayX = player.x;
+        if (!Number.isFinite(player.displayY)) player.displayY = player.y;
+        player.displayX += (player.x - player.displayX) * blend;
+        player.displayY += (player.y - player.displayY) * blend;
+      });
     }
 
     function renderGameWorld() {
@@ -907,9 +983,11 @@
 
       // Draw Remote Players
       Object.values(remotePlayers).forEach(p => {
-        drawSlimeModel(ctx, p.x, p.y, p.equippedSkin, p.equippedAcc, p.equippedTitle, p.isJumping, p.jumpOffset, p.activeSpecialEmote, false);
-
-        drawPlayerLabel(ctx, p);
+        const playerX = Number.isFinite(p.displayX) ? p.displayX : p.x;
+        const playerY = Number.isFinite(p.displayY) ? p.displayY : p.y;
+        const displayPlayer = { ...p, x: playerX, y: playerY };
+        drawSlimeModel(ctx, playerX, playerY, p.equippedSkin, p.equippedAcc, p.equippedTitle, p.isJumping, p.jumpOffset, p.activeSpecialEmote, false);
+        drawPlayerLabel(ctx, displayPlayer);
       });
 
       // Draw Local Player Slime
@@ -936,23 +1014,60 @@
       const clickWorldY = e.clientY - rect.top + camera.y;
 
       // Check click on remote player slimes
-      Object.values(remotePlayers).forEach(p => {
-        const dist = Math.hypot(p.x - clickWorldX, p.y - clickWorldY);
-        if (dist < 35) {
-          promptAddFriend(p);
-        }
+      let closest = null;
+      Object.values(remotePlayers).forEach(player => {
+        const x = Number.isFinite(player.displayX) ? player.displayX : player.x;
+        const y = Number.isFinite(player.displayY) ? player.displayY : player.y;
+        const distance = Math.hypot(x - clickWorldX, y - clickWorldY);
+        if (distance < 38 && (!closest || distance < closest.distance)) closest = { player, distance };
       });
+      if (closest) showPlayerCard(closest.player);
     });
 
-    function promptAddFriend(player) {
-      if (friendList.some(friend => friend.id === player.id)) return;
-      if (confirm(`Send ${player.name} a friend request?`)) {
-        sendFriendRequest(player.id, player.name, player.pfp, player.avatarUrl);
-      }
+    function closePlayerCard() {
+      document.getElementById('player-card').classList.add('hidden');
+      selectedPlayerId = null;
+    }
+
+    function showPlayerCard(player) {
+      if (!player || !isValidUserId(player.id)) return;
+      selectedPlayerId = player.id;
+      const card = document.getElementById('player-card');
+      const avatar = document.getElementById('player-card-avatar');
+      avatar.innerHTML = '';
+      avatar.appendChild(makeAvatar(player, 'w-10 h-10'));
+      document.getElementById('player-card-name').textContent = player.name || 'Slime';
+      const action = document.getElementById('player-card-action');
+      const status = document.getElementById('player-card-status');
+      const friend = friendList.some(item => item.id === player.id);
+      const incoming = friendRequests.some(item => item.senderId === player.id);
+      const sent = outgoingFriendRequests.some(item => item.targetId === player.id);
+      if (friend) { action.textContent = 'Already Friends'; action.disabled = true; status.textContent = 'You are friends'; }
+      else if (incoming) { action.textContent = 'Accept Request'; action.disabled = false; status.textContent = 'This player sent you a request'; }
+      else if (sent) { action.textContent = 'Request Sent'; action.disabled = true; status.textContent = 'Waiting for their reply'; }
+      else { action.textContent = 'Add Friend'; action.disabled = false; status.textContent = 'Online in this room'; }
+      action.className = `mt-2 w-full rounded-xl py-2 text-xs font-bold text-white ${action.disabled ? 'bg-slate-400' : incoming ? 'bg-emerald-500' : 'bg-sky-500'}`;
+      card.classList.remove('hidden');
+      const container = document.getElementById('canvas-container');
+      const x = (Number.isFinite(player.displayX) ? player.displayX : player.x) - camera.x;
+      const y = (Number.isFinite(player.displayY) ? player.displayY : player.y) - camera.y;
+      const left = Math.max(8, Math.min(container.clientWidth - card.offsetWidth - 8, x - card.offsetWidth / 2));
+      const top = Math.max(8, Math.min(container.clientHeight - card.offsetHeight - 8, y - card.offsetHeight - 54));
+      card.style.left = `${left}px`; card.style.top = `${top}px`;
+    }
+
+    function handlePlayerCardAction() {
+      const player = remotePlayers[selectedPlayerId];
+      if (!player) { closePlayerCard(); return; }
+      if (friendList.some(friend => friend.id === player.id)) { showPlayerCard(player); return; }
+      if (friendRequests.some(request => request.senderId === player.id)) acceptFriendRequest(player.id);
+      else sendFriendRequest(player.id, player.name, player.pfp, player.avatarUrl);
+      showPlayerCard(player);
     }
 
     // --- MARKET & INVENTORY SYSTEM ---
     let activeMarketCategory = 'accessories';
+    let activeInventoryCategory = 'skins';
     let marketTestingItem = null;
 
     function openMarketModal() {
@@ -1028,6 +1143,7 @@
       localPlayer.points -= item.price;
       localPlayer.inventory.push(item.id);
       savePlayerToStorage();
+      persistProfileToAuth();
       playSound('buy');
       updateUIHeader();
       renderMarketGrid();
@@ -1073,14 +1189,27 @@
       document.getElementById('inventory-modal').classList.add('hidden');
     }
 
+    function filterInventoryCategory(category) {
+      activeInventoryCategory = category;
+      ['skins', 'accessories', 'titles', 'profile', 'emotes'].forEach(name => {
+        const button = document.getElementById('icat-' + name);
+        button.className = `px-2.5 py-1 rounded-xl text-[10px] font-bold ${name === category ? 'tab-active' : 'tab-inactive'}`;
+      });
+      renderInventoryGrid();
+    }
+
     function renderInventoryGrid() {
       const grid = document.getElementById('inventory-items-grid');
       const search = document.getElementById('inv-search-input').value.toLowerCase();
       grid.innerHTML = '';
 
-      const allItems = [].concat(...Object.values(MARKET_ITEMS));
-      const ownedItems = allItems.filter(i => localPlayer.inventory.includes(i.id) && i.name.toLowerCase().includes(search));
-
+      const ownedItems = (MARKET_ITEMS[activeInventoryCategory] || []).filter(i => localPlayer.inventory.includes(i.id) && i.name.toLowerCase().includes(search));
+      if (!ownedItems.length) {
+        const empty = document.createElement('p');
+        empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-purple-700';
+        empty.textContent = 'Nothing here yet. Find items in the market.';
+        grid.appendChild(empty);
+      }
       ownedItems.forEach(item => {
         const isEquipped = localPlayer.equippedSkin === item.id || localPlayer.equippedAcc === item.id || localPlayer.equippedTitle === item.id || (item.type === 'profile' && localPlayer.pfp === item.icon && !localPlayer.avatarUrl);
         const card = document.createElement('div');
@@ -1101,7 +1230,7 @@
     function equipInventoryItem(itemId) {
       const allItems = [].concat(...Object.values(MARKET_ITEMS));
       const item = allItems.find(i => i.id === itemId);
-      if (!item) return;
+      if (!item || !localPlayer.inventory.includes(item.id)) return;
 
       if (item.type === 'skins') localPlayer.equippedSkin = item.id;
       if (item.type === 'accessories') localPlayer.equippedAcc = localPlayer.equippedAcc === item.id ? null : item.id;
@@ -1117,8 +1246,8 @@
       savePlayerToStorage();
       broadcastPlayerState();
       broadcastProfileUpdate();
+      persistProfileToAuth();
       renderAvatarPreview();
-      renderPfpPicker();
       renderInventoryGrid();
     }
 
@@ -1190,6 +1319,7 @@
       saveFriendData();
       renderFriendsList();
       if (activeDMUserId === id) renderDMBox();
+      if (selectedPlayerId === id) showPlayerCard(remotePlayers[id] || profile);
     }
 
     function sendFriendRequest(id, name, pfp, avatarUrl = '') {
@@ -1204,7 +1334,10 @@
       outgoingFriendRequests.push(request);
       localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
       sendSocialBroadcast('friend_request', { targetId: id, senderId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl });
-      handleFriendUserSearch();
+      const query = document.getElementById('friend-search-input').value.trim();
+      if (query) handleFriendUserSearch();
+      else renderFriendsList();
+      if (selectedPlayerId === id) showPlayerCard(remotePlayers[id] || { id, name, pfp, avatarUrl });
     }
 
     function receiveFriendRequest(payload) {
@@ -1213,6 +1346,7 @@
       friendRequests.push({ senderId: payload.senderId, name: typeof payload.name === 'string' && payload.name.trim() ? payload.name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(payload.pfp) ? payload.pfp : '🌸', avatarUrl: safeAvatarUrl(payload.avatarUrl), time: Date.now() });
       saveFriendData();
       renderFriendsList();
+      if (selectedPlayerId === payload.senderId) showPlayerCard(remotePlayers[payload.senderId] || payload);
     }
 
     function acceptFriendRequest(senderId) {
@@ -1309,28 +1443,30 @@
     function syncFriendProfile(player) {
       if (!player || !isValidUserId(player.id)) return;
       let changed = false;
+      const nextName = typeof player.name === 'string' && player.name.trim() ? player.name.trim() : null;
+      const nextPfp = PROFILE_PFP_OPTIONS.includes(player.pfp) ? player.pfp : null;
+      const hasAvatar = Object.prototype.hasOwnProperty.call(player, 'avatarUrl');
+      const nextAvatar = hasAvatar ? safeAvatarUrl(player.avatarUrl) : null;
       friendList.forEach(friend => {
-        if (friend.id === player.id) {
-          friend.name = player.name || friend.name;
-          friend.pfp = player.pfp || friend.pfp;
-          friend.avatarUrl = Object.prototype.hasOwnProperty.call(player, 'avatarUrl') ? safeAvatarUrl(player.avatarUrl) : (friend.avatarUrl || '');
-          changed = true;
-        }
+        if (friend.id !== player.id) return;
+        if (nextName && friend.name !== nextName) { friend.name = nextName; changed = true; }
+        if (nextPfp && friend.pfp !== nextPfp) { friend.pfp = nextPfp; changed = true; }
+        if (hasAvatar && friend.avatarUrl !== nextAvatar) { friend.avatarUrl = nextAvatar; changed = true; }
       });
       friendRequests.forEach(request => {
-        if (request.senderId === player.id) {
-          request.name = player.name || request.name;
-          request.pfp = player.pfp || request.pfp;
-          request.avatarUrl = Object.prototype.hasOwnProperty.call(player, 'avatarUrl') ? safeAvatarUrl(player.avatarUrl) : (request.avatarUrl || '');
-          changed = true;
-        }
+        if (request.senderId !== player.id) return;
+        if (nextName && request.name !== nextName) { request.name = nextName; changed = true; }
+        if (nextPfp && request.pfp !== nextPfp) { request.pfp = nextPfp; changed = true; }
+        if (hasAvatar && request.avatarUrl !== nextAvatar) { request.avatarUrl = nextAvatar; changed = true; }
       });
-      if (changed) saveFriendData();
+      if (!changed) return;
+      saveFriendData();
       if (!document.getElementById('friends-modal').classList.contains('hidden')) {
         if (document.getElementById('friend-search-input').value.trim()) handleFriendUserSearch();
         else renderFriendsList();
         if (activeDMUserId === player.id) renderDMBox();
       }
+      if (selectedPlayerId === player.id) showPlayerCard(player);
     }
 
     function selectFriendForDM(friendId) {
@@ -1385,7 +1521,6 @@
         document.getElementById('setting-username').value = localPlayer.name;
         document.getElementById('profile-image-input').value = '';
         renderAvatarPreview();
-        renderPfpPicker();
       }
     }
 
@@ -1395,24 +1530,64 @@
       preview.appendChild(makeAvatar(localPlayer, 'w-12 h-12'));
     }
 
-    function handleProfileImageUpload(event) {
+    async function persistProfileToAuth() {
+      if (!authUser) return null;
+      const { data, error } = await supabaseClient.auth.updateUser({ data: {
+        ...(authUser.user_metadata || {}),
+        display_name: localPlayer.name,
+        pfp: localPlayer.pfp,
+        avatar_url: localPlayer.avatarUrl || '',
+        points: localPlayer.points,
+        inventory: localPlayer.inventory,
+        equipped_skin: localPlayer.equippedSkin,
+        equipped_accessory: localPlayer.equippedAcc || '',
+        equipped_title: localPlayer.equippedTitle || ''
+      }});
+      if (data && data.user) authUser = data.user;
+      return error || null;
+    }
+
+    function applyAuthProfile(user) {
+      authUser = user;
+      localPlayer.id = user.id;
+      const metadata = user.user_metadata || {};
+      const hasAccountProfile = Boolean(metadata.display_name || metadata.name || metadata.username || metadata.pfp || metadata.avatar_url || metadata.inventory || metadata.points !== undefined);
+      const hasCustomLocalProfile = !/^Slime_\d{3}$/.test(localPlayer.name) || localPlayer.pfp !== '🌸' || Boolean(localPlayer.avatarUrl);
+      const savedName = metadata.display_name || metadata.name || metadata.username;
+      if (typeof savedName === 'string' && savedName.trim()) localPlayer.name = savedName.trim().slice(0, 15);
+      if (PROFILE_PFP_OPTIONS.includes(metadata.pfp)) localPlayer.pfp = metadata.pfp;
+      if (Object.prototype.hasOwnProperty.call(metadata, 'avatar_url')) localPlayer.avatarUrl = safeAvatarUrl(metadata.avatar_url);
+      if (Number.isFinite(Number(metadata.points)) && metadata.points !== undefined) localPlayer.points = Math.max(0, Number(metadata.points));
+      if (Array.isArray(metadata.inventory)) {
+        const catalogIds = new Set([].concat(...Object.values(MARKET_ITEMS)).map(item => item.id));
+        localPlayer.inventory = metadata.inventory.filter(id => catalogIds.has(id));
+      }
+      if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
+      if (!localPlayer.inventory.includes('pfp_sakura')) localPlayer.inventory.push('pfp_sakura');
+      if (metadata.equipped_skin && localPlayer.inventory.includes(metadata.equipped_skin)) localPlayer.equippedSkin = metadata.equipped_skin;
+      if (metadata.equipped_accessory && localPlayer.inventory.includes(metadata.equipped_accessory)) localPlayer.equippedAcc = metadata.equipped_accessory;
+      if (metadata.equipped_title && localPlayer.inventory.includes(metadata.equipped_title)) localPlayer.equippedTitle = metadata.equipped_title;
+      savePlayerToStorage();
+      return hasAccountProfile || hasCustomLocalProfile ? persistProfileToAuth() : null;
+    }
+
+    async function handleProfileImageUpload(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
       if (!file.type.startsWith('image/')) { alert('Choose an image file.'); event.target.value = ''; return; }
       const reader = new FileReader();
       reader.onload = () => {
         const image = new Image();
-        image.onload = () => {
-          const scale = Math.min(1, 256 / Math.max(image.width, image.height));
+        image.onload = async () => {
+          const scale = Math.min(1, 160 / Math.max(image.width, image.height));
           const canvas = document.createElement('canvas');
           canvas.width = Math.max(1, Math.round(image.width * scale));
           canvas.height = Math.max(1, Math.round(image.height * scale));
           canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-          localPlayer.avatarUrl = canvas.toDataURL('image/jpeg', .82);
-          savePlayerToStorage();
-          renderAvatarPreview();
-          broadcastProfileUpdate();
-          renderFriendsList();
+          localPlayer.avatarUrl = canvas.toDataURL('image/jpeg', .76);
+          savePlayerToStorage(); renderAvatarPreview(); broadcastProfileUpdate();
+          const error = await persistProfileToAuth();
+          if (error) alert('The image is saved on this browser, but could not sync to your account. ' + error.message);
         };
         image.onerror = () => alert('That image could not be opened.');
         image.src = reader.result;
@@ -1421,39 +1596,22 @@
       reader.readAsDataURL(file);
     }
 
-    function clearProfileImage() {
+    async function clearProfileImage() {
       localPlayer.avatarUrl = '';
-      savePlayerToStorage();
-      renderAvatarPreview();
-      broadcastProfileUpdate();
-      renderFriendsList();
+      savePlayerToStorage(); renderAvatarPreview(); broadcastProfileUpdate(); renderFriendsList();
+      const error = await persistProfileToAuth();
+      if (error) alert('The default sticker is active here, but could not sync to your account. ' + error.message);
     }
 
-    function renderPfpPicker() {
-      const grid = document.getElementById('pfp-picker-grid');
-      grid.innerHTML = '';
-      PROFILE_PFP_OPTIONS.forEach(p => {
-        const sticker = PROFILE_STICKERS.find(item => item.icon === p);
-        const owned = sticker && localPlayer.inventory.includes(sticker.id);
-        const btn = document.createElement('button');
-        btn.className = `p-2 rounded-xl text-lg border ${localPlayer.pfp === p && !localPlayer.avatarUrl ? 'bg-pink-500 text-white border-pink-600' : 'bg-white/80 border-pink-200'} ${owned ? '' : 'opacity-40'}`;
-        btn.textContent = p;
-        btn.title = owned ? `Use ${sticker.name}` : `${sticker.name} is in the market`;
-        btn.disabled = !owned;
-        btn.onclick = () => { localPlayer.pfp = p; localPlayer.avatarUrl = ''; renderAvatarPreview(); renderPfpPicker(); };
-        grid.appendChild(btn);
-      });
-    }
-
-    function saveProfileSettings() {
+    async function saveProfileSettings() {
       const newName = document.getElementById('setting-username').value.trim() || localPlayer.name;
       localPlayer.name = newName.slice(0, 15);
       savePlayerToStorage();
-      broadcastPlayerState();
-      broadcastProfileUpdate();
-      toggleSettingsModal();
-      syncFriendProfile(localPlayer);
-      alert('Profile updated and refreshed everywhere!');
+      const error = await persistProfileToAuth();
+      broadcastPlayerState(); broadcastProfileUpdate();
+      toggleSettingsModal(); syncFriendProfile(localPlayer);
+      if (error) alert('The profile is saved on this browser, but could not sync to your account. ' + error.message);
+      else alert('Profile updated and saved to your account.');
     }
 
     // Storage & Header UI Update Helper
@@ -1521,14 +1679,21 @@
           const state = realtimeChannel.presenceState();
           remotePlayers = {};
           Object.keys(state).forEach(key => {
-            if (key !== localPlayer.id) remotePlayers[key] = state[key][0];
+            if (key !== localPlayer.id) {
+              const player = state[key][0];
+              remotePlayers[key] = { ...player, displayX: player.x, displayY: player.y };
+            }
           });
           Object.values(remotePlayers).forEach(syncFriendProfile);
           if (document.getElementById('friend-search-input').value.trim()) handleFriendUserSearch();
         })
         .on('broadcast', { event: 'player_update' }, ({ payload }) => {
           if (payload && payload.id !== localPlayer.id) {
-            remotePlayers[payload.id] = payload;
+            const previous = remotePlayers[payload.id];
+            remotePlayers[payload.id] = { ...payload,
+              displayX: previous && Number.isFinite(previous.displayX) ? previous.displayX : payload.x,
+              displayY: previous && Number.isFinite(previous.displayY) ? previous.displayY : payload.y
+            };
             syncFriendProfile(payload);
           }
         })
@@ -1686,7 +1851,10 @@
     let memoryMatched = new Set();
     let memoryLocked = false;
     let memoryFinished = false;
+    function openGamesModal() { document.getElementById('games-modal').classList.remove('hidden'); }
+    function closeGamesModal() { document.getElementById('games-modal').classList.add('hidden'); }
     function openMemoriesModal() {
+      closeGamesModal();
       document.getElementById('memories-modal').classList.remove('hidden');
       if (!memoryDeck.length || memoryFinished) startMemoriesGame();
     }
@@ -1729,6 +1897,7 @@
           memoryFinished = true;
           localPlayer.points += 5;
           savePlayerToStorage();
+          persistProfileToAuth();
           updateUIHeader();
           document.getElementById('memory-status').textContent = 'You won! +5 points 🪙';
         }
@@ -1738,35 +1907,215 @@
       }
     }
 
+    const sequenceStickers = ['🌸', '🐸', '🍡', '⭐'];
+    let slimeSequence = [];
+    let sequenceInput = [];
+    let sequenceLevel = 0;
+    let sequenceLocked = true;
+    let sequenceTimer = null;
+    function openSequenceGame() {
+      closeGamesModal();
+      document.getElementById('sequence-modal').classList.remove('hidden');
+      renderSequenceButtons();
+    }
+    function closeSequenceGame() {
+      document.getElementById('sequence-modal').classList.add('hidden');
+      window.clearTimeout(sequenceTimer);
+      sequenceLocked = true;
+    }
+    function renderSequenceButtons() {
+      const grid = document.getElementById('sequence-grid');
+      grid.innerHTML = '';
+      sequenceStickers.forEach((sticker, index) => {
+        const button = document.createElement('button');
+        button.type = 'button'; button.className = 'aspect-square rounded-2xl border-2 border-white bg-gradient-to-br from-violet-400 to-indigo-500 text-4xl shadow-md transition active:scale-95';
+        button.textContent = sticker; button.setAttribute('aria-label', `Sticker ${index + 1}`);
+        button.onclick = () => clickSequenceSticker(index);
+        grid.appendChild(button);
+      });
+    }
+    function startSequenceGame() {
+      window.clearTimeout(sequenceTimer);
+      slimeSequence = []; sequenceInput = []; sequenceLevel = 0; sequenceLocked = true;
+      document.getElementById('sequence-status').textContent = 'Watch the pattern…';
+      advanceSequence();
+    }
+    function advanceSequence() {
+      slimeSequence.push(Math.floor(Math.random() * sequenceStickers.length));
+      sequenceInput = []; sequenceLevel++;
+      const status = document.getElementById('sequence-status');
+      status.textContent = `Round ${sequenceLevel} of 8 — watch closely`;
+      sequenceLocked = true;
+      const grid = document.getElementById('sequence-grid');
+      const buttons = Array.from(grid.children);
+      let step = 0;
+      const showNext = () => {
+        buttons.forEach(button => button.classList.remove('ring-4', 'ring-yellow-300', 'brightness-150'));
+        if (step >= slimeSequence.length) {
+          sequenceLocked = false;
+          status.textContent = `Round ${sequenceLevel} of 8 — repeat the pattern`;
+          return;
+        }
+        const button = buttons[slimeSequence[step++]];
+        button.classList.add('ring-4', 'ring-yellow-300', 'brightness-150');
+        sequenceTimer = window.setTimeout(showNext, 430);
+      };
+      sequenceTimer = window.setTimeout(showNext, 350);
+    }
+    function clickSequenceSticker(index) {
+      if (sequenceLocked || !slimeSequence.length) return;
+      sequenceInput.push(index);
+      const position = sequenceInput.length - 1;
+      if (sequenceInput[position] !== slimeSequence[position]) {
+        sequenceLocked = true;
+        document.getElementById('sequence-status').textContent = 'Not quite. Press Start and try again.';
+        return;
+      }
+      if (sequenceInput.length === slimeSequence.length) {
+        sequenceLocked = true;
+        if (sequenceLevel >= 8) {
+          localPlayer.points += 5; savePlayerToStorage(); persistProfileToAuth(); updateUIHeader();
+          document.getElementById('sequence-status').textContent = 'You won! +5 points 🪙';
+        } else {
+          document.getElementById('sequence-status').textContent = 'Nice! Get ready for the next round…';
+          sequenceTimer = window.setTimeout(advanceSequence, 650);
+        }
+      }
+    }
+
+    // Notice-board writes are checked against protected app_metadata in the UI and by RLS below.
+    // One-time Supabase SQL setup (assign role=admin or role=developer via the Admin API):
+    // create table public.notice_board (id uuid primary key default gen_random_uuid(), title text not null, body text not null, author_id uuid not null references auth.users(id) on delete cascade, author_name text not null, created_at timestamptz not null default now());
+    // alter table public.notice_board enable row level security;
+    // grant select on public.notice_board to anon, authenticated; grant insert on public.notice_board to authenticated;
+    // create policy "Public reads notices" on public.notice_board for select to anon, authenticated using (true);
+    // create policy "Admins and developers post notices" on public.notice_board for insert to authenticated with check (auth.uid() = author_id and (coalesce(auth.jwt()->'app_metadata'->>'role','') in ('admin','developer','dev') or coalesce(auth.jwt()->'app_metadata'->'roles','[]'::jsonb) ?| array['admin','developer','dev']));
+    function isNoticeWriter() {
+      const metadata = authUser && authUser.app_metadata ? authUser.app_metadata : {};
+      const roles = Array.isArray(metadata.roles) ? metadata.roles : [];
+      const allRoles = [...roles, metadata.role].filter(Boolean).map(role => String(role).toLowerCase());
+      return allRoles.some(role => ['admin', 'developer', 'dev'].includes(role));
+    }
+    async function openNoticeBoard() {
+      document.getElementById('notice-board-modal').classList.remove('hidden');
+      document.getElementById('notice-post-form').classList.toggle('hidden', !isNoticeWriter());
+      document.getElementById('notice-board-status').textContent = isNoticeWriter() ? 'Loading notices…' : 'Loading the latest notices…';
+      await loadNoticeBoard();
+    }
+    function closeNoticeBoard() { document.getElementById('notice-board-modal').classList.add('hidden'); }
+    async function loadNoticeBoard() {
+      const list = document.getElementById('notice-board-list');
+      const status = document.getElementById('notice-board-status');
+      list.innerHTML = '';
+      const { data, error } = await supabaseClient.from('notice_board').select('id,title,body,author_name,created_at').order('created_at', { ascending: false }).limit(30);
+      if (error) {
+        status.textContent = 'The shared notice board needs the notice_board table and admin/developer RLS policy set up in Supabase.';
+        return;
+      }
+      status.textContent = data.length ? `${data.length} recent notice${data.length === 1 ? '' : 's'}` : 'No notices yet.';
+      data.forEach(notice => {
+        const card = document.createElement('article'); card.className = 'rounded-2xl border border-amber-200 bg-white/80 p-3';
+        const title = document.createElement('h4'); title.className = 'text-sm font-extrabold text-amber-950'; title.textContent = notice.title;
+        const body = document.createElement('p'); body.className = 'mt-1 whitespace-pre-wrap break-words text-xs text-slate-700'; body.textContent = notice.body;
+        const meta = document.createElement('p'); meta.className = 'mt-2 text-[9px] font-semibold text-amber-700';
+        const time = notice.created_at ? new Date(notice.created_at).toLocaleString() : '';
+        meta.textContent = `${notice.author_name || 'Sakura team'}${time ? ' · ' + time : ''}`;
+        card.append(title, body, meta); list.appendChild(card);
+      });
+    }
+    async function postNotice(event) {
+      event.preventDefault();
+      if (!isNoticeWriter() || !authUser) { alert('Only an admin or developer account can post notices.'); return; }
+      const title = document.getElementById('notice-title-input').value.trim();
+      const body = document.getElementById('notice-body-input').value.trim();
+      if (!title || !body) return;
+      const status = document.getElementById('notice-board-status');
+      status.textContent = 'Posting…';
+      const { error } = await supabaseClient.from('notice_board').insert({ title, body, author_id: authUser.id, author_name: localPlayer.name });
+      if (error) { status.textContent = 'Could not post this notice. Check the notice_board table and its RLS policy.'; return; }
+      document.getElementById('notice-post-form').reset();
+      await loadNoticeBoard();
+    }
+
     // --- AUTH MODAL HANDLERS ---
     let authMode = 'signin';
     function switchAuthTab(mode) {
       authMode = mode;
       document.getElementById('username-field').classList.toggle('hidden', mode === 'signin');
+      const alertBox = document.getElementById('auth-alert'); alertBox.classList.add('hidden');
+      document.getElementById('auth-submit-btn').querySelector('span').textContent = mode === 'signup' ? 'Create Account' : 'Sign In';
+    }
+
+    function showAuthAlert(message, isError = true) {
+      const alertBox = document.getElementById('auth-alert');
+      alertBox.textContent = message;
+      alertBox.className = `text-xs p-3 rounded-xl border font-medium ${isError ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`;
     }
 
     function loginAsGuest() {
+      authUser = null;
       document.getElementById('auth-modal').classList.add('hidden');
-      initSocialChannel();
-      initSupabaseChannel(currentChannel);
+      initSocialChannel(); initSupabaseChannel(currentChannel);
     }
 
-    async function handleAuthSubmit(e) {
-      e.preventDefault();
-      const chosenName = document.getElementById('auth-username').value.trim();
-      if (authMode === 'signup' && chosenName) { localPlayer.name = chosenName.slice(0, 15); savePlayerToStorage(); }
-      document.getElementById('auth-modal').classList.add('hidden');
-      initSocialChannel();
-      initSupabaseChannel(currentChannel);
+    async function handleAuthSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const button = document.getElementById('auth-submit-btn');
+      button.disabled = true;
+      button.querySelector('span').textContent = authMode === 'signup' ? 'Creating account…' : 'Signing in…';
+      try {
+        let result;
+        if (authMode === 'signup') {
+          const chosenName = document.getElementById('auth-username').value.trim().slice(0, 15) || localPlayer.name;
+          localPlayer.name = chosenName;
+          result = await supabaseClient.auth.signUp({
+            email, password,
+            options: { data: {
+              display_name: localPlayer.name, pfp: localPlayer.pfp, avatar_url: localPlayer.avatarUrl || '',
+              points: localPlayer.points, inventory: localPlayer.inventory,
+              equipped_skin: localPlayer.equippedSkin, equipped_accessory: localPlayer.equippedAcc || '', equipped_title: localPlayer.equippedTitle || ''
+            }}
+          });
+          if (result.error) throw result.error;
+          if (!result.data.session || !result.data.user) {
+            showAuthAlert('Check your email to confirm your account, then return here to sign in.', false);
+            return;
+          }
+        } else {
+          result = await supabaseClient.auth.signInWithPassword({ email, password });
+          if (result.error) throw result.error;
+        }
+        const profileError = await applyAuthProfile(result.data.user);
+        document.getElementById('auth-modal').classList.add('hidden');
+        initSocialChannel(); initSupabaseChannel(currentChannel); broadcastProfileUpdate(); updateUIHeader();
+        if (profileError) alert('Signed in, but this profile could not sync to the account yet. ' + profileError.message);
+      } catch (error) {
+        showAuthAlert(error && error.message ? error.message : 'Could not sign in. Please try again.');
+      } finally {
+        button.disabled = false;
+        button.querySelector('span').textContent = authMode === 'signup' ? 'Create Account' : 'Sign In';
+      }
     }
 
     // INITIALIZATION ON LOAD
-    window.onload = function() {
+    window.onload = async function() {
       resizeCanvas();
       updateUIHeader();
-      renderPfpPicker();
       requestAnimationFrame(gameLoop);
       lucide.createIcons();
+      try {
+        const { data } = await supabaseClient.auth.getSession();
+        if (data && data.session && data.session.user) {
+          const error = await applyAuthProfile(data.session.user);
+          document.getElementById('auth-modal').classList.add('hidden');
+          initSocialChannel(); initSupabaseChannel(currentChannel); broadcastProfileUpdate(); updateUIHeader();
+          if (error) alert('Signed in, but this profile could not sync to the account yet. ' + error.message);
+        }
+      } catch (error) {
+        showAuthAlert(error && error.message ? error.message : 'Could not restore your saved account session.');
+      }
     };
   </script>
 </body>
