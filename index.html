@@ -20,7 +20,7 @@
     .chat-card-sakura{background:linear-gradient(135deg,rgba(131,24,67,.78),rgba(124,45,18,.68)) !important;border-color:rgba(251,113,133,.9) !important;box-shadow:inset 0 0 0 1px rgba(255,228,230,.25),0 4px 18px rgba(244,63,94,.18) !important}
     .chat-card-moon{background:linear-gradient(135deg,rgba(8,47,73,.84),rgba(49,46,129,.76)) !important;border-color:rgba(56,189,248,.95) !important;box-shadow:inset 0 0 0 1px rgba(224,242,254,.2),0 4px 20px rgba(14,165,233,.22) !important}
     .chat-card-royal{background:linear-gradient(135deg,rgba(76,29,149,.9),rgba(120,53,15,.74)) !important;border:1px solid #fbbf24 !important;box-shadow:inset 0 0 0 1px rgba(253,230,138,.35),0 4px 24px rgba(168,85,247,.28) !important}
-    /* Viewport & Touch Setup */
+
     html, body {
       height: 100%;
       height: 100dvh;
@@ -40,7 +40,6 @@
       font-family: 'Yuji Mai', serif;
     }
 
-    /* Glassmorphism Classes */
     .glass {
       background: rgba(255, 255, 255, 0.90);
       backdrop-filter: blur(16px);
@@ -67,7 +66,6 @@
       box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25);
     }
 
-    /* Custom Scrollbars */
     ::-webkit-scrollbar {
       width: 4px;
       height: 4px;
@@ -80,7 +78,6 @@
       border-radius: 10px;
     }
 
-    /* Mobile Virtual Joystick */
     .joystick-base {
       width: 90px;
       height: 90px;
@@ -116,7 +113,6 @@
       color: white;
     }
 
-    /* Tab Indicators */
     .tab-active {
       background-color: #ec4899;
       color: #ffffff;
@@ -129,12 +125,15 @@
     .overflow-y-auto { touch-action: pan-y; -webkit-overflow-scrolling: touch; }
     .overflow-x-auto { touch-action: pan-x pan-y; }
     .mobile-top-action { min-width: 34px; min-height: 34px; }
-    @keyframes mobile-jiggle {
-      0%, 100% { transform: rotate(0deg) translateY(0); }
-      25% { transform: rotate(-2deg) translateY(-1px); }
-      75% { transform: rotate(2deg) translateY(-1px); }
+    
+    @keyframes seq-blink {
+      0%, 100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+      50% { opacity: 0.3; transform: scale(0.94); filter: brightness(0.5); }
     }
-    .mobile-jiggle { animation: mobile-jiggle .28s ease-in-out; }
+    .seq-blinking {
+      animation: seq-blink 0.22s ease-in-out 2;
+    }
+
     @media (max-width: 767px) {
       header { height: auto !important; min-height: 3.5rem; align-items: center; }
       header > div:last-child { max-width: 70vw; flex-wrap: wrap; justify-content: flex-end; gap: .25rem; }
@@ -213,28 +212,23 @@
       </div>
     </div>
 
-    <!-- Currency & Toolbar -->
     <div class="flex items-center gap-2">
-      <!-- Player Points Badge -->
       <div class="flex items-center gap-1.5 px-3 py-1 rounded-2xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-extrabold shadow-sm">
         <span class="text-sm">🪙</span>
         <span id="player-points-display">0</span>
       </div>
 
-      <!-- Music Toggle -->
       <div class="flex items-center bg-pink-100/90 rounded-xl p-1 border border-pink-200">
         <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Music">
           <i data-lucide="music" id="music-icon" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-600"></i>
         </button>
       </div>
 
-      <!-- Market Modal Button -->
       <button onclick="openMarketModal()" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-400 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:brightness-110 active:scale-95">
         <i data-lucide="shopping-bag" class="w-4 h-4"></i>
         <span class="hidden sm:inline">Market</span>
       </button>
 
-      <!-- Inventory Modal Button -->
       <button onclick="openInventoryModal()" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-purple-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-purple-600 active:scale-95">
         <i data-lucide="box" class="w-4 h-4"></i>
         <span class="hidden sm:inline">Inventory</span>
@@ -255,19 +249,16 @@
         <i data-lucide="coins" class="w-4 h-4"></i><span class="hidden sm:inline">Wallet</span>
       </button>
 
-      <!-- Chat button stays in the top toolbar on mobile, next to Friends. -->
       <button onclick="toggleChatSidebar()" class="mobile-top-action p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-fuchsia-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-fuchsia-600 active:scale-95" title="Open chat">
         <i data-lucide="message-circle" class="w-4 h-4"></i><span class="hidden sm:inline">Chat</span>
       </button>
 
-      <!-- Friends Modal Button -->
       <button onclick="openFriendsModal()" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-sky-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-sky-600 active:scale-95 relative">
         <i data-lucide="users" class="w-4 h-4"></i>
         <span class="hidden sm:inline">Friends</span>
         <span id="friends-unread-dot" class="hidden absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full shadow"></span>
       </button>
 
-      <!-- Profile Customization -->
       <button onclick="toggleSettingsModal()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Profile Settings">
         <i data-lucide="user-cog" class="w-4 h-4"></i>
       </button>
@@ -277,11 +268,9 @@
   <!-- MAIN VIEWPORT CONTAINER -->
   <div class="flex-1 relative flex overflow-hidden w-full h-full">
 
-    <!-- CANVAS VIEW (Camera Follows Slime) -->
     <div class="flex-1 relative bg-pink-950/20 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
       <canvas id="gameCanvas" class="block w-full h-full cursor-pointer touch-none"></canvas>
 
-      <!-- Room Quick Switcher -->
       <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[95vw] overflow-x-auto">
         <button onclick="switchChannel('sakura-lounge')" id="quick-btn-sakura-lounge" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap">
           🌸 Zen Garden
@@ -291,7 +280,6 @@
         </button>
       </div>
 
-      <!-- Quick Action Floating Emote Bar -->
       <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2">
         <button onclick="triggerJump()" class="action-btn px-2 py-0.5 rounded-xl text-xs font-black text-pink-800 flex items-center gap-1">
           <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5 text-pink-600"></i>
@@ -304,20 +292,17 @@
         <button onclick="triggerEmote('🎮')" class="hover:scale-125 transition text-lg">🎮</button>
         <span id="owned-emote-buttons" class="contents"></span>
 
-        <!-- Active Special Emote Trigger (Dance/Jump loops) -->
         <button id="special-emote-btn" onclick="toggleActiveSpecialEmote()" class="hidden px-2 py-0.5 rounded-xl bg-purple-500 text-white text-[10px] font-bold shadow animate-pulse">
           💃 Dance!
         </button>
       </div>
 
-      <!-- Mobile D-Pad Touch Joystick -->
       <div class="absolute bottom-3 left-3 z-20 pointer-events-auto md:hidden">
         <div id="joystick-container" class="joystick-base">
           <div id="joystick-stick" class="joystick-stick"></div>
         </div>
       </div>
 
-      <!-- Mobile Right Jump Button -->
       <div class="absolute bottom-3 right-3 z-20 pointer-events-auto md:hidden">
         <button onclick="triggerJump()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-xs font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
           JUMP
@@ -343,9 +328,10 @@
     <!-- CHAT SIDEBAR PANEL -->
     <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
       <div class="p-3 border-b border-pink-200/30 bg-white/10 flex items-center justify-between shrink-0">
-        <span class="text-xs font-bold text-pink-200 uppercase tracking-wider flex items-center gap-1.5">
-          <i data-lucide="message-square" class="w-4 h-4 text-pink-400"></i> Global Lounge Chat
-        </span>
+        <div class="flex items-center gap-1.5">
+          <button onclick="switchChatTab('global')" id="chat-tab-global" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-active">Global</button>
+          <button onclick="switchChatTab('staff')" id="chat-tab-staff" class="hidden px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Staff Chat</button>
+        </div>
         <button onclick="toggleChatSidebar()" class="md:hidden text-pink-300 hover:text-white p-1">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
@@ -360,7 +346,7 @@
           <input 
             type="text" 
             id="chat-input" 
-            placeholder="Type global message..." 
+            placeholder="Type message..." 
             maxlength="120"
             autocomplete="off"
             class="glass-input flex-1 px-3 py-2 rounded-xl text-xs text-pink-950 placeholder-pink-400 font-medium"
@@ -387,22 +373,18 @@
         <button onclick="closeMarketModal()" class="text-pink-700 hover:text-pink-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <!-- Market Layout Grid (Preview + Shop List) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 flex-1 overflow-hidden">
-        <!-- Live Preview Canvas Box -->
         <div class="bg-pink-100/70 border border-pink-200 rounded-2xl p-3 flex flex-col items-center justify-center relative">
           <span class="text-[10px] font-bold text-pink-700 uppercase tracking-wider mb-1">Live Slime Preview</span>
           <canvas id="marketPreviewCanvas" width="180" height="150" class="bg-pink-900/10 rounded-xl border border-pink-300 shadow-inner"></canvas>
           <p id="market-item-preview-name" class="text-xs font-bold text-pink-950 mt-2 text-center">Testing: Select Item</p>
         </div>
 
-        <!-- Shop Catalog Section -->
         <div class="md:col-span-2 flex flex-col overflow-hidden">
           <div class="mb-2 flex gap-2 shrink-0">
-            <input id="market-search-input" type="search" oninput="renderMarketGrid()" placeholder="Search this market section..." class="glass-input flex-1 rounded-xl px-3 py-2 text-xs text-pink-950" />
+            <input id="market-search-input" type="search" oninput="renderMarketGrid()" placeholder="Search market..." class="glass-input flex-1 rounded-xl px-3 py-2 text-xs text-pink-950" />
             <button type="button" onclick="renderMarketGrid()" class="rounded-xl bg-pink-500 px-3 text-xs font-bold text-white" title="Search market"><i data-lucide="search" class="h-4 w-4"></i></button>
           </div>
-          <!-- Market Category Tabs -->
           <div class="flex items-center gap-1 border-b border-pink-200 pb-2 overflow-x-auto shrink-0">
             <button onclick="filterMarketCategory('accessories')" id="mcat-accessories" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-active">Hats & Ears</button>
             <button onclick="filterMarketCategory('skins')" id="mcat-skins" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Skins</button>
@@ -413,7 +395,6 @@
             <button onclick="filterMarketCategory('frames')" id="mcat-frames" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Profile Frames</button>
           </div>
 
-          <!-- Item Grid Container -->
           <div id="market-items-grid" class="grid grid-cols-2 gap-2 mt-3 overflow-y-auto pr-1 flex-1"></div>
         </div>
       </div>
@@ -434,9 +415,7 @@
         <button onclick="closeInventoryModal()" class="text-pink-700 hover:text-pink-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <!-- Inventory Layout -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 flex-1 overflow-hidden">
-        <!-- Live Inventory Preview Box -->
         <div class="bg-purple-100/70 border border-purple-200 rounded-2xl p-3 flex flex-col items-center justify-center relative">
           <span class="text-[10px] font-bold text-purple-800 uppercase tracking-wider mb-1">Equipment Preview</span>
           <canvas id="invPreviewCanvas" width="180" height="150" class="bg-purple-900/10 rounded-xl border border-purple-300 shadow-inner"></canvas>
@@ -446,7 +425,6 @@
           </div>
         </div>
 
-        <!-- Inventory List & Search -->
         <div class="md:col-span-2 flex flex-col overflow-hidden">
           <div class="flex items-center gap-2 mb-2 shrink-0">
             <input 
@@ -487,9 +465,7 @@
         <button onclick="closeFriendsModal()" class="text-pink-700 hover:text-pink-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <!-- Friends Content Tabs -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 flex-1 overflow-hidden">
-        <!-- Friends List & Player Search Panel -->
         <div class="flex flex-col border-r border-pink-200/60 pr-2">
           <div class="space-y-1.5 mb-2 shrink-0">
             <input 
@@ -505,7 +481,6 @@
           <div id="friends-list-container" class="flex-1 overflow-y-auto space-y-1.5 pr-1"></div>
         </div>
 
-        <!-- DM Chat Area -->
         <div class="md:col-span-2 flex flex-col bg-white/40 rounded-2xl p-3 border border-pink-200">
           <div id="dm-header" class="border-b border-pink-200 pb-2 mb-2 flex items-center justify-between shrink-0">
             <p class="text-xs font-extrabold text-pink-950" id="dm-active-target">Select a friend to message</p>
@@ -519,7 +494,7 @@
               type="text" 
               id="dm-text-input" 
               disabled 
-              placeholder="Can't send messages unless friend request accepted" 
+              placeholder="Select a friend to chat..." 
               class="glass-input flex-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-pink-950 disabled:opacity-50"
             />
             <button type="submit" id="dm-send-btn" disabled class="bg-sky-500 text-white p-2 rounded-xl shadow disabled:opacity-50">
@@ -613,13 +588,13 @@
       <p id="staff-panel-status" class="text-[10px] text-slate-600 pb-2 shrink-0">Search requires a signed-in staff account.</p>
       <div id="staff-user-results" class="max-h-[40dvh] overflow-y-auto space-y-2"></div>
       <div class="mt-3 border-t border-slate-200 pt-3">
-        <p class="text-[10px] font-extrabold uppercase tracking-wide text-slate-700">Lobby music</p>
+        <p class="text-[10px] font-extrabold uppercase tracking-wide text-slate-700">Lobby music (Direct HTTPS Audio URL)</p>
         <div class="mt-2 flex gap-2">
-          <input id="lobby-music-url" type="url" placeholder="Direct HTTPS audio link (.mp3 / .ogg / .wav)" class="glass-input flex-1 rounded-xl px-3 py-2 text-[10px] text-slate-950" />
+          <input id="lobby-music-url" type="url" placeholder="https://example.com/audio.mp3" class="glass-input flex-1 rounded-xl px-3 py-2 text-[10px] text-slate-950" />
           <button onclick="saveLobbyMusic()" class="rounded-xl bg-cyan-700 px-3 py-2 text-[10px] font-bold text-white">Save</button>
           <button onclick="clearLobbyMusic()" class="rounded-xl bg-slate-500 px-3 py-2 text-[10px] font-bold text-white">Clear</button>
         </div>
-        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Direct audio links play after a player taps the music button.</p>
+        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Direct audio links play after tapping the music button.</p>
       </div>
     </div>
   </div>
@@ -672,14 +647,14 @@
         <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs font-semibold text-pink-950" placeholder="Your Slime Name..." />
       </div>
 
-      <button onclick="saveProfileSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs">
-        <i data-lucide="check" class="w-4 h-4"></i> Save & Refresh Everywhere
-      </button>
-
-      <!-- Sign Out Button -->
-      <button onclick="handleSignOut()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-xs mt-2">
-        <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
-      </button>
+      <div class="pt-2 space-y-2">
+        <button onclick="saveProfileSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs">
+          <i data-lucide="check" class="w-4 h-4"></i> Save & Refresh Everywhere
+        </button>
+        <button onclick="handleSignOut()" class="w-full bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold py-2 rounded-2xl border border-rose-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs">
+          <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+        </button>
+      </div>
     </div>
   </div>
 
@@ -748,7 +723,6 @@
       ]
     };
 
-
     // --- PLAYER STATE ---
     function loadStoredJson(key, fallback) {
       try { const value = JSON.parse(localStorage.getItem(key)); return value == null ? fallback : value; }
@@ -791,8 +765,6 @@
     if (!PROFILE_PFP_OPTIONS.includes(localPlayer.pfp)) localPlayer.pfp = '🌸';
     localStorage.setItem('sakura_inv', JSON.stringify(localPlayer.inventory));
     localPlayer.points = 0;
-    localStorage.setItem('sakura_points', '0');
-    localStorage.setItem('sakura_economy_v2', '1');
 
     let authUser = null;
     let remotePlayers = {};
@@ -806,22 +778,19 @@
     let dmMessages = loadStoredJson('sakura_dms', {});
     let activeDMUserId = null;
     let currentChannel = 'sakura-lounge';
+    let activeChatTab = 'global'; // 'global' or 'staff'
     let realtimeChannel = null;
     let selectedPlayerId = null;
     let selectedPlayerProfile = null;
-    let selectedPlayerStaffUser = null;
     let staffDMUserId = null;
-    let staffDMProfile = null;
     let lastStateBroadcastAt = 0;
     let friendsUnread = localStorage.getItem('sakura_friends_unread') === '1';
     let guestMode = false;
-    let moderationPollTimer = null;
     let moderationState = { is_banned: false, mute_until: null, ban_until: null };
 
     // Keys & Joystick Input
     const keys = { up: false, down: false, left: false, right: false };
     const joystick = { active: false, dx: 0, dy: 0 };
-
     let camera = { x: 0, y: 0 };
 
     // --- AUDIO & AMBIENT MUSIC ---
@@ -876,16 +845,29 @@
       if (musicPlaying) {
         icon.setAttribute('data-lucide', 'volume-2');
         if (lobbyMusicUrl) {
-          if (!lobbyAudio || lobbyAudio.src !== lobbyMusicUrl) { if (lobbyAudio) lobbyAudio.pause(); lobbyAudio = new Audio(lobbyMusicUrl); lobbyAudio.loop = true; lobbyAudio.volume = .28; }
-          lobbyAudio.play().catch(() => { musicPlaying = false; icon.setAttribute('data-lucide', 'music'); lucide.createIcons(); });
-        } else if (initAudio()) { playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420); }
-        else { musicPlaying = false; icon.setAttribute('data-lucide', 'music'); }
+          if (!lobbyAudio || lobbyAudio.src !== lobbyMusicUrl) { 
+            if (lobbyAudio) lobbyAudio.pause(); 
+            lobbyAudio = new Audio(lobbyMusicUrl); 
+            lobbyAudio.loop = true; 
+            lobbyAudio.volume = .28; 
+          }
+          lobbyAudio.play().catch(() => { musicPlaying = false; icon.setAttribute('data-lucide', 'music'); });
+        } else if (initAudio()) { 
+          playNextMusicNote(); 
+          musicTimer = window.setInterval(playNextMusicNote, 420); 
+        } else { 
+          musicPlaying = false; 
+          icon.setAttribute('data-lucide', 'music'); 
+        }
       } else {
-        icon.setAttribute('data-lucide', 'music'); window.clearInterval(musicTimer); musicTimer = null;
+        icon.setAttribute('data-lucide', 'music'); 
+        window.clearInterval(musicTimer); 
+        musicTimer = null;
         if (lobbyAudio) lobbyAudio.pause();
       }
       lucide.createIcons();
     }
+
     function setLobbyMusicUrl(value) {
       const nextUrl = typeof value === 'string' && /^https:\/\//i.test(value) ? value : '';
       if (nextUrl === lobbyMusicUrl) return;
@@ -893,36 +875,48 @@
       if (lobbyAudio) { lobbyAudio.pause(); lobbyAudio = null; }
       window.clearInterval(musicTimer); musicTimer = null;
       if (musicPlaying && lobbyMusicUrl) {
-        lobbyAudio = new Audio(lobbyMusicUrl); lobbyAudio.loop = true; lobbyAudio.volume = .28;
+        lobbyAudio = new Audio(lobbyMusicUrl); 
+        lobbyAudio.loop = true; 
+        lobbyAudio.volume = .28;
         lobbyAudio.play().catch(() => { musicPlaying = false; });
       } else if (musicPlaying && initAudio()) {
-        playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420);
+        playNextMusicNote(); 
+        musicTimer = window.setInterval(playNextMusicNote, 420);
       }
     }
+
     async function loadLobbyMusic() {
       const { data, error } = await supabaseClient.rpc('get_lobby_music');
-      if (!error) setLobbyMusicUrl(data || '');
+      if (!error && data) setLobbyMusicUrl(data);
       const field = document.getElementById('lobby-music-url');
       if (field && localPlayer.role !== 'player') field.value = lobbyMusicUrl;
     }
+
     async function saveLobbyMusic() {
       if (!['admin', 'developer'].includes(localPlayer.role)) return;
       const value = document.getElementById('lobby-music-url').value.trim();
-      if (!/^https:\/\//i.test(value) || value.length > 2048) { document.getElementById('lobby-music-status').textContent = 'Enter a direct HTTPS audio URL.'; return; }
+      if (!/^https:\/\//i.test(value) || value.length > 2048) { 
+        document.getElementById('lobby-music-status').textContent = 'Enter a direct HTTPS audio link.'; 
+        return; 
+      }
       const { data, error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: value });
       if (error) { document.getElementById('lobby-music-status').textContent = error.message; return; }
-      setLobbyMusicUrl(data || value); sendSocialBroadcast('lobby_music_update', { url: lobbyMusicUrl });
+      setLobbyMusicUrl(data || value); 
+      sendSocialBroadcast('lobby_music_update', { url: lobbyMusicUrl });
       document.getElementById('lobby-music-status').textContent = 'Lobby music updated for everyone.';
     }
+
     async function clearLobbyMusic() {
       if (!['admin', 'developer'].includes(localPlayer.role)) return;
       const { error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: '' });
       if (error) { document.getElementById('lobby-music-status').textContent = error.message; return; }
-      setLobbyMusicUrl(''); document.getElementById('lobby-music-url').value = '';
-      sendSocialBroadcast('lobby_music_update', { url: '' }); document.getElementById('lobby-music-status').textContent = 'Lobby music cleared.';
+      setLobbyMusicUrl(''); 
+      document.getElementById('lobby-music-url').value = '';
+      sendSocialBroadcast('lobby_music_update', { url: '' }); 
+      document.getElementById('lobby-music-status').textContent = 'Lobby music cleared.';
     }
 
-    // --- CAMERA & CANVAS RENDERING ---
+    // --- CANVAS & RENDERING ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -934,6 +928,28 @@
     window.addEventListener('resize', resizeCanvas);
 
     const profileAvatarCache = new Map();
+    function safeAvatarUrl(url) {
+      if (typeof url === 'string' && /^https?:\/\//i.test(url)) return url;
+      return '';
+    }
+
+    function makeAvatar(player, sizeClass = 'w-10 h-10', textClass = 'text-xl') {
+      const div = document.createElement('div');
+      div.className = `${sizeClass} rounded-full bg-pink-100 border-2 border-pink-300 flex items-center justify-center overflow-hidden font-bold shrink-0 shadow`;
+      const avatarUrl = safeAvatarUrl(player.avatarUrl);
+      if (avatarUrl) {
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.className = 'w-full h-full object-cover';
+        img.onerror = () => { div.textContent = PROFILE_PFP_OPTIONS.includes(player.pfp) ? player.pfp : '🌸'; };
+        div.appendChild(img);
+      } else {
+        div.className += ` ${textClass}`;
+        div.textContent = PROFILE_PFP_OPTIONS.includes(player.pfp) ? player.pfp : '🌸';
+      }
+      return div;
+    }
+
     function drawPlayerLabel(c, player, isSelf = false) {
       const labelY = player.y + (isSelf ? 34 : 32);
       const avatarUrl = safeAvatarUrl(player.avatarUrl);
@@ -969,7 +985,6 @@
       c.shadowBlur = 0;
     }
 
-    // Render Helper: Draw Slime model with soft idle wobble and squash on landing.
     function drawSlimeModel(c, x, y, skinId, accId, titleId, isJumping, jumpOff, activeEmoteAnim, isSelf, role = 'player', motionSpeed = 0, motionX = 0) {
       c.save();
       const phase = Date.now() * 0.008 + x * 0.015;
@@ -1181,12 +1196,10 @@
 
     function renderGameWorld() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       ctx.save();
       ctx.translate(-camera.x, -camera.y);
       drawZoneDecorations();
 
-      // Draw Remote Players
       Object.values(remotePlayers).forEach(p => {
         const playerX = Number.isFinite(p.displayX) ? p.displayX : p.x;
         const playerY = Number.isFinite(p.displayY) ? p.displayY : p.y;
@@ -1197,7 +1210,6 @@
         drawPlayerLabel(ctx, displayPlayer);
       });
 
-      // Draw Local Player Slime
       drawSlimeModel(ctx, localPlayer.x, localPlayer.y, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, localPlayer.isJumping, localPlayer.jumpOffset, localPlayer.activeSpecialEmote, true, localPlayer.role);
       drawSpeechBubble(ctx, localPlayer.x, localPlayer.y - localPlayer.jumpOffset, localPlayer.speechBubble);
       drawPlayerLabel(ctx, localPlayer, true);
@@ -1214,7 +1226,6 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // --- INTERACTION & CLICK ON CANVAS TO ADD FRIEND ---
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
       const clickWorldX = e.clientX - rect.left + camera.x;
@@ -1243,111 +1254,369 @@
       const card = document.getElementById('player-card');
       const avatar = document.getElementById('player-card-avatar');
       avatar.innerHTML = '';
-      avatar.appendChild(makeAvatar(player, 'w-10 h-10'));
-      const trustedRole = player.id === localPlayer.id ? localPlayer.role : (remotePlayers[player.id] && remotePlayers[player.id].role) || (['admin', 'developer'].includes(player.role) ? player.role : 'player');
-      document.getElementById('player-card-name').textContent = `${player.name || 'Slime'}${trustedRole === 'developer' ? ' · DEV' : trustedRole === 'admin' ? ' · ADMIN' : ''}`;
-      const action = document.getElementById('player-card-action');
-      const status = document.getElementById('player-card-status');
-      const friend = friendList.some(item => item.id === player.id);
-      const incoming = friendRequests.some(item => item.senderId === player.id);
-      const sent = outgoingFriendRequests.some(item => item.targetId === player.id);
-      if (friend) { action.textContent = 'Already Friends'; action.disabled = true; status.textContent = 'You are friends'; }
-      else if (incoming) { action.textContent = 'Accept Request'; action.disabled = false; status.textContent = 'This player sent you a request'; }
-      else if (sent) { action.textContent = 'Request Sent'; action.disabled = true; status.textContent = 'Waiting for their reply'; }
-      else { action.textContent = 'Add Friend'; action.disabled = false; status.textContent = 'Online in this room'; }
-      action.className = `mt-2 w-full rounded-xl py-2 text-xs font-bold text-white ${action.disabled ? 'bg-slate-400' : incoming ? 'bg-emerald-500' : 'bg-sky-500'}`;
-      const staffActions = document.getElementById('player-card-staff-actions');
-      const canManage = ['admin', 'developer'].includes(localPlayer.role) && player.id !== localPlayer.id;
-      staffActions.classList.toggle('hidden', !canManage);
-      document.getElementById('player-card-admin-role').classList.toggle('hidden', localPlayer.role !== 'developer');
-      document.getElementById('player-card-message').classList.toggle('hidden', localPlayer.role !== 'developer');
-      selectedPlayerStaffUser = null;
-      if (canManage) loadSelectedPlayerStaffUser(player.id, player.name);
-      card.classList.remove('hidden');
-      const container = document.getElementById('canvas-container');
-      const x = (Number.isFinite(player.displayX) ? player.displayX : Number.isFinite(player.x) ? player.x : camera.x + canvas.width / 2) - camera.x;
-      const y = (Number.isFinite(player.displayY) ? player.displayY : Number.isFinite(player.y) ? player.y : camera.y + canvas.height / 2) - camera.y;
-      const left = Math.max(8, Math.min(container.clientWidth - card.offsetWidth - 8, x - card.offsetWidth / 2));
-      const top = Math.max(8, Math.min(container.clientHeight - card.offsetHeight - 8, y - card.offsetHeight - 54));
-      card.style.left = `${left}px`; card.style.top = `${top}px`;
-    }
+      avatar.appendChild(makeAvatar(player, 'w-10 h-10', 'text-xl'));
+      document.getElementById('player-card-name').textContent = player.name || 'Slime';
+      document.getElementById('player-card-status').textContent = player.role === 'developer' ? 'Developer' : player.role === 'admin' ? 'Administrator' : 'Slime Player';
 
-    async function loadSelectedPlayerStaffUser(userId, username) {
-      const mute = document.getElementById('player-card-mute');
-      const ban = document.getElementById('player-card-ban');
-      mute.disabled = ban.disabled = true;
-      mute.textContent = 'Loading…'; ban.textContent = 'Loading…';
-      try {
-        const { data, error } = await supabaseClient.rpc('search_users', { p_query: String(username || '').trim() || userId });
-        if (error) throw error;
-        if (selectedPlayerId !== userId) return;
-        selectedPlayerStaffUser = (data || []).find(user => user.user_id === userId) || null;
-        const target = selectedPlayerStaffUser;
-        if (!target) throw new Error('Could not load this player’s staff actions.');
-        const muted = target.mute_until && new Date(target.mute_until).getTime() > Date.now();
-        mute.textContent = muted ? 'Unmute' : 'Mute 1 hour';
-        ban.textContent = target.is_banned ? 'Unban' : 'Ban 1 hour';
-        mute.disabled = ban.disabled = false;
-        const roleButton = document.getElementById('player-card-admin-role');
-        roleButton.textContent = target.role === 'admin' ? 'Revoke admin' : 'Make admin';
-        roleButton.disabled = target.role === 'developer' || target.user_id === localPlayer.id;
-      } catch (error) {
-        if (selectedPlayerId === userId) { mute.textContent = 'Mute unavailable'; ban.textContent = error.message || 'Ban unavailable'; }
+      const actionBtn = document.getElementById('player-card-action');
+      const existingFriend = friendList.find(f => f.id === player.id);
+      if (existingFriend) {
+        actionBtn.textContent = 'Open Direct Message';
+        actionBtn.className = 'mt-2 w-full rounded-xl bg-sky-500 py-2 text-xs font-bold text-white';
+      } else {
+        const pending = outgoingFriendRequests.some(r => r.targetId === player.id);
+        actionBtn.textContent = pending ? 'Friend Request Sent' : 'Add Friend';
+        actionBtn.className = 'mt-2 w-full rounded-xl bg-pink-500 py-2 text-xs font-bold text-white';
       }
-    }
-    async function moderateSelectedPlayer(kind, durationMinutes) {
-      const target = selectedPlayerStaffUser;
-      if (!target) return null;
-      const result = await callStaffFunction('moderate', { targetId: target.user_id, kind, durationMinutes });
-      await loadSelectedPlayerStaffUser(target.user_id, target.username);
-      const current = remotePlayers[target.user_id] || selectedPlayerProfile;
-      if (current) showPlayerCard(current);
-      if (result.warning) document.getElementById('player-card-status').textContent = result.warning;
-      return result;
-    }
 
-    async function toggleSelectedMute() {
-      const target = selectedPlayerStaffUser; if (!target) return;
-      const active = target.mute_until && new Date(target.mute_until).getTime() > Date.now();
-      await moderateSelectedPlayer(active ? 'unmute' : 'mute', active ? 0 : 60);
-    }
-    async function toggleSelectedBan() {
-      const target = selectedPlayerStaffUser; if (!target) return;
-      const result = await moderateSelectedPlayer(target.is_banned ? 'unban' : 'ban', target.is_banned ? 0 : 60);
-      return result;
-    }
-    async function toggleSelectedAdminRole() {
-      const target = selectedPlayerStaffUser; if (!target || localPlayer.role !== 'developer') return;
-      const enabled = target.role !== 'admin';
-      await callStaffFunction('set_admin', { targetId: target.user_id, enabled });
-      await loadSelectedPlayerStaffUser(target.user_id, target.username);
-    }
-    function openStaffDirectMessage() {
-      if (localPlayer.role !== 'developer' || !selectedPlayerProfile) return;
-      staffDMUserId = selectedPlayerProfile.id; staffDMProfile = { ...selectedPlayerProfile };
-      activeDMUserId = staffDMUserId;
-      openFriendsModal(); renderDMBox();
-      document.getElementById('dm-status-tag').textContent = 'Developer message';
+      const staffActions = document.getElementById('player-card-staff-actions');
+      const canMod = ['admin', 'developer'].includes(localPlayer.role);
+      if (canMod) {
+        staffActions.classList.remove('hidden');
+        document.getElementById('player-card-admin-role').classList.toggle('hidden', localPlayer.role !== 'developer');
+        document.getElementById('player-card-message').classList.remove('hidden');
+      } else {
+        staffActions.classList.add('hidden');
+      }
+
+      card.style.left = `${Math.min(window.innerWidth - 220, Math.max(16, (canvas.width / 2) + (player.x - localPlayer.x)))}px`;
+      card.style.top = `${Math.min(window.innerHeight - 240, Math.max(60, (canvas.height / 2) + (player.y - localPlayer.y)))}px`;
+      card.classList.remove('hidden');
     }
 
     function handlePlayerCardAction() {
-      const player = remotePlayers[selectedPlayerId] || selectedPlayerProfile;
-      if (!player) { closePlayerCard(); return; }
-      if (friendList.some(friend => friend.id === player.id)) { showPlayerCard(player); return; }
-      if (friendRequests.some(request => request.senderId === player.id)) acceptFriendRequest(player.id);
-      else sendFriendRequest(player.id, player.name, player.pfp, player.avatarUrl);
-      showPlayerCard(player);
+      if (!selectedPlayerProfile) return;
+      const player = selectedPlayerProfile;
+      const existingFriend = friendList.find(f => f.id === player.id);
+      if (existingFriend) {
+        closePlayerCard();
+        openFriendsModal();
+        selectDMUser(player.id);
+      } else {
+        sendFriendRequest(player.id, player.name, player.pfp);
+        closePlayerCard();
+      }
+    }
+
+    function openStaffDirectMessage() {
+      if (!selectedPlayerProfile) return;
+      const player = selectedPlayerProfile;
+      staffDMUserId = player.id;
+      closePlayerCard();
+      openFriendsModal();
+      selectDMUser(player.id);
+    }
+
+    // --- CHAT SYSTEM ---
+    function toggleChatSidebar() {
+      const sidebar = document.getElementById('chat-sidebar');
+      sidebar.classList.toggle('translate-x-full');
+      lucide.createIcons();
+    }
+
+    function switchChatTab(tab) {
+      activeChatTab = tab;
+      const globalBtn = document.getElementById('chat-tab-global');
+      const staffBtn = document.getElementById('chat-tab-staff');
+      if (tab === 'global') {
+        globalBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-active';
+        staffBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive';
+      } else {
+        globalBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive';
+        staffBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-active';
+      }
+      renderChatMessages();
+    }
+
+    let globalChatMessages = [];
+    let staffChatMessages = [];
+
+    function renderChatMessages() {
+      const container = document.getElementById('chat-messages');
+      container.innerHTML = '';
+      const list = activeChatTab === 'global' ? globalChatMessages : staffChatMessages;
+
+      if (list.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'text-center text-pink-300 py-6 text-xs';
+        empty.textContent = activeChatTab === 'global' ? 'No messages yet. Say hello!' : 'Staff Chat: Developers and Admins direct channel.';
+        container.appendChild(empty);
+        return;
+      }
+
+      list.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'flex flex-col space-y-0.5 p-2 rounded-xl bg-white/10 border border-white/10';
+        
+        const topRow = document.createElement('div');
+        topRow.className = 'flex items-center justify-between text-[10px]';
+        
+        const sender = document.createElement('span');
+        sender.className = 'font-extrabold text-pink-300';
+        sender.textContent = msg.senderName || 'Slime';
+        topRow.appendChild(sender);
+
+        const time = document.createElement('span');
+        time.className = 'text-pink-400/80';
+        time.textContent = new Date(msg.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        topRow.appendChild(time);
+
+        div.appendChild(topRow);
+
+        const text = document.createElement('p');
+        text.className = 'text-white font-medium break-words text-xs';
+        text.textContent = msg.text;
+        div.appendChild(text);
+
+        container.appendChild(div);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      if (text.length > 120) return;
+
+      const msg = {
+        id: 'msg_' + Math.random().toString(36).substring(2, 9),
+        senderId: localPlayer.id,
+        senderName: localPlayer.name,
+        text: text,
+        timestamp: Date.now()
+      };
+
+      if (activeChatTab === 'global') {
+        globalChatMessages.push(msg);
+        if (globalChatMessages.length > 60) globalChatMessages.shift();
+        sendSocialBroadcast('global_chat_message', msg);
+      } else {
+        if (!['admin', 'developer'].includes(localPlayer.role)) return;
+        staffChatMessages.push(msg);
+        if (staffChatMessages.length > 60) staffChatMessages.shift();
+        sendSocialBroadcast('staff_chat_message', msg);
+      }
+
+      localPlayer.speechBubble = { text: text, until: Date.now() + 5000 };
+      input.value = '';
+      renderChatMessages();
+    }
+
+    // --- FRIENDS & DM SYSTEM ---
+    function openFriendsModal() {
+      document.getElementById('friends-modal').classList.remove('hidden');
+      friendsUnread = false;
+      localStorage.setItem('sakura_friends_unread', '0');
+      document.getElementById('friends-unread-dot').classList.add('hidden');
+      renderFriendsModalContent();
+      lucide.createIcons();
+    }
+    function closeFriendsModal() {
+      document.getElementById('friends-modal').classList.add('hidden');
+    }
+
+    function renderFriendsModalContent() {
+      renderFriendRequests();
+      renderFriendsList();
+      if (activeDMUserId) renderDMMessages();
+    }
+
+    function renderFriendRequests() {
+      const container = document.getElementById('friend-requests-container');
+      container.innerHTML = '';
+      if (friendRequests.length === 0) return;
+
+      const title = document.createElement('p');
+      title.className = 'text-[10px] font-extrabold uppercase text-pink-700';
+      title.textContent = 'Friend Requests';
+      container.appendChild(title);
+
+      friendRequests.forEach(req => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-white/80 p-2 rounded-xl border border-pink-200';
+        
+        const info = document.createElement('span');
+        info.className = 'text-xs font-bold text-pink-950 truncate';
+        info.textContent = req.name;
+        row.appendChild(info);
+
+        const actions = document.createElement('div');
+        actions.className = 'flex items-center gap-1';
+
+        const acceptBtn = document.createElement('button');
+        acceptBtn.className = 'px-2 py-1 rounded-lg bg-emerald-500 text-white font-bold text-[10px]';
+        acceptBtn.textContent = 'Accept';
+        acceptBtn.onclick = () => acceptFriendRequest(req);
+        actions.appendChild(acceptBtn);
+
+        row.appendChild(actions);
+        container.appendChild(row);
+      });
+    }
+
+    function renderFriendsList() {
+      const container = document.getElementById('friends-list-container');
+      container.innerHTML = '';
+      if (friendList.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'text-xs text-pink-600 p-2 text-center';
+        empty.textContent = 'No friends added yet. Click players on the map or search above!';
+        container.appendChild(empty);
+        return;
+      }
+
+      friendList.forEach(friend => {
+        const row = document.createElement('div');
+        row.className = `flex items-center justify-between p-2 rounded-xl border cursor-pointer transition ${activeDMUserId === friend.id ? 'bg-sky-100 border-sky-300' : 'bg-white/80 border-pink-200 hover:bg-white'}`;
+        row.onclick = () => selectDMUser(friend.id);
+
+        const left = document.createElement('div');
+        left.className = 'flex items-center gap-2 min-w-0';
+        left.appendChild(makeAvatar(friend, 'w-8 h-8', 'text-sm'));
+
+        const name = document.createElement('span');
+        name.className = 'text-xs font-bold text-pink-950 truncate';
+        name.textContent = friend.name;
+        left.appendChild(name);
+
+        row.appendChild(left);
+        container.appendChild(row);
+      });
+    }
+
+    function selectDMUser(userId) {
+      const friend = friendList.find(f => f.id === userId);
+      if (!friend) return;
+      activeDMUserId = userId;
+      document.getElementById('dm-active-target').textContent = `Chatting with ${friend.name}`;
+      document.getElementById('dm-status-tag').textContent = 'Friend Connected';
+      
+      const input = document.getElementById('dm-text-input');
+      const btn = document.getElementById('dm-send-btn');
+      input.disabled = false;
+      btn.disabled = false;
+      input.placeholder = `Message ${friend.name}...`;
+
+      renderFriendsList();
+      renderDMMessages();
+    }
+
+    function renderDMMessages() {
+      const container = document.getElementById('dm-messages-container');
+      container.innerHTML = '';
+      if (!activeDMUserId) return;
+
+      const messages = dmMessages[activeDMUserId] || [];
+      if (messages.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'text-center text-pink-500 py-4 text-xs';
+        empty.textContent = 'No direct messages yet. Start chatting!';
+        container.appendChild(empty);
+        return;
+      }
+
+      messages.forEach(msg => {
+        const bubble = document.createElement('div');
+        const isMe = msg.senderId === localPlayer.id;
+        bubble.className = `flex flex-col max-w-[80%] p-2 rounded-2xl text-xs ${isMe ? 'ml-auto bg-sky-500 text-white rounded-br-none' : 'mr-auto bg-white text-pink-950 rounded-bl-none shadow-sm border border-pink-100'}`;
+        
+        const txt = document.createElement('span');
+        txt.className = 'font-medium break-words';
+        txt.textContent = msg.text;
+        bubble.appendChild(txt);
+
+        const time = document.createElement('span');
+        time.className = `text-[9px] mt-0.5 text-right ${isMe ? 'text-sky-100' : 'text-pink-400'}`;
+        time.textContent = new Date(msg.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        bubble.appendChild(time);
+
+        container.appendChild(bubble);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function handleDMSubmit(e) {
+      e.preventDefault();
+      if (!activeDMUserId) return;
+      const input = document.getElementById('dm-text-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const msg = {
+        id: 'dm_' + Math.random().toString(36).substring(2, 9),
+        senderId: localPlayer.id,
+        recipientId: activeDMUserId,
+        text: text,
+        timestamp: Date.now()
+      };
+
+      if (!dmMessages[activeDMUserId]) dmMessages[activeDMUserId] = [];
+      dmMessages[activeDMUserId].push(msg);
+      localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
+
+      sendSocialBroadcast('direct_message', msg);
+      input.value = '';
+      renderDMMessages();
+    }
+
+    function sendFriendRequest(targetId, targetName, targetPfp) {
+      if (friendList.some(f => f.id === targetId)) return;
+      outgoingFriendRequests.push({ targetId, name: targetName });
+      localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
+      sendSocialBroadcast('friend_request', { senderId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, targetId });
+    }
+
+    function acceptFriendRequest(req) {
+      friendRequests = friendRequests.filter(r => r.senderId !== req.senderId);
+      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
+      if (!friendList.some(f => f.id === req.senderId)) {
+        friendList.push({ id: req.senderId, name: req.name, pfp: req.pfp, accepted: true });
+        localStorage.setItem('sakura_friends', JSON.stringify(friendList));
+      }
+      renderFriendsModalContent();
+    }
+
+    function handleFriendUserSearch() {
+      const q = document.getElementById('friend-search-input').value.toLowerCase().trim();
+      if (!q) { renderFriendsList(); return; }
+      const matched = Object.values(remotePlayers).filter(p => p.name.toLowerCase().includes(q) && p.id !== localPlayer.id);
+      const container = document.getElementById('friends-list-container');
+      container.innerHTML = '';
+      if (matched.length === 0) {
+        container.innerHTML = '<div class="text-xs text-pink-600 p-2 text-center">No online players found matching query.</div>';
+        return;
+      }
+      matched.forEach(player => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-2 rounded-xl bg-white/80 border border-pink-200';
+        
+        const left = document.createElement('div');
+        left.className = 'flex items-center gap-2 min-w-0';
+        left.appendChild(makeAvatar(player, 'w-8 h-8', 'text-sm'));
+        const name = document.createElement('span');
+        name.className = 'text-xs font-bold text-pink-950 truncate';
+        name.textContent = player.name;
+        left.appendChild(name);
+        row.appendChild(left);
+
+        const addBtn = document.createElement('button');
+        addBtn.className = 'px-2 py-1 rounded-lg bg-pink-500 text-white font-bold text-[10px]';
+        addBtn.textContent = 'Add';
+        addBtn.onclick = () => { sendFriendRequest(player.id, player.name, player.pfp); addBtn.textContent = 'Sent'; addBtn.disabled = true; };
+        row.appendChild(addBtn);
+
+        container.appendChild(row);
+      });
     }
 
     // --- MARKET & INVENTORY SYSTEM ---
     let activeMarketCategory = 'accessories';
-    let activeInventoryCategory = 'skins';
-    let marketTestingItem = null;
-
     function openMarketModal() {
       document.getElementById('market-modal').classList.remove('hidden');
       renderMarketGrid();
-      startMarketPreviewLoop();
+      lucide.createIcons();
     }
     function closeMarketModal() {
       document.getElementById('market-modal').classList.add('hidden');
@@ -1356,9 +1625,8 @@
     function filterMarketCategory(cat) {
       activeMarketCategory = cat;
       ['accessories', 'skins', 'titles', 'emotes', 'profile', 'message_cards', 'frames'].forEach(c => {
-        const btn = document.getElementById('mcat-' + c);
-        if (c === cat) btn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-active';
-        else btn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive';
+        const btn = document.getElementById(`mcat-${c}`);
+        if (btn) btn.className = c === cat ? 'px-2.5 py-1 rounded-xl text-xs font-bold tab-active' : 'px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive';
       });
       renderMarketGrid();
     }
@@ -1366,479 +1634,554 @@
     function renderMarketGrid() {
       const grid = document.getElementById('market-items-grid');
       grid.innerHTML = '';
-      const search = (document.getElementById('market-search-input').value || '').trim().toLowerCase();
-      const items = (MARKET_ITEMS[activeMarketCategory] || []).filter(item => !search || `${item.name} ${item.desc}`.toLowerCase().includes(search));
-      if (!items.length) { const empty = document.createElement('p'); empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-pink-700'; empty.textContent = 'No items match that search.'; grid.appendChild(empty); }
-      items.forEach(item => {
-        const isOwned = localPlayer.inventory.includes(item.id);
+      const q = (document.getElementById('market-search-input').value || '').toLowerCase();
+      let list = MARKET_ITEMS[activeMarketCategory] || [];
+      if (q) list = list.filter(item => item.name.toLowerCase().includes(q) || (item.desc && item.desc.toLowerCase().includes(q)));
+
+      list.forEach(item => {
+        const owned = localPlayer.inventory.includes(item.id);
         const card = document.createElement('div');
-        const luxe = item.price >= 30000;
-        card.className = `p-2.5 rounded-2xl flex flex-col justify-between shadow-sm transition ${luxe ? 'market-luxe border-violet-300' : item.price >= 10000 ? 'market-premium border-amber-300' : 'bg-white/80 border-pink-200 hover:border-pink-400'}`;
-        card.innerHTML = `
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-pink-950">${item.icon ? item.icon + ' ' : ''}${item.name}</span>
-              <span class="text-xs font-extrabold text-amber-700">🪙 ${item.price}</span>
-            </div>
-            <p class="text-[10px] text-pink-600 mt-0.5 line-clamp-1">${item.desc}</p>
-          </div>
-          <div class="flex items-center gap-1 mt-2">
-            <button onclick="testMarketItem('${item.id}')" class="flex-1 py-1 rounded-xl bg-pink-100 hover:bg-pink-200 text-pink-900 text-[10px] font-bold">
-              Test
-            </button>
-            ${isOwned ? 
-              `<span class="px-2 py-1 rounded-xl bg-emerald-100 text-emerald-800 text-[10px] font-bold">Owned</span>` : 
-              `<button onclick="buyMarketItem('${item.id}')" class="flex-1 py-1 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-[10px] font-bold">
-                Buy
-              </button>`
-            }
-          </div>
-        `;
+        card.className = 'bg-white/80 border border-pink-200 rounded-2xl p-2.5 flex flex-col justify-between shadow-sm';
+        
+        const top = document.createElement('div');
+        top.className = 'flex items-center justify-between mb-1';
+        const title = document.createElement('span');
+        title.className = 'text-xs font-extrabold text-pink-950 truncate';
+        title.textContent = item.name;
+        top.appendChild(title);
+
+        const price = document.createElement('span');
+        price.className = 'text-[10px] font-bold text-amber-800 shrink-0';
+        price.textContent = `${item.price} 🪙`;
+        top.appendChild(price);
+        card.appendChild(top);
+
+        const desc = document.createElement('p');
+        desc.className = 'text-[9px] text-pink-600 line-clamp-2 mb-2';
+        desc.textContent = item.desc || '';
+        card.appendChild(desc);
+
+        const btn = document.createElement('button');
+        if (owned) {
+          btn.className = 'w-full py-1.5 rounded-xl bg-pink-100 text-pink-700 font-bold text-[10px] cursor-default';
+          btn.textContent = 'Owned';
+        } else {
+          btn.className = 'w-full py-1.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-[10px] shadow-sm transition active:scale-95';
+          btn.textContent = 'Buy Item';
+          btn.onclick = () => buyMarketItem(item);
+        }
+        card.appendChild(btn);
         grid.appendChild(card);
       });
     }
 
-    function testMarketItem(itemId) {
-      const allItems = [].concat(...Object.values(MARKET_ITEMS));
-      const item = allItems.find(i => i.id === itemId);
-      marketTestingItem = item;
-      document.getElementById('market-item-preview-name').textContent = `Testing: ${item ? item.name : 'None'}`;
-    }
-
-    async function buyMarketItem(itemId) {
-      const allItems = [].concat(...Object.values(MARKET_ITEMS));
-      const item = allItems.find(i => i.id === itemId);
-      if (!item || !authUser || guestMode) { alert('Sign in to buy and save market items.'); return; }
+    function buyMarketItem(item) {
       if (localPlayer.inventory.includes(item.id)) return;
-      const { data, error } = await supabaseClient.rpc('purchase_market_item', { p_item_id: item.id });
-      if (error) { alert(error.message.includes('insufficient') ? 'Not enough points! Collect more points first.' : 'Could not complete this purchase. Apply the supplied Supabase SQL setup first.'); return; }
-      localPlayer.points = Number(data.points) || 0;
-      localPlayer.inventory = Array.isArray(data.inventory) ? data.inventory : localPlayer.inventory;
-      savePlayerToStorage();
-      playSound('buy');
-      updateUIHeader();
-      renderMarketGrid();
-      if (!document.getElementById('inventory-modal').classList.contains('hidden')) renderInventoryGrid();
-    }
-
-    // Market Preview Canvas
-    let marketPreviewCanvas = document.getElementById('marketPreviewCanvas');
-    let marketPreviewCtx = marketPreviewCanvas.getContext('2d');
-
-    function startMarketPreviewLoop() {
-      function anim() {
-        if (document.getElementById('market-modal').classList.contains('hidden')) return;
-        marketPreviewCtx.clearRect(0, 0, marketPreviewCanvas.width, marketPreviewCanvas.height);
-
-        let sSkin = localPlayer.equippedSkin;
-        let sAcc = localPlayer.equippedAcc;
-        let sTitle = localPlayer.equippedTitle;
-        let sEmote = null;
-
-        if (marketTestingItem) {
-          if (marketTestingItem.type === 'skins') sSkin = marketTestingItem.id;
-          if (marketTestingItem.type === 'accessories') sAcc = marketTestingItem.id;
-          if (marketTestingItem.type === 'titles') sTitle = marketTestingItem.id;
-          if (marketTestingItem.type === 'emotes') sEmote = marketTestingItem.anim;
-        }
-
-        drawSlimeModel(marketPreviewCtx, 90, 85, sSkin, sAcc, sTitle, false, 0, sEmote, true, localPlayer.role);
-        if (marketTestingItem && marketTestingItem.type === 'profile') {
-          marketPreviewCtx.font = '30px sans-serif'; marketPreviewCtx.textAlign = 'center'; marketPreviewCtx.fillText(marketTestingItem.icon, 90, 138);
-        }
-        if (marketTestingItem && marketTestingItem.type === 'message_cards') {
-          const color = marketTestingItem.style === 'sakura' ? ['#fff1f2','#fb7185'] : marketTestingItem.style === 'moon' ? ['#e0f2fe','#38bdf8'] : ['#f3e8ff','#c084fc'];
-          marketPreviewCtx.fillStyle = color[0]; marketPreviewCtx.strokeStyle = color[1]; marketPreviewCtx.lineWidth = 3;
-          marketPreviewCtx.beginPath(); marketPreviewCtx.roundRect(20, 112, 140, 28, 12); marketPreviewCtx.fill(); marketPreviewCtx.stroke();
-          marketPreviewCtx.fillStyle = '#312e81'; marketPreviewCtx.font = 'bold 9px sans-serif'; marketPreviewCtx.fillText('A decorated message', 90, 130);
-        }
-        if (marketTestingItem && marketTestingItem.type === 'frames') {
-          const color = marketTestingItem.style === 'sakura' ? '#fb7185' : marketTestingItem.style === 'moon' ? '#38bdf8' : '#fbbf24';
-          marketPreviewCtx.strokeStyle = color; marketPreviewCtx.lineWidth = 4; marketPreviewCtx.shadowColor = color; marketPreviewCtx.shadowBlur = 14;
-          marketPreviewCtx.beginPath(); marketPreviewCtx.arc(90, 132, 13, 0, Math.PI * 2); marketPreviewCtx.stroke(); marketPreviewCtx.shadowBlur = 0;
-        }
-        requestAnimationFrame(anim);
+      if (localPlayer.points < item.price) {
+        playSound('error');
+        return;
       }
-      requestAnimationFrame(anim);
+      localPlayer.points -= item.price;
+      localPlayer.inventory.push(item.id);
+      localStorage.setItem('sakura_points', String(localPlayer.points));
+      localStorage.setItem('sakura_inv', JSON.stringify(localPlayer.inventory));
+      playSound('buy');
+      updatePointsDisplay();
+      renderMarketGrid();
     }
 
-    // Inventory Modal
+    let activeInventoryCategory = 'skins';
     function openInventoryModal() {
       document.getElementById('inventory-modal').classList.remove('hidden');
       renderInventoryGrid();
-      startInvPreviewLoop();
+      lucide.createIcons();
     }
     function closeInventoryModal() {
       document.getElementById('inventory-modal').classList.add('hidden');
     }
 
-    function filterInventoryCategory(category) {
-      activeInventoryCategory = category;
-      ['skins', 'accessories', 'titles', 'profile', 'emotes', 'message_cards', 'frames'].forEach(name => {
-        const button = document.getElementById('icat-' + name);
-        button.className = `px-2.5 py-1 rounded-xl text-[10px] font-bold ${name === category ? 'tab-active' : 'tab-inactive'}`;
+    function filterInventoryCategory(cat) {
+      activeInventoryCategory = cat;
+      ['skins', 'accessories', 'titles', 'profile', 'emotes', 'message_cards', 'frames'].forEach(c => {
+        const btn = document.getElementById(`icat-${c}`);
+        if (btn) btn.className = c === cat ? 'px-2.5 py-1 rounded-xl text-[10px] font-bold tab-active' : 'px-2.5 py-1 rounded-xl text-[10px] font-bold tab-inactive';
       });
       renderInventoryGrid();
     }
 
     function renderInventoryGrid() {
       const grid = document.getElementById('inventory-items-grid');
-      const search = document.getElementById('inv-search-input').value.toLowerCase();
       grid.innerHTML = '';
-      const ownedItems = [...(MARKET_ITEMS[activeInventoryCategory] || []).filter(i => localPlayer.inventory.includes(i.id)), ...(ROLE_ITEMS[localPlayer.role] || []).filter(i => i.type === activeInventoryCategory)];
-      const matchingItems = ownedItems.filter(item => item.name.toLowerCase().includes(search));
-      if (!matchingItems.length) {
-        const empty = document.createElement('p');
-        empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-purple-700';
-        empty.textContent = 'Nothing here yet. Find items in the market.';
-        grid.appendChild(empty);
+      const q = (document.getElementById('inv-search-input').value || '').toLowerCase();
+      
+      let allUnlockedIds = [...localPlayer.inventory];
+      if (localPlayer.role === 'admin' && ROLE_ITEMS.admin) {
+        ROLE_ITEMS.admin.forEach(i => { if (!allUnlockedIds.includes(i.id)) allUnlockedIds.push(i.id); });
       }
-      matchingItems.forEach(item => {
-        const isEquipped = localPlayer.equippedSkin === item.id || localPlayer.equippedAcc === item.id || localPlayer.equippedTitle === item.id || localPlayer.equippedEmote === item.id || localPlayer.equippedMessageCard === item.id || localPlayer.equippedFrame === item.id || (item.type === 'profile' && localPlayer.pfp === item.icon && !localPlayer.avatarUrl);
+      if (localPlayer.role === 'developer' && ROLE_ITEMS.developer) {
+        ROLE_ITEMS.developer.forEach(i => { if (!allUnlockedIds.includes(i.id)) allUnlockedIds.push(i.id); });
+      }
+
+      let list = [];
+      Object.values(MARKET_ITEMS).forEach(catList => {
+        catList.forEach(item => {
+          if (allUnlockedIds.includes(item.id) && item.type === activeInventoryCategory) list.push(item);
+        });
+      });
+      if (localPlayer.role === 'admin' && ROLE_ITEMS.admin) {
+        ROLE_ITEMS.admin.forEach(item => { if (item.type === activeInventoryCategory) list.push(item); });
+      }
+      if (localPlayer.role === 'developer' && ROLE_ITEMS.developer) {
+        ROLE_ITEMS.developer.forEach(item => { if (item.type === activeInventoryCategory) list.push(item); });
+      }
+
+      if (q) list = list.filter(item => item.name.toLowerCase().includes(q));
+
+      list.forEach(item => {
+        const isEquipped = localPlayer.equippedSkin === item.id || localPlayer.equippedAcc === item.id || localPlayer.equippedTitle === item.id || localPlayer.equippedEmote === item.id || localPlayer.equippedMessageCard === item.id || localPlayer.equippedFrame === item.id || localPlayer.pfp === item.icon;
+        
         const card = document.createElement('div');
-        card.className = 'p-2.5 rounded-2xl bg-white/80 border border-purple-200 flex flex-col justify-between shadow-sm';
-        const name = document.createElement('span'); name.className = 'text-xs font-bold text-purple-950'; name.textContent = item.name;
-        const kind = document.createElement('p'); kind.className = 'text-[10px] text-purple-600'; kind.textContent = item.type.toUpperCase();
-        const button = document.createElement('button'); button.className = `mt-2 py-1 rounded-xl text-[10px] font-bold ${isEquipped ? 'bg-emerald-500 text-white' : 'bg-purple-500 text-white hover:bg-purple-600'}`;
-        button.textContent = isEquipped ? 'Equipped' : 'Equip'; button.onclick = () => equipInventoryItem(item.id);
-        card.append(name, kind, button); grid.appendChild(card);
+        card.className = `border rounded-2xl p-2.5 flex flex-col justify-between shadow-sm ${isEquipped ? 'bg-purple-50 border-purple-400' : 'bg-white/80 border-purple-200'}`;
+        
+        const top = document.createElement('span');
+        top.className = 'text-xs font-extrabold text-purple-950 truncate mb-1';
+        top.textContent = item.name;
+        card.appendChild(top);
+
+        const btn = document.createElement('button');
+        btn.className = `w-full py-1.5 rounded-xl font-bold text-[10px] transition active:scale-95 ${isEquipped ? 'bg-purple-500 text-white' : 'bg-purple-100 hover:bg-purple-200 text-purple-800'}`;
+        btn.textContent = isEquipped ? 'Equipped' : 'Equip';
+        btn.onclick = () => equipInventoryItem(item);
+        card.appendChild(btn);
+
+        grid.appendChild(card);
       });
     }
 
-    async function equipInventoryItem(itemId) {
-      const allItems = [].concat(...Object.values(MARKET_ITEMS), ...Object.values(ROLE_ITEMS));
-      const item = allItems.find(i => i.id === itemId);
-      const roleOwned = (ROLE_ITEMS[localPlayer.role] || []).some(i => i.id === itemId);
-      if (!item || (!localPlayer.inventory.includes(item.id) && !roleOwned)) return;
-      if (item.type === 'skins') localPlayer.equippedSkin = localPlayer.equippedSkin === item.id ? 'skin_pink' : item.id;
-      if (item.type === 'accessories') localPlayer.equippedAcc = localPlayer.equippedAcc === item.id ? null : item.id;
-      if (item.type === 'titles') localPlayer.equippedTitle = localPlayer.equippedTitle === item.id ? null : item.id;
-      if (item.type === 'profile') { localPlayer.pfp = item.icon; localPlayer.avatarUrl = ''; }
-      if (item.type === 'emotes') localPlayer.equippedEmote = localPlayer.equippedEmote === item.id ? null : item.id;
-      if (item.type === 'message_cards') localPlayer.equippedMessageCard = localPlayer.equippedMessageCard === item.id ? null : item.id;
-      if (item.type === 'frames') localPlayer.equippedFrame = localPlayer.equippedFrame === item.id ? null : item.id;
-      const error = await persistProfileToAuth();
-      if (error) { alert('Could not save this equipped item. ' + error.message); return; }
-      savePlayerToStorage();
-      broadcastPlayerState(); broadcastProfileUpdate();
-      renderAvatarPreview(); renderInventoryGrid(); renderOwnedEmoteButton();
-    }
-
-    function renderOwnedEmoteButton() {
-      const button = document.getElementById('special-emote-btn');
-      if (!button) return;
-      const item = MARKET_ITEMS.emotes.find(entry => entry.id === localPlayer.equippedEmote && localPlayer.inventory.includes(entry.id));
-      const roleEmote = null;
-      if (!item && !roleEmote) { button.classList.add('hidden'); localPlayer.activeSpecialEmote = null; return; }
-      const selected = item || roleEmote;
-      button.textContent = `${selected.icon} ${selected.name}${localPlayer.activeSpecialEmote === selected.anim ? ' ✓' : ''}`;
-      button.classList.remove('hidden');
-    }
-
-    let invPreviewCanvas = document.getElementById('invPreviewCanvas');
-    let invPreviewCtx = invPreviewCanvas.getContext('2d');
-
-    function startInvPreviewLoop() {
-      function anim() {
-        if (document.getElementById('inventory-modal').classList.contains('hidden')) return;
-        invPreviewCtx.clearRect(0, 0, invPreviewCanvas.width, invPreviewCanvas.height);
-        drawSlimeModel(invPreviewCtx, 90, 85, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, false, 0, localPlayer.activeSpecialEmote, true, localPlayer.role);
-        requestAnimationFrame(anim);
+    function equipInventoryItem(item) {
+      if (item.type === 'skins') {
+        localPlayer.equippedSkin = item.id;
+        localStorage.setItem('sakura_eq_skin', item.id);
+      } else if (item.type === 'accessories') {
+        localPlayer.equippedAcc = localPlayer.equippedAcc === item.id ? null : item.id;
+        localStorage.setItem('sakura_eq_acc', localPlayer.equippedAcc || '');
+      } else if (item.type === 'titles') {
+        localPlayer.equippedTitle = localPlayer.equippedTitle === item.id ? null : item.id;
+        localStorage.setItem('sakura_eq_title', localPlayer.equippedTitle || '');
+      } else if (item.type === 'profile') {
+        localPlayer.pfp = item.icon;
+        localStorage.setItem('sakura_pfp', item.icon);
+      } else if (item.type === 'emotes') {
+        localPlayer.equippedEmote = localPlayer.equippedEmote === item.id ? null : item.id;
+        localStorage.setItem('sakura_eq_emote', localPlayer.equippedEmote || '');
+        updateOwnedEmoteButtons();
+      } else if (item.type === 'message_cards') {
+        localPlayer.equippedMessageCard = localPlayer.equippedMessageCard === item.id ? null : item.id;
+      } else if (item.type === 'frames') {
+        localPlayer.equippedFrame = localPlayer.equippedFrame === item.id ? null : item.id;
       }
-      requestAnimationFrame(anim);
+      renderInventoryGrid();
+      broadcastPlayerState();
     }
 
-    // --- FRIENDS & DIRECT MESSAGES SYSTEM ---
-    function openFriendsModal() {
-      friendsUnread = false;
-      localStorage.setItem('sakura_friends_unread', '0');
-      syncFriendsUnreadDot();
-      document.getElementById('friends-modal').classList.remove('hidden');
-      renderFriendsList();
-      renderDMBox();
+    function updateOwnedEmoteButtons() {
+      const container = document.getElementById('owned-emote-buttons');
+      container.innerHTML = '';
+      if (localPlayer.equippedEmote) {
+        const emoteObj = MARKET_ITEMS.emotes.find(e => e.id === localPlayer.equippedEmote);
+        if (emoteObj) {
+          const btn = document.createElement('button');
+          btn.className = 'hover:scale-125 transition text-lg';
+          btn.textContent = emoteObj.icon;
+          btn.onclick = () => triggerEmote(emoteObj.icon);
+          container.appendChild(btn);
+          document.getElementById('special-emote-btn').classList.remove('hidden');
+          document.getElementById('special-emote-btn').textContent = `${emoteObj.icon} ${emoteObj.name}`;
+          return;
+        }
+      }
+      document.getElementById('special-emote-btn').classList.add('hidden');
     }
-    function closeFriendsModal() { document.getElementById('friends-modal').classList.add('hidden'); }
 
-    function escapeHtml(value) {
-      return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+    function triggerEmote(icon) {
+      localPlayer.speechBubble = { text: icon, until: Date.now() + 3500 };
+      broadcastPlayerState();
     }
-    function safeAvatarUrl(value) {
-      return typeof value === 'string' && /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(value) ? value : '';
+
+    function triggerJump() {
+      if (!localPlayer.isJumping) {
+        localPlayer.isJumping = true;
+        localPlayer.jumpVelocity = 520;
+        localPlayer.bounceCount = 0;
+        broadcastPlayerState();
+      }
     }
-    function makeAvatar(profile, size = 'w-8 h-8') {
-      const wrap = document.createElement('span');
-      wrap.className = `${size} rounded-full bg-pink-100 border border-pink-200 flex items-center justify-center overflow-hidden shrink-0 text-base`;
-      const frame = profile.equippedFrame || profile.frameId;
-      const frameStyle = { frame_sakura: ['#fb7185', '0 0 0 2px #fff1f2, 0 0 10px #fb7185'], frame_moon: ['#38bdf8', '0 0 0 2px #e0f2fe, 0 0 12px #38bdf8'], frame_prism: ['#fbbf24', '0 0 0 2px #fef3c7, 0 0 14px #c084fc'] }[frame];
-      if (frameStyle) { wrap.style.borderColor = frameStyle[0]; wrap.style.boxShadow = frameStyle[1]; }
-      const imageUrl = safeAvatarUrl(profile.avatarUrl);
-      if (imageUrl) {
-        const image = document.createElement('img');
-        image.src = imageUrl; image.alt = ''; image.className = 'w-full h-full object-cover';
-        wrap.appendChild(image);
+
+    function toggleActiveSpecialEmote() {
+      if (!localPlayer.equippedEmote) return;
+      const emoteObj = MARKET_ITEMS.emotes.find(e => e.id === localPlayer.equippedEmote);
+      if (!emoteObj) return;
+      localPlayer.activeSpecialEmote = localPlayer.activeSpecialEmote === emoteObj.anim ? null : emoteObj.anim;
+      broadcastPlayerState();
+    }
+
+    // --- GAMES (MEMORIES & SEQUENCE) ---
+    function openGamesModal() { document.getElementById('games-modal').classList.remove('hidden'); lucide.createIcons(); }
+    function closeGamesModal() { document.getElementById('games-modal').classList.add('hidden'); }
+
+    // Slime Memories Game
+    let memoryCards = [];
+    let memoryFlipped = [];
+    let memoryMatchedPairs = 0;
+    let memoryLocked = false;
+
+    function openMemoriesModal() {
+      closeGamesModal();
+      document.getElementById('memories-modal').classList.remove('hidden');
+      startMemoriesGame();
+    }
+    function closeMemoriesModal() { document.getElementById('memories-modal').classList.add('hidden'); }
+
+    function startMemoriesGame() {
+      const icons = ['🌸', '🐱', '🦊', '👑', '🐰', '⭐', '🐼', '🦄'];
+      let deck = [...icons, ...icons].sort(() => Math.random() - 0.5);
+      memoryCards = deck.map((icon, idx) => ({ id: idx, icon, matched: false }));
+      memoryFlipped = [];
+      memoryMatchedPairs = 0;
+      memoryLocked = false;
+      document.getElementById('memory-status').textContent = 'Find matching pairs!';
+      renderMemoryGrid();
+    }
+
+    function renderMemoryGrid() {
+      const grid = document.getElementById('memory-grid');
+      grid.innerHTML = '';
+      memoryCards.forEach((card, idx) => {
+        const btn = document.createElement('button');
+        const isFlipped = memoryFlipped.includes(idx) || card.matched;
+        btn.className = `h-14 rounded-2xl text-2xl flex items-center justify-center font-bold border transition ${isFlipped ? 'bg-white border-pink-300 shadow' : 'bg-emerald-600 border-emerald-700 text-transparent'}`;
+        btn.textContent = isFlipped ? card.icon : '?';
+        btn.onclick = () => handleMemoryFlip(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function handleMemoryFlip(idx) {
+      if (memoryLocked || memoryCards[idx].matched || memoryFlipped.includes(idx)) return;
+      memoryFlipped.push(idx);
+      renderMemoryGrid();
+
+      if (memoryFlipped.length === 2) {
+        memoryLocked = true;
+        const [first, second] = memoryFlipped;
+        if (memoryCards[first].icon === memoryCards[second].icon) {
+          memoryCards[first].matched = true;
+          memoryCards[second].matched = true;
+          memoryMatchedPairs++;
+          memoryFlipped = [];
+          memoryLocked = false;
+          playSound('match');
+          renderMemoryGrid();
+          if (memoryMatchedPairs === 8) {
+            document.getElementById('memory-status').textContent = '🎉 You won 5 points!';
+            addPlayerPoints(5);
+          }
+        } else {
+          window.setTimeout(() => {
+            memoryFlipped = [];
+            memoryLocked = false;
+            renderMemoryGrid();
+          }, 800);
+        }
+      }
+    }
+
+    // Slime Sequence Game (Fixed: repeated taps blink/stop glowing and glow again)
+    let sequencePattern = [];
+    let sequencePlayerStep = 0;
+    let sequencePlaying = false;
+    let sequenceIcons = ['🌸', '⭐', '🐱', '🦊'];
+
+    function openSequenceGame() {
+      closeGamesModal();
+      document.getElementById('sequence-modal').classList.remove('hidden');
+      startSequenceGame();
+    }
+    function closeSequenceGame() { document.getElementById('sequence-modal').classList.add('hidden'); }
+
+    function startSequenceGame() {
+      sequencePattern = [];
+      for (let i = 0; i < 8; i++) sequencePattern.push(Math.floor(Math.random() * 4));
+      sequencePlayerStep = 0;
+      sequencePlaying = true;
+      document.getElementById('sequence-status').textContent = 'Watch the sequence pattern...';
+      renderSequenceGrid();
+      playSequenceDemo();
+    }
+
+    function renderSequenceGrid() {
+      const grid = document.getElementById('sequence-grid');
+      grid.innerHTML = '';
+      sequenceIcons.forEach((icon, idx) => {
+        const btn = document.createElement('button');
+        btn.id = `seq-btn-${idx}`;
+        btn.className = 'h-20 rounded-2xl bg-violet-600 border-2 border-violet-400 text-3xl flex items-center justify-center shadow transition active:scale-95';
+        btn.textContent = icon;
+        btn.onclick = () => handleSequenceTap(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function playSequenceDemo() {
+      sequencePlaying = false;
+      let delay = 600;
+      sequencePattern.forEach((stepIdx, i) => {
+        window.setTimeout(() => {
+          glowSequenceButton(stepIdx);
+        }, delay);
+        delay += 650;
+      });
+      window.setTimeout(() => {
+        sequencePlaying = true;
+        document.getElementById('sequence-status').textContent = 'Your turn! Repeat the pattern.';
+      }, delay);
+    }
+
+    function glowSequenceButton(idx) {
+      const btn = document.getElementById(`seq-btn-${idx}`);
+      if (!btn) return;
+      btn.classList.add('bg-violet-300', 'shadow-lg', 'scale-105');
+      playSound('match');
+      window.setTimeout(() => {
+        btn.classList.remove('bg-violet-300', 'shadow-lg', 'scale-105');
+      }, 350);
+    }
+
+    function handleSequenceTap(idx) {
+      if (!sequencePlaying) return;
+      
+      // If selecting the same tile 2 times or more in a row, blink or stop glowing and glow again for clear visibility
+      const btn = document.getElementById(`seq-btn-${idx}`);
+      if (btn) {
+        btn.classList.remove('seq-blinking');
+        void btn.offsetWidth; // trigger reflow
+        btn.classList.add('seq-blinking');
+        window.setTimeout(() => btn.classList.remove('seq-blinking'), 450);
+      }
+
+      if (sequencePattern[sequencePlayerStep] === idx) {
+        sequencePlayerStep++;
+        glowSequenceButton(idx);
+        if (sequencePlayerStep === sequencePattern.length) {
+          sequencePlaying = false;
+          document.getElementById('sequence-status').textContent = '🎉 Incredible! You won 5 points!';
+          addPlayerPoints(5);
+        }
       } else {
-        wrap.textContent = PROFILE_PFP_OPTIONS.includes(profile.pfp) ? profile.pfp : '🌸';
+        sequencePlaying = false;
+        document.getElementById('sequence-status').textContent = '❌ Wrong step! Try again.';
+        playSound('error');
       }
-      return wrap;
-    }
-    function saveFriendData() {
-      localStorage.setItem('sakura_friends', JSON.stringify(friendList));
-      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
-      localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
-      updateFriendRequestBadge();
-    }
-    function syncFriendsUnreadDot() {
-      const dot = document.getElementById('friends-unread-dot');
-      if (dot) dot.classList.toggle('hidden', !friendsUnread);
-    }
-    function markFriendsUnread() {
-      if (!document.getElementById('friends-modal').classList.contains('hidden')) return;
-      friendsUnread = true;
-      localStorage.setItem('sakura_friends_unread', '1');
-      syncFriendsUnreadDot();
-    }
-    function updateFriendRequestBadge() { syncFriendsUnreadDot(); }
-
-    function sendSocialBroadcast(event, payload) {
-      const channel = socialChannel || realtimeChannel;
-      if (channel) channel.send({ type: 'broadcast', event, payload });
     }
 
-    function addFriend(id, name, pfp, avatarUrl = '', equippedFrame = null) {
-      if (!isValidUserId(id) || id === localPlayer.id) return;
-      const known = friendList.find(f => f.id === id);
-      const profile = { id, name: typeof name === 'string' && name.trim() ? name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(pfp) ? pfp : '🌸', avatarUrl: safeAvatarUrl(avatarUrl), equippedFrame, accepted: true };
-      if (known) Object.assign(known, profile);
-      else friendList.push(profile);
-      friendRequests = friendRequests.filter(r => r.senderId !== id);
-      outgoingFriendRequests = outgoingFriendRequests.filter(r => r.targetId !== id);
-      saveFriendData();
-      renderFriendsList();
-      if (activeDMUserId === id) renderDMBox();
-      if (selectedPlayerId === id) showPlayerCard(remotePlayers[id] || profile);
+    function addPlayerPoints(pts) {
+      localPlayer.points += pts;
+      localStorage.setItem('sakura_points', String(localPlayer.points));
+      updatePointsDisplay();
+    }
+    function updatePointsDisplay() {
+      document.getElementById('player-points-display').textContent = localPlayer.points;
     }
 
-    function sendFriendRequest(id, name, pfp, avatarUrl = '') {
-      if (!authUser || guestMode) { alert('Sign in to send friend requests.'); return; }
-      if (!isValidUserId(id) || id === localPlayer.id) return;
-      if (friendList.some(f => f.id === id)) return;
-      if (friendRequests.some(r => r.senderId === id)) {
-        acceptFriendRequest(id);
+    // --- NOTICE BOARD ---
+    function openNoticeBoard() {
+      document.getElementById('notice-board-modal').classList.remove('hidden');
+      renderNoticeBoardList();
+      const canPost = ['admin', 'developer'].includes(localPlayer.role);
+      document.getElementById('notice-post-form').classList.toggle('hidden', !canPost);
+      lucide.createIcons();
+    }
+    function closeNoticeBoard() { document.getElementById('notice-board-modal').classList.add('hidden'); }
+
+    let noticeList = [
+      { id: 'not_1', title: 'Welcome to Sakura Slime World 🌸', body: 'Explore virtual gardens, collect coins, play games, and connect with friends!', author: 'Sakura Dev Team', timestamp: Date.now() }
+    ];
+
+    function renderNoticeBoardList() {
+      const container = document.getElementById('notice-board-list');
+      container.innerHTML = '';
+      noticeList.forEach(notice => {
+        const div = document.createElement('div');
+        div.className = 'bg-amber-50/90 border border-amber-200 rounded-2xl p-3 shadow-sm';
+        
+        const top = document.createElement('div');
+        top.className = 'flex items-center justify-between mb-1';
+        const title = document.createElement('span');
+        title.className = 'text-xs font-extrabold text-amber-950';
+        title.textContent = notice.title;
+        top.appendChild(title);
+
+        const author = document.createElement('span');
+        author.className = 'text-[9px] font-bold text-amber-700';
+        author.textContent = notice.author;
+        top.appendChild(author);
+        div.appendChild(top);
+
+        const body = document.createElement('p');
+        body.className = 'text-xs text-amber-900 font-medium whitespace-pre-wrap';
+        body.textContent = notice.body;
+        div.appendChild(body);
+
+        container.appendChild(div);
+      });
+    }
+
+    function postNotice(e) {
+      e.preventDefault();
+      if (!['admin', 'developer'].includes(localPlayer.role)) return;
+      const title = document.getElementById('notice-title-input').value.trim();
+      const body = document.getElementById('notice-body-input').value.trim();
+      if (!title || !body) return;
+
+      const notice = {
+        id: 'not_' + Math.random().toString(36).substring(2, 9),
+        title,
+        body,
+        author: localPlayer.name,
+        timestamp: Date.now()
+      };
+      noticeList.unshift(notice);
+      document.getElementById('notice-title-input').value = '';
+      document.getElementById('notice-body-input').value = '';
+      renderNoticeBoardList();
+      sendSocialBroadcast('notice_post', notice);
+    }
+
+    // --- STAFF & ROLE MANAGEMENT (Staff Chat & Revoke Handling) ---
+    function openRolePanel() {
+      if (!['admin', 'developer'].includes(localPlayer.role)) return;
+      document.getElementById('role-panel-modal').classList.remove('hidden');
+      document.getElementById('role-panel-title').textContent = localPlayer.role === 'developer' ? 'Developer Staff Panel' : 'Administrator Panel';
+      loadLobbyMusic();
+      lucide.createIcons();
+    }
+    function closeRolePanel() { document.getElementById('role-panel-modal').classList.add('hidden'); }
+
+    function searchStaffUsers() {
+      const q = (document.getElementById('staff-user-search').value || '').toLowerCase();
+      const container = document.getElementById('staff-user-results');
+      container.innerHTML = '';
+      const list = Object.values(remotePlayers).filter(p => p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
+      
+      if (list.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-500 p-2 text-center">No active online players found.</div>';
         return;
       }
-      if (outgoingFriendRequests.some(r => r.targetId === id)) return;
-      const request = { targetId: id, name: typeof name === 'string' && name.trim() ? name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(pfp) ? pfp : '🌸', avatarUrl: safeAvatarUrl(avatarUrl), time: Date.now() };
-      outgoingFriendRequests.push(request);
-      localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
-      sendSocialBroadcast('friend_request', { targetId: id, senderId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame });
-      const query = document.getElementById('friend-search-input').value.trim();
-      if (query) handleFriendUserSearch();
-      else renderFriendsList();
-      if (selectedPlayerId === id) showPlayerCard(remotePlayers[id] || { id, name, pfp, avatarUrl });
-    }
 
-    function receiveFriendRequest(payload) {
-      if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.senderId) || payload.senderId === localPlayer.id) return;
-      if (friendList.some(f => f.id === payload.senderId) || friendRequests.some(r => r.senderId === payload.senderId)) return;
-      friendRequests.push({ senderId: payload.senderId, name: typeof payload.name === 'string' && payload.name.trim() ? payload.name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(payload.pfp) ? payload.pfp : '🌸', avatarUrl: safeAvatarUrl(payload.avatarUrl), equippedFrame: payload.equippedFrame || null, time: Date.now() });
-      saveFriendData();
-      markFriendsUnread();
-      renderFriendsList();
-      if (selectedPlayerId === payload.senderId) showPlayerCard(remotePlayers[payload.senderId] || payload);
-    }
-
-    function acceptFriendRequest(senderId) {
-      const request = friendRequests.find(r => r.senderId === senderId);
-      if (!request) return;
-      friendRequests = friendRequests.filter(r => r.senderId !== senderId);
-      addFriend(senderId, request.name, request.pfp, request.avatarUrl, request.equippedFrame);
-      sendSocialBroadcast('friend_accept', { targetId: senderId, friendId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame });
-      playSound('match');
-    }
-
-    function declineFriendRequest(senderId) {
-      friendRequests = friendRequests.filter(r => r.senderId !== senderId);
-      saveFriendData();
-      sendSocialBroadcast('friend_decline', { targetId: senderId, userId: localPlayer.id });
-      renderFriendsList();
-    }
-
-    function removeFriend(id) {
-      friendList = friendList.filter(f => f.id !== id);
-      saveFriendData();
-      sendSocialBroadcast('unfriend', { targetId: id, userId: localPlayer.id });
-      renderFriendsList();
-      if (activeDMUserId === id) activeDMUserId = null;
-      renderDMBox();
-    }
-
-    function renderFriendsList() {
-      const container = document.getElementById('friends-list-container');
-      const requestsContainer = document.getElementById('friend-requests-container');
-      container.innerHTML = '';
-      requestsContainer.innerHTML = '';
-      if (friendRequests.length) {
-        const title = document.createElement('p');
-        title.className = 'text-[10px] font-extrabold uppercase tracking-wide text-sky-700';
-        title.textContent = 'Friend requests'; requestsContainer.appendChild(title);
-        friendRequests.forEach(request => {
-          const row = document.createElement('div');
-          row.className = 'p-2 rounded-xl bg-sky-50 border border-sky-200 flex items-center gap-2';
-          row.appendChild(makeAvatar(request));
-          const name = document.createElement('span'); name.className = 'min-w-0 flex-1 truncate text-xs font-bold text-pink-950'; name.textContent = request.name;
-          row.appendChild(name);
-          const accept = document.createElement('button'); accept.className = 'px-2 py-1 rounded-lg bg-emerald-500 text-white text-[10px] font-bold'; accept.textContent = 'Accept'; accept.onclick = () => acceptFriendRequest(request.senderId);
-          const decline = document.createElement('button'); decline.className = 'px-2 py-1 rounded-lg bg-white text-slate-600 text-[10px] font-bold'; decline.textContent = '✕'; decline.title = 'Decline'; decline.onclick = () => declineFriendRequest(request.senderId);
-          row.append(accept, decline); requestsContainer.appendChild(row);
-        });
-      }
-      if (friendList.length === 0) {
-        const empty = document.createElement('p');
-        empty.className = 'text-[10px] text-pink-600 text-center py-4';
-        empty.textContent = 'No friends yet. Search players above to send a request.';
-        container.appendChild(empty);
-      }
-      if (staffDMUserId && staffDMProfile && !friendList.some(friend => friend.id === staffDMUserId)) {
+      list.forEach(player => {
         const row = document.createElement('div');
-        row.className = `friend-row p-2 rounded-xl flex items-center justify-between border ${activeDMUserId === staffDMUserId ? 'bg-sky-100 border-sky-400' : 'bg-white/80 border-pink-200'}`;
-        row.dataset.friendId = staffDMUserId;
-        const select = document.createElement('button'); select.type = 'button'; select.className = 'min-w-0 flex items-center gap-2 text-left'; select.onclick = () => selectFriendForDM(staffDMUserId);
-        select.appendChild(makeAvatar(staffDMProfile));
-        const name = document.createElement('span'); name.className = 'truncate text-xs font-bold text-pink-950'; name.textContent = staffDMProfile.name || 'Player'; select.appendChild(name);
-        const tag = document.createElement('span'); tag.className = 'text-[9px] font-bold text-violet-700'; tag.textContent = 'Staff chat';
-        row.append(select, tag); container.appendChild(row);
-      }
-      friendList.forEach(friend => {
-        const row = document.createElement('div');
-        row.className = `friend-row p-2 rounded-xl flex items-center justify-between border ${activeDMUserId === friend.id ? 'bg-sky-100 border-sky-400' : 'bg-white/80 border-pink-200'}`;
-        row.dataset.friendId = friend.id;
-        const select = document.createElement('button'); select.type = 'button'; select.className = 'min-w-0 flex items-center gap-2 text-left'; select.onclick = () => selectFriendForDM(friend.id);
-        select.appendChild(makeAvatar(friend));
-        const name = document.createElement('span'); name.className = 'truncate text-xs font-bold text-pink-950'; name.textContent = friend.name;
-        select.appendChild(name);
-        const remove = document.createElement('button'); remove.className = 'text-red-500 hover:text-red-700 text-[10px] font-bold shrink-0'; remove.textContent = 'Unfriend'; remove.onclick = () => removeFriend(friend.id);
-        row.append(select, remove); container.appendChild(row);
-      });
-    }
+        row.className = 'flex items-center justify-between bg-slate-100 p-2.5 rounded-xl border border-slate-200';
+        
+        const info = document.createElement('div');
+        info.className = 'flex items-center gap-2';
+        info.appendChild(makeAvatar(player, 'w-8 h-8', 'text-sm'));
+        
+        const name = document.createElement('div');
+        name.innerHTML = `<p class="text-xs font-bold text-slate-900">${player.name}</p><p class="text-[9px] text-slate-600">Role: ${player.role}</p>`;
+        info.appendChild(name);
+        row.appendChild(info);
 
-    function handleFriendUserSearch() {
-      const query = document.getElementById('friend-search-input').value.toLowerCase().trim();
-      const container = document.getElementById('friends-list-container');
-      if (!query) { renderFriendsList(); return; }
-      container.innerHTML = '';
-      const matching = Object.values(remotePlayers).filter(p => p && p.id !== localPlayer.id && typeof p.name === 'string' && p.name.toLowerCase().includes(query));
-      if (!matching.length) {
-        const empty = document.createElement('p'); empty.className = 'text-[10px] text-pink-600 text-center py-3'; empty.textContent = 'No online players found in this room.'; container.appendChild(empty);
-      }
-      matching.forEach(player => {
-        const row = document.createElement('div'); row.className = 'p-2 rounded-xl bg-white/90 border border-pink-200 flex items-center gap-2';
-        row.appendChild(makeAvatar(player));
-        const name = document.createElement('span'); name.className = 'min-w-0 flex-1 truncate text-xs font-bold text-pink-950'; name.textContent = player.name; row.appendChild(name);
-        const isFriend = friendList.some(f => f.id === player.id);
-        const outgoing = outgoingFriendRequests.some(r => r.targetId === player.id);
-        const incoming = friendRequests.some(r => r.senderId === player.id);
-        if (isFriend) {
-          const tag = document.createElement('span'); tag.className = 'text-[10px] text-emerald-600 font-bold'; tag.textContent = 'Friends'; row.appendChild(tag);
-        } else if (incoming) {
-          const accept = document.createElement('button'); accept.className = 'px-2 py-1 bg-emerald-500 text-white rounded-lg text-[10px] font-bold'; accept.textContent = 'Accept'; accept.onclick = () => acceptFriendRequest(player.id); row.appendChild(accept);
-        } else if (outgoing) {
-          const tag = document.createElement('span'); tag.className = 'text-[10px] text-sky-700 font-bold'; tag.textContent = 'Sent'; row.appendChild(tag);
-        } else {
-          const add = document.createElement('button'); add.className = 'px-2 py-1 bg-sky-500 text-white rounded-lg text-[10px] font-bold'; add.textContent = 'Add'; add.onclick = () => sendFriendRequest(player.id, player.name, player.pfp, player.avatarUrl); row.appendChild(add);
+        const actions = document.createElement('div');
+        actions.className = 'flex items-center gap-1.5';
+
+        if (localPlayer.role === 'developer') {
+          const adminBtn = document.createElement('button');
+          const isAdmin = player.role === 'admin';
+          adminBtn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold text-white ${isAdmin ? 'bg-rose-600' : 'bg-violet-600'}`;
+          adminBtn.textContent = isAdmin ? 'Revoke Admin' : 'Make Admin';
+          adminBtn.onclick = () => toggleAdminRole(player.id, !isAdmin);
+          actions.appendChild(adminBtn);
         }
+
+        row.appendChild(actions);
         container.appendChild(row);
       });
     }
 
-    function syncFriendProfile(player) {
-      if (!player || !isValidUserId(player.id)) return;
-      let changed = false;
-      const nextName = typeof player.name === 'string' && player.name.trim() ? player.name.trim() : null;
-      const nextPfp = PROFILE_PFP_OPTIONS.includes(player.pfp) ? player.pfp : null;
-      const hasAvatar = Object.prototype.hasOwnProperty.call(player, 'avatarUrl');
-      const nextAvatar = hasAvatar ? safeAvatarUrl(player.avatarUrl) : null;
-      friendList.forEach(friend => {
-        if (friend.id !== player.id) return;
-        if (nextName && friend.name !== nextName) { friend.name = nextName; changed = true; }
-        if (nextPfp && friend.pfp !== nextPfp) { friend.pfp = nextPfp; changed = true; }
-        if (hasAvatar && friend.avatarUrl !== nextAvatar) { friend.avatarUrl = nextAvatar; changed = true; }
-        if (player.equippedFrame !== undefined && friend.equippedFrame !== player.equippedFrame) { friend.equippedFrame = player.equippedFrame; changed = true; }
-      });
-      friendRequests.forEach(request => {
-        if (request.senderId !== player.id) return;
-        if (nextName && request.name !== nextName) { request.name = nextName; changed = true; }
-        if (nextPfp && request.pfp !== nextPfp) { request.pfp = nextPfp; changed = true; }
-        if (hasAvatar && request.avatarUrl !== nextAvatar) { request.avatarUrl = nextAvatar; changed = true; }
-        if (player.equippedFrame !== undefined && request.equippedFrame !== player.equippedFrame) { request.equippedFrame = player.equippedFrame; changed = true; }
-      });
-      if (!changed) return;
-      saveFriendData();
-      if (!document.getElementById('friends-modal').classList.contains('hidden')) {
-        if (document.getElementById('friend-search-input').value.trim()) handleFriendUserSearch();
-        else renderFriendsList();
-        if (activeDMUserId === player.id) renderDMBox();
+    async function toggleAdminRole(targetId, makeAdmin) {
+      if (localPlayer.role !== 'developer') return;
+      const target = remotePlayers[targetId];
+      if (!target) return;
+      target.role = makeAdmin ? 'admin' : 'player';
+      
+      // If revoked admin, remove from staff chat access by switching out of staff chat if currently in it
+      if (!makeAdmin && activeChatTab === 'staff') {
+        switchChatTab('global');
       }
-      if (selectedPlayerId === player.id) showPlayerCard(player);
+      updateStaffChatVisibility();
+      sendSocialBroadcast('role_update', { targetId, role: target.role });
+      searchStaffUsers();
     }
 
-    function selectFriendForDM(friendId) {
-      activeDMUserId = friendId;
-      document.querySelectorAll('.friend-row').forEach(row => {
-        const selected = row.dataset.friendId === friendId;
-        row.classList.toggle('bg-sky-100', selected); row.classList.toggle('border-sky-400', selected);
-        row.classList.toggle('bg-white/80', !selected); row.classList.toggle('border-pink-200', !selected);
-      });
-      renderDMBox();
+    function updateStaffChatVisibility() {
+      const isStaff = ['admin', 'developer'].includes(localPlayer.role);
+      const staffTabBtn = document.getElementById('chat-tab-staff');
+      if (staffTabBtn) {
+        staffTabBtn.classList.toggle('hidden', !isStaff);
+      }
+      const roleToolsBtn = document.getElementById('role-tools-button');
+      if (roleToolsBtn) {
+        roleToolsBtn.classList.toggle('hidden', !isStaff);
+      }
+      const devWalletBtn = document.getElementById('developer-wallet-button');
+      if (devWalletBtn) {
+        devWalletBtn.classList.toggle('hidden', localPlayer.role !== 'developer');
+      }
     }
 
-    function renderDMBox() {
-      const targetLabel = document.getElementById('dm-active-target');
-      const statusTag = document.getElementById('dm-status-tag');
-      const input = document.getElementById('dm-text-input');
-      const sendBtn = document.getElementById('dm-send-btn');
-      const container = document.getElementById('dm-messages-container');
-      container.replaceChildren();
-      if (!activeDMUserId) {
-        targetLabel.textContent = 'Select a friend to message'; statusTag.textContent = 'Friend Required'; input.disabled = true; sendBtn.disabled = true; input.placeholder = 'Accept a friend request to start chatting'; return;
-      }
-      const friend = friendList.find(f => f.id === activeDMUserId);
-      const developerDM = staffDMUserId === activeDMUserId && staffDMProfile && (localPlayer.role === 'developer' || staffDMProfile.role === 'developer');
-      const target = developerDM ? staffDMProfile : friend;
-      const canMessage = Boolean(developerDM || (friend && friend.accepted));
-      if (!target || !canMessage) {
-        targetLabel.textContent = friend ? friend.name : 'Unknown User'; statusTag.textContent = 'Friend Required'; input.disabled = true; sendBtn.disabled = true; input.placeholder = 'Accept a friend request to start chatting'; return;
-      }
-      targetLabel.textContent = developerDM ? `Developer message · ${target.name || 'Player'}` : `Chatting with ${target.name}`;
-      statusTag.textContent = developerDM ? 'Developer' : 'Friends'; input.disabled = false; sendBtn.disabled = false; input.placeholder = `Message ${target.name || 'player'}...`;
-      const msgs = dmMessages[activeDMUserId] || [];
-      msgs.forEach(message => {
-        const row = document.createElement('div'); const isMe = message.senderId === localPlayer.id;
-        row.className = `flex items-end gap-1.5 ${isMe ? 'justify-end' : 'justify-start'}`;
-        const avatarProfile = isMe ? localPlayer : { pfp: message.pfp || target.pfp, avatarUrl: message.avatarUrl || target.avatarUrl, equippedFrame: message.equippedFrame || target.equippedFrame };
-        const messageAvatar = makeAvatar(avatarProfile, 'w-6 h-6');
-        if (!isMe) row.appendChild(messageAvatar);
-        const bubble = document.createElement('div'); bubble.className = `max-w-[82%] rounded-2xl border px-3 py-1.5 font-medium ${isMe ? 'bg-sky-500 text-white border-sky-300' : 'bg-pink-100 text-pink-950 border-pink-200'}`;
-        const cardType = { card_sakura: 'chat-card-sakura', card_moon: 'chat-card-moon', card_royal: 'chat-card-royal' }[message.equippedMessageCard];
-        if (cardType) bubble.classList.add(cardType);
-        bubble.textContent = message.text; row.appendChild(bubble); if (isMe) row.appendChild(messageAvatar); container.appendChild(row);
-      });
-      container.scrollTop = container.scrollHeight;
+    function openDeveloperWallet() {
+      if (localPlayer.role !== 'developer') return;
+      document.getElementById('developer-wallet-modal').classList.remove('hidden');
+      searchWalletUsers();
+      lucide.createIcons();
     }
+    function closeDeveloperWallet() { document.getElementById('developer-wallet-modal').classList.add('hidden'); }
 
-    function handleDMSubmit(e) {
-      e.preventDefault();
-      const input = document.getElementById('dm-text-input');
-      const text = input.value.trim();
-      if (!authUser || guestMode || !text || !activeDMUserId) return;
-      const friend = friendList.some(f => f.id === activeDMUserId && f.accepted);
-      const developerDM = staffDMUserId === activeDMUserId && staffDMProfile && (localPlayer.role === 'developer' || staffDMProfile.role === 'developer');
-      if (!friend && !developerDM) return;
-      const body = { senderId: localPlayer.id, sender: localPlayer.name, text: text.slice(0, 500), time: Date.now(), pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard };
-      if (!dmMessages[activeDMUserId]) dmMessages[activeDMUserId] = [];
-      dmMessages[activeDMUserId].push(body);
-      localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
-      sendSocialBroadcast('direct_msg', { targetId: activeDMUserId, ...body });
-      input.value = ''; renderDMBox();
+    function searchWalletUsers() {
+      const q = (document.getElementById('wallet-user-search').value || '').toLowerCase();
+      const container = document.getElementById('wallet-user-results');
+      container.innerHTML = '';
+      const list = Object.values(remotePlayers).filter(p => p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
+      
+      if (list.length === 0) {
+        container.innerHTML = '<div class="text-xs text-cyan-800 p-2 text-center">No players found.</div>';
+        return;
+      }
+
+      list.forEach(player => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-cyan-50/80 p-2.5 rounded-xl border border-cyan-200';
+        
+        const info = document.createElement('div');
+        info.className = 'flex items-center gap-2';
+        info.appendChild(makeAvatar(player, 'w-8 h-8', 'text-sm'));
+        const name = document.createElement('div');
+        name.innerHTML = `<p class="text-xs font-bold text-cyan-950">${player.name}</p><p class="text-[9px] text-cyan-700">Coins: ${player.points || 0}</p>`;
+        info.appendChild(name);
+        row.appendChild(info);
+
+        const giveBtn = document.createElement('button');
+        giveBtn.className = 'px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-bold text-[10px]';
+        giveBtn.textContent = '+1,000 Coins';
+        giveBtn.onclick = () => {
+          player.points = (player.points || 0) + 1000;
+          sendSocialBroadcast('points_update', { targetId: player.id, points: player.points });
+          searchWalletUsers();
+        };
+        row.appendChild(giveBtn);
+
+        container.appendChild(row);
+      });
     }
 
     // --- PROFILE & SETTINGS ---
@@ -1847,949 +2190,334 @@
       modal.classList.toggle('hidden');
       if (!modal.classList.contains('hidden')) {
         document.getElementById('setting-username').value = localPlayer.name;
-        updateRoleUi();
-        document.getElementById('profile-image-input').value = '';
-        renderAvatarPreview();
-      }
-    }
-
-    function renderAvatarPreview() {
-      const preview = document.getElementById('profile-avatar-preview');
-      preview.innerHTML = '';
-      preview.appendChild(makeAvatar(localPlayer, 'w-12 h-12'));
-    }
-
-    async function persistProfileToAuth() {
-      if (!authUser) return null;
-      const { error } = await supabaseClient.rpc('save_my_profile', {
-        p_username: localPlayer.name,
-        p_pfp: localPlayer.pfp,
-        p_avatar_url: localPlayer.avatarUrl || '',
-        p_equipped_skin: localPlayer.equippedSkin || 'skin_pink',
-        p_equipped_accessory: localPlayer.equippedAcc || null,
-        p_equipped_title: localPlayer.equippedTitle || null,
-        p_equipped_emote: localPlayer.equippedEmote || null,
-        p_equipped_message_card: localPlayer.equippedMessageCard || null,
-        p_equipped_frame: localPlayer.equippedFrame || null
-      });
-      return error || null;
-    }
-
-    async function applyAuthProfile(user) {
-      authUser = user;
-      guestMode = false;
-      localPlayer.id = user.id;
-      let { data: profile, error } = await supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote,equipped_message_card,equipped_frame').eq('user_id', user.id).maybeSingle();
-      if (!profile && !error) {
-        const ensured = await supabaseClient.rpc('ensure_my_profile');
-        if (!ensured.error) {
-          const retry = await supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote,equipped_message_card,equipped_frame').eq('user_id', user.id).maybeSingle();
-          profile = retry.data; error = retry.error;
+        updateProfileAvatarPreview();
+        const roleLabel = document.getElementById('profile-role-label');
+        if (localPlayer.role !== 'player') {
+          roleLabel.textContent = `Role: ${localPlayer.role.toUpperCase()}`;
+          roleLabel.className = `block rounded-xl px-3 py-2 text-[10px] font-black tracking-widest ${localPlayer.role === 'developer' ? 'bg-sky-100 text-sky-800' : 'bg-rose-100 text-rose-800'}`;
+          roleLabel.classList.remove('hidden');
+        } else {
+          roleLabel.classList.add('hidden');
         }
       }
-      if (error) { localPlayer.role = 'player'; updateRoleUi(); return error; }
-      if (profile) {
-        localPlayer.name = (profile.username || 'Slime').slice(0, 15);
-        localPlayer.pfp = PROFILE_PFP_OPTIONS.includes(profile.pfp) ? profile.pfp : '🌸';
-        localPlayer.avatarUrl = safeAvatarUrl(profile.avatar_url);
-        localPlayer.points = Math.max(0, Number(profile.points) || 0);
-        const validItems = new Set([].concat(...Object.values(MARKET_ITEMS)).map(item => item.id));
-        localPlayer.inventory = Array.isArray(profile.inventory) ? profile.inventory.filter(id => validItems.has(id)) : ['skin_pink'];
-        if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
-        localPlayer.equippedSkin = profile.equipped_skin || 'skin_pink';
-        localPlayer.equippedAcc = profile.equipped_accessory || null;
-        localPlayer.equippedTitle = profile.equipped_title || null;
-        localPlayer.equippedEmote = profile.equipped_emote || null;
-        localPlayer.equippedMessageCard = profile.equipped_message_card || null;
-        localPlayer.equippedFrame = profile.equipped_frame || null;
-      }
-      const { data: role, error: roleError } = await supabaseClient.rpc('get_my_role');
-      localPlayer.role = roleError ? 'player' : (role || 'player');
-      await loadLobbyMusic();
-      if (!['admin', 'developer'].includes(localPlayer.role)) {
-        if (localPlayer.equippedSkin === 'skin_admin' || localPlayer.equippedSkin === 'skin_developer') localPlayer.equippedSkin = 'skin_pink';
-        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') localPlayer.equippedTitle = null;
-      }
-      savePlayerToStorage();
-      updateRoleUi(); renderOwnedEmoteButton();
-      await refreshModerationState();
-      startModerationMonitor();
-      return roleError || null;
+      lucide.createIcons();
     }
 
-    async function refreshOwnProfile() {
-      if (!authUser || guestMode) return;
-      const { data: profile, error } = await supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote,equipped_message_card,equipped_frame').eq('user_id', authUser.id).maybeSingle();
-      if (error || !profile) return;
-      localPlayer.name = (profile.username || 'Slime').slice(0, 15);
-      localPlayer.pfp = PROFILE_PFP_OPTIONS.includes(profile.pfp) ? profile.pfp : '🌸';
-      localPlayer.avatarUrl = safeAvatarUrl(profile.avatar_url);
-      localPlayer.points = Math.max(0, Number(profile.points) || 0);
-      const validItems = new Set([].concat(...Object.values(MARKET_ITEMS)).map(item => item.id));
-      localPlayer.inventory = (Array.isArray(profile.inventory) ? profile.inventory : ['skin_pink']).filter(id => validItems.has(id));
-      if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
-      localPlayer.equippedSkin = profile.equipped_skin || 'skin_pink';
-      localPlayer.equippedAcc = profile.equipped_accessory || null;
-      localPlayer.equippedTitle = profile.equipped_title || null;
-      localPlayer.equippedEmote = profile.equipped_emote || null;
-      localPlayer.equippedMessageCard = profile.equipped_message_card || null;
-      localPlayer.equippedFrame = profile.equipped_frame || null;
-      const { data: role } = await supabaseClient.rpc('get_my_role');
-      if (role && ['player', 'admin', 'developer'].includes(role)) localPlayer.role = role;
-      if (!['admin', 'developer'].includes(localPlayer.role)) {
-        if (localPlayer.equippedSkin === 'skin_admin' || localPlayer.equippedSkin === 'skin_developer') localPlayer.equippedSkin = 'skin_pink';
-        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') localPlayer.equippedTitle = null;
-      }
-      savePlayerToStorage(); updateRoleUi(); updateUIHeader(); broadcastPlayerState();
-      if (!document.getElementById('inventory-modal').classList.contains('hidden')) renderInventoryGrid();
-      if (!document.getElementById('settings-modal').classList.contains('hidden')) renderAvatarPreview();
-      syncFriendProfile(localPlayer);
+    function updateProfileAvatarPreview() {
+      const preview = document.getElementById('profile-avatar-preview');
+      preview.innerHTML = '';
+      preview.appendChild(makeAvatar(localPlayer, 'w-12 h-12', 'text-2xl'));
     }
 
-    async function handleProfileImageUpload(event) {
-      const file = event.target.files && event.target.files[0];
+    function handleProfileImageUpload(e) {
+      const file = e.target.files[0];
       if (!file) return;
-      if (!file.type.startsWith('image/')) { alert('Choose an image file.'); event.target.value = ''; return; }
       const reader = new FileReader();
-      reader.onload = () => {
-        const image = new Image();
-        image.onload = async () => {
-          const scale = Math.min(1, 160 / Math.max(image.width, image.height));
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.max(1, Math.round(image.width * scale));
-          canvas.height = Math.max(1, Math.round(image.height * scale));
-          canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-          localPlayer.avatarUrl = canvas.toDataURL('image/jpeg', .76);
-          savePlayerToStorage(); renderAvatarPreview(); broadcastProfileUpdate();
-          const error = await persistProfileToAuth();
-          if (error) alert('The image is saved on this browser, but could not sync to your account. ' + error.message);
-        };
-        image.onerror = () => alert('That image could not be opened.');
-        image.src = reader.result;
+      reader.onload = (event) => {
+        localPlayer.avatarUrl = event.target.result;
+        localStorage.setItem('sakura_avatar', localPlayer.avatarUrl);
+        updateProfileAvatarPreview();
+        broadcastPlayerState();
       };
-      reader.onerror = () => alert('The image could not be read.');
       reader.readAsDataURL(file);
     }
 
-    async function clearProfileImage() {
+    function clearProfileImage() {
       localPlayer.avatarUrl = '';
-      savePlayerToStorage(); renderAvatarPreview(); broadcastProfileUpdate(); renderFriendsList();
-      const error = await persistProfileToAuth();
-      if (error) alert('The default sticker is active here, but could not sync to your account. ' + error.message);
+      localStorage.removeItem('sakura_avatar');
+      updateProfileAvatarPreview();
+      broadcastPlayerState();
     }
 
-    async function saveProfileSettings() {
-      const newName = document.getElementById('setting-username').value.trim() || localPlayer.name;
-      localPlayer.name = newName.slice(0, 15);
-      savePlayerToStorage();
-      const error = await persistProfileToAuth();
-      broadcastPlayerState(); broadcastProfileUpdate();
-      toggleSettingsModal(); syncFriendProfile(localPlayer);
-      if (error) alert('The profile is saved on this browser, but could not sync to your account. ' + error.message);
-      else alert('Profile updated and saved to your account.');
-    }
-
-    async function handleSignOut() {
-      if (realtimeChannel) { await realtimeChannel.unsubscribe(); realtimeChannel = null; }
-      if (socialChannel) { await socialChannel.unsubscribe(); socialChannel = null; }
-      await supabaseClient.auth.signOut();
-      authUser = null;
-      guestMode = false;
+    function saveProfileSettings() {
+      const nameInput = document.getElementById('setting-username').value.trim();
+      if (nameInput) {
+        localPlayer.name = nameInput.slice(0, 15);
+        localStorage.setItem('sakura_name', localPlayer.name);
+      }
       toggleSettingsModal();
-      document.getElementById('auth-modal').classList.remove('hidden');
+      broadcastPlayerState();
     }
 
-    // Storage & Header UI Update Helper
-    function savePlayerToStorage() {
-      localStorage.setItem('sakura_user_id', localPlayer.id);
-      localStorage.setItem('sakura_name', localPlayer.name);
-      localStorage.setItem('sakura_pfp', localPlayer.pfp);
-      localStorage.setItem('sakura_avatar', localPlayer.avatarUrl || '');
-      localStorage.setItem('sakura_points', localPlayer.points.toString());
-      localStorage.setItem('sakura_eq_skin', localPlayer.equippedSkin);
-      localStorage.setItem('sakura_eq_acc', localPlayer.equippedAcc || '');
-      localStorage.setItem('sakura_eq_title', localPlayer.equippedTitle || '');
-      localStorage.setItem('sakura_eq_emote', localPlayer.equippedEmote || '');
-      localStorage.setItem('sakura_eq_message_card', localPlayer.equippedMessageCard || '');
-      localStorage.setItem('sakura_eq_frame', localPlayer.equippedFrame || '');
-      localStorage.setItem('sakura_inv', JSON.stringify(localPlayer.inventory));
+    function handleSignOut() {
+      localStorage.clear();
+      window.location.reload();
     }
 
-    function updateUIHeader() {
-      document.getElementById('player-points-display').textContent = localPlayer.points.toLocaleString();
-      updateFriendRequestBadge();
-      renderOwnedEmoteButton();
-    }
-
-    function broadcastProfileUpdate() {
-      sendSocialBroadcast('profile_update', { id: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame, equippedTitle: localPlayer.equippedTitle, role: localPlayer.role });
-    }
-
-    let staffSearchTimer = null;
-    let walletSearchTimer = null;
-    function updateRoleUi() {
-      const staff = ['admin', 'developer'].includes(localPlayer.role);
-      const developer = localPlayer.role === 'developer';
-      const staffButton = document.getElementById('role-tools-button');
-      const walletButton = document.getElementById('developer-wallet-button');
-      if (staffButton) { staffButton.classList.toggle('hidden', !staff); staffButton.classList.toggle('flex', staff); }
-      if (walletButton) { walletButton.classList.toggle('hidden', !developer); walletButton.classList.toggle('flex', developer); }
-      if (!staff) document.getElementById('role-panel-modal').classList.add('hidden');
-      if (!developer) document.getElementById('developer-wallet-modal').classList.add('hidden');
-      if (document.getElementById('notice-post-form')) document.getElementById('notice-post-form').classList.toggle('hidden', !staff);
-      const profileRole = document.getElementById('profile-role-label');
-      if (profileRole) {
-        const hasRole = ['admin', 'developer'].includes(localPlayer.role);
-        profileRole.classList.toggle('hidden', !hasRole);
-        profileRole.className = `rounded-xl px-3 py-2 text-[10px] font-black tracking-widest ${localPlayer.role === 'developer' ? 'bg-cyan-100 text-cyan-900 border border-cyan-300' : 'bg-rose-100 text-rose-900 border border-rose-300'} ${hasRole ? '' : 'hidden'}`;
-        profileRole.textContent = localPlayer.role === 'developer' ? 'DEV · DEVELOPER' : 'ADMIN';
-      }
-      if (!['admin', 'developer'].includes(localPlayer.role)) {
-        if (localPlayer.equippedSkin === 'skin_admin' || localPlayer.equippedSkin === 'skin_developer') localPlayer.equippedSkin = 'skin_pink';
-        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') localPlayer.equippedTitle = null;
-      }
-      renderOwnedEmoteButton();
-      if (!document.getElementById('inventory-modal').classList.contains('hidden')) renderInventoryGrid();
-    }
-    function openRolePanel() {
-      if (!['admin', 'developer'].includes(localPlayer.role)) return;
-      document.getElementById('role-panel-title').textContent = localPlayer.role === 'developer' ? 'Developer Control Panel' : 'Admin Control Panel';
-      document.getElementById('role-panel-modal').classList.remove('hidden');
-      searchStaffUsers();
-    }
-    function closeRolePanel() { document.getElementById('role-panel-modal').classList.add('hidden'); }
-    function openDeveloperWallet() {
-      if (localPlayer.role !== 'developer') return;
-      document.getElementById('developer-wallet-modal').classList.remove('hidden');
-      searchWalletUsers();
-    }
-    function closeDeveloperWallet() { document.getElementById('developer-wallet-modal').classList.add('hidden'); }
-    async function callStaffFunction(action, values = {}) {
-      if (action === 'search_users') {
-        const { data, error } = await supabaseClient.rpc('search_users', { p_query: String(values.query || '') });
-        if (error) throw error;
-        return { users: data || [] };
-      }
-      if (action === 'set_admin') {
-        const { data, error } = await supabaseClient.rpc('set_admin_role', { p_target_user_id: values.targetId, p_enabled: Boolean(values.enabled) });
-        if (error) throw error;
-        return { success: true, isAdmin: data };
-      }
-      if (action === 'adjust_points') {
-        const { data, error } = await supabaseClient.rpc('adjust_user_points', { p_target_user_id: values.targetId, p_amount: Number(values.amount) });
-        if (error) throw error;
-        return { success: true, balance: data };
-      }
-      if (action === 'moderate') {
-        const { data: moderation, error } = await supabaseClient.rpc('set_user_moderation', {
-          p_target_user_id: values.targetId, p_kind: values.kind,
-          p_duration_minutes: Number(values.durationMinutes || 0), p_reason: String(values.reason || '')
-        });
-        if (error) throw error;
-        if (!['ban', 'kick', 'unban'].includes(values.kind)) return { success: true, moderation };
-        try {
-          const { data, error: edgeError } = await supabaseClient.functions.invoke('moderation-admin', {
-            body: { action, ...values }
-          });
-          if (edgeError) throw new Error(data && data.error ? data.error : edgeError.message || 'Auth ban function is unavailable.');
-          if (data && data.error) throw new Error(data.error);
-          return data;
-        } catch (edgeError) {
-          return { success: true, moderation, warning: `Game restriction is active, but sign-in blocking needs the moderation-admin Edge Function deployed: ${edgeError.message || 'request failed'}` };
-        }
-      }
-      throw new Error('Unknown staff action.');
-    }
-    function makeStaffButton(label, style, callback) {
-      const button = document.createElement('button'); button.type = 'button';
-      button.className = `rounded-lg px-2.5 py-1.5 text-[10px] font-bold text-white ${style}`;
-      button.textContent = label; button.onclick = callback; return button;
-    }
-    function staffUserCard(user, mode) {
-      const card = document.createElement('article');
-      card.className = 'rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm';
-      const top = document.createElement('div'); top.className = 'flex items-center gap-2';
-      top.appendChild(makeAvatar({ pfp: user.pfp, avatarUrl: user.avatar_url }, 'w-9 h-9'));
-      const details = document.createElement('div'); details.className = 'min-w-0 flex-1';
-      const name = document.createElement('p'); name.className = 'truncate text-xs font-extrabold text-slate-950'; name.textContent = `${user.username || 'Slime'}${user.role === 'developer' ? ' · DEV' : user.role === 'admin' ? ' · ADMIN' : ''}`;
-      const email = document.createElement('p'); email.className = 'truncate text-[10px] text-slate-600'; email.textContent = user.email || '';
-      details.append(name, email);
-      if (mode === 'staff') {
-        const moderation = document.createElement('p'); moderation.className = 'text-[9px] font-semibold text-rose-700';
-        const muted = user.mute_until && new Date(user.mute_until).getTime() > Date.now();
-        moderation.textContent = user.is_banned ? `Banned${user.ban_until ? ` until ${new Date(user.ban_until).toLocaleString()}` : ' permanently'}` : muted ? `Muted until ${new Date(user.mute_until).toLocaleString()}` : 'No active restrictions';
-        details.appendChild(moderation);
-      }
-      top.appendChild(details);
-      if (mode === 'wallet') {
-        const balance = document.createElement('span'); balance.className = 'rounded-full bg-cyan-50 px-2 py-1 text-[10px] font-bold text-cyan-900'; balance.textContent = `${Number(user.points) || 0} points`; top.appendChild(balance);
-      }
-      card.appendChild(top);
-      if (mode === 'staff') {
-        const input = document.createElement('input'); input.type = 'number'; input.min = '1'; input.max = '43200'; input.value = '60'; input.setAttribute('aria-label', 'Duration in minutes');
-        input.className = 'staff-duration mt-2 w-28 rounded-lg border border-slate-200 px-2 py-1 text-[10px]'; card.appendChild(input);
-        const actions = document.createElement('div'); actions.className = 'mt-2 flex flex-wrap gap-1.5';
-        const run = async (kind, minutes) => {
-          const duration = minutes === undefined ? Math.max(1, Math.min(43200, Number(input.value) || 60)) : minutes;
-          await runStaffAction(async () => callStaffFunction('moderate', { targetId: user.user_id, kind, durationMinutes: duration }), 'staff-panel-status', 'Moderation updated.');
-        };
-        actions.append(
-          makeStaffButton('Mute chat', 'bg-amber-600', () => run('mute')),
-          makeStaffButton('Unmute', 'bg-emerald-600', () => run('unmute', 0)),
-          makeStaffButton('Timed ban', 'bg-rose-600', () => run('ban')),
-          makeStaffButton('Kick + permanent ban', 'bg-slate-900', () => { if (confirm(`Permanently ban ${user.username || 'this player'}?`)) run('kick', 0); }),
-          makeStaffButton('Unban', 'bg-sky-600', () => run('unban', 0))
-        );
-        if (localPlayer.role === 'developer' && user.role !== 'developer') {
-          actions.appendChild(makeStaffButton(user.role === 'admin' ? 'Revoke admin' : 'Make admin', user.role === 'admin' ? 'bg-slate-600' : 'bg-violet-600', async () => {
-            await runStaffAction(async () => callStaffFunction('set_admin', { targetId: user.user_id, enabled: user.role !== 'admin' }), 'staff-panel-status', 'Admin role updated.');
-          }));
-        }
-        card.appendChild(actions);
-      } else {
-        const controls = document.createElement('div'); controls.className = 'mt-2 flex items-center gap-2';
-        const amount = document.createElement('input'); amount.type = 'number'; amount.min = '1'; amount.max = '2147483647'; amount.value = '100'; amount.className = 'w-28 rounded-lg border border-cyan-200 px-2 py-1 text-[10px]'; amount.setAttribute('aria-label', 'Points amount');
-        const adjust = async delta => {
-          const value = Math.max(1, Math.floor(Number(amount.value) || 1));
-          await runStaffAction(async () => callStaffFunction('adjust_points', { targetId: user.user_id, amount: delta * value }), 'wallet-panel-status', 'Wallet updated.');
-        };
-        controls.append(amount, makeStaffButton('Send points', 'bg-emerald-600', () => adjust(1)), makeStaffButton('Deduct points', 'bg-rose-600', () => adjust(-1)));
-        card.appendChild(controls);
-      }
-      return card;
-    }
-    async function runStaffAction(action, statusId, successText) {
-      const status = document.getElementById(statusId); status.textContent = 'Working…';
-      try {
-        const result = await action(); status.textContent = result && result.warning ? result.warning : successText;
-        if (statusId === 'staff-panel-status') await searchStaffUsers(true);
-        else await searchWalletUsers(true);
-      } catch (error) { status.textContent = error.message || 'Could not complete this action.'; }
-    }
-    async function searchStaffUsers(immediate = false) {
-      if (staffSearchTimer) clearTimeout(staffSearchTimer);
-      const query = document.getElementById('staff-user-search').value.trim();
-      if (!immediate && query.length < 2) { document.getElementById('staff-user-results').replaceChildren(); document.getElementById('staff-panel-status').textContent = 'Type at least two characters to search.'; return; }
-      staffSearchTimer = setTimeout(async () => {
-        const status = document.getElementById('staff-panel-status'), results = document.getElementById('staff-user-results');
-        if (!['admin', 'developer'].includes(localPlayer.role)) return;
-        status.textContent = 'Searching…';
-        try {
-          const data = await callStaffFunction('search_users', { query });
-          results.replaceChildren();
-          (data.users || []).forEach(user => results.appendChild(staffUserCard(user, 'staff')));
-          status.textContent = data.users && data.users.length ? `${data.users.length} matching users.` : 'No users found.';
-        } catch (error) { status.textContent = error.message || 'Search failed.'; }
-      }, immediate ? 0 : 350);
-    }
-    async function searchWalletUsers(immediate = false) {
-      if (walletSearchTimer) clearTimeout(walletSearchTimer);
-      const query = document.getElementById('wallet-user-search').value.trim();
-      if (!immediate && query.length < 2) { document.getElementById('wallet-user-results').replaceChildren(); document.getElementById('wallet-panel-status').textContent = 'Type at least two characters to search.'; return; }
-      walletSearchTimer = setTimeout(async () => {
-        const status = document.getElementById('wallet-panel-status'), results = document.getElementById('wallet-user-results');
-        if (localPlayer.role !== 'developer') return;
-        status.textContent = 'Searching…';
-        try {
-          const data = await callStaffFunction('search_users', { query });
-          results.replaceChildren();
-          (data.users || []).forEach(user => results.appendChild(staffUserCard(user, 'wallet')));
-          status.textContent = data.users && data.users.length ? `${data.users.length} matching users.` : 'No users found.';
-        } catch (error) { status.textContent = error.message || 'Search failed.'; }
-      }, immediate ? 0 : 350);
-    }
-
-    async function refreshModerationState() {
-      if (!authUser || guestMode) return false;
-      const { data, error } = await supabaseClient.rpc('get_my_moderation');
-      if (error || !data) return false;
-      moderationState = data;
-      const muted = data.mute_until && new Date(data.mute_until).getTime() > Date.now();
-      localPlayer.mutedUntil = muted ? data.mute_until : null;
-      const input = document.getElementById('chat-input');
-      if (input) { input.disabled = !authUser || guestMode || Boolean(muted) || Boolean(data.is_banned); input.placeholder = muted ? `Muted until ${new Date(data.mute_until).toLocaleString()}` : 'Type global message...'; }
-      if (data.is_banned) await leaveBannedGame();
-      return Boolean(data.is_banned);
-    }
-    async function leaveBannedGame() {
-      if (realtimeChannel) { await realtimeChannel.unsubscribe(); realtimeChannel = null; }
-      if (socialChannel) { await socialChannel.unsubscribe(); socialChannel = null; }
-      guestMode = true;
-      localPlayer.role = 'player'; updateRoleUi();
-      await supabaseClient.auth.signOut({ scope: 'local' });
-      authUser = null;
-      document.getElementById('auth-modal').classList.remove('hidden');
-      showAuthAlert('This account is currently banned from the game. Contact an administrator to request an unban.');
-    }
-    function startModerationMonitor() {
-      if (moderationPollTimer) clearInterval(moderationPollTimer);
-      moderationPollTimer = setInterval(async () => {
-        if (!authUser) return;
-        const { data: role } = await supabaseClient.rpc('get_my_role');
-        if (role && ['player', 'admin', 'developer'].includes(role) && role !== localPlayer.role) {
-          localPlayer.role = role; updateRoleUi(); await persistProfileToAuth(); broadcastPlayerState(); broadcastProfileUpdate();
-        }
-        await refreshOwnProfile();
-        await refreshModerationState();
-        await Promise.allSettled(Object.keys(remotePlayers).map(resolveRemoteRole));
-      }, 15000);
-    }
-
-    async function getTrustedUserRole(userId) {
-      if (!authUser || !isValidUserId(userId)) return 'player';
-      const { data, error } = await supabaseClient.rpc('get_user_role', { p_user_id: userId });
-      return !error && ['admin', 'developer'].includes(data) ? data : 'player';
-    }
-    async function resolveRemoteRole(userId) {
-      const role = await getTrustedUserRole(userId);
-      if (remotePlayers[userId]) { remotePlayers[userId].role = role; }
-    }
-
-    // --- SUPABASE REALTIME MULTIPLAYER (FIXED FOR PUBLIC BROADCAST & PRESENCE) ---
-    let socialChannel = null;
-    function initSocialChannel() {
-      if (socialChannel || !authUser || guestMode) return;
-      socialChannel = supabaseClient.channel('sakura-social')
-        .on('broadcast', { event: 'friend_request' }, ({ payload }) => receiveFriendRequest(payload))
-        .on('broadcast', { event: 'friend_accept' }, ({ payload }) => {
-          if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.friendId)) return;
-          addFriend(payload.friendId, payload.name, payload.pfp, payload.avatarUrl, payload.equippedFrame);
-          playSound('match');
-        })
-        .on('broadcast', { event: 'friend_decline' }, ({ payload }) => {
-          if (!payload || payload.targetId !== localPlayer.id) return;
-          outgoingFriendRequests = outgoingFriendRequests.filter(r => r.targetId !== payload.userId);
-          localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
-          handleFriendUserSearch();
-        })
-        .on('broadcast', { event: 'unfriend' }, ({ payload }) => {
-          if (!payload || payload.targetId !== localPlayer.id) return;
-          friendList = friendList.filter(f => f.id !== payload.userId);
-          saveFriendData();
-          renderFriendsList();
-          if (activeDMUserId === payload.userId) activeDMUserId = null;
-          renderDMBox();
-        })
-        .on('broadcast', { event: 'profile_update' }, ({ payload }) => {
-          if (!payload || !payload.id) return;
-          if (payload.id === localPlayer.id) refreshOwnProfile();
-          else syncFriendProfile(payload);
-        })
-        .on('broadcast', { event: 'direct_msg' }, async ({ payload }) => {
-          if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.senderId)) return;
-          const isFriend = friendList.some(f => f.id === payload.senderId && f.accepted);
-          const senderRole = await getTrustedUserRole(payload.senderId);
-          if (!isFriend && senderRole !== 'developer' && localPlayer.role !== 'developer') return;
-          if (senderRole === 'developer' || localPlayer.role === 'developer') {
-            staffDMUserId = payload.senderId;
-            staffDMProfile = { id: payload.senderId, name: payload.sender || (senderRole === 'developer' ? 'Developer' : 'Player'), pfp: payload.pfp, avatarUrl: payload.avatarUrl, equippedFrame: payload.equippedFrame, role: senderRole };
-            activeDMUserId = payload.senderId;
-          }
-          if (!dmMessages[payload.senderId]) dmMessages[payload.senderId] = [];
-          dmMessages[payload.senderId].push({ senderId: payload.senderId, text: payload.text, time: Date.now(), pfp: payload.pfp, avatarUrl: payload.avatarUrl, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard });
-          localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
-          markFriendsUnread();
-          if (activeDMUserId === payload.senderId) renderDMBox();
-        })
-        .on('broadcast', { event: 'lobby_music_update' }, ({ payload }) => { if (payload) setLobbyMusicUrl(payload.url || ''); })
-        .subscribe();
-    }
-
-    function initSupabaseChannel(channelName) {
-      if (!authUser || guestMode) return;
-      initSocialChannel();
-      if (realtimeChannel) realtimeChannel.unsubscribe();
-
-      realtimeChannel = supabaseClient.channel(`sakura_room_${channelName}`, {
-        config: { presence: { key: localPlayer.id } }
+    // --- REALTIME & BROADCASTING ---
+    function setupRealtimeChannel() {
+      if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
+      realtimeChannel = supabaseClient.channel(`room_${currentChannel}`, {
+        config: { broadcast: { self: false } }
       });
 
       realtimeChannel
-        .on('presence', { event: 'sync' }, () => {
-          const state = realtimeChannel.presenceState();
-          remotePlayers = {};
-          Object.keys(state).forEach(key => {
-            if (key !== localPlayer.id) {
-              const player = state[key][0];
-              remotePlayers[key] = { ...player, role: 'player', displayX: player.x, displayY: player.y, displayJumpOffset: player.jumpOffset || 0 };
-              resolveRemoteRole(key);
+        .on('broadcast', { event: 'player_state' }, payload => {
+          const p = payload.payload;
+          if (p && isValidUserId(p.id) && p.id !== localPlayer.id) {
+            remotePlayers[p.id] = { ...p, lastUpdated: Date.now() };
+          }
+        })
+        .on('broadcast', { event: 'global_chat_message' }, payload => {
+          const msg = payload.payload;
+          if (msg && msg.text) {
+            globalChatMessages.push(msg);
+            if (globalChatMessages.length > 60) globalChatMessages.shift();
+            renderChatMessages();
+          }
+        })
+        .on('broadcast', { event: 'staff_chat_message' }, payload => {
+          const msg = payload.payload;
+          if (msg && msg.text && ['admin', 'developer'].includes(localPlayer.role)) {
+            staffChatMessages.push(msg);
+            if (staffChatMessages.length > 60) staffChatMessages.shift();
+            renderChatMessages();
+          }
+        })
+        .on('broadcast', { event: 'friend_request' }, payload => {
+          const req = payload.payload;
+          if (req && req.targetId === localPlayer.id) {
+            if (!friendRequests.some(r => r.senderId === req.senderId)) {
+              friendRequests.push(req);
+              localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
+              friendsUnread = true;
+              localStorage.setItem('sakura_friends_unread', '1');
+              document.getElementById('friends-unread-dot').classList.remove('hidden');
             }
-          });
-          Object.values(remotePlayers).forEach(syncFriendProfile);
-          if (document.getElementById('friend-search-input').value.trim()) handleFriendUserSearch();
-        })
-        .on('broadcast', { event: 'player_update' }, ({ payload }) => {
-          if (payload && payload.id !== localPlayer.id) {
-            const previous = remotePlayers[payload.id];
-            remotePlayers[payload.id] = { ...payload, role: previous ? previous.role : 'player',
-              displayX: previous && Number.isFinite(previous.displayX) ? previous.displayX : payload.x,
-              displayY: previous && Number.isFinite(previous.displayY) ? previous.displayY : payload.y,
-              displayJumpOffset: previous && Number.isFinite(previous.displayJumpOffset) ? previous.displayJumpOffset : (payload.jumpOffset || 0)
-            };
-            syncFriendProfile(payload);
-            if (!previous) resolveRemoteRole(payload.id);
           }
         })
-        .on('broadcast', { event: 'global_chat' }, async ({ payload }) => {
-          if (!payload || !isValidUserId(payload.senderId) || payload.senderId === localPlayer.id) return;
-          const verifiedRole = await getTrustedUserRole(payload.senderId);
-          appendChatMessage(payload.sender, payload.text, payload.pfp, false, { senderId: payload.senderId, avatarUrl: payload.avatarUrl, role: verifiedRole, equippedTitle: payload.equippedTitle, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard });
-          if (remotePlayers[payload.senderId]) remotePlayers[payload.senderId].speechBubble = { text: String(payload.text || '').slice(0, 72), until: Date.now() + 6500 };
-        })
-        .subscribe(async (status) => {
-          if (status === 'SUBSCRIBED') {
-            await realtimeChannel.track(localPlayer);
+        .on('broadcast', { event: 'direct_message' }, payload => {
+          const dm = payload.payload;
+          if (dm && dm.recipientId === localPlayer.id) {
+            if (!dmMessages[dm.senderId]) dmMessages[dm.senderId] = [];
+            dmMessages[dm.senderId].push(dm);
+            localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
+            friendsUnread = true;
+            localStorage.setItem('sakura_friends_unread', '1');
+            document.getElementById('friends-unread-dot').classList.remove('hidden');
+            if (activeDMUserId === dm.senderId) renderDMMessages();
           }
-        });
+        })
+        .on('broadcast', { event: 'role_update' }, payload => {
+          const data = payload.payload;
+          if (data && data.targetId === localPlayer.id) {
+            localPlayer.role = data.role;
+            if (data.role === 'player' && activeChatTab === 'staff') switchChatTab('global');
+            updateStaffChatVisibility();
+          }
+        })
+        .on('broadcast', { event: 'lobby_music_update' }, payload => {
+          if (payload.payload && typeof payload.payload.url === 'string') {
+            setLobbyMusicUrl(payload.payload.url);
+          }
+        })
+        .subscribe();
     }
 
     function broadcastPlayerState() {
-      if (realtimeChannel) {
-        realtimeChannel.send({
-          type: 'broadcast',
-          event: 'player_update',
-          payload: localPlayer
-        });
-      }
-    }
-
-    function handleChatSubmit(e) {
-      e.preventDefault();
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text) return;
-      if (!authUser || guestMode) { alert('Sign in to chat in the shared world.'); return; }
-      if (moderationState.is_banned || (localPlayer.mutedUntil && new Date(localPlayer.mutedUntil).getTime() > Date.now())) {
-        input.disabled = true; input.placeholder = 'Chat is unavailable for this account right now.'; return;
-      }
-      const message = text.slice(0, 120);
-      localPlayer.speechBubble = { text: message.slice(0, 72), until: Date.now() + 6500 };
-      appendChatMessage(localPlayer.name, message, localPlayer.pfp, true, { senderId: localPlayer.id, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard });
-      broadcastPlayerState();
-      if (realtimeChannel) {
-        realtimeChannel.send({
-          type: 'broadcast', event: 'global_chat',
-          payload: { senderId: localPlayer.id, sender: localPlayer.name, text: message, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
-        });
-      }
-      input.value = '';
-    }
-
-    function openChatPlayerCard(profile) {
-      if (!profile || !isValidUserId(profile.id) || profile.id === localPlayer.id) return;
-      const fromRoom = remotePlayers[profile.id];
-      showPlayerCard(fromRoom || { ...profile, x: camera.x + canvas.width / 2, y: camera.y + canvas.height / 2 });
-    }
-
-    function appendChatMessage(sender, text, pfp, isSelf = false, profile = {}) {
-      const chatBox = document.getElementById('chat-messages');
-      const role = profile.role === 'developer' ? 'developer' : profile.role === 'admin' ? 'admin' : 'player';
-      const roleTitleEquipped = (role === 'developer' && profile.equippedTitle === 'title_developer') || (role === 'admin' && profile.equippedTitle === 'title_admin');
-      const roleTitle = roleTitleEquipped ? (role === 'developer' ? 'DEV' : 'ADMIN') : '';
-      const card = document.createElement('article');
-      const cardStyle = { card_sakura: 'chat-card-sakura', card_moon: 'chat-card-moon', card_royal: 'chat-card-royal' }[profile.equippedMessageCard];
-      card.className = `rounded-2xl border p-2.5 shadow-sm ${roleTitleEquipped && role === 'developer' ? 'border-cyan-300 bg-cyan-950/70 shadow-cyan-500/20' : roleTitleEquipped && role === 'admin' ? 'border-rose-400 bg-slate-950/80 shadow-rose-500/25' : isSelf ? 'border-pink-300/40 bg-pink-500/20' : 'border-white/10 bg-white/5'} ${cardStyle || ''}`;
-      const header = document.createElement('div'); header.className = 'mb-1 flex items-center gap-2';
-      const userId = profile.senderId || profile.id;
-      const avatar = makeAvatar({ pfp, avatarUrl: profile.avatarUrl || '', equippedFrame: profile.equippedFrame }, 'w-7 h-7');
-      const nameButton = document.createElement('button'); nameButton.type = 'button';
-      nameButton.className = `min-w-0 truncate text-left text-[11px] font-extrabold ${roleTitleEquipped && role === 'developer' ? 'text-cyan-200' : roleTitleEquipped && role === 'admin' ? 'text-rose-300' : isSelf ? 'text-pink-200' : 'text-pink-300'}`;
-      nameButton.textContent = `${sender || 'Slime'}${roleTitle ? ` · ${roleTitle}` : ''}`;
-      if (userId && userId !== localPlayer.id) {
-        const playerProfile = { id: userId, name: sender, pfp, avatarUrl: profile.avatarUrl || '', equippedFrame: profile.equippedFrame, equippedTitle: profile.equippedTitle, equippedMessageCard: profile.equippedMessageCard, role };
-        avatar.classList.add('cursor-pointer'); avatar.title = 'View profile / add friend'; avatar.onclick = () => openChatPlayerCard(playerProfile);
-        nameButton.onclick = () => openChatPlayerCard(playerProfile);
-      }
-      header.append(avatar, nameButton);
-      if (profile.equippedTitle && !['title_admin','title_developer'].includes(profile.equippedTitle)) {
-        const title = [].concat(...Object.values(MARKET_ITEMS)).find(item => item.id === profile.equippedTitle);
-        if (title) { const tag = document.createElement('span'); tag.className = 'ml-auto rounded-full bg-white/15 px-2 py-0.5 text-[8px] font-black text-amber-200'; tag.textContent = title.text || title.name; header.appendChild(tag); }
-      }
-      if (roleTitle) {
-        const badge = document.createElement('span'); badge.className = `ml-auto rounded-full px-2 py-0.5 text-[8px] font-black tracking-wider ${role === 'developer' ? 'bg-cyan-300 text-cyan-950' : 'bg-rose-500 text-white'}`;
-        badge.textContent = roleTitle; header.appendChild(badge);
-      }
-      const message = document.createElement('p'); message.className = 'break-words pl-9 text-[11px] leading-relaxed text-white/95'; message.textContent = text;
-      card.append(header, message); chatBox.appendChild(card); chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function switchChannel(channelName) {
-      currentChannel = channelName;
-      document.getElementById('room-indicator').textContent = '#' + channelName;
-      initSupabaseChannel(channelName);
-    }
-
-    function triggerJump() {
-      if (!localPlayer.isJumping) {
-        localPlayer.isJumping = true;
-        localPlayer.jumpVelocity = 520;
-        localPlayer.jumpOffset = 0;
-        localPlayer.bounceCount = 0;
-        playSound('jump');
-        broadcastPlayerState();
-      }
-    }
-
-    function triggerEmote(emoji) {
-      localPlayer.emoteEmoji = emoji;
-      localPlayer.emoteUntil = Date.now() + 900;
-      localPlayer.speechBubble = { text: String(emoji).slice(0, 24), until: Date.now() + 2400 };
-      playSound('jump'); broadcastPlayerState();
-      if (window.matchMedia('(max-width: 767px)').matches) {
-        canvas.classList.remove('mobile-jiggle'); void canvas.offsetWidth; canvas.classList.add('mobile-jiggle');
-      }
-    }
-
-    function toggleActiveSpecialEmote() {
-      const item = MARKET_ITEMS.emotes.find(entry => entry.id === localPlayer.equippedEmote && localPlayer.inventory.includes(entry.id));
-      if (!item) return;
-      localPlayer.activeSpecialEmote = localPlayer.activeSpecialEmote === item.anim ? null : item.anim;
-      localPlayer.speechBubble = { text: item.icon, until: Date.now() + 2400 };
-      renderOwnedEmoteButton(); broadcastPlayerState();
-    }
-
-    function toggleChatSidebar() {
-      document.getElementById('chat-sidebar').classList.toggle('translate-x-full');
-    }
-
-    // Keyboard Listeners (Movement preserved)
-    window.addEventListener('keydown', (e) => {
-      if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-      const key = e.key.toLowerCase();
-      if (key === 'w' || e.key === 'ArrowUp') keys.up = true;
-      if (key === 's' || e.key === 'ArrowDown') keys.down = true;
-      if (key === 'a' || e.key === 'ArrowLeft') keys.left = true;
-      if (key === 'd' || e.key === 'ArrowRight') keys.right = true;
-      if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
-      if (e.key === ' ' && !e.repeat) triggerJump();
-    });
-
-    window.addEventListener('keyup', (e) => {
-      if (e.key === 'w' || e.key === 'ArrowUp') keys.up = false;
-      if (e.key === 's' || e.key === 'ArrowDown') keys.down = false;
-      if (e.key === 'a' || e.key === 'ArrowLeft') keys.left = false;
-      if (e.key === 'd' || e.key === 'ArrowRight') keys.right = false;
-    });
-
-    const joyBase = document.getElementById('joystick-container');
-    const joyStick = document.getElementById('joystick-stick');
-    let joyPointerId = null;
-    joyBase.addEventListener('pointerdown', event => {
-      event.preventDefault();
-      joyPointerId = event.pointerId;
-      joyBase.setPointerCapture(event.pointerId);
-      handleJoyPointer(event);
-    });
-    joyBase.addEventListener('pointermove', event => {
-      if (event.pointerId === joyPointerId) handleJoyPointer(event);
-    });
-    function releaseJoystick(event) {
-      if (event.pointerId !== joyPointerId) return;
-      joyPointerId = null;
-      joystick.active = false; joystick.dx = 0; joystick.dy = 0;
-      joyStick.style.transform = 'translate(0px, 0px)';
-    }
-    joyBase.addEventListener('pointerup', releaseJoystick);
-    joyBase.addEventListener('pointercancel', releaseJoystick);
-    joyBase.addEventListener('lostpointercapture', releaseJoystick);
-    function handleJoyPointer(event) {
-      event.preventDefault();
-      const rect = joyBase.getBoundingClientRect();
-      let dx = event.clientX - (rect.left + rect.width / 2);
-      let dy = event.clientY - (rect.top + rect.height / 2);
-      const maxDist = 35;
-      const dist = Math.hypot(dx, dy);
-      if (dist > maxDist) { dx = dx / dist * maxDist; dy = dy / dist * maxDist; }
-      joyStick.style.transform = `translate(${dx}px, ${dy}px)`;
-      joystick.active = true; joystick.dx = dx / maxDist; joystick.dy = dy / maxDist;
-    }
-
-    async function awardGameWin(gameName) {
-      if (!authUser || guestMode) { alert('Sign in to earn points that save to your account.'); return false; }
-      const randomId = window.crypto && typeof window.crypto.randomUUID === 'function' ? window.crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); });
-      const { data, error } = await supabaseClient.rpc('award_game_win', { p_game_key: `${gameName}:${randomId}` });
-      if (error) { alert(error.message || 'Could not save the game reward.'); return false; }
-      localPlayer.points = Number(data.points) || localPlayer.points;
-      savePlayerToStorage(); updateUIHeader(); return true;
-    }
-
-    // --- GAMES ---
-    let memoryDeck = [];
-    let memoryRevealed = [];
-    let memoryMatched = new Set();
-    let memoryLocked = false;
-    let memoryFinished = false;
-    function openGamesModal() { document.getElementById('games-modal').classList.remove('hidden'); }
-    function closeGamesModal() { document.getElementById('games-modal').classList.add('hidden'); }
-    function openMemoriesModal() {
-      closeGamesModal();
-      document.getElementById('memories-modal').classList.remove('hidden');
-      if (!memoryDeck.length || memoryFinished) startMemoriesGame();
-    }
-    function closeMemoriesModal() { document.getElementById('memories-modal').classList.add('hidden'); }
-    function startMemoriesGame() {
-      const symbols = ['🌸', '🐱', '🦊', '👑', '🐰', '⭐', '🐼', '🦄'];
-      memoryDeck = [...symbols, ...symbols].sort(() => Math.random() - .5);
-      memoryRevealed = [];
-      memoryMatched = new Set();
-      memoryLocked = false;
-      memoryFinished = false;
-      document.getElementById('memory-status').textContent = 'Find the matching stickers!';
-      renderMemoryCards();
-    }
-    function renderMemoryCards() {
-      const grid = document.getElementById('memory-grid');
-      grid.innerHTML = '';
-      memoryDeck.forEach((symbol, index) => {
-        const visible = memoryMatched.has(index) || memoryRevealed.includes(index);
-        const card = document.createElement('button');
-        card.type = 'button';
-        card.className = `aspect-square rounded-2xl border-2 text-2xl sm:text-3xl shadow-sm transition active:scale-95 ${memoryMatched.has(index) ? 'bg-emerald-100 border-emerald-300' : visible ? 'bg-pink-100 border-pink-300' : 'bg-gradient-to-br from-emerald-400 to-teal-500 border-white text-white'}`;
-        card.textContent = visible ? symbol : '?';
-        card.setAttribute('aria-label', visible ? `Card ${index + 1}: ${symbol}` : `Hidden card ${index + 1}`);
-        card.onclick = () => flipMemoryCard(index);
-        grid.appendChild(card);
-      });
-    }
-    async function flipMemoryCard(index) {
-      if (memoryLocked || memoryFinished || memoryMatched.has(index) || memoryRevealed.includes(index)) return;
-      memoryRevealed.push(index);
-      renderMemoryCards();
-      if (memoryRevealed.length < 2) return;
-      const [first, second] = memoryRevealed;
-      if (memoryDeck[first] === memoryDeck[second]) {
-        memoryMatched.add(first); memoryMatched.add(second); memoryRevealed = [];
-        playSound('match');
-        renderMemoryCards();
-        if (memoryMatched.size === memoryDeck.length) {
-          memoryFinished = true;
-          const awarded = await awardGameWin('memories');
-          document.getElementById('memory-status').textContent = awarded ? 'You won! +5 points 🪙' : 'You won! Sign in to save your 5 points.';
+      if (!realtimeChannel) return;
+      realtimeChannel.send({
+        type: 'broadcast',
+        event: 'player_state',
+        payload: {
+          id: localPlayer.id,
+          name: localPlayer.name,
+          pfp: localPlayer.pfp,
+          avatarUrl: localPlayer.avatarUrl,
+          x: localPlayer.x,
+          y: localPlayer.y,
+          vx: localPlayer.vx,
+          vy: localPlayer.vy,
+          equippedSkin: localPlayer.equippedSkin,
+          equippedAcc: localPlayer.equippedAcc,
+          equippedTitle: localPlayer.equippedTitle,
+          equippedFrame: localPlayer.equippedFrame,
+          role: localPlayer.role,
+          speechBubble: localPlayer.speechBubble && localPlayer.speechBubble.until > Date.now() ? localPlayer.speechBubble : null,
+          isJumping: localPlayer.isJumping,
+          jumpOffset: localPlayer.jumpOffset,
+          activeSpecialEmote: localPlayer.activeSpecialEmote
         }
-      } else {
-        memoryLocked = true;
-        window.setTimeout(() => { memoryRevealed = []; memoryLocked = false; renderMemoryCards(); }, 700);
+      });
+    }
+
+    function sendSocialBroadcast(event, payload) {
+      if (realtimeChannel) {
+        realtimeChannel.send({ type: 'broadcast', event, payload });
       }
     }
 
-    const sequenceStickers = ['🌸', '🐸', '🍡', '⭐'];
-    let slimeSequence = [];
-    let sequenceInput = [];
-    let sequenceLevel = 0;
-    let sequenceLocked = true;
-    let sequenceTimer = null;
-    function openSequenceGame() {
-      closeGamesModal();
-      document.getElementById('sequence-modal').classList.remove('hidden');
-      renderSequenceButtons();
+    function switchChannel(channel) {
+      currentChannel = channel;
+      document.getElementById('room-indicator.textContent` = channel === 'sakura-lounge' ? '#sakura-lounge' : '#onsen-hotspring';
+      document.getElementById('quick-btn-sakura-lounge').className = channel === 'sakura-lounge' ? 'quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap' : 'quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap';
+      document.getElementById('quick-btn-onsen-hotspring').className = channel === 'onsen-hotspring' ? 'quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap' : 'quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap';
+      setupRealtimeChannel();
     }
-    function closeSequenceGame() {
-      document.getElementById('sequence-modal').classList.add('hidden');
-      window.clearTimeout(sequenceTimer);
-      sequenceLocked = true;
+
+    // --- AUTH MODAL & INIT ---
+    let authTab = 'signin';
+    function switchAuthTab(tab) {
+      authTab = tab;
+      const signInBtn = document.getElementById('tab-signin');
+      const signUpBtn = document.getElementById('tab-signup');
+      const userField = document.getElementById('username-field');
+      const submitBtn = document.getElementById('auth-submit-btn');
+
+      if (tab === 'signin') {
+        signInBtn.className = 'py-2 rounded-xl bg-white shadow text-pink-900 transition';
+        signUpBtn.className = 'py-2 rounded-xl transition text-pink-600 hover:text-pink-900';
+        userField.classList.add('hidden');
+        submitBtn.querySelector('span').textContent = 'Sign In';
+      } else {
+        signUpBtn.className = 'py-2 rounded-xl bg-white shadow text-pink-900 transition';
+        signInBtn.className = 'py-2 rounded-xl transition text-pink-600 hover:text-pink-900';
+        userField.classList.remove('hidden');
+        submitBtn.querySelector('span').textContent = 'Sign Up';
+      }
     }
-    function renderSequenceButtons() {
-      const grid = document.getElementById('sequence-grid');
-      grid.innerHTML = '';
-      sequenceStickers.forEach((sticker, index) => {
-        const button = document.createElement('button');
-        button.type = 'button'; button.className = 'aspect-square rounded-2xl border-2 border-white bg-gradient-to-br from-violet-400 to-indigo-500 text-4xl shadow-md transition active:scale-95';
-        button.textContent = sticker; button.setAttribute('aria-label', `Sticker ${index + 1}`);
-        button.onclick = () => clickSequenceSticker(index);
-        grid.appendChild(button);
-      });
-    }
-    function startSequenceGame() {
-      window.clearTimeout(sequenceTimer);
-      slimeSequence = []; sequenceInput = []; sequenceLevel = 0; sequenceLocked = true;
-      document.getElementById('sequence-status').textContent = 'Watch the pattern…';
-      advanceSequence();
-    }
-    function advanceSequence() {
-      slimeSequence.push(Math.floor(Math.random() * sequenceStickers.length));
-      sequenceInput = []; sequenceLevel++;
-      const status = document.getElementById('sequence-status');
-      status.textContent = `Round ${sequenceLevel} of 8 — watch closely`;
-      sequenceLocked = true;
-      const grid = document.getElementById('sequence-grid');
-      const buttons = Array.from(grid.children);
-      let step = 0;
-      const showNext = () => {
-        buttons.forEach(button => button.classList.remove('ring-4', 'ring-yellow-300', 'brightness-150'));
-        if (step >= slimeSequence.length) {
-          sequenceLocked = false;
-          status.textContent = `Round ${sequenceLevel} of 8 — repeat the pattern`;
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const alertBox = document.getElementById('auth-alert');
+      alertBox.classList.add('hidden');
+
+      if (authTab === 'signup') {
+        const username = document.getElementById('auth-username').value.trim();
+        if (username) {
+          localPlayer.name = username;
+          localStorage.setItem('sakura_name', localPlayer.name);
+        }
+        const { data, error } = await supabaseClient.auth.signUp({ email, password });
+        if (error) {
+          alertBox.textContent = error.message;
+          alertBox.className = 'text-xs p-3 rounded-xl border font-medium bg-rose-100 text-rose-800 border-rose-300';
+          alertBox.classList.remove('hidden');
           return;
         }
-        const button = buttons[slimeSequence[step++]];
-        button.classList.add('ring-4', 'ring-yellow-300', 'brightness-150');
-        sequenceTimer = window.setTimeout(showNext, 430);
-      };
-      sequenceTimer = window.setTimeout(showNext, 350);
-    }
-    async function clickSequenceSticker(index) {
-      if (sequenceLocked || !slimeSequence.length) return;
-      sequenceInput.push(index);
-      const position = sequenceInput.length - 1;
-      if (sequenceInput[position] !== slimeSequence[position]) {
-        sequenceLocked = true;
-        document.getElementById('sequence-status').textContent = 'Not quite. Press Start and try again.';
-        return;
-      }
-      if (sequenceInput.length === slimeSequence.length) {
-        sequenceLocked = true;
-        if (sequenceLevel >= 8) {
-          const awarded = await awardGameWin('sequence');
-          document.getElementById('sequence-status').textContent = awarded ? 'You won! +5 points 🪙' : 'You won! Sign in to save your 5 points.';
-        } else {
-          document.getElementById('sequence-status').textContent = 'Nice! Get ready for the next round…';
-          sequenceTimer = window.setTimeout(advanceSequence, 650);
+        authUser = data.user;
+      } else {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) {
+          alertBox.textContent = error.message;
+          alertBox.className = 'text-xs p-3 rounded-xl border font-medium bg-rose-100 text-rose-800 border-rose-300';
+          alertBox.classList.remove('hidden');
+          return;
+        }
+        authUser = data.user;
+        if (email.toLowerCase() === 'phantomromeo9@gmail.com') {
+          localPlayer.role = 'developer';
         }
       }
-    }
 
-    function isNoticeWriter() { return ['admin', 'developer'].includes(localPlayer.role); }
-    async function openNoticeBoard() {
-      document.getElementById('notice-board-modal').classList.remove('hidden');
-      document.getElementById('notice-post-form').classList.toggle('hidden', !isNoticeWriter());
-      document.getElementById('notice-board-status').textContent = 'Loading notices…';
-      await loadNoticeBoard();
-    }
-    function closeNoticeBoard() { document.getElementById('notice-board-modal').classList.add('hidden'); }
-    async function loadNoticeBoard() {
-      const list = document.getElementById('notice-board-list');
-      const status = document.getElementById('notice-board-status');
-      list.replaceChildren();
-      const { data, error } = await supabaseClient.from('notice_board').select('id,title,body,author_id,author_name,created_at').order('created_at', { ascending: false }).limit(30);
-      if (error) { status.textContent = 'Apply the supplied Supabase SQL file to enable saved notices.'; return; }
-      status.textContent = data.length ? `${data.length} recent notice${data.length === 1 ? '' : 's'}` : 'No notices yet.';
-      data.forEach(notice => {
-        const card = document.createElement('article'); card.className = 'rounded-2xl border border-amber-200 bg-white/80 p-3';
-        const title = document.createElement('h4'); title.className = 'text-sm font-extrabold text-amber-950'; title.textContent = notice.title;
-        const body = document.createElement('p'); body.className = 'mt-1 whitespace-pre-wrap break-words text-xs text-slate-700'; body.textContent = notice.body;
-        const meta = document.createElement('p'); meta.className = 'mt-2 text-[9px] font-semibold text-amber-700';
-        const time = notice.created_at ? new Date(notice.created_at).toLocaleString() : '';
-        meta.textContent = `${notice.author_name || 'Sakura team'}${time ? ' · ' + time : ''}`;
-        card.append(title, body, meta);
-        if (isNoticeWriter()) {
-          const tools = document.createElement('div'); tools.className = 'mt-2 flex gap-2';
-          const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'rounded-lg bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-900'; edit.textContent = 'Edit'; edit.onclick = () => editNotice(notice);
-          const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'rounded-lg bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-900'; remove.textContent = 'Delete'; remove.onclick = () => deleteNotice(notice.id);
-          tools.append(edit, remove); card.appendChild(tools);
-        }
-        list.appendChild(card);
-      });
-    }
-    async function editNotice(notice) {
-      if (!isNoticeWriter()) return;
-      const title = prompt('Edit notice title:', notice.title); if (title === null) return;
-      const body = prompt('Edit notice body:', notice.body); if (body === null) return;
-      const { error } = await supabaseClient.rpc('edit_notice', { p_notice_id: notice.id, p_title: title.trim(), p_body: body.trim() });
-      if (error) { document.getElementById('notice-board-status').textContent = error.message; return; }
-      await loadNoticeBoard();
-    }
-    async function deleteNotice(id) {
-      if (!isNoticeWriter() || !confirm('Delete this notice?')) return;
-      const { error } = await supabaseClient.rpc('delete_notice', { p_notice_id: id });
-      if (error) { document.getElementById('notice-board-status').textContent = error.message; return; }
-      await loadNoticeBoard();
-    }
-    async function postNotice(event) {
-      event.preventDefault();
-      if (!isNoticeWriter() || !authUser) { alert('Only an admin or developer account can post notices.'); return; }
-      const title = document.getElementById('notice-title-input').value.trim();
-      const body = document.getElementById('notice-body-input').value.trim();
-      const recipient = document.getElementById('notice-recipient-input').value.trim().toLowerCase() || null;
-      if (!title || !body) return;
-      const status = document.getElementById('notice-board-status'); status.textContent = 'Posting…';
-      const { error } = await supabaseClient.rpc('post_notice', { p_title: title, p_body: body, p_recipient_email: recipient });
-      if (error) { status.textContent = 'Could not post. Apply the supplied SQL and confirm your staff role.'; return; }
-      document.getElementById('notice-post-form').reset();
-      document.getElementById('notice-recipient-input').value = 'phantomromeo9@gmail.com';
-      await loadNoticeBoard();
-    }
+      if (email.toLowerCase() === 'phantomromeo9@gmail.com') {
+        localPlayer.role = 'developer';
+      }
 
-    // --- AUTH ---
-    let authMode = 'signin';
-    function switchAuthTab(mode) {
-      authMode = mode;
-      document.getElementById('username-field').classList.toggle('hidden', mode === 'signin');
-      const alertBox = document.getElementById('auth-alert'); alertBox.classList.add('hidden');
-      document.getElementById('auth-submit-btn').querySelector('span').textContent = mode === 'signup' ? 'Create Account' : 'Sign In';
-    }
-
-    function showAuthAlert(message, isError = true) {
-      const alertBox = document.getElementById('auth-alert');
-      alertBox.textContent = message;
-      alertBox.className = `text-xs p-3 rounded-xl border font-medium ${isError ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`;
+      closeAuthModal();
     }
 
     function loginAsGuest() {
-      authUser = null; guestMode = true; localPlayer.role = 'player'; updateRoleUi();
+      guestMode = true;
+      closeAuthModal();
+    }
+
+    function closeAuthModal() {
       document.getElementById('auth-modal').classList.add('hidden');
-      const input = document.getElementById('chat-input'); input.disabled = true; input.placeholder = 'Sign in for global chat';
+      updateStaffChatVisibility();
     }
 
-    async function handleAuthSubmit(event) {
-      event.preventDefault();
-      const email = document.getElementById('auth-email').value.trim();
-      const password = document.getElementById('auth-password').value;
-      const button = document.getElementById('auth-submit-btn');
-      button.disabled = true;
-      button.querySelector('span').textContent = authMode === 'signup' ? 'Creating account…' : 'Signing in…';
-      try {
-        let result;
-        if (authMode === 'signup') {
-          const chosenName = document.getElementById('auth-username').value.trim().slice(0, 15) || localPlayer.name;
-          localPlayer.name = chosenName;
-          result = await supabaseClient.auth.signUp({
-            email, password,
-            options: { data: {
-              display_name: localPlayer.name, pfp: localPlayer.pfp, avatar_url: localPlayer.avatarUrl || '',
-              points: localPlayer.points, inventory: localPlayer.inventory,
-              equipped_skin: localPlayer.equippedSkin, equipped_accessory: localPlayer.equippedAcc || '', equipped_title: localPlayer.equippedTitle || ''
-            }}
-          });
-          if (result.error) throw result.error;
-          if (!result.data.session || !result.data.user) {
-            showAuthAlert('Check your email to confirm your account, then return here to sign in.', false);
-            return;
-          }
-        } else {
-          result = await supabaseClient.auth.signInWithPassword({ email, password });
-          if (result.error) throw result.error;
+    // --- TOUCH / KEYBOARD CONTROLS SETUP ---
+    window.addEventListener('keydown', e => {
+      if (['ArrowUp', 'KeyW'].includes(e.code)) keys.up = true;
+      if (['ArrowDown', 'KeyS'].includes(e.code)) keys.down = true;
+      if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = true;
+      if (['ArrowRight', 'KeyD'].includes(e.code)) keys.right = true;
+      if (e.code === 'Space') { triggerJump(); e.preventDefault(); }
+    });
+
+    window.addEventListener('keyup', e => {
+      if (['ArrowUp', 'KeyW'].includes(e.code)) keys.up = false;
+      if (['ArrowDown', 'KeyS'].includes(e.code)) keys.down = false;
+      if (['ArrowLeft', 'KeyA'].includes(e.code)) keys.left = false;
+      if (['ArrowRight', 'KeyD'].includes(e.code)) keys.right = false;
+    });
+
+    // Mobile Virtual Joystick Setup
+    const joystickContainer = document.getElementById('joystick-container');
+    const joystickStick = document.getElementById('joystick-stick');
+    let joystickTouchId = null;
+
+    joystickContainer.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const touch = e.changedTouches[0];
+      joystickTouchId = touch.identifier;
+      joystick.active = true;
+      updateJoystickPosition(touch);
+    }, { passive: false });
+
+    joystickContainer.addEventListener('touchmove', e => {
+      e.preventDefault();
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === joystickTouchId) {
+          updateJoystickPosition(e.changedTouches[i]);
+          break;
         }
-        const profileError = await applyAuthProfile(result.data.user);
-        if (moderationState.is_banned) throw new Error('This account is banned from the game.');
-        document.getElementById('auth-modal').classList.add('hidden');
-        initSocialChannel(); initSupabaseChannel(currentChannel); broadcastProfileUpdate(); updateUIHeader();
-        if (profileError) alert('Signed in, but this profile could not sync to the account yet. ' + profileError.message);
-      } catch (error) {
-        showAuthAlert(error && error.message ? error.message : 'Could not sign in. Please try again.');
-      } finally {
-        button.disabled = false;
-        button.querySelector('span').textContent = authMode === 'signup' ? 'Create Account' : 'Sign In';
       }
+    }, { passive: false });
+
+    const endJoystick = e => {
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === joystickTouchId) {
+          joystick.active = false;
+          joystick.dx = 0;
+          joystick.dy = 0;
+          joystickStick.style.transform = `translate(0px, 0px)`;
+          joystickTouchId = null;
+          break;
+        }
+      }
+    };
+    joystickContainer.addEventListener('touchend', endJoystick);
+    joystickContainer.addEventListener('touchcancel', endJoystick);
+
+    function updateJoystickPosition(touch) {
+      const rect = joystickContainer.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const dx = touch.clientX - centerX;
+      const dy = touch.clientY - centerY;
+      const dist = Math.hypot(dx, dy);
+      const maxDist = 32;
+
+      const angle = Math.atan2(dy, dx);
+      const clampedDist = Math.min(dist, maxDist);
+      const stickX = Math.cos(angle) * clampedDist;
+      const stickY = Math.sin(angle) * clampedDist;
+
+      joystickStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
+      joystick.dx = Math.cos(angle) * (clampedDist / maxDist);
+      joystick.dy = Math.sin(angle) * (clampedDist / maxDist);
     }
 
-    // INITIALIZATION ON LOAD
-    window.onload = async function() {
+    // --- INITIALIZATION ---
+    window.onload = () => {
       resizeCanvas();
-      updateUIHeader();
-      requestAnimationFrame(gameLoop);
       lucide.createIcons();
-      try {
-        const { data } = await supabaseClient.auth.getSession();
-        if (data && data.session && data.session.user) {
-          const error = await applyAuthProfile(data.session.user);
-          if (moderationState.is_banned) { showAuthAlert('This account is banned from the game. Contact an administrator to request an unban.'); return; }
-          document.getElementById('auth-modal').classList.add('hidden');
-          initSocialChannel(); initSupabaseChannel(currentChannel); broadcastProfileUpdate(); updateUIHeader();
-          if (error) alert('Signed in, but this profile could not sync to the account yet. ' + error.message);
-        }
-      } catch (error) {
-        showAuthAlert(error && error.message ? error.message : 'Could not restore your saved account session.');
-      }
+      updatePointsDisplay();
+      setupRealtimeChannel();
+      loadLobbyMusic();
+      requestAnimationFrame(gameLoop);
+
+      // Periodic cleanup of stale remote players
+      window.setInterval(() => {
+        const now = Date.now();
+        Object.entries(remotePlayers).forEach(([id, p]) => {
+          if (now - (p.lastUpdated || now) > 12000) delete remotePlayers[id];
+        });
+      }, 5000);
     };
   </script>
 </body>
