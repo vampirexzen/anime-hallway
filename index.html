@@ -129,12 +129,6 @@
     .overflow-y-auto { touch-action: pan-y; -webkit-overflow-scrolling: touch; }
     .overflow-x-auto { touch-action: pan-x pan-y; }
     .mobile-top-action { min-width: 34px; min-height: 34px; }
-    @keyframes mobile-jiggle {
-      0%, 100% { transform: rotate(0deg) translateY(0); }
-      25% { transform: rotate(-2deg) translateY(-1px); }
-      75% { transform: rotate(2deg) translateY(-1px); }
-    }
-    .mobile-jiggle { animation: mobile-jiggle .28s ease-in-out; }
     @media (max-width: 767px) {
       header { height: auto !important; min-height: 3.5rem; align-items: center; }
       header > div:last-child { max-width: 70vw; flex-wrap: wrap; justify-content: flex-end; gap: .25rem; }
@@ -148,6 +142,8 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; }
     }
+    .sticker-navigation { touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+    @media (hover: none) { .sticker-navigation button:hover { transform: none !important; } }
   </style>
 </head>
 <body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
@@ -223,8 +219,9 @@
 
       <!-- Music Toggle -->
       <div class="flex items-center bg-pink-100/90 rounded-xl p-1 border border-pink-200">
-        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Music">
+        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Play lobby music" aria-label="Play lobby music">
           <i data-lucide="music" id="music-icon" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-600"></i>
+          <span class="hidden sm:inline">Music</span>
         </button>
       </div>
 
@@ -273,6 +270,11 @@
       </button>
     </div>
   </header>
+  <div id="music-playback-notice" role="status" aria-live="polite" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-[80] max-w-[92vw] rounded-2xl border border-rose-200 bg-slate-950/90 px-4 py-2 text-center text-xs font-semibold text-white shadow-xl hidden"></div>
+  <section id="youtube-music-panel" aria-label="Lobby music player" class="fixed bottom-20 right-3 z-[70] hidden w-[248px] overflow-hidden rounded-2xl border border-cyan-200 bg-slate-950 shadow-2xl">
+    <div class="flex h-9 items-center justify-between px-2.5 text-[10px] font-bold text-white"><span>Lobby music · YouTube</span><button type="button" onclick="closeYouTubeMusicPanel()" class="rounded-md px-2 py-1 text-cyan-100 hover:bg-white/15" aria-label="Pause and close YouTube player">✕</button></div>
+    <div id="youtube-music-player" class="h-[200px] w-[240px] bg-black"></div>
+  </section>
 
   <!-- MAIN VIEWPORT CONTAINER -->
   <div class="flex-1 relative flex overflow-hidden w-full h-full">
@@ -292,12 +294,7 @@
       </div>
 
       <!-- Quick Action Floating Emote Bar -->
-      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2">
-        <button onclick="triggerJump()" class="action-btn px-2 py-0.5 rounded-xl text-xs font-black text-pink-800 flex items-center gap-1">
-          <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5 text-pink-600"></i>
-          <span class="hidden sm:inline">Jump</span>
-        </button>
-        <span class="text-pink-300">|</span>
+      <div class="sticker-navigation absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2" onpointerdown="event.stopPropagation()" ontouchstart="event.stopPropagation()" style="touch-action:manipulation;-webkit-tap-highlight-color:transparent">
         <button onclick="triggerEmote('🌸')" class="hover:scale-125 transition text-lg">🌸</button>
         <button onclick="triggerEmote('❤️')" class="hover:scale-125 transition text-lg">❤️</button>
         <button onclick="triggerEmote('✨')" class="hover:scale-125 transition text-lg">✨</button>
@@ -315,13 +312,6 @@
         <div id="joystick-container" class="joystick-base">
           <div id="joystick-stick" class="joystick-stick"></div>
         </div>
-      </div>
-
-      <!-- Mobile Right Jump Button -->
-      <div class="absolute bottom-3 right-3 z-20 pointer-events-auto md:hidden">
-        <button onclick="triggerJump()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-xs font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
-          JUMP
-        </button>
       </div>
 
       <div id="player-card" class="absolute z-30 hidden w-52 rounded-2xl glass p-3 shadow-xl border border-pink-200">
@@ -615,11 +605,16 @@
       <div class="mt-3 border-t border-slate-200 pt-3">
         <p class="text-[10px] font-extrabold uppercase tracking-wide text-slate-700">Lobby music</p>
         <div class="mt-2 flex gap-2">
-          <input id="lobby-music-url" type="url" placeholder="Direct HTTPS audio link (.mp3 / .ogg / .wav)" class="glass-input flex-1 rounded-xl px-3 py-2 text-[10px] text-slate-950" />
-          <button onclick="saveLobbyMusic()" class="rounded-xl bg-cyan-700 px-3 py-2 text-[10px] font-bold text-white">Save</button>
+          <input id="lobby-music-url" type="url" placeholder="YouTube link or direct HTTPS audio URL" class="glass-input min-w-0 flex-1 rounded-xl px-3 py-2 text-[10px] text-slate-950" />
+          <button onclick="saveLobbyMusic()" class="rounded-xl bg-cyan-700 px-3 py-2 text-[10px] font-bold text-white">Save link</button>
           <button onclick="clearLobbyMusic()" class="rounded-xl bg-slate-500 px-3 py-2 text-[10px] font-bold text-white">Clear</button>
         </div>
-        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Direct audio links play after a player taps the music button.</p>
+        <div class="mt-2 flex flex-wrap items-center gap-2">
+          <label for="lobby-music-file" class="cursor-pointer rounded-xl bg-violet-700 px-3 py-2 text-[10px] font-bold text-white">Upload audio file</label>
+          <input id="lobby-music-file" type="file" accept="audio/*,.mp3,.ogg,.wav,.m4a,.aac,.webm,.flac" onchange="uploadLobbyMusic(event)" class="sr-only" />
+          <span class="text-[9px] text-slate-500">MP3, OGG, WAV, M4A or similar · up to 15 MB</span>
+        </div>
+        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Each player taps Music once to start playback. YouTube needs the game hosted on HTTPS; upload an audio file when opening this page locally.</p>
       </div>
     </div>
   </div>
@@ -675,6 +670,7 @@
       <button onclick="saveProfileSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs">
         <i data-lucide="check" class="w-4 h-4"></i> Save & Refresh Everywhere
       </button>
+      <button type="button" onclick="signOutFromProfile()" class="w-full rounded-2xl border border-rose-200 bg-white/80 py-2.5 text-xs font-bold text-rose-700 hover:bg-rose-50">Sign out</button>
     </div>
   </div>
 
@@ -827,6 +823,9 @@
     let musicNoteIndex = 0;
     let lobbyMusicUrl = '';
     let lobbyAudio = null;
+    let youtubePlayer = null;
+    let youtubePlayerVideoId = '';
+    let youtubeApiPromise = null;
     const musicNotes = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46];
 
     function initAudio() {
@@ -865,34 +864,202 @@
       playTone(frequency, .34, .018, 'triangle');
     }
 
-    function toggleBackgroundMusic() {
-      musicPlaying = !musicPlaying;
+    let musicNoticeTimer = null;
+    function showMusicPlaybackNotice(message) {
+      const notice = document.getElementById('music-playback-notice');
+      if (!notice) return;
+      notice.textContent = message; notice.classList.remove('hidden');
+      window.clearTimeout(musicNoticeTimer);
+      musicNoticeTimer = window.setTimeout(() => notice.classList.add('hidden'), 5000);
+    }
+    function updateMusicButton(isOn) {
+      const button = document.getElementById('music-toggle-btn');
       const icon = document.getElementById('music-icon');
-      if (musicPlaying) {
-        icon.setAttribute('data-lucide', 'volume-2');
-        if (lobbyMusicUrl) {
-          if (!lobbyAudio || lobbyAudio.src !== lobbyMusicUrl) { if (lobbyAudio) lobbyAudio.pause(); lobbyAudio = new Audio(lobbyMusicUrl); lobbyAudio.loop = true; lobbyAudio.volume = .28; }
-          lobbyAudio.play().catch(() => { musicPlaying = false; icon.setAttribute('data-lucide', 'music'); lucide.createIcons(); });
-        } else if (initAudio()) { playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420); }
-        else { musicPlaying = false; icon.setAttribute('data-lucide', 'music'); }
-      } else {
-        icon.setAttribute('data-lucide', 'music'); window.clearInterval(musicTimer); musicTimer = null;
-        if (lobbyAudio) lobbyAudio.pause();
-      }
+      if (!button || !icon) return;
+      icon.setAttribute('data-lucide', isOn ? 'volume-2' : 'music');
+      button.title = isOn ? 'Pause lobby music' : (lobbyMusicUrl ? 'Tap once to hear the shared lobby music' : 'Play lobby music');
+      button.setAttribute('aria-label', button.title);
       lucide.createIcons();
     }
-    function setLobbyMusicUrl(value) {
+    function getYouTubeVideoId(value) {
+      if (!value) return '';
+      try {
+        const url = new URL(value);
+        const host = url.hostname.toLowerCase().replace(/^www\./, '');
+        let id = '';
+        if (host === 'youtu.be') id = url.pathname.split('/').filter(Boolean)[0] || '';
+        else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com' || host === 'youtube-nocookie.com') {
+          id = url.searchParams.get('v') || '';
+          if (!id) id = (url.pathname.match(/^\/(?:embed|shorts|live)\/([^/?]+)/) || [])[1] || '';
+        }
+        return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : '';
+      } catch (_) { return ''; }
+    }
+    function loadYouTubeIframeApi() {
+      if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
+      if (youtubeApiPromise) return youtubeApiPromise;
+      youtubeApiPromise = new Promise((resolve, reject) => {
+        const previousReady = window.onYouTubeIframeAPIReady;
+        const timeout = window.setTimeout(() => {
+          youtubeApiPromise = null;
+          reject(new Error('YouTube player did not load. Check the browser connection and try again.'));
+        }, 15000);
+        window.onYouTubeIframeAPIReady = () => {
+          window.clearTimeout(timeout);
+          if (typeof previousReady === 'function') previousReady();
+          resolve(window.YT);
+        };
+        let script = document.querySelector('script[data-youtube-iframe-api]');
+        if (!script) {
+          script = document.createElement('script');
+          script.src = 'https://www.youtube.com/iframe_api';
+          script.async = true;
+          script.dataset.youtubeIframeApi = 'true';
+          script.onerror = () => {
+            window.clearTimeout(timeout);
+            youtubeApiPromise = null;
+            reject(new Error('Could not load the YouTube player API.'));
+          };
+          document.head.appendChild(script);
+        }
+      });
+      return youtubeApiPromise;
+    }
+    function youtubeErrorText(code) {
+      if (code === 2) return 'That YouTube video link is invalid.';
+      if (code === 5) return 'This browser could not play the YouTube video.';
+      if (code === 100) return 'This YouTube video is private or unavailable.';
+      if (code === 101 || code === 150) return 'The video owner does not allow embedded playback.';
+      if (code === 153) return 'YouTube needs a page referrer. Open the game from its hosted website to play this video.';
+      return 'YouTube could not play this video (error ' + code + ').';
+    }
+    async function startYouTubeMusic(videoId) {
+      const panel = document.getElementById('youtube-music-panel');
+      panel.classList.remove('hidden');
+      musicPlaying = true;
+      updateMusicButton(true);
+      await loadYouTubeIframeApi();
+      if (youtubePlayer && typeof youtubePlayer.playVideo === 'function') {
+        if (youtubePlayerVideoId !== videoId) {
+          youtubePlayerVideoId = videoId;
+          youtubePlayer.loadVideoById({ videoId, suggestedQuality: 'small' });
+        } else youtubePlayer.playVideo();
+        return;
+      }
+      await new Promise((resolve, reject) => {
+        let settled = false;
+        const settle = (callback, value) => { if (settled) return; settled = true; callback(value); };
+        youtubePlayerVideoId = videoId;
+        youtubePlayer = new window.YT.Player('youtube-music-player', {
+          width: '240', height: '200', videoId,
+          playerVars: { autoplay: 1, controls: 1, playsinline: 1, rel: 0, loop: 1, playlist: videoId },
+          events: {
+            onReady: event => {
+              event.target.playVideo();
+              settle(resolve);
+              showMusicPlaybackNotice('Lobby video is ready. If it does not start, tap Play in the player.');
+            },
+            onAutoplayBlocked: () => {
+              musicPlaying = false; updateMusicButton(false);
+              const message = 'Your browser blocked YouTube autoplay. Tap Play in the visible YouTube player, or upload an audio file for shared lobby music.';
+              const status = document.getElementById('lobby-music-status');
+              if (status) status.textContent = message;
+              showMusicPlaybackNotice(message);
+            },
+            onError: event => {
+              const message = youtubeErrorText(event.data);
+              showMusicPlaybackNotice(message);
+              const status = document.getElementById('lobby-music-status');
+              if (status) status.textContent = message;
+              musicPlaying = false;
+              updateMusicButton(false);
+              settle(reject, new Error(message));
+            },
+            onStateChange: event => {
+              if (event.data === window.YT.PlayerState.ENDED) event.target.playVideo();
+            }
+          }
+        });
+        window.setTimeout(() => settle(reject, new Error('YouTube player timed out. Tap Music to try again.')), 18000);
+      });
+    }
+    async function toggleBackgroundMusic() {
+      if (musicPlaying) {
+        musicPlaying = false; window.clearInterval(musicTimer); musicTimer = null;
+        if (lobbyAudio) lobbyAudio.pause();
+        if (youtubePlayer && typeof youtubePlayer.pauseVideo === 'function') youtubePlayer.pauseVideo();
+        if (audioCtx && audioCtx.state !== 'closed') await audioCtx.suspend().catch(() => {});
+        updateMusicButton(false); return;
+      }
+      if (lobbyMusicUrl) {
+        const videoId = getYouTubeVideoId(lobbyMusicUrl);
+        if (videoId && location.protocol === 'file:') {
+          const message = 'YouTube needs the game hosted on HTTPS to play. Upload an audio file here while testing this local page.';
+          const status = document.getElementById('lobby-music-status');
+          if (status) status.textContent = message;
+          showMusicPlaybackNotice(message);
+          updateMusicButton(false);
+          return;
+        }
+        if (videoId) {
+          try { await startYouTubeMusic(videoId); }
+          catch (error) { musicPlaying = false; updateMusicButton(false); showMusicPlaybackNotice(error.message); }
+          return;
+        }
+        musicPlaying = true;
+        if (!lobbyAudio || lobbyAudio.src !== lobbyMusicUrl) {
+          if (lobbyAudio) lobbyAudio.pause();
+          lobbyAudio = new Audio(lobbyMusicUrl); lobbyAudio.loop = true; lobbyAudio.volume = .32;
+        }
+        try { await lobbyAudio.play(); updateMusicButton(true); }
+        catch (_) {
+          musicPlaying = false; updateMusicButton(false);
+          const message = 'Lobby audio could not play. Try uploading an MP3, OGG, WAV, or M4A file.';
+          const status = document.getElementById('lobby-music-status');
+          if (status) status.textContent = message;
+          showMusicPlaybackNotice(message);
+        }
+      } else if (initAudio()) {
+        musicPlaying = true;
+        await audioCtx.resume().catch(() => {});
+        playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420); updateMusicButton(true);
+      } else { musicPlaying = false; updateMusicButton(false); }
+    }
+    function closeYouTubeMusicPanel() {
+      if (youtubePlayer && typeof youtubePlayer.pauseVideo === 'function') youtubePlayer.pauseVideo();
+      document.getElementById('youtube-music-panel').classList.add('hidden');
+      musicPlaying = false;
+      updateMusicButton(false);
+    }
+    function setLobbyMusicUrl(value, announce = false) {
       const nextUrl = typeof value === 'string' && /^https:\/\//i.test(value) ? value : '';
-      if (nextUrl === lobbyMusicUrl) return;
+      if (nextUrl === lobbyMusicUrl) return false;
       lobbyMusicUrl = nextUrl;
+      const field = document.getElementById('lobby-music-url');
+      if (field && document.activeElement !== field) field.value = nextUrl;
       if (lobbyAudio) { lobbyAudio.pause(); lobbyAudio = null; }
       window.clearInterval(musicTimer); musicTimer = null;
-      if (musicPlaying && lobbyMusicUrl) {
-        lobbyAudio = new Audio(lobbyMusicUrl); lobbyAudio.loop = true; lobbyAudio.volume = .28;
-        lobbyAudio.play().catch(() => { musicPlaying = false; });
-      } else if (musicPlaying && initAudio()) {
-        playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420);
+      if (youtubePlayer && typeof youtubePlayer.pauseVideo === 'function') youtubePlayer.pauseVideo();
+      if (!getYouTubeVideoId(nextUrl)) document.getElementById('youtube-music-panel').classList.add('hidden');
+      if (musicPlaying && nextUrl) {
+        const videoId = getYouTubeVideoId(nextUrl);
+        if (videoId) startYouTubeMusic(videoId).catch(error => {
+          musicPlaying = false; updateMusicButton(false); showMusicPlaybackNotice(error.message);
+        });
+        else {
+          lobbyAudio = new Audio(nextUrl); lobbyAudio.loop = true; lobbyAudio.volume = .32;
+          lobbyAudio.play().catch(() => {
+            musicPlaying = false; updateMusicButton(false);
+            showMusicPlaybackNotice('Lobby audio could not play. Tap Music to try again, or upload an MP3, OGG, WAV, or M4A file.');
+          });
+        }
+      } else {
+        musicPlaying = false;
+        if (audioCtx && audioCtx.state !== 'closed') audioCtx.suspend().catch(() => {});
+        updateMusicButton(false);
       }
+      if (announce && nextUrl && !musicPlaying) showMusicPlaybackNotice('Lobby music was updated. Tap the Music button to hear it.');
+      return true;
     }
     async function loadLobbyMusic() {
       const { data, error } = await supabaseClient.rpc('get_lobby_music');
@@ -903,17 +1070,58 @@
     async function saveLobbyMusic() {
       if (!['admin', 'developer'].includes(localPlayer.role)) return;
       const value = document.getElementById('lobby-music-url').value.trim();
-      if (!/^https:\/\//i.test(value) || value.length > 2048) { document.getElementById('lobby-music-status').textContent = 'Enter a direct HTTPS audio URL.'; return; }
+      const isYouTube = Boolean(getYouTubeVideoId(value));
+      if (!/^https:\/\//i.test(value) || value.length > 2048) { document.getElementById('lobby-music-status').textContent = 'Enter a valid HTTPS audio URL or YouTube video link.'; return; }
+      if ((/youtube|youtu\.be/i.test(value)) && !getYouTubeVideoId(value)) { document.getElementById('lobby-music-status').textContent = 'That YouTube link does not contain a valid video ID.'; return; }
       const { data, error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: value });
       if (error) { document.getElementById('lobby-music-status').textContent = error.message; return; }
-      setLobbyMusicUrl(data || value); sendSocialBroadcast('lobby_music_update', { url: lobbyMusicUrl });
-      document.getElementById('lobby-music-status').textContent = 'Lobby music updated for everyone.';
+      setLobbyMusicUrl(data || value, true); sendSocialBroadcast('lobby_music_update', { url: lobbyMusicUrl });
+      document.getElementById('lobby-music-status').textContent = isYouTube && location.protocol === 'file:'
+        ? 'YouTube link saved, but this page is opened as a local file and YouTube blocks playback without a web referrer. Open the game from its HTTPS website, or upload an audio file here.'
+        : 'Lobby music updated for everyone. Each player taps Music once to start playback.';
+    }
+    async function uploadLobbyMusic(event) {
+      const input = event.target;
+      const file = input.files && input.files[0];
+      const status = document.getElementById('lobby-music-status');
+      if (!['admin', 'developer'].includes(localPlayer.role)) { input.value = ''; return; }
+      if (!file) return;
+      const extension = (file.name.split('.').pop() || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8);
+      const supportedExtensions = ['mp3','ogg','oga','wav','m4a','mp4','aac','webm','flac'];
+      if ((!file.type.startsWith('audio/') && !supportedExtensions.includes(extension)) || file.size > 15 * 1024 * 1024) {
+        status.textContent = 'Choose an MP3, OGG, WAV, M4A, AAC, WebM, or FLAC audio file no larger than 15 MB.'; input.value = ''; return;
+      }
+      status.textContent = 'Uploading lobby audio…';
+      const mimeByExtension = { mp3:'audio/mpeg', ogg:'audio/ogg', oga:'audio/ogg', wav:'audio/wav', m4a:'audio/mp4', mp4:'audio/mp4', aac:'audio/aac', webm:'audio/webm', flac:'audio/flac' };
+      const contentType = mimeByExtension[extension] || (file.type.startsWith('audio/') ? file.type : '');
+      if (!contentType) { status.textContent = 'That audio format is not supported. Choose MP3, OGG, WAV, M4A, AAC, WebM, or FLAC.'; input.value = ''; return; }
+      const objectPath = `lobby/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension || 'audio'}`;
+      let uploadResult;
+      try {
+        uploadResult = await supabaseClient.storage.from('lobby-audio').upload(objectPath, file, {
+          cacheControl: '60', upsert: false, contentType
+        });
+      } catch (error) {
+        status.textContent = `Upload failed: ${error.message || 'Check your connection and lobby-audio storage setup.'}`; input.value = ''; return;
+      }
+      if (uploadResult.error) { status.textContent = `Upload failed: ${uploadResult.error.message}. Run the updated Supabase setup SQL first.`; input.value = ''; return; }
+      const { data: publicData } = supabaseClient.storage.from('lobby-audio').getPublicUrl(objectPath);
+      const publicUrl = publicData && publicData.publicUrl;
+      if (!publicUrl) { status.textContent = 'Upload succeeded, but the public audio URL could not be created.'; input.value = ''; return; }
+      let saved;
+      try { saved = await supabaseClient.rpc('set_lobby_music', { p_music_url: publicUrl }); }
+      catch (error) { status.textContent = `File uploaded, but lobby music could not be saved: ${error.message || 'Check your connection.'}`; input.value = ''; return; }
+      if (saved.error) { status.textContent = `File uploaded, but lobby music could not be saved: ${saved.error.message}`; input.value = ''; return; }
+      setLobbyMusicUrl(saved.data || publicUrl, true);
+      sendSocialBroadcast('lobby_music_update', { url: lobbyMusicUrl });
+      status.textContent = 'Audio uploaded and saved for everyone. Each player taps Music once to start playback.';
+      input.value = '';
     }
     async function clearLobbyMusic() {
       if (!['admin', 'developer'].includes(localPlayer.role)) return;
       const { error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: '' });
       if (error) { document.getElementById('lobby-music-status').textContent = error.message; return; }
-      setLobbyMusicUrl(''); document.getElementById('lobby-music-url').value = '';
+      setLobbyMusicUrl('', true); document.getElementById('lobby-music-url').value = '';
       sendSocialBroadcast('lobby_music_update', { url: '' }); document.getElementById('lobby-music-status').textContent = 'Lobby music cleared.';
     }
 
@@ -970,7 +1178,7 @@
       const phase = Date.now() * 0.008 + x * 0.015;
       const moving = isSelf ? Math.min(1, Math.hypot(localPlayer.vx, localPlayer.vy) / 190) : Math.min(1, motionSpeed / 190);
       const squash = isSelf ? localPlayer.landingSquash : 0;
-      const walkHop = Math.abs(Math.sin(phase * 1.65)) * moving * 4.8;
+      const walkHop = Math.pow(Math.abs(Math.sin(phase * 1.65)), .82) * moving * 7.2;
       c.translate(x + Math.sin(phase * .8) * moving * 1.5, y - jumpOff - walkHop + Math.sin(phase) * (moving ? 1.1 : 0.45));
       const motionXValue = isSelf ? localPlayer.vx : motionX;
       if (moving) c.rotate(Math.max(-.08, Math.min(.08, motionXValue / 2500)));
@@ -1071,6 +1279,75 @@
       c.restore();
     }
 
+    function drawPondLife(cx, cy, rx, ry, phase) {
+      const now = performance.now() * .001;
+      const gardenPond = phase < .7;
+      ctx.save();
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx * .94, ry * .88, 0, 0, Math.PI * 2); ctx.clip();
+
+      // Soft current lines and expanding rings keep both ponds visibly alive.
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < 5; i++) {
+        const angle = phase + i * 2.26;
+        const x = cx + Math.cos(angle) * rx * .55;
+        const y = cy + Math.sin(angle * 1.17) * ry * .52;
+        const pulse = (now * .19 + i * .21) % 1;
+        ctx.strokeStyle = `rgba(255,255,255,${.24 * (1 - pulse)})`;
+        ctx.beginPath(); ctx.ellipse(x, y, 5 + pulse * 27, 2 + pulse * 8, Math.sin(angle) * .16, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = `rgba(55,119,126,${.09 * (1 - pulse)})`;
+        ctx.beginPath(); ctx.ellipse(x, y, 9 + pulse * 31, 3 + pulse * 9, Math.sin(angle) * .16, 0, Math.PI * 2); ctx.stroke();
+      }
+      for (let i = 0; i < 6; i++) {
+        const t = now * .12 + phase + i * 1.74;
+        const x = cx + Math.cos(t) * rx * .76;
+        const y = cy + Math.sin(t * .92) * ry * .69;
+        const size = .78 + (i % 3) * .13;
+        ctx.fillStyle = i % 2 ? '#4f916b' : '#68a879';
+        ctx.beginPath(); ctx.ellipse(x, y, 15 * size, 9 * size, t, .19, Math.PI * 2 - .19); ctx.lineTo(x, y); ctx.fill();
+        ctx.strokeStyle = 'rgba(233,255,226,.56)'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(t + .8) * 11 * size, y + Math.sin(t + .8) * 7 * size); ctx.stroke();
+        if (i === 1 || i === 4) {
+          const bob = Math.sin(now * 1.4 + i) * 1.5;
+          ctx.fillStyle = gardenPond ? '#fff2f7' : '#fff9dd';
+          for (let petal = 0; petal < 5; petal++) {
+            const a = petal * Math.PI * .4;
+            ctx.beginPath(); ctx.ellipse(x + Math.cos(a) * 5, y + bob + Math.sin(a) * 5, 3.1, 2.3, a, 0, Math.PI * 2); ctx.fill();
+          }
+          ctx.fillStyle = '#f6c85f'; ctx.beginPath(); ctx.arc(x, y + bob, 2.1, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 4; i++) {
+        const t = now * (.31 + i * .047) + phase + i * 1.63;
+        const x = cx + Math.cos(t) * rx * (.22 + (i % 3) * .105);
+        const y = cy + Math.sin(t * 1.24 + i * .4) * ry * (.24 + (i % 2) * .105);
+        const scale = .72 + (i % 3) * .12;
+        const facing = -Math.sin(t) >= 0 ? 1 : -1;
+        const wag = Math.sin(now * 8.2 + i * 2) * 3.2;
+        const ripple = (now * .27 + i * .29) % 1;
+        ctx.strokeStyle = `rgba(255,255,255,${.34 * (1 - ripple)})`; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.ellipse(x, y + 7, 7 + ripple * 15, 2 + ripple * 4.5, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.save(); ctx.translate(x, y); ctx.scale(facing * scale, scale);
+        ctx.fillStyle = 'rgba(37,83,86,.18)'; ctx.beginPath(); ctx.ellipse(0, 8, 14, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+        const fish = ctx.createLinearGradient(0, -6, 0, 7);
+        fish.addColorStop(0, i % 2 ? '#ffe8a8' : '#ffc1a7');
+        fish.addColorStop(.55, i % 2 ? '#f1a968' : '#ed8d93');
+        fish.addColorStop(1, i % 2 ? '#d98258' : '#c96f7d');
+        ctx.fillStyle = fish;
+        ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(-18, -7 + wag); ctx.lineTo(-16, 0); ctx.lineTo(-18, 7 + wag); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(0, 0, 12, 6.8, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = i % 2 ? 'rgba(255,247,207,.72)' : 'rgba(255,231,226,.7)';
+        ctx.beginPath(); ctx.moveTo(-3, -5); ctx.lineTo(1, -11 - wag * .15); ctx.lineTo(5, -4); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-1, 3); ctx.lineTo(5, 9 + wag * .1); ctx.lineTo(7, 2); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = 'rgba(139,83,65,.48)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(7, 0, 2.4, -.9, .9); ctx.stroke();
+        ctx.fillStyle = '#263b43'; ctx.beginPath(); ctx.arc(8.3, -1.6, 1.15, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.beginPath(); ctx.arc(8.6, -2, .42, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
     function drawZoneDecorations() {
       const garden = currentChannel === 'sakura-lounge';
       ctx.fillStyle = garden ? '#f8e7ed' : '#c3d8a9';
@@ -1082,9 +1359,13 @@
         ctx.strokeStyle = '#dfcba8'; ctx.lineWidth = 68; ctx.lineCap = 'round';
         ctx.beginPath(); ctx.moveTo(130, 1120); ctx.bezierCurveTo(500, 950, 850, 1060, 1210, 890); ctx.bezierCurveTo(1480, 760, 1720, 520, 1980, 610); ctx.stroke();
         ctx.strokeStyle = 'rgba(255,255,255,.58)'; ctx.lineWidth = 5; ctx.setLineDash([4, 24]); ctx.stroke(); ctx.setLineDash([]);
-        ctx.fillStyle = '#a9dce2'; ctx.beginPath(); ctx.ellipse(1470, 440, 205, 118, -.18, 0, Math.PI * 2); ctx.fill();
+        const gardenWater = ctx.createLinearGradient(1300, 338, 1620, 540);
+        gardenWater.addColorStop(0, '#d2f2eb'); gardenWater.addColorStop(.48, '#91d0d6'); gardenWater.addColorStop(1, '#72b4c4');
+        ctx.fillStyle = gardenWater; ctx.beginPath(); ctx.ellipse(1470, 440, 205, 118, -.18, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.68)'; ctx.lineWidth = 3; ctx.stroke();
         ctx.strokeStyle = '#77b9c3'; ctx.lineWidth = 8; ctx.stroke();
-        ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.beginPath(); ctx.ellipse(1415, 405, 52, 15, -.22, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.62)'; ctx.beginPath(); ctx.ellipse(1415, 405, 52, 15, -.22, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.27)'; ctx.beginPath(); ctx.ellipse(1540, 488, 42, 7, -.2, 0, Math.PI * 2); ctx.fill();
         const trees = [[240,250],[660,240],[1110,230],[1860,300],[270,740],[950,540],[1810,850],[380,1580],[880,1840],[1580,1660],[1880,1350]];
         trees.forEach(([x,y],i) => {
           ctx.fillStyle = 'rgba(69, 49, 48, .18)'; ctx.beginPath(); ctx.ellipse(x,y+20,39,12,0,0,Math.PI*2); ctx.fill();
@@ -1105,15 +1386,28 @@
           ctx.fillStyle=i%3===0?'rgba(255,208,220,.88)':'rgba(236,72,153,.55)';
           ctx.beginPath();ctx.ellipse(0,0,4,8,0,0,Math.PI*2);ctx.fill();ctx.restore();
         }
+        drawPondLife(1470, 440, 205, 118, .2);
         ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(131,24,67,.55)';ctx.fillText('🌸 SAKURA ZEN GARDEN',75,78);
       } else {
         ctx.fillStyle='#d4bd91';ctx.fillRect(120,520,1860,155);ctx.fillRect(930,120,155,1860);
         ctx.strokeStyle='rgba(119,89,56,.23)';ctx.lineWidth=4;
         for(let n=130;n<1980;n+=72){ctx.beginPath();ctx.moveTo(n,520);ctx.lineTo(n,675);ctx.stroke();ctx.beginPath();ctx.moveTo(930,n);ctx.lineTo(1085,n);ctx.stroke();}
-        ctx.fillStyle='#93cfd0';ctx.beginPath();ctx.ellipse(1420,1260,280,190,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#799a69';ctx.lineWidth=20;ctx.stroke();
-        ctx.fillStyle='rgba(255,255,255,.65)';ctx.beginPath();ctx.ellipse(1360,1205,82,19,-.2,0,Math.PI*2);ctx.fill();
+        const springWater=ctx.createLinearGradient(1170,1090,1660,1435);springWater.addColorStop(0,'#c8f0df');springWater.addColorStop(.5,'#91cfd0');springWater.addColorStop(1,'#6caeb5');
+        ctx.fillStyle=springWater;ctx.beginPath();ctx.ellipse(1420,1260,280,190,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(235,248,208,.72)';ctx.lineWidth=4;ctx.stroke();ctx.strokeStyle='#799a69';ctx.lineWidth=20;ctx.stroke();
+        ctx.fillStyle='rgba(255,255,255,.62)';ctx.beginPath();ctx.ellipse(1360,1205,82,19,-.2,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,.25)';ctx.beginPath();ctx.ellipse(1510,1322,63,10,.14,0,Math.PI*2);ctx.fill();
         for(let i=0;i<14;i++){const x=160+(i*149)%1780,y=150+(i*263)%1780;ctx.strokeStyle='#47794b';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x,y+54);ctx.lineTo(x,y-50-(i%3)*16);ctx.stroke();for(let j=0;j<5;j++){ctx.fillStyle=j%2?'#6caa65':'#83b777';ctx.beginPath();ctx.ellipse(x+(j%2?10:-10),y-30-j*12,9,17,j%2?.6:-.6,0,Math.PI*2);ctx.fill();}}
+        const leafTime = Date.now();
+        for (let i = 0; i < 40; i++) {
+          const y = (i * 313 + leafTime * .038) % 2100;
+          const x = (i * 197 + Math.sin(leafTime * .0012 + i) * 42 + 2100) % 2100;
+          ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(leafTime * .001 + i) * .8);
+          ctx.fillStyle = i % 2 ? 'rgba(94, 160, 82, .78)' : 'rgba(145, 190, 106, .84)';
+          ctx.beginPath(); ctx.ellipse(0, 0, 5, 10, .7, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = 'rgba(58, 112, 51, .62)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-4, 5); ctx.lineTo(4, -5); ctx.stroke(); ctx.restore();
+        }
         [[690,760],[1270,790],[680,1500],[1720,430]].forEach(([x,y])=>{ctx.fillStyle='#77796d';ctx.beginPath();ctx.ellipse(x,y,35,22,.1,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9a9b8f';ctx.beginPath();ctx.ellipse(x-5,y-7,22,11,0,0,Math.PI*2);ctx.fill();});
+        drawPondLife(1420, 1260, 280, 190, 1.1);
         ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(52,83,43,.65)';ctx.fillText('🎋 ONSEN SPRING',75,78);
       }
     }
@@ -1126,8 +1420,8 @@
       const inputLength = Math.hypot(dx, dy);
       if (inputLength > 1) { dx /= inputLength; dy /= inputLength; }
       const blend = 1 - Math.exp(-dt * 15);
-      localPlayer.vx += (dx * 340 - localPlayer.vx) * blend;
-      localPlayer.vy += (dy * 340 - localPlayer.vy) * blend;
+      localPlayer.vx += (dx * 380 - localPlayer.vx) * blend;
+      localPlayer.vy += (dy * 380 - localPlayer.vy) * blend;
       localPlayer.x = Math.max(50, Math.min(2050, localPlayer.x + localPlayer.vx * dt));
       localPlayer.y = Math.max(50, Math.min(2050, localPlayer.y + localPlayer.vy * dt));
       localPlayer.landingSquash = Math.max(0, localPlayer.landingSquash - dt * 4.5);
@@ -1160,11 +1454,11 @@
     }
 
     function updateRemotePlayerMotion(dt) {
-      const blend = 1 - Math.exp(-dt * 42);
+      const blend = 1 - Math.exp(-dt * 76);
       Object.values(remotePlayers).forEach(player => {
         if (!Number.isFinite(player.displayX)) player.displayX = player.x;
         if (!Number.isFinite(player.displayY)) player.displayY = player.y;
-        const lead = Math.min(.075, dt * 2.2);
+        const lead = Math.min(.18, dt * 5.2);
         const targetX = player.x + (Number.isFinite(player.vx) ? player.vx * lead : 0);
         const targetY = player.y + (Number.isFinite(player.vy) ? player.vy * lead : 0);
         player.displayX += (targetX - player.displayX) * blend;
@@ -1268,6 +1562,13 @@
       card.style.left = `${left}px`; card.style.top = `${top}px`;
     }
 
+    function staffErrorMessage(error) {
+      const message = error && error.message ? error.message : 'The staff action failed.';
+      return /structure of query does not match function result type/i.test(message)
+        ? 'Supabase still has an older RPC return type. Run the updated sakura_admin_setup.sql, then refresh the page. ' + message
+        : message;
+    }
+
     async function loadSelectedPlayerStaffUser(userId, username) {
       const mute = document.getElementById('player-card-mute');
       const ban = document.getElementById('player-card-ban');
@@ -1277,9 +1578,12 @@
         const { data, error } = await supabaseClient.rpc('search_users', { p_query: String(username || '').trim() || userId });
         if (error) throw error;
         if (selectedPlayerId !== userId) return;
-        selectedPlayerStaffUser = (data || []).find(user => user.user_id === userId) || null;
+        const users = Array.isArray(data) ? data : Array.isArray(data && data.users) ? data.users : [];
+        selectedPlayerStaffUser = users.find(user => user.user_id === userId) || null;
         const target = selectedPlayerStaffUser;
         if (!target) throw new Error('Could not load this player’s staff actions.');
+        if (remotePlayers[userId]) remotePlayers[userId].role = target.role;
+        if (selectedPlayerProfile && selectedPlayerProfile.id === userId) selectedPlayerProfile.role = target.role;
         const muted = target.mute_until && new Date(target.mute_until).getTime() > Date.now();
         mute.textContent = muted ? 'Unmute' : 'Mute 1 hour';
         ban.textContent = target.is_banned ? 'Unban' : 'Ban 1 hour';
@@ -1288,7 +1592,10 @@
         roleButton.textContent = target.role === 'admin' ? 'Revoke admin' : 'Make admin';
         roleButton.disabled = target.role === 'developer' || target.user_id === localPlayer.id;
       } catch (error) {
-        if (selectedPlayerId === userId) { mute.textContent = 'Mute unavailable'; ban.textContent = error.message || 'Ban unavailable'; }
+        if (selectedPlayerId === userId) {
+          mute.textContent = 'Mute unavailable';
+          ban.textContent = staffErrorMessage(error);
+        }
       }
     }
     async function moderateSelectedPlayer(kind, durationMinutes) {
@@ -1315,8 +1622,16 @@
     async function toggleSelectedAdminRole() {
       const target = selectedPlayerStaffUser; if (!target || localPlayer.role !== 'developer') return;
       const enabled = target.role !== 'admin';
-      await callStaffFunction('set_admin', { targetId: target.user_id, enabled });
-      await loadSelectedPlayerStaffUser(target.user_id, target.username);
+      try {
+        await callStaffFunction('set_admin', { targetId: target.user_id, enabled });
+        sendSocialBroadcast('role_update', { targetId: target.user_id });
+        await loadSelectedPlayerStaffUser(target.user_id, target.username);
+        const current = remotePlayers[target.user_id] || selectedPlayerProfile;
+        if (current) showPlayerCard(current);
+      } catch (error) {
+        const status = document.getElementById('player-card-status');
+        if (status) status.textContent = error.message || 'Could not update this player’s admin role.';
+      }
     }
     function openStaffDirectMessage() {
       if (localPlayer.role !== 'developer' || !selectedPlayerProfile) return;
@@ -1496,7 +1811,7 @@
         const name = document.createElement('span'); name.className = 'text-xs font-bold text-purple-950'; name.textContent = item.name;
         const kind = document.createElement('p'); kind.className = 'text-[10px] text-purple-600'; kind.textContent = item.type.toUpperCase();
         const button = document.createElement('button'); button.className = `mt-2 py-1 rounded-xl text-[10px] font-bold ${isEquipped ? 'bg-emerald-500 text-white' : 'bg-purple-500 text-white hover:bg-purple-600'}`;
-        button.textContent = isEquipped ? 'Equipped' : 'Equip'; button.onclick = () => equipInventoryItem(item.id);
+        button.textContent = isEquipped ? 'Unequip' : 'Equip'; button.onclick = () => equipInventoryItem(item.id);
         card.append(name, kind, button); grid.appendChild(card);
       });
     }
@@ -1506,6 +1821,11 @@
       const item = allItems.find(i => i.id === itemId);
       const roleOwned = (ROLE_ITEMS[localPlayer.role] || []).some(i => i.id === itemId);
       if (!item || (!localPlayer.inventory.includes(item.id) && !roleOwned)) return;
+      const previousEquipment = {
+        skin: localPlayer.equippedSkin, accessory: localPlayer.equippedAcc, title: localPlayer.equippedTitle,
+        pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, emote: localPlayer.equippedEmote,
+        messageCard: localPlayer.equippedMessageCard, frame: localPlayer.equippedFrame
+      };
       if (item.type === 'skins') localPlayer.equippedSkin = localPlayer.equippedSkin === item.id ? 'skin_pink' : item.id;
       if (item.type === 'accessories') localPlayer.equippedAcc = localPlayer.equippedAcc === item.id ? null : item.id;
       if (item.type === 'titles') localPlayer.equippedTitle = localPlayer.equippedTitle === item.id ? null : item.id;
@@ -1514,7 +1834,18 @@
       if (item.type === 'message_cards') localPlayer.equippedMessageCard = localPlayer.equippedMessageCard === item.id ? null : item.id;
       if (item.type === 'frames') localPlayer.equippedFrame = localPlayer.equippedFrame === item.id ? null : item.id;
       const error = await persistProfileToAuth();
-      if (error) { alert('Could not save this equipped item. ' + error.message); return; }
+      if (error) {
+        if (item.type === 'skins') localPlayer.equippedSkin = previousEquipment.skin;
+        if (item.type === 'accessories') localPlayer.equippedAcc = previousEquipment.accessory;
+        if (item.type === 'titles') localPlayer.equippedTitle = previousEquipment.title;
+        if (item.type === 'profile') { localPlayer.pfp = previousEquipment.pfp; localPlayer.avatarUrl = previousEquipment.avatarUrl; }
+        if (item.type === 'emotes') localPlayer.equippedEmote = previousEquipment.emote;
+        if (item.type === 'message_cards') localPlayer.equippedMessageCard = previousEquipment.messageCard;
+        if (item.type === 'frames') localPlayer.equippedFrame = previousEquipment.frame;
+        renderAvatarPreview(); renderInventoryGrid(); renderOwnedEmoteButton();
+        alert('Could not save this equipped item. Apply the updated Supabase setup SQL, then try again. ' + error.message);
+        return;
+      }
       savePlayerToStorage();
       broadcastPlayerState(); broadcastProfileUpdate();
       renderAvatarPreview(); renderInventoryGrid(); renderOwnedEmoteButton();
@@ -1527,6 +1858,8 @@
       const roleEmote = null;
       if (!item && !roleEmote) { button.classList.add('hidden'); localPlayer.activeSpecialEmote = null; return; }
       const selected = item || roleEmote;
+      // Jump remains available from the keyboard, but never occupies the sticker navigation bar.
+      if (selected.anim === 'jump_loop') { button.classList.add('hidden'); return; }
       button.textContent = `${selected.icon} ${selected.name}${localPlayer.activeSpecialEmote === selected.anim ? ' ✓' : ''}`;
       button.classList.remove('hidden');
     }
@@ -1552,6 +1885,31 @@
       document.getElementById('friends-modal').classList.remove('hidden');
       renderFriendsList();
       renderDMBox();
+      loadFriendDataFromServer();
+    }
+    async function loadFriendDataFromServer() {
+      if (!authUser || guestMode) return;
+      const wasOpen = !document.getElementById('friends-modal').classList.contains('hidden');
+      const priorIncoming = new Set(friendRequests.map(request => request.senderId));
+      const { data, error } = await supabaseClient.rpc('get_my_friend_data');
+      if (error || !data) return;
+      const removed = new Set((Array.isArray(data.removed) ? data.removed : []).filter(isValidUserId));
+      const savedFriends = new Map(friendList.filter(friend => !removed.has(friend.id)).map(friend => [friend.id, friend]));
+      (Array.isArray(data.friends) ? data.friends : []).forEach(friend => {
+        if (friend && isValidUserId(friend.id)) savedFriends.set(friend.id, { ...(savedFriends.get(friend.id) || {}), ...friend, accepted: true });
+      });
+      friendList = [...savedFriends.values()].filter(friend => isValidUserId(friend.id))
+        .map(friend => ({ ...friend, accepted: true, name: typeof friend.name === 'string' && friend.name.trim() ? friend.name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(friend.pfp) ? friend.pfp : '🌸', avatarUrl: safeAvatarUrl(friend.avatarUrl) }));
+      friendRequests = (Array.isArray(data.incoming) ? data.incoming : []).filter(request => request && isValidUserId(request.senderId));
+      outgoingFriendRequests = (Array.isArray(data.outgoing) ? data.outgoing : []).filter(isValidUserId).map(targetId => ({ targetId }));
+      const hasNewRequest = friendRequests.some(request => !priorIncoming.has(request.senderId));
+      saveFriendData();
+      if (hasNewRequest && !wasOpen) markFriendsUnread();
+      if (wasOpen) {
+        const query = document.getElementById('friend-search-input').value.trim();
+        if (query) handleFriendUserSearch(); else renderFriendsList();
+        renderDMBox();
+      }
     }
     function closeFriendsModal() { document.getElementById('friends-modal').classList.add('hidden'); }
 
@@ -1614,56 +1972,57 @@
       if (selectedPlayerId === id) showPlayerCard(remotePlayers[id] || profile);
     }
 
-    function sendFriendRequest(id, name, pfp, avatarUrl = '') {
+    async function sendFriendRequest(id, name, pfp, avatarUrl = '') {
       if (!authUser || guestMode) { alert('Sign in to send friend requests.'); return; }
       if (!isValidUserId(id) || id === localPlayer.id) return;
-      if (friendList.some(f => f.id === id)) return;
-      if (friendRequests.some(r => r.senderId === id)) {
-        acceptFriendRequest(id);
-        return;
+      if (friendList.some(friend => friend.id === id && friend.accepted)) return;
+      if (friendRequests.some(request => request.senderId === id)) { await acceptFriendRequest(id); return; }
+      if (outgoingFriendRequests.some(request => request.targetId === id)) return;
+      outgoingFriendRequests.push({ targetId: id, name: name || 'Slime', pfp: pfp || '🌸', avatarUrl: safeAvatarUrl(avatarUrl), time: Date.now() });
+      saveFriendData(); handleFriendUserSearch();
+      const { data, error } = await supabaseClient.rpc('send_friend_request', { p_target_user_id: id });
+      if (error) {
+        outgoingFriendRequests = outgoingFriendRequests.filter(request => request.targetId !== id); saveFriendData(); handleFriendUserSearch();
+        alert(`Could not send friend request. ${error.message}`); return;
       }
-      if (outgoingFriendRequests.some(r => r.targetId === id)) return;
-      const request = { targetId: id, name: typeof name === 'string' && name.trim() ? name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(pfp) ? pfp : '🌸', avatarUrl: safeAvatarUrl(avatarUrl), time: Date.now() };
-      outgoingFriendRequests.push(request);
-      localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
-      sendSocialBroadcast('friend_request', { targetId: id, senderId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame });
-      const query = document.getElementById('friend-search-input').value.trim();
-      if (query) handleFriendUserSearch();
-      else renderFriendsList();
+      if (data && data.status === 'pending') sendSocialBroadcast('friend_request', { targetId: id, senderId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame });
+      else if (data && data.status === 'friends') sendSocialBroadcast('friend_accept', { targetId: id, friendId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame });
+      await loadFriendDataFromServer();
       if (selectedPlayerId === id) showPlayerCard(remotePlayers[id] || { id, name, pfp, avatarUrl });
     }
 
-    function receiveFriendRequest(payload) {
+    async function receiveFriendRequest(payload) {
       if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.senderId) || payload.senderId === localPlayer.id) return;
-      if (friendList.some(f => f.id === payload.senderId) || friendRequests.some(r => r.senderId === payload.senderId)) return;
-      friendRequests.push({ senderId: payload.senderId, name: typeof payload.name === 'string' && payload.name.trim() ? payload.name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(payload.pfp) ? payload.pfp : '🌸', avatarUrl: safeAvatarUrl(payload.avatarUrl), equippedFrame: payload.equippedFrame || null, time: Date.now() });
-      saveFriendData();
-      markFriendsUnread();
-      renderFriendsList();
+      await loadFriendDataFromServer();
       if (selectedPlayerId === payload.senderId) showPlayerCard(remotePlayers[payload.senderId] || payload);
     }
 
-    function acceptFriendRequest(senderId) {
-      const request = friendRequests.find(r => r.senderId === senderId);
-      if (!request) return;
-      friendRequests = friendRequests.filter(r => r.senderId !== senderId);
-      addFriend(senderId, request.name, request.pfp, request.avatarUrl, request.equippedFrame);
+    async function acceptFriendRequest(senderId) {
+      if (!authUser || guestMode || !isValidUserId(senderId)) return;
+      const { error } = await supabaseClient.rpc('accept_friend_request', { p_sender_id: senderId });
+      if (error) { alert(`Could not accept friend request. ${error.message}`); return; }
       sendSocialBroadcast('friend_accept', { targetId: senderId, friendId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame });
+      await loadFriendDataFromServer();
       playSound('match');
     }
 
-    function declineFriendRequest(senderId) {
-      friendRequests = friendRequests.filter(r => r.senderId !== senderId);
-      saveFriendData();
+    async function declineFriendRequest(senderId) {
+      const { error } = await supabaseClient.rpc('decline_friend_request', { p_sender_id: senderId });
+      if (error) { alert(`Could not decline friend request. ${error.message}`); return; }
       sendSocialBroadcast('friend_decline', { targetId: senderId, userId: localPlayer.id });
-      renderFriendsList();
+      await loadFriendDataFromServer();
     }
 
-    function removeFriend(id) {
-      friendList = friendList.filter(f => f.id !== id);
+    async function removeFriend(id) {
+      if (authUser && !guestMode) {
+        const { error } = await supabaseClient.rpc('remove_friend', { p_friend_id: id });
+        if (error) { alert(`Could not remove friend. ${error.message}`); return; }
+      }
+      friendList = friendList.filter(friend => friend.id !== id);
       saveFriendData();
-      renderFriendsList();
+      if (authUser && !guestMode) sendSocialBroadcast('friend_remove', { targetId: id, friendId: localPlayer.id });
       if (activeDMUserId === id) activeDMUserId = null;
+      if (authUser && !guestMode) await loadFriendDataFromServer(); else renderFriendsList();
       renderDMBox();
     }
 
@@ -1716,33 +2075,59 @@
       });
     }
 
+    let friendSearchTimer = null;
+    let friendSearchSequence = 0;
     function handleFriendUserSearch() {
-      const query = document.getElementById('friend-search-input').value.toLowerCase().trim();
+      const query = document.getElementById('friend-search-input').value.trim();
       const container = document.getElementById('friends-list-container');
+      const sequence = ++friendSearchSequence;
+      window.clearTimeout(friendSearchTimer);
       if (!query) { renderFriendsList(); return; }
-      container.innerHTML = '';
-      const matching = Object.values(remotePlayers).filter(p => p && p.id !== localPlayer.id && typeof p.name === 'string' && p.name.toLowerCase().includes(query));
-      if (!matching.length) {
-        const empty = document.createElement('p'); empty.className = 'text-[10px] text-pink-600 text-center py-3'; empty.textContent = 'No online players found in this room.'; container.appendChild(empty);
+      if (!authUser || guestMode) {
+        container.replaceChildren();
+        const empty = document.createElement('p'); empty.className = 'text-[10px] text-pink-600 text-center py-3'; empty.textContent = 'Sign in to search all players.'; container.appendChild(empty); return;
       }
-      matching.forEach(player => {
-        const row = document.createElement('div'); row.className = 'p-2 rounded-xl bg-white/90 border border-pink-200 flex items-center gap-2';
-        row.appendChild(makeAvatar(player));
-        const name = document.createElement('span'); name.className = 'min-w-0 flex-1 truncate text-xs font-bold text-pink-950'; name.textContent = player.name; row.appendChild(name);
-        const isFriend = friendList.some(f => f.id === player.id);
-        const outgoing = outgoingFriendRequests.some(r => r.targetId === player.id);
-        const incoming = friendRequests.some(r => r.senderId === player.id);
-        if (isFriend) {
-          const tag = document.createElement('span'); tag.className = 'text-[10px] text-emerald-600 font-bold'; tag.textContent = 'Friends'; row.appendChild(tag);
-        } else if (incoming) {
-          const accept = document.createElement('button'); accept.className = 'px-2 py-1 bg-emerald-500 text-white rounded-lg text-[10px] font-bold'; accept.textContent = 'Accept'; accept.onclick = () => acceptFriendRequest(player.id); row.appendChild(accept);
-        } else if (outgoing) {
-          const tag = document.createElement('span'); tag.className = 'text-[10px] text-sky-700 font-bold'; tag.textContent = 'Sent'; row.appendChild(tag);
-        } else {
-          const add = document.createElement('button'); add.className = 'px-2 py-1 bg-sky-500 text-white rounded-lg text-[10px] font-bold'; add.textContent = 'Add'; add.onclick = () => sendFriendRequest(player.id, player.name, player.pfp, player.avatarUrl); row.appendChild(add);
+      if (query.length < 2) {
+        container.replaceChildren();
+        const empty = document.createElement('p'); empty.className = 'text-[10px] text-pink-600 text-center py-3'; empty.textContent = 'Type at least two characters to search all players.'; container.appendChild(empty); return;
+      }
+      friendSearchTimer = window.setTimeout(async () => {
+        container.replaceChildren();
+        const loading = document.createElement('p'); loading.className = 'text-[10px] text-pink-600 text-center py-3'; loading.textContent = 'Searching all players…'; container.appendChild(loading);
+        const { data, error } = await supabaseClient.rpc('search_players', { p_query: query });
+        if (sequence !== friendSearchSequence || document.getElementById('friend-search-input').value.trim() !== query) return;
+        container.replaceChildren();
+        if (error) {
+          const note = document.createElement('p'); note.className = 'text-[10px] text-rose-600 text-center py-3'; note.textContent = 'Apply the latest Supabase setup SQL to search all accounts.'; container.appendChild(note); return;
         }
-        container.appendChild(row);
-      });
+        const matching = (Array.isArray(data) ? data : []).filter(player => player && player.id !== localPlayer.id && isValidUserId(player.id));
+        if (!matching.length) {
+          const empty = document.createElement('p'); empty.className = 'text-[10px] text-pink-600 text-center py-3'; empty.textContent = 'No player accounts found.'; container.appendChild(empty); return;
+        }
+        matching.forEach(player => {
+          const live = remotePlayers[player.id];
+          if (live) player = { ...live, ...player, id: player.id };
+          const row = document.createElement('div'); row.className = 'p-2 rounded-xl bg-white/90 border border-pink-200 flex items-center gap-2';
+          row.appendChild(makeAvatar(player));
+          const details = document.createElement('div'); details.className = 'min-w-0 flex-1';
+          const name = document.createElement('span'); name.className = 'block truncate text-xs font-bold text-pink-950'; name.textContent = player.name || 'Slime';
+          const presence = document.createElement('span'); presence.className = `block text-[9px] font-semibold ${live ? 'text-emerald-700' : 'text-slate-500'}`; presence.textContent = live ? 'Online now' : 'Offline';
+          details.append(name, presence); row.appendChild(details);
+          const isFriend = friendList.some(friend => friend.id === player.id && friend.accepted);
+          const outgoing = outgoingFriendRequests.some(request => request.targetId === player.id);
+          const incoming = friendRequests.some(request => request.senderId === player.id);
+          if (isFriend) {
+            const tag = document.createElement('span'); tag.className = 'text-[10px] text-emerald-600 font-bold'; tag.textContent = 'Friends'; row.appendChild(tag);
+          } else if (incoming) {
+            const accept = document.createElement('button'); accept.className = 'px-2 py-1 bg-emerald-500 text-white rounded-lg text-[10px] font-bold'; accept.textContent = 'Accept'; accept.onclick = () => acceptFriendRequest(player.id); row.appendChild(accept);
+          } else if (outgoing) {
+            const tag = document.createElement('span'); tag.className = 'text-[10px] text-sky-700 font-bold'; tag.textContent = 'Request sent'; row.appendChild(tag);
+          } else {
+            const add = document.createElement('button'); add.className = 'px-2 py-1 bg-sky-500 text-white rounded-lg text-[10px] font-bold'; add.textContent = 'Add'; add.onclick = () => sendFriendRequest(player.id, player.name, player.pfp, player.avatarUrl); row.appendChild(add);
+          }
+          container.appendChild(row);
+        });
+      }, 220);
     }
 
     function syncFriendProfile(player) {
@@ -1901,6 +2286,7 @@
       const { data: role, error: roleError } = await supabaseClient.rpc('get_my_role');
       localPlayer.role = roleError ? 'player' : (role || 'player');
       await loadLobbyMusic();
+      await loadFriendDataFromServer();
       if (!['admin', 'developer'].includes(localPlayer.role)) {
         if (localPlayer.equippedSkin === 'skin_admin' || localPlayer.equippedSkin === 'skin_developer') localPlayer.equippedSkin = 'skin_pink';
         if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') localPlayer.equippedTitle = null;
@@ -1971,6 +2357,19 @@
       savePlayerToStorage(); renderAvatarPreview(); broadcastProfileUpdate(); renderFriendsList();
       const error = await persistProfileToAuth();
       if (error) alert('The default sticker is active here, but could not sync to your account. ' + error.message);
+    }
+
+    async function signOutFromProfile() {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) { alert('Could not sign out: ' + error.message); return; }
+      if (realtimeChannel) { await realtimeChannel.unsubscribe(); realtimeChannel = null; }
+      if (socialChannel) { await socialChannel.unsubscribe(); socialChannel = null; }
+      if (moderationPollTimer) { clearInterval(moderationPollTimer); moderationPollTimer = null; }
+      authUser = null; guestMode = false; localPlayer.role = 'player';
+      document.getElementById('settings-modal').classList.add('hidden');
+      document.getElementById('auth-modal').classList.remove('hidden');
+      updateRoleUi();
+      const input = document.getElementById('chat-input'); input.disabled = true; input.placeholder = 'Sign in for global chat';
     }
 
     async function saveProfileSettings() {
@@ -2054,7 +2453,7 @@
       if (action === 'search_users') {
         const { data, error } = await supabaseClient.rpc('search_users', { p_query: String(values.query || '') });
         if (error) throw error;
-        return { users: data || [] };
+        return { users: Array.isArray(data) ? data : Array.isArray(data && data.users) ? data.users : [] };
       }
       if (action === 'set_admin') {
         const { data, error } = await supabaseClient.rpc('set_admin_role', { p_target_user_id: values.targetId, p_enabled: Boolean(values.enabled) });
@@ -2067,22 +2466,30 @@
         return { success: true, balance: data };
       }
       if (action === 'moderate') {
+        const needsAuthBan = ['ban', 'kick', 'unban'].includes(values.kind);
+        if (needsAuthBan) {
+          try {
+            const { data, error } = await supabaseClient.functions.invoke('moderation-admin', {
+              body: { action, ...values }
+            });
+            if (error) throw new Error(data && data.error ? data.error : error.message || 'Auth moderation function is unavailable.');
+            if (data && data.error) throw new Error(data.error);
+            return data;
+          } catch (edgeError) {
+            const { data: moderation, error } = await supabaseClient.rpc('set_user_moderation', {
+              p_target_user_id: values.targetId, p_kind: values.kind,
+              p_duration_minutes: Number(values.durationMinutes || 0), p_reason: String(values.reason || '')
+            });
+            if (error) throw error;
+            return { success: true, moderation, warning: 'The in-game restriction is active, but sign-in blocking needs the moderation-admin Edge Function deployed: ' + (edgeError.message || 'request failed') };
+          }
+        }
         const { data: moderation, error } = await supabaseClient.rpc('set_user_moderation', {
           p_target_user_id: values.targetId, p_kind: values.kind,
           p_duration_minutes: Number(values.durationMinutes || 0), p_reason: String(values.reason || '')
         });
         if (error) throw error;
-        if (!['ban', 'kick', 'unban'].includes(values.kind)) return { success: true, moderation };
-        try {
-          const { data, error: edgeError } = await supabaseClient.functions.invoke('moderation-admin', {
-            body: { action, ...values }
-          });
-          if (edgeError) throw new Error(data && data.error ? data.error : edgeError.message || 'Auth ban function is unavailable.');
-          if (data && data.error) throw new Error(data.error);
-          return data;
-        } catch (edgeError) {
-          return { success: true, moderation, warning: `Game restriction is active, but sign-in blocking needs the moderation-admin Edge Function deployed: ${edgeError.message || 'request failed'}` };
-        }
+        return { success: true, moderation };
       }
       throw new Error('Unknown staff action.');
     }
@@ -2128,7 +2535,11 @@
         );
         if (localPlayer.role === 'developer' && user.role !== 'developer') {
           actions.appendChild(makeStaffButton(user.role === 'admin' ? 'Revoke admin' : 'Make admin', user.role === 'admin' ? 'bg-slate-600' : 'bg-violet-600', async () => {
-            await runStaffAction(async () => callStaffFunction('set_admin', { targetId: user.user_id, enabled: user.role !== 'admin' }), 'staff-panel-status', 'Admin role updated.');
+            await runStaffAction(async () => {
+              const result = await callStaffFunction('set_admin', { targetId: user.user_id, enabled: user.role !== 'admin' });
+              sendSocialBroadcast('role_update', { targetId: user.user_id });
+              return result;
+            }, 'staff-panel-status', 'Admin role updated.');
           }));
         }
         card.appendChild(actions);
@@ -2152,7 +2563,7 @@
         if (statusId === 'staff-panel-status') await searchStaffUsers(true);
         else await searchWalletUsers(true);
         if (result && result.warning) setTimeout(() => { status.textContent = result.warning; }, 450);
-      } catch (error) { status.textContent = error.message || 'Could not complete this action.'; }
+      } catch (error) { status.textContent = staffErrorMessage(error); }
     }
     async function searchStaffUsers(immediate = false) {
       if (staffSearchTimer) clearTimeout(staffSearchTimer);
@@ -2167,7 +2578,7 @@
           results.replaceChildren();
           (data.users || []).forEach(user => results.appendChild(staffUserCard(user, 'staff')));
           status.textContent = data.users && data.users.length ? `${data.users.length} matching users.` : 'No users found.';
-        } catch (error) { status.textContent = error.message || 'Search failed.'; }
+        } catch (error) { status.textContent = staffErrorMessage(error); }
       }, immediate ? 0 : 350);
     }
     async function searchWalletUsers(immediate = false) {
@@ -2183,7 +2594,7 @@
           results.replaceChildren();
           (data.users || []).forEach(user => results.appendChild(staffUserCard(user, 'wallet')));
           status.textContent = data.users && data.users.length ? `${data.users.length} matching users.` : 'No users found.';
-        } catch (error) { status.textContent = error.message || 'Search failed.'; }
+        } catch (error) { status.textContent = staffErrorMessage(error); }
       }, immediate ? 0 : 350);
     }
 
@@ -2241,19 +2652,30 @@
         .on('broadcast', { event: 'friend_request' }, ({ payload }) => receiveFriendRequest(payload))
         .on('broadcast', { event: 'friend_accept' }, ({ payload }) => {
           if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.friendId)) return;
-          addFriend(payload.friendId, payload.name, payload.pfp, payload.avatarUrl, payload.equippedFrame);
+          loadFriendDataFromServer();
           playSound('match');
         })
         .on('broadcast', { event: 'friend_decline' }, ({ payload }) => {
           if (!payload || payload.targetId !== localPlayer.id) return;
           outgoingFriendRequests = outgoingFriendRequests.filter(r => r.targetId !== payload.userId);
           localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
+          loadFriendDataFromServer();
           handleFriendUserSearch();
+        })
+        .on('broadcast', { event: 'friend_remove' }, ({ payload }) => {
+          if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.friendId)) return;
+          friendList = friendList.filter(friend => friend.id !== payload.friendId);
+          saveFriendData();
+          if (activeDMUserId === payload.friendId) { activeDMUserId = null; renderDMBox(); }
+          renderFriendsList();
         })
         .on('broadcast', { event: 'profile_update' }, ({ payload }) => {
           if (!payload || !payload.id) return;
           if (payload.id === localPlayer.id) refreshOwnProfile();
           else syncFriendProfile(payload);
+        })
+        .on('broadcast', { event: 'role_update' }, ({ payload }) => {
+          if (payload && payload.targetId === localPlayer.id) refreshOwnProfile();
         })
         .on('broadcast', { event: 'direct_msg' }, async ({ payload }) => {
           if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.senderId)) return;
@@ -2271,7 +2693,7 @@
           markFriendsUnread();
           if (activeDMUserId === payload.senderId) renderDMBox();
         })
-        .on('broadcast', { event: 'lobby_music_update' }, ({ payload }) => { if (payload) setLobbyMusicUrl(payload.url || ''); })
+        .on('broadcast', { event: 'lobby_music_update' }, ({ payload }) => { if (payload) setLobbyMusicUrl(payload.url || '', true); })
         .subscribe();
     }
     function initSupabaseChannel(channelName) {
@@ -2413,13 +2835,13 @@
     }
 
     function triggerEmote(emoji) {
+      try {
+        if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') navigator.vibrate(18);
+      } catch (_) {}
       localPlayer.emoteEmoji = emoji;
       localPlayer.emoteUntil = Date.now() + 900;
       localPlayer.speechBubble = { text: String(emoji).slice(0, 24), until: Date.now() + 2400 };
-      playSound('jump'); broadcastPlayerState();
-      if (window.matchMedia('(max-width: 767px)').matches) {
-        canvas.classList.remove('mobile-jiggle'); void canvas.offsetWidth; canvas.classList.add('mobile-jiggle');
-      }
+      broadcastPlayerState();
     }
 
     function toggleActiveSpecialEmote() {
@@ -2656,21 +3078,32 @@
         card.append(title, body, meta);
         if (isNoticeWriter()) {
           const tools = document.createElement('div'); tools.className = 'mt-2 flex gap-2';
-          const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'rounded-lg bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-900'; edit.textContent = 'Edit'; edit.onclick = () => editNotice(notice);
+          const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'rounded-lg bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-900'; edit.textContent = 'Edit'; edit.onclick = () => editNotice(notice, card);
           const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'rounded-lg bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-900'; remove.textContent = 'Delete'; remove.onclick = () => deleteNotice(notice.id);
           tools.append(edit, remove); card.appendChild(tools);
         }
         list.appendChild(card);
       });
     }
-    async function editNotice(notice) {
-      if (!isNoticeWriter()) return;
-      const title = prompt('Edit notice title:', notice.title); if (title === null) return;
-      const body = prompt('Edit notice body:', notice.body); if (body === null) return;
-      const { error } = await supabaseClient.rpc('edit_notice', { p_notice_id: notice.id, p_title: title.trim(), p_body: body.trim() });
-      if (error) { document.getElementById('notice-board-status').textContent = error.message; return; }
-      await loadNoticeBoard();
+    function editNotice(notice, card) {
+      if (!isNoticeWriter() || !card) return;
+      const form = document.createElement('form'); form.className = 'space-y-2';
+      const heading = document.createElement('p'); heading.className = 'text-[10px] font-extrabold uppercase tracking-wide text-amber-800'; heading.textContent = 'Edit notice';
+      const title = document.createElement('input'); title.type = 'text'; title.maxLength = 80; title.required = true; title.value = notice.title; title.className = 'glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950'; title.setAttribute('aria-label', 'Notice title');
+      const body = document.createElement('textarea'); body.maxLength = 1200; body.required = true; body.rows = 5; body.value = notice.body; body.className = 'glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950'; body.setAttribute('aria-label', 'Notice body');
+      const controls = document.createElement('div'); controls.className = 'flex gap-2';
+      const save = document.createElement('button'); save.type = 'submit'; save.className = 'rounded-xl bg-emerald-600 px-3 py-1.5 text-[10px] font-bold text-white'; save.textContent = 'Save changes';
+      const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'rounded-xl bg-slate-200 px-3 py-1.5 text-[10px] font-bold text-slate-800'; cancel.textContent = 'Cancel'; cancel.onclick = () => loadNoticeBoard();
+      controls.append(save, cancel); form.append(heading, title, body, controls);
+      form.onsubmit = async event => {
+        event.preventDefault(); save.disabled = true; save.textContent = 'Saving…';
+        const { error } = await supabaseClient.rpc('edit_notice', { p_notice_id: notice.id, p_title: title.value.trim(), p_body: body.value.trim() });
+        if (error) { document.getElementById('notice-board-status').textContent = error.message; save.disabled = false; save.textContent = 'Save changes'; return; }
+        await loadNoticeBoard();
+      };
+      card.replaceChildren(form); title.focus();
     }
+
     async function deleteNotice(id) {
       if (!isNoticeWriter() || !confirm('Delete this notice?')) return;
       const { error } = await supabaseClient.rpc('delete_notice', { p_notice_id: id });
