@@ -123,7 +123,7 @@
     }
     #gameCanvas { touch-action: none; }
     .overflow-y-auto { touch-action: pan-y; -webkit-overflow-scrolling: touch; }
-    .mobile-top-action { min-width: 34px; min-height: 34px; }
+    .mobile-top-action { min-width: 32px; min-height: 32px; }
   </style>
 </head>
 <body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
@@ -178,66 +178,69 @@
   </div>
 
   <!-- TOP HEADER TOOLBAR -->
-  <header class="h-12 sm:h-14 glass px-3 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
-    <div class="flex items-center gap-2">
+  <header class="h-12 sm:h-14 glass px-2 sm:px-3 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm gap-1">
+    <div class="flex items-center gap-1.5 shrink-0">
       <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shadow-pink-300 shrink-0">
         <i data-lucide="flower-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style="animation-duration: 12s;"></i>
       </div>
       <div>
-        <h1 class="font-sakura text-xs sm:text-base text-pink-950 font-bold tracking-wide leading-none">Sakura Slime 🌸</h1>
-        <p class="text-[9px] sm:text-[10px] text-pink-600 font-semibold uppercase mt-0.5" id="room-indicator">#sakura-lounge</p>
+        <h1 class="font-sakura text-xs sm:text-base text-pink-950 font-bold tracking-wide leading-none">Sakura 🌸</h1>
+        <p class="text-[8px] sm:text-[10px] text-pink-600 font-semibold uppercase mt-0.5" id="room-indicator">#sakura-lounge</p>
       </div>
     </div>
 
-    <div class="flex items-center gap-2">
-      <div class="flex items-center gap-1.5 px-3 py-1 rounded-2xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-extrabold shadow-sm">
-        <span class="text-sm">🪙</span>
+    <div class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar py-1">
+      <div class="flex items-center gap-1 px-2 py-1 rounded-xl bg-amber-100/90 border border-amber-300 text-amber-900 text-[11px] sm:text-xs font-extrabold shadow-sm shrink-0">
+        <span>🪙</span>
         <span id="player-points-display">0</span>
       </div>
 
-      <div class="flex items-center bg-pink-100/90 rounded-xl p-1 border border-pink-200">
-        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Music">
-          <i data-lucide="music" id="music-icon" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-600"></i>
-        </button>
-      </div>
-
-      <button onclick="openMarketModal()" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-400 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:brightness-110 active:scale-95">
-        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-        <span class="hidden sm:inline">Market</span>
+      <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="mobile-top-action p-1.5 rounded-xl bg-pink-100 hover:bg-white text-pink-800 border border-pink-200 transition flex items-center justify-center text-xs shrink-0" title="Toggle Music">
+        <i data-lucide="music" id="music-icon" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-600"></i>
       </button>
 
-      <button onclick="openInventoryModal()" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-purple-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-purple-600 active:scale-95">
-        <i data-lucide="box" class="w-4 h-4"></i>
-        <span class="hidden sm:inline">Inventory</span>
+      <button onclick="openMarketModal()" class="mobile-top-action px-2 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-400 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:brightness-110 active:scale-95 shrink-0">
+        <i data-lucide="shopping-bag" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span class="hidden md:inline">Market</span>
       </button>
 
-      <button onclick="openGamesModal()" class="mobile-top-action p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-emerald-600 active:scale-95" title="Games">
-        <i data-lucide="gamepad-2" class="w-4 h-4"></i><span class="hidden sm:inline">Games</span>
+      <button onclick="openInventoryModal()" class="mobile-top-action px-2 sm:px-3 py-1.5 rounded-xl bg-purple-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-purple-600 active:scale-95 shrink-0">
+        <i data-lucide="box" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span class="hidden md:inline">Inventory</span>
       </button>
 
-      <button onclick="openNoticeBoard()" class="mobile-top-action p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-amber-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-amber-600 active:scale-95" title="Notice Board">
-        <i data-lucide="scroll-text" class="w-4 h-4"></i><span class="hidden sm:inline">Notices</span>
+      <button onclick="openGamesModal()" class="mobile-top-action px-2 sm:px-3 py-1.5 rounded-xl bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-emerald-600 active:scale-95 shrink-0" title="Games">
+        <i data-lucide="gamepad-2" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span class="hidden md:inline">Games</span>
       </button>
 
-      <button id="role-tools-button" onclick="openRolePanel()" class="hidden p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 text-white font-bold text-xs items-center gap-1 shadow-md hover:bg-slate-800 active:scale-95" title="Admin and developer tools">
-        <i data-lucide="shield" class="w-4 h-4"></i><span class="hidden sm:inline">Staff</span>
+      <button onclick="openNoticeBoard()" class="mobile-top-action px-2 sm:px-3 py-1.5 rounded-xl bg-amber-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-amber-600 active:scale-95 shrink-0" title="Notice Board">
+        <i data-lucide="scroll-text" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span class="hidden md:inline">Notices</span>
       </button>
 
-      <button id="developer-wallet-button" onclick="openDeveloperWallet()" class="hidden p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-cyan-700 text-white font-bold text-xs items-center gap-1 shadow-md hover:bg-cyan-600 active:scale-95" title="Developer wallet tools">
-        <i data-lucide="coins" class="w-4 h-4"></i><span class="hidden sm:inline">Wallet</span>
+      <button id="role-tools-button" onclick="openRolePanel()" class="hidden mobile-top-action px-2 sm:px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold text-xs items-center gap-1 shadow-md hover:bg-slate-800 active:scale-95 shrink-0" title="Staff Tools">
+        <i data-lucide="shield" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span class="hidden md:inline">Staff</span>
       </button>
 
-      <button onclick="toggleChatSidebar()" class="mobile-top-action p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-fuchsia-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-fuchsia-600 active:scale-95" title="Open chat">
-        <i data-lucide="message-circle" class="w-4 h-4"></i><span class="hidden sm:inline">Chat</span>
+      <button id="developer-wallet-button" onclick="openDeveloperWallet()" class="hidden mobile-top-action px-2 sm:px-3 py-1.5 rounded-xl bg-cyan-700 text-white font-bold text-xs items-center gap-1 shadow-md hover:bg-cyan-600 active:scale-95 shrink-0" title="Wallet">
+        <i data-lucide="coins" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span class="hidden md:inline">Wallet</span>
       </button>
 
-      <button onclick="openFriendsModal()" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-sky-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-sky-600 active:scale-95 relative">
-        <i data-lucide="users" class="w-4 h-4"></i>
-        <span class="hidden sm:inline">Friends</span>
+      <button onclick="toggleChatSidebar()" class="mobile-top-action px-2 sm:px-3 py-1.5 rounded-xl bg-fuchsia-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-fuchsia-600 active:scale-95 shrink-0" title="Open chat">
+        <i data-lucide="message-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span class="hidden md:inline">Chat</span>
+      </button>
+
+      <button onclick="openFriendsModal()" class="mobile-top-action px-2 sm:px-3 py-1.5 rounded-xl bg-sky-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-sky-600 active:scale-95 relative shrink-0">
+        <i data-lucide="users" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span class="hidden md:inline">Friends</span>
         <span id="friends-unread-dot" class="hidden absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full shadow"></span>
       </button>
 
-      <button onclick="toggleSettingsModal()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Profile Settings">
+      <button onclick="toggleSettingsModal()" class="mobile-top-action p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 shrink-0" title="Profile Settings">
         <i data-lucide="user-cog" class="w-4 h-4"></i>
       </button>
     </div>
@@ -290,10 +293,7 @@
       <div id="player-card" class="absolute z-30 hidden w-52 rounded-2xl glass p-3 shadow-xl border border-pink-200">
         <div class="flex items-center gap-2">
           <div id="player-card-avatar"></div>
-          <div class="min-w-0 flex-1">
-            <p id="player-card-name" class="truncate text-xs font-extrabold text-pink-950"></p>
-            <p id="player-card-status" class="text-[10px] text-pink-700"></p>
-          </div>
+          <div class="min-w-0 flex-1"><p id="player-card-name" class="truncate text-xs font-extrabold text-pink-950"></p><p id="player-card-status" class="text-[10px] text-pink-700"></p></div>
           <button onclick="closePlayerCard()" class="text-pink-700 p-1" aria-label="Close player card">✕</button>
         </div>
         <button id="player-card-action" onclick="handlePlayerCardAction()" class="mt-2 w-full rounded-xl bg-sky-500 py-2 text-xs font-bold text-white"></button>
@@ -306,7 +306,7 @@
       </div>
     </div>
 
-    <!-- SIDEBAR CHAT PANEL WITH SEPARATE CHAT HISTORY STORAGE -->
+    <!-- SIDEBAR CHAT PANEL WITH PERSISTENT TABS -->
     <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
       <div class="p-3 border-b border-pink-200/30 bg-white/10 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-1 bg-pink-950/60 p-1 rounded-xl border border-pink-200/30">
@@ -354,14 +354,14 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 flex-1 overflow-hidden">
         <div class="bg-pink-100/70 border border-pink-200 rounded-2xl p-3 flex flex-col items-center justify-center relative">
-          <span class="text-[10px] font-bold text-pink-700 uppercase tracking-wider mb-1">Live Preview</span>
+          <span class="text-[10px] font-bold text-pink-700 uppercase tracking-wider mb-1">Live Test Preview</span>
           <canvas id="marketPreviewCanvas" width="180" height="150" class="bg-pink-900/10 rounded-xl border border-pink-300 shadow-inner"></canvas>
           <p id="market-item-preview-name" class="text-xs font-bold text-pink-950 mt-2 text-center">Testing: Select Item</p>
         </div>
 
         <div class="md:col-span-2 flex flex-col overflow-hidden">
           <div class="mb-2 flex gap-2 shrink-0">
-            <input id="market-search-input" type="search" oninput="renderMarketGrid()" placeholder="Search this market section..." class="glass-input flex-1 rounded-xl px-3 py-2 text-xs text-pink-950" />
+            <input id="market-search-input" type="search" oninput="renderMarketGrid()" placeholder="Search market items..." class="glass-input flex-1 rounded-xl px-3 py-2 text-xs text-pink-950" />
             <button type="button" onclick="renderMarketGrid()" class="rounded-xl bg-pink-500 px-3 text-xs font-bold text-white"><i data-lucide="search" class="h-4 w-4"></i></button>
           </div>
           <div class="flex items-center gap-1 border-b border-pink-200 pb-2 overflow-x-auto shrink-0">
@@ -549,6 +549,7 @@
       <form id="notice-post-form" onsubmit="postNotice(event)" class="hidden mt-4 space-y-2 border-t border-amber-200 pt-3">
         <p class="text-[10px] font-extrabold uppercase text-amber-800">Admin / developer post</p>
         <input id="notice-title-input" maxlength="80" required placeholder="Notice title" class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950" />
+        <input id="notice-recipient-input" type="email" placeholder="Recipient email (blank = everyone)" class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950" />
         <textarea id="notice-body-input" maxlength="1200" required rows="3" placeholder="Write a notice for players..." class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950"></textarea>
         <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white">Post notice</button>
       </form>
@@ -567,15 +568,17 @@
         <button onclick="searchStaffUsers()" class="rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white">Search</button>
       </div>
       <p id="staff-panel-status" class="text-[10px] text-slate-600 pb-2 shrink-0">Search requires a signed-in staff account.</p>
-      <div id="staff-user-results" class="max-h-[40dvh] overflow-y-auto space-y-2"></div>
-      <div class="mt-3 border-t border-slate-200 pt-3">
-        <p class="text-[10px] font-extrabold uppercase tracking-wide text-slate-700">Lobby Music Upload</p>
-        <div class="mt-2 flex gap-2 items-center">
-          <input id="lobby-music-file" type="file" accept="audio/*" class="block w-full text-[10px] text-slate-700 file:mr-2 file:rounded-lg file:border-0 file:bg-cyan-700 file:px-2 file:py-1 file:text-[10px] file:font-bold file:text-white" />
-          <button onclick="uploadLobbyMusicFile()" class="rounded-xl bg-purple-700 px-3 py-2 text-[10px] font-bold text-white shrink-0">Upload & Play</button>
-          <button onclick="clearLobbyMusic()" class="rounded-xl bg-slate-500 px-3 py-2 text-[10px] font-bold text-white shrink-0">Clear Music</button>
+      <div id="staff-user-results" class="max-h-[30dvh] overflow-y-auto space-y-2"></div>
+      <div class="mt-3 border-t border-slate-200 pt-3 shrink-0">
+        <p class="text-[10px] font-extrabold uppercase tracking-wide text-slate-700">Lobby Music Stream (Synced File Upload)</p>
+        <div class="mt-2 flex flex-col gap-2">
+          <div class="flex gap-2 items-center">
+            <input id="lobby-music-file" type="file" accept="audio/*" class="block w-full text-[10px] text-slate-700 file:mr-2 file:rounded-lg file:border-0 file:bg-cyan-700 file:px-3 file:py-1.5 file:text-[10px] file:font-bold file:text-white" />
+            <button onclick="uploadLobbyMusicFile()" class="rounded-xl bg-purple-700 px-3 py-2 text-[10px] font-bold text-white shrink-0">Upload & Sync</button>
+            <button onclick="clearLobbyMusic()" class="rounded-xl bg-slate-500 px-3 py-2 text-[10px] font-bold text-white shrink-0">Clear</button>
+          </div>
         </div>
-        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Audio file syncs and plays automatically across the entire lobby.</p>
+        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Audio plays and syncs across the entire lobby for all users.</p>
       </div>
     </div>
   </div>
@@ -761,11 +764,11 @@
     let dmMessages = loadStoredJson('sakura_dms', {});
     let activeDMUserId = null;
     let currentChannel = 'sakura-lounge';
-    
-    // SEPARATE CHAT HISTORY ARRAYS FOR GLOBAL & STAFF CHATS
-    let globalChatHistory = [];
-    let staffChatHistory = [];
     let activeChatTab = 'global';
+    
+    // Persistent Chat Message Arrays
+    let globalChatMessages = [];
+    let staffChatMessages = [];
 
     let realtimeChannel = null;
     let staffGroupChannel = null;
@@ -841,7 +844,7 @@
             if (lobbyAudio) lobbyAudio.pause(); 
             lobbyAudio = new Audio(lobbyMusicUrl); 
             lobbyAudio.loop = true; 
-            lobbyAudio.volume = .40; 
+            lobbyAudio.volume = .4; 
           }
           lobbyAudio.play().catch(() => { musicPlaying = false; icon.setAttribute('data-lucide', 'music'); lucide.createIcons(); });
         } else if (initAudio()) { 
@@ -866,15 +869,11 @@
       lobbyMusicUrl = nextUrl;
       if (lobbyAudio) { lobbyAudio.pause(); lobbyAudio = null; }
       window.clearInterval(musicTimer); musicTimer = null;
-      if (lobbyMusicUrl) {
-        lobbyAudio = new Audio(lobbyMusicUrl); 
-        lobbyAudio.loop = true; 
-        lobbyAudio.volume = .40;
-        musicPlaying = true;
-        const icon = document.getElementById('music-icon');
-        if (icon) icon.setAttribute('data-lucide', 'volume-2');
-        lucide.createIcons();
+      if (musicPlaying && lobbyMusicUrl) {
+        lobbyAudio = new Audio(lobbyMusicUrl); lobbyAudio.loop = true; lobbyAudio.volume = .4;
         lobbyAudio.play().catch(() => { musicPlaying = false; });
+      } else if (musicPlaying && initAudio()) {
+        playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420);
       }
     }
 
@@ -888,24 +887,21 @@
       const fileInput = document.getElementById('lobby-music-file');
       const file = fileInput.files && fileInput.files[0];
       if (!file) {
-        document.getElementById('lobby-music-status').textContent = 'Please select an audio file first.';
+        document.getElementById('lobby-music-status').textContent = 'Please select an MP3/Audio file first.';
         return;
       }
       if (file.size > 8 * 1024 * 1024) {
-        document.getElementById('lobby-music-status').textContent = 'File too large! Max size 8MB.';
+        document.getElementById('lobby-music-status').textContent = 'File too large! Max 8MB.';
         return;
       }
       const reader = new FileReader();
       reader.onload = async (e) => {
         const audioData = e.target.result;
-        const { error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: audioData });
-        if (error) {
-          document.getElementById('lobby-music-status').textContent = 'Database sync warning: Playing locally and broadcasting.';
-        } else {
-          document.getElementById('lobby-music-status').textContent = 'Uploaded MP3 playing and synced across entire lobby!';
-        }
         setLobbyMusicUrl(audioData);
+        await supabaseClient.rpc('set_lobby_music', { p_music_url: audioData });
         sendSocialBroadcast('lobby_music_update', { url: audioData });
+        document.getElementById('lobby-music-status').textContent = 'Uploaded MP3 actively synced & playing for the lobby!';
+        if (!musicPlaying) toggleBackgroundMusic();
       };
       reader.readAsDataURL(file);
     }
@@ -913,9 +909,9 @@
     async function clearLobbyMusic() {
       if (!['admin', 'developer'].includes(localPlayer.role)) return;
       await supabaseClient.rpc('set_lobby_music', { p_music_url: '' });
-      setLobbyMusicUrl(''); 
-      sendSocialBroadcast('lobby_music_update', { url: '' }); 
-      document.getElementById('lobby-music-status').textContent = 'Lobby music stopped and cleared.';
+      setLobbyMusicUrl('');
+      sendSocialBroadcast('lobby_music_update', { url: '' });
+      document.getElementById('lobby-music-status').textContent = 'Lobby music cleared.';
     }
 
     // CANVAS & GRAPHICS ENGINE
@@ -943,7 +939,7 @@
       c.fillStyle = roleTitleEquipped && role === 'developer' ? '#a5f3fc' : roleTitleEquipped && role === 'admin' ? '#fda4af' : isSelf ? '#f472b6' : '#ffffff';
       c.shadowColor = roleTitleEquipped && role === 'developer' ? '#67e8f9' : roleTitleEquipped && role === 'admin' ? '#ef4444' : 'transparent';
       c.shadowBlur = roleTitleEquipped ? 12 : 0;
-      const text = `${player.name || 'Slime'}${isSelf ? ' (You)' : ''}${roleTitleEquipped ? roleTag : ''}`;
+      const text = `${player.name || 'Slime'}${isSelf ? ' (You)' : ''}${roleTitleEquipped ? roleTag : (role === 'developer' ? ' · DEV' : role === 'admin' ? ' · ADMIN' : '')}`;
       
       if (avatarUrl) {
         let avatar = profileAvatarCache.get(avatarUrl);
@@ -1176,28 +1172,12 @@
         const playerY = Number.isFinite(p.displayY) ? p.displayY : p.y;
         const displayPlayer = { ...p, x: playerX, y: playerY };
         const jumpHeight = Number.isFinite(p.displayJumpOffset) ? p.displayJumpOffset : (p.jumpOffset || 0);
-        
-        // DRAW REMOTE PLAYERS WITH EQUIPPED ITEMS
-        drawSlimeModel(
-          ctx, playerX, playerY, 
-          p.equippedSkin || 'skin_pink', 
-          p.equippedAcc || p.equippedAccessory || null, 
-          p.equippedTitle || null, 
-          p.isJumping, jumpHeight, p.activeSpecialEmote, false, p.role, 
-          Math.hypot(p.vx || 0, p.vy || 0), p.vx || 0
-        );
+        drawSlimeModel(ctx, playerX, playerY, p.equippedSkin, p.equippedAcc, p.equippedTitle, p.isJumping, jumpHeight, p.activeSpecialEmote, false, p.role, Math.hypot(p.vx || 0, p.vy || 0), p.vx || 0);
         drawSpeechBubble(ctx, playerX, playerY - jumpHeight, p.speechBubble);
         drawPlayerLabel(ctx, displayPlayer);
       });
 
-      // DRAW LOCAL PLAYER WITH EQUIPPED ITEMS
-      drawSlimeModel(
-        ctx, localPlayer.x, localPlayer.y, 
-        localPlayer.equippedSkin, 
-        localPlayer.equippedAcc, 
-        localPlayer.equippedTitle, 
-        localPlayer.isJumping, localPlayer.jumpOffset, localPlayer.activeSpecialEmote, true, localPlayer.role
-      );
+      drawSlimeModel(ctx, localPlayer.x, localPlayer.y, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, localPlayer.isJumping, localPlayer.jumpOffset, localPlayer.activeSpecialEmote, true, localPlayer.role);
       drawSpeechBubble(ctx, localPlayer.x, localPlayer.y - localPlayer.jumpOffset, localPlayer.speechBubble);
       drawPlayerLabel(ctx, localPlayer, true);
 
@@ -1213,7 +1193,7 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // CLICK HANDLER ON GAME WORLD
+    // CLICK HANDLER ON GAME WORLD (DEV SLIME CLICK MUSIC PLAYBACK)
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
       const clickWorldX = e.clientX - rect.left + camera.x;
@@ -1228,7 +1208,7 @@
       });
 
       if (closest) {
-        if (closest.player.role === 'developer' || closest.player.role === 'admin') {
+        if (closest.player.role === 'developer') {
           toggleBackgroundMusic();
         }
         showPlayerCard(closest.player);
@@ -1249,13 +1229,9 @@
       const avatar = document.getElementById('player-card-avatar');
       avatar.innerHTML = '';
       avatar.appendChild(makeAvatar(player, 'w-10 h-10'));
-      
       const trustedRole = player.id === localPlayer.id ? localPlayer.role : (remotePlayers[player.id] && remotePlayers[player.id].role) || (['admin', 'developer'].includes(player.role) ? player.role : 'player');
       
-      // FIXED: RENDER ADMIN / DEV TAG IN SLIME CARD WITH PROFILE PICTURE
-      const roleBadge = trustedRole === 'developer' ? ' · DEV' : trustedRole === 'admin' ? ' · ADMIN' : '';
-      document.getElementById('player-card-name').textContent = `${player.name || 'Slime'}${roleBadge}`;
-      
+      document.getElementById('player-card-name').textContent = `${player.name || 'Slime'}${trustedRole === 'developer' ? ' · DEV' : trustedRole === 'admin' ? ' · ADMIN' : ''}`;
       const action = document.getElementById('player-card-action');
       const status = document.getElementById('player-card-status');
       const friend = friendList.some(item => item.id === player.id);
@@ -1263,14 +1239,12 @@
       const sent = outgoingFriendRequests.some(item => item.targetId === player.id);
       
       if (friend) { action.textContent = 'Already Friends'; action.disabled = true; status.textContent = 'You are friends'; }
-      else if (incoming) { action.textContent = 'Accept Request'; action.disabled = false; status.textContent = 'Sent you a friend request'; }
-      else if (sent) { action.textContent = 'Request Sent'; action.disabled = true; status.textContent = 'Waiting for reply'; }
-      else { action.textContent = 'Add Friend'; action.disabled = false; status.textContent = 'Online in room'; }
+      else if (incoming) { action.textContent = 'Accept Request'; action.disabled = false; status.textContent = 'This player sent you a request'; }
+      else if (sent) { action.textContent = 'Request Sent'; action.disabled = true; status.textContent = 'Waiting for their reply'; }
+      else { action.textContent = 'Add Friend'; action.disabled = false; status.textContent = 'Online in this room'; }
       action.className = `mt-2 w-full rounded-xl py-2 text-xs font-bold text-white ${action.disabled ? 'bg-slate-400' : incoming ? 'bg-emerald-500' : 'bg-sky-500'}`;
       
       const staffActions = document.getElementById('player-card-staff-actions');
-      
-      // ADMINS CANNOT SEE OR DO ANYTHING TO DEVS IN PANEL OR SLIME CARD
       const isTargetDev = trustedRole === 'developer';
       const canManage = ['admin', 'developer'].includes(localPlayer.role) && player.id !== localPlayer.id && !(localPlayer.role === 'admin' && isTargetDev);
       
@@ -1395,7 +1369,7 @@
       grid.innerHTML = '';
       const search = (document.getElementById('market-search-input').value || '').trim().toLowerCase();
       const items = (MARKET_ITEMS[activeMarketCategory] || []).filter(item => !search || `${item.name} ${item.desc}`.toLowerCase().includes(search));
-      if (!items.length) { const empty = document.createElement('p'); empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-pink-700'; empty.textContent = 'No items match search.'; grid.appendChild(empty); }
+      if (!items.length) { const empty = document.createElement('p'); empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-pink-700'; empty.textContent = 'No items match that search.'; grid.appendChild(empty); }
       items.forEach(item => {
         const isOwned = localPlayer.inventory.includes(item.id);
         const card = document.createElement('div');
@@ -1438,7 +1412,7 @@
       if (!item || !authUser || guestMode) { alert('Sign in to buy and save market items.'); return; }
       if (localPlayer.inventory.includes(item.id)) return;
       const { data, error } = await supabaseClient.rpc('purchase_market_item', { p_item_id: item.id });
-      if (error) { alert(error.message.includes('insufficient') ? 'Not enough points!' : 'Purchase failed.'); return; }
+      if (error) { alert(error.message.includes('insufficient') ? 'Not enough points! Collect more points first.' : 'Could not complete this purchase.'); return; }
       localPlayer.points = Number(data.points) || 0;
       localPlayer.inventory = Array.isArray(data.inventory) ? data.inventory : localPlayer.inventory;
       savePlayerToStorage();
@@ -1451,7 +1425,6 @@
     let marketPreviewCanvas = document.getElementById('marketPreviewCanvas');
     let marketPreviewCtx = marketPreviewCanvas.getContext('2d');
 
-    // FIXED MARKET PREVIEW LOOP: HANDLES SLIME, PROFILE CARDS, STICKERS AND MESSAGE CARDS
     function startMarketPreviewLoop() {
       function anim() {
         if (document.getElementById('market-modal').classList.contains('hidden')) return;
@@ -1461,56 +1434,29 @@
         let sAcc = localPlayer.equippedAcc;
         let sTitle = localPlayer.equippedTitle;
         let sEmote = null;
+        let sPfp = localPlayer.pfp;
+        let sCard = localPlayer.equippedMessageCard;
+        let sFrame = localPlayer.equippedFrame;
 
         if (marketTestingItem) {
           if (marketTestingItem.type === 'skins') sSkin = marketTestingItem.id;
           if (marketTestingItem.type === 'accessories') sAcc = marketTestingItem.id;
           if (marketTestingItem.type === 'titles') sTitle = marketTestingItem.id;
           if (marketTestingItem.type === 'emotes') sEmote = marketTestingItem.anim;
+          if (marketTestingItem.type === 'profile') sPfp = marketTestingItem.icon;
+          if (marketTestingItem.type === 'message_cards') sCard = marketTestingItem.id;
+          if (marketTestingItem.type === 'frames') sFrame = marketTestingItem.id;
         }
 
         drawSlimeModel(marketPreviewCtx, 90, 75, sSkin, sAcc, sTitle, false, 0, sEmote, true, localPlayer.role);
 
-        // RENDER PREVIEW FOR PROFILE STICKERS
-        if (marketTestingItem && marketTestingItem.type === 'profile') {
-          marketPreviewCtx.font = '28px sans-serif'; 
-          marketPreviewCtx.textAlign = 'center'; 
-          marketPreviewCtx.fillText(marketTestingItem.icon, 90, 130);
-        }
-
-        // RENDER PREVIEW FOR MESSAGE CARDS / BUBBLES
-        if (marketTestingItem && marketTestingItem.type === 'message_cards') {
-          const cardStyle = marketTestingItem.style;
-          const bgGrad = marketPreviewCtx.createLinearGradient(20, 105, 160, 140);
-          if (cardStyle === 'sakura') { bgGrad.addColorStop(0, '#831843'); bgGrad.addColorStop(1, '#7c2d12'); }
-          else if (cardStyle === 'moon') { bgGrad.addColorStop(0, '#082f49'); bgGrad.addColorStop(1, '#312e81'); }
-          else { bgGrad.addColorStop(0, '#4c1d95'); bgGrad.addColorStop(1, '#78350f'); }
-
-          marketPreviewCtx.fillStyle = bgGrad;
-          marketPreviewCtx.strokeStyle = cardStyle === 'royal' ? '#fbbf24' : '#f472b6';
-          marketPreviewCtx.lineWidth = 2;
-          marketPreviewCtx.beginPath();
-          marketPreviewCtx.roundRect(20, 110, 140, 30, 8);
-          marketPreviewCtx.fill();
-          marketPreviewCtx.stroke();
-
-          marketPreviewCtx.fillStyle = '#ffffff';
-          marketPreviewCtx.font = 'bold 10px Plus Jakarta Sans, sans-serif';
-          marketPreviewCtx.textAlign = 'center';
-          marketPreviewCtx.fillText('Sample Chat Card', 90, 129);
-        }
-
-        // RENDER PREVIEW FOR PROFILE FRAMES
-        if (marketTestingItem && marketTestingItem.type === 'frames') {
-          const frameColor = { frame_sakura: '#fb7185', frame_moon: '#38bdf8', frame_prism: '#fbbf24' }[marketTestingItem.id] || '#f472b6';
+        // If testing profile cards or message cards, render a preview sample badge
+        if (marketTestingItem && (marketTestingItem.type === 'message_cards' || marketTestingItem.type === 'profile' || marketTestingItem.type === 'frames')) {
           marketPreviewCtx.save();
-          marketPreviewCtx.strokeStyle = frameColor;
-          marketPreviewCtx.lineWidth = 3;
-          marketPreviewCtx.shadowColor = frameColor;
-          marketPreviewCtx.shadowBlur = 10;
-          marketPreviewCtx.beginPath();
-          marketPreviewCtx.arc(90, 125, 16, 0, Math.PI * 2);
-          marketPreviewCtx.stroke();
+          marketPreviewCtx.font = 'bold 10px Plus Jakarta Sans';
+          marketPreviewCtx.fillStyle = '#831843';
+          marketPreviewCtx.textAlign = 'center';
+          marketPreviewCtx.fillText(`${sPfp} Testing ${marketTestingItem.name}`, 90, 135);
           marketPreviewCtx.restore();
         }
 
@@ -1544,7 +1490,7 @@
       if (!matchingItems.length) {
         const empty = document.createElement('p');
         empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-purple-700';
-        empty.textContent = 'Nothing here yet.';
+        empty.textContent = 'Nothing here yet. Find items in the market.';
         grid.appendChild(empty);
       }
       matchingItems.forEach(item => {
@@ -2156,7 +2102,6 @@
       if (action === 'search_users') {
         const { data, error } = await supabaseClient.rpc('search_users', { p_query: String(values.query || '') });
         if (error) throw error;
-        // ADMIN CANNOT SEE DEVS IN SEARCH PANEL
         const filtered = (data || []).filter(u => !(localPlayer.role === 'admin' && u.role === 'developer'));
         return { users: filtered };
       }
@@ -2376,19 +2321,15 @@
       staffGroupChannel = supabaseClient.channel('sakura-staff-group')
         .on('broadcast', { event: 'staff_chat' }, async ({ payload }) => {
           if (!payload || payload.senderId === localPlayer.id) return;
-          const msgObj = {
-            sender: payload.sender, text: payload.text, pfp: payload.pfp, isSelf: false,
-            profile: { senderId: payload.senderId, avatarUrl: payload.avatarUrl, role: payload.role, equippedTitle: payload.equippedTitle, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard }
-          };
-          staffChatHistory.push(msgObj);
+          const msgObj = { sender: payload.sender, text: payload.text, pfp: payload.pfp, isSelf: false, profile: { senderId: payload.senderId, avatarUrl: payload.avatarUrl, role: payload.role, equippedTitle: payload.equippedTitle, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard } };
+          staffChatMessages.push(msgObj);
           if (activeChatTab === 'staff') {
-            appendChatMessageToDOM(msgObj.sender, msgObj.text, msgObj.pfp, false, msgObj.profile);
+            appendChatMessage(msgObj.sender, msgObj.text, msgObj.pfp, msgObj.isSelf, msgObj.profile);
           }
         })
         .subscribe();
     }
 
-    // FIXED: TAB SWITCHING PRESERVES FULL CHAT MESSAGES HISTORY FOR BOTH GLOBAL AND STAFF CHAT
     function switchChatTab(tab) {
       if (tab === 'staff' && !['admin', 'developer'].includes(localPlayer.role)) return;
       activeChatTab = tab;
@@ -2396,14 +2337,13 @@
       document.getElementById('chat-tab-staff').className = `px-2.5 py-1 rounded-lg text-xs font-bold ${tab === 'staff' ? 'bg-violet-600 text-white' : 'text-pink-300 hover:text-white'}`;
       document.getElementById('chat-input').placeholder = tab === 'staff' ? 'Type staff group message...' : 'Type global message...';
       
+      // Render persistent messages for selected tab
       const chatBox = document.getElementById('chat-messages');
       chatBox.replaceChildren();
-
-      const history = tab === 'staff' ? staffChatHistory : globalChatHistory;
-      history.forEach(item => {
-        appendChatMessageToDOM(item.sender, item.text, item.pfp, item.isSelf, item.profile);
+      const messagesToRender = tab === 'staff' ? staffChatMessages : globalChatMessages;
+      messagesToRender.forEach(m => {
+        appendChatMessage(m.sender, m.text, m.pfp, m.isSelf, m.profile, false);
       });
-      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function initSupabaseChannel(channelName) {
@@ -2423,16 +2363,7 @@
           Object.keys(state).forEach(key => {
             if (key !== localPlayer.id) {
               const player = state[key][0];
-              remotePlayers[key] = { 
-                ...player, 
-                role: player.role || 'player',
-                equippedSkin: player.equippedSkin || 'skin_pink',
-                equippedAcc: player.equippedAcc || player.equippedAccessory || null,
-                equippedTitle: player.equippedTitle || null,
-                equippedFrame: player.equippedFrame || null,
-                equippedMessageCard: player.equippedMessageCard || null,
-                displayX: player.x, displayY: player.y, displayJumpOffset: player.jumpOffset || 0 
-              };
+              remotePlayers[key] = { ...player, role: player.role || 'player', displayX: player.x, displayY: player.y, displayJumpOffset: player.jumpOffset || 0 };
             }
           });
           Object.values(remotePlayers).forEach(syncFriendProfile);
@@ -2441,14 +2372,7 @@
         .on('broadcast', { event: 'player_update' }, ({ payload }) => {
           if (payload && payload.id !== localPlayer.id) {
             const previous = remotePlayers[payload.id];
-            remotePlayers[payload.id] = { 
-              ...payload, 
-              role: previous ? previous.role : (payload.role || 'player'),
-              equippedSkin: payload.equippedSkin || 'skin_pink',
-              equippedAcc: payload.equippedAcc || payload.equippedAccessory || null,
-              equippedTitle: payload.equippedTitle || null,
-              equippedFrame: payload.equippedFrame || null,
-              equippedMessageCard: payload.equippedMessageCard || null,
+            remotePlayers[payload.id] = { ...payload, role: payload.role || (previous ? previous.role : 'player'),
               displayX: previous && Number.isFinite(previous.displayX) ? previous.displayX : payload.x,
               displayY: previous && Number.isFinite(previous.displayY) ? previous.displayY : payload.y,
               displayJumpOffset: previous && Number.isFinite(previous.displayJumpOffset) ? previous.displayJumpOffset : (payload.jumpOffset || 0)
@@ -2459,13 +2383,10 @@
         .on('broadcast', { event: 'global_chat' }, async ({ payload }) => {
           if (!payload || !isValidUserId(payload.senderId) || payload.senderId === localPlayer.id) return;
           const verifiedRole = await getTrustedUserRole(payload.senderId);
-          const msgObj = {
-            sender: payload.sender, text: payload.text, pfp: payload.pfp, isSelf: false,
-            profile: { senderId: payload.senderId, avatarUrl: payload.avatarUrl, role: verifiedRole, equippedTitle: payload.equippedTitle, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard }
-          };
-          globalChatHistory.push(msgObj);
+          const msgObj = { sender: payload.sender, text: payload.text, pfp: payload.pfp, isSelf: false, profile: { senderId: payload.senderId, avatarUrl: payload.avatarUrl, role: verifiedRole, equippedTitle: payload.equippedTitle, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard } };
+          globalChatMessages.push(msgObj);
           if (activeChatTab === 'global') {
-            appendChatMessageToDOM(msgObj.sender, msgObj.text, msgObj.pfp, false, msgObj.profile);
+            appendChatMessage(msgObj.sender, msgObj.text, msgObj.pfp, msgObj.isSelf, msgObj.profile, false);
           }
           if (remotePlayers[payload.senderId]) remotePlayers[payload.senderId].speechBubble = { text: String(payload.text || '').slice(0, 72), until: Date.now() + 6500 };
         })
@@ -2494,32 +2415,28 @@
       const message = text.slice(0, 120);
       localPlayer.speechBubble = { text: message.slice(0, 72), until: Date.now() + 6500 };
       
-      const msgObj = {
-        sender: localPlayer.name, text: message, pfp: localPlayer.pfp, isSelf: true,
-        profile: { senderId: localPlayer.id, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
-      };
-
+      const msgObj = { sender: localPlayer.name, text: message, pfp: localPlayer.pfp, isSelf: true, profile: { senderId: localPlayer.id, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard } };
+      
       if (activeChatTab === 'staff') {
-        staffChatHistory.push(msgObj);
-        appendChatMessageToDOM(msgObj.sender, msgObj.text, msgObj.pfp, true, msgObj.profile);
-        if (staffGroupChannel) {
-          staffGroupChannel.send({
-            type: 'broadcast', event: 'staff_chat',
-            payload: { senderId: localPlayer.id, sender: localPlayer.name, text: message, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
-          });
-        }
+        staffChatMessages.push(msgObj);
       } else {
-        globalChatHistory.push(msgObj);
-        appendChatMessageToDOM(msgObj.sender, msgObj.text, msgObj.pfp, true, msgObj.profile);
-        if (realtimeChannel) {
-          realtimeChannel.send({
-            type: 'broadcast', event: 'global_chat',
-            payload: { senderId: localPlayer.id, sender: localPlayer.name, text: message, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
-          });
-        }
+        globalChatMessages.push(msgObj);
       }
 
+      appendChatMessage(msgObj.sender, msgObj.text, msgObj.pfp, msgObj.isSelf, msgObj.profile, false);
       broadcastPlayerState();
+
+      if (activeChatTab === 'staff' && staffGroupChannel) {
+        staffGroupChannel.send({
+          type: 'broadcast', event: 'staff_chat',
+          payload: { senderId: localPlayer.id, sender: localPlayer.name, text: message, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
+        });
+      } else if (realtimeChannel) {
+        realtimeChannel.send({
+          type: 'broadcast', event: 'global_chat',
+          payload: { senderId: localPlayer.id, sender: localPlayer.name, text: message, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
+        });
+      }
       input.value = '';
     }
 
@@ -2529,11 +2446,11 @@
       showPlayerCard(fromRoom || { ...profile, x: camera.x + canvas.width / 2, y: camera.y + canvas.height / 2 });
     }
 
-    function appendChatMessageToDOM(sender, text, pfp, isSelf = false, profile = {}) {
+    function appendChatMessage(sender, text, pfp, isSelf = false, profile = {}, pushToHistory = true) {
       const chatBox = document.getElementById('chat-messages');
       const role = profile.role === 'developer' ? 'developer' : profile.role === 'admin' ? 'admin' : 'player';
       const roleTitleEquipped = (role === 'developer' && profile.equippedTitle === 'title_developer') || (role === 'admin' && profile.equippedTitle === 'title_admin');
-      const roleTitle = roleTitleEquipped ? (role === 'developer' ? 'DEV' : 'ADMIN') : '';
+      const roleTitle = roleTitleEquipped ? (role === 'developer' ? 'DEV' : 'ADMIN') : (role === 'developer' ? 'DEV' : role === 'admin' ? 'ADMIN' : '');
       const card = document.createElement('article');
       const cardStyle = { card_sakura: 'chat-card-sakura', card_moon: 'chat-card-moon', card_royal: 'chat-card-royal' }[profile.equippedMessageCard];
       card.className = `rounded-2xl border p-2.5 shadow-sm ${roleTitleEquipped && role === 'developer' ? 'border-cyan-300 bg-cyan-950/70 shadow-cyan-500/20' : roleTitleEquipped && role === 'admin' ? 'border-rose-400 bg-slate-950/80 shadow-rose-500/25' : isSelf ? 'border-pink-300/40 bg-pink-500/20' : 'border-white/10 bg-white/5'} ${cardStyle || ''}`;
@@ -2759,7 +2676,6 @@
       const button = document.getElementById(`seq-btn-${index}`);
       if (!button) return;
       button.classList.remove('ring-4', 'ring-yellow-300', 'brightness-150', 'scale-105', 'ring-pink-300');
-      
       setTimeout(() => {
         button.classList.add('ring-4', 'ring-yellow-300', 'brightness-150', 'scale-105');
         setTimeout(() => {
@@ -2793,9 +2709,7 @@
 
     async function clickSequenceSticker(index) {
       if (sequenceLocked || !slimeSequence.length) return;
-
       flashSequenceTile(index, 200);
-
       sequenceInput.push(index);
       const position = sequenceInput.length - 1;
 
@@ -2825,25 +2739,15 @@
       await loadNoticeBoard();
     }
     function closeNoticeBoard() { document.getElementById('notice-board-modal').classList.add('hidden'); }
-
-    // LOCAL MEMORY STORAGE FOR NOTICES
-    let localNotices = [
-      { id: 'not_1', title: 'Welcome to Sakura Slime World 🌸', body: 'Enjoy mini-games, earn points, collect skins, and chat with friends!', author_name: 'Sakura Team', created_at: new Date().toISOString() }
-    ];
-
+    
     async function loadNoticeBoard() {
       const list = document.getElementById('notice-board-list');
       const status = document.getElementById('notice-board-status');
       list.replaceChildren();
-
-      let notices = localNotices;
-      try {
-        const { data, error } = await supabaseClient.from('notice_board').select('id,title,body,author_id,author_name,created_at').order('created_at', { ascending: false }).limit(30);
-        if (!error && data && data.length > 0) notices = data;
-      } catch (e) {}
-
-      status.textContent = notices.length ? `${notices.length} active notice(s)` : 'No notices yet.';
-      notices.forEach(notice => {
+      const { data, error } = await supabaseClient.from('notice_board').select('id,title,body,author_id,author_name,created_at').order('created_at', { ascending: false }).limit(30);
+      if (error) { status.textContent = 'Notice board error.'; return; }
+      status.textContent = data.length ? `${data.length} notices` : 'No notices yet.';
+      data.forEach(notice => {
         const card = document.createElement('article'); card.className = 'rounded-2xl border border-amber-200 bg-white/80 p-3';
         const title = document.createElement('h4'); title.className = 'text-sm font-extrabold text-amber-950'; title.textContent = notice.title;
         const body = document.createElement('p'); body.className = 'mt-1 whitespace-pre-wrap break-words text-xs text-slate-700'; body.textContent = notice.body;
@@ -2851,12 +2755,10 @@
         const time = notice.created_at ? new Date(notice.created_at).toLocaleString() : '';
         meta.textContent = `${notice.author_name || 'Sakura team'}${time ? ' · ' + time : ''}`;
         card.append(title, body, meta);
-        
-        // DIRECT EDIT & DELETE BUTTONS INSIDE THE NOTICE BOARD FOR ADMINS / DEVS
         if (isNoticeWriter()) {
           const tools = document.createElement('div'); tools.className = 'mt-2 flex gap-2';
-          const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'rounded-lg bg-amber-500 hover:bg-amber-600 px-3 py-1 text-[10px] font-bold text-white shadow'; edit.textContent = 'Edit Notice'; edit.onclick = () => editNotice(notice);
-          const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'rounded-lg bg-rose-600 hover:bg-rose-700 px-3 py-1 text-[10px] font-bold text-white shadow'; remove.textContent = 'Delete Notice'; remove.onclick = () => deleteNotice(notice.id);
+          const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'rounded-lg bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-900'; edit.textContent = 'Edit'; edit.onclick = () => editNotice(notice);
+          const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'rounded-lg bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-900'; remove.textContent = 'Delete'; remove.onclick = () => deleteNotice(notice.id);
           tools.append(edit, remove); card.appendChild(tools);
         }
         list.appendChild(card);
@@ -2866,49 +2768,29 @@
     async function editNotice(notice) {
       if (!isNoticeWriter()) return;
       const title = prompt('Edit notice title:', notice.title); if (title === null) return;
-      const body = prompt('Edit notice content:', notice.body); if (body === null) return;
-      
-      notice.title = title.trim();
-      notice.body = body.trim();
-
-      try {
-        await supabaseClient.rpc('edit_notice', { p_notice_id: notice.id, p_title: title.trim(), p_body: body.trim() });
-      } catch (e) {}
-
+      const body = prompt('Edit notice body:', notice.body); if (body === null) return;
+      const { error } = await supabaseClient.rpc('edit_notice', { p_notice_id: notice.id, p_title: title.trim(), p_body: body.trim() });
+      if (error) { document.getElementById('notice-board-status').textContent = error.message; return; }
       await loadNoticeBoard();
     }
 
     async function deleteNotice(id) {
       if (!isNoticeWriter() || !confirm('Are you sure you want to delete this notice?')) return;
-      localNotices = localNotices.filter(n => n.id !== id);
-
-      try {
-        await supabaseClient.rpc('delete_notice', { p_notice_id: id });
-      } catch (e) {}
-
+      const { error } = await supabaseClient.rpc('delete_notice', { p_notice_id: id });
+      if (error) { document.getElementById('notice-board-status').textContent = error.message; return; }
       await loadNoticeBoard();
     }
 
     async function postNotice(event) {
       event.preventDefault();
-      if (!isNoticeWriter()) { alert('Only staff can post notices.'); return; }
+      if (!isNoticeWriter() || !authUser) { alert('Only staff can post notices.'); return; }
       const title = document.getElementById('notice-title-input').value.trim();
       const body = document.getElementById('notice-body-input').value.trim();
+      const recipient = document.getElementById('notice-recipient-input').value.trim().toLowerCase() || null;
       if (!title || !body) return;
-      
-      const newNotice = {
-        id: 'not_' + Date.now(),
-        title,
-        body,
-        author_name: localPlayer.name,
-        created_at: new Date().toISOString()
-      };
-      localNotices.unshift(newNotice);
-
-      try {
-        await supabaseClient.rpc('post_notice', { p_title: title, p_body: body });
-      } catch (e) {}
-
+      const status = document.getElementById('notice-board-status'); status.textContent = 'Posting…';
+      const { error } = await supabaseClient.rpc('post_notice', { p_title: title, p_body: body, p_recipient_email: recipient });
+      if (error) { status.textContent = 'Posting failed.'; return; }
       document.getElementById('notice-post-form').reset();
       await loadNoticeBoard();
     }
