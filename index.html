@@ -243,6 +243,13 @@
         <i data-lucide="scroll-text" class="w-4 h-4"></i><span class="hidden sm:inline">Notices</span>
       </button>
 
+      <button id="role-tools-button" onclick="openRolePanel()" class="hidden p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 text-white font-bold text-xs items-center gap-1 shadow-md hover:bg-slate-800 active:scale-95" title="Admin and developer tools">
+        <i data-lucide="shield" class="w-4 h-4"></i><span class="hidden sm:inline">Staff</span>
+      </button>
+      <button id="developer-wallet-button" onclick="openDeveloperWallet()" class="hidden p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-cyan-700 text-white font-bold text-xs items-center gap-1 shadow-md hover:bg-cyan-600 active:scale-95" title="Developer wallet tools">
+        <i data-lucide="coins" class="w-4 h-4"></i><span class="hidden sm:inline">Wallet</span>
+      </button>
+
       <!-- Chat button stays in the top toolbar on mobile, next to Friends. -->
       <button onclick="toggleChatSidebar()" class="mobile-top-action p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-fuchsia-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-fuchsia-600 active:scale-95" title="Open chat">
         <i data-lucide="message-circle" class="w-4 h-4"></i><span class="hidden sm:inline">Chat</span>
@@ -252,8 +259,7 @@
       <button onclick="openFriendsModal()" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-sky-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-sky-600 active:scale-95 relative">
         <i data-lucide="users" class="w-4 h-4"></i>
         <span class="hidden sm:inline">Friends</span>
-        <span id="unread-dm-badge" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
-        <span id="friend-request-badge" class="hidden absolute -top-1 -left-1 min-w-3 h-3 px-1 bg-rose-600 border border-white rounded-full text-[8px] text-white"></span>
+        <span id="friends-unread-dot" class="hidden absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full shadow"></span>
       </button>
 
       <!-- Profile Customization -->
@@ -291,6 +297,7 @@
         <button onclick="triggerEmote('❤️')" class="hover:scale-125 transition text-lg">❤️</button>
         <button onclick="triggerEmote('✨')" class="hover:scale-125 transition text-lg">✨</button>
         <button onclick="triggerEmote('🎮')" class="hover:scale-125 transition text-lg">🎮</button>
+        <span id="owned-emote-buttons" class="contents"></span>
 
         <!-- Active Special Emote Trigger (Dance/Jump loops) -->
         <button id="special-emote-btn" onclick="toggleActiveSpecialEmote()" class="hidden px-2 py-0.5 rounded-xl bg-purple-500 text-white text-[10px] font-bold shadow animate-pulse">
@@ -334,7 +341,7 @@
       </div>
 
       <!-- Chat Messages Container -->
-      <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2 text-xs"></div>
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2.5 text-xs"></div>
 
       <!-- Chat Input Form -->
       <div class="p-2.5 bg-pink-950/80 border-t border-pink-200/30 shrink-0">
@@ -566,9 +573,42 @@
       <form id="notice-post-form" onsubmit="postNotice(event)" class="hidden mt-4 space-y-2 border-t border-amber-200 pt-3">
         <p class="text-[10px] font-extrabold uppercase text-amber-800">Admin / developer post</p>
         <input id="notice-title-input" maxlength="80" required placeholder="Notice title" class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950" />
+        <input id="notice-recipient-input" type="email" value="phantomromeo9@gmail.com" placeholder="Recipient email (blank = everyone)" class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950" />
         <textarea id="notice-body-input" maxlength="1200" required rows="3" placeholder="Write a notice for players..." class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950"></textarea>
         <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white">Post notice</button>
       </form>
+    </div>
+  </div>
+
+  <!-- STAFF MODERATION AND ROLE PANEL -->
+  <div id="role-panel-modal" class="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+    <div class="glass w-full max-w-2xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3 shrink-0">
+        <div><h3 id="role-panel-title" class="font-extrabold text-slate-950 text-base sm:text-lg">Staff tools</h3><p class="text-[10px] text-slate-600">Search players and manage chat or game access.</p></div>
+        <button onclick="closeRolePanel()" class="text-slate-700 p-1" aria-label="Close staff panel">✕</button>
+      </div>
+      <div class="flex gap-2 py-3 shrink-0">
+        <input id="staff-user-search" type="search" oninput="searchStaffUsers()" placeholder="Search by username or email..." class="glass-input flex-1 rounded-xl px-3 py-2 text-xs text-slate-950" />
+        <button onclick="searchStaffUsers()" class="rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white">Search</button>
+      </div>
+      <p id="staff-panel-status" class="text-[10px] text-slate-600 pb-2 shrink-0">Search requires a signed-in staff account.</p>
+      <div id="staff-user-results" class="flex-1 overflow-y-auto space-y-2"></div>
+    </div>
+  </div>
+
+  <!-- DEVELOPER WALLET PANEL -->
+  <div id="developer-wallet-modal" class="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+    <div class="glass w-full max-w-xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
+      <div class="flex items-center justify-between border-b border-cyan-200 pb-3 shrink-0">
+        <div><h3 class="font-extrabold text-cyan-950 text-base sm:text-lg">Developer Wallet</h3><p class="text-[10px] text-cyan-800">Adjust a player's points balance.</p></div>
+        <button onclick="closeDeveloperWallet()" class="text-cyan-800 p-1" aria-label="Close wallet panel">✕</button>
+      </div>
+      <div class="flex gap-2 py-3 shrink-0">
+        <input id="wallet-user-search" type="search" oninput="searchWalletUsers()" placeholder="Search username or email..." class="glass-input flex-1 rounded-xl px-3 py-2 text-xs text-slate-950" />
+        <button onclick="searchWalletUsers()" class="rounded-xl bg-cyan-700 px-3 py-2 text-xs font-bold text-white">Search</button>
+      </div>
+      <p id="wallet-panel-status" class="text-[10px] text-cyan-900 pb-2 shrink-0">Choose a player to send or deduct points.</p>
+      <div id="wallet-user-results" class="flex-1 overflow-y-auto space-y-2"></div>
     </div>
   </div>
 
@@ -597,6 +637,8 @@
         </div>
       </div>
 
+      <p id="profile-role-label" class="hidden rounded-xl px-3 py-2 text-[10px] font-black tracking-widest"></p>
+
       <div class="space-y-1">
         <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Display Name</label>
         <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs font-semibold text-pink-950" placeholder="Your Slime Name..." />
@@ -616,7 +658,7 @@
 
     // --- GAME CATALOG ---
     const PROFILE_STICKERS = [
-      { id: 'pfp_sakura', name: 'Sakura Blossom', icon: '🌸', price: 500, desc: 'Your starter profile sticker' },
+      { id: 'pfp_sakura', name: 'Sakura Blossom', icon: '🌸', price: 500, desc: 'A blossom for your profile' },
       { id: 'pfp_cat', name: 'Sakura Cat', icon: '🐱', price: 1200, desc: 'A little lucky cat' },
       { id: 'pfp_fox', name: 'Clever Fox', icon: '🦊', price: 2500, desc: 'A bright fox sticker' },
       { id: 'pfp_crown', name: 'Royal Crown', icon: '👑', price: 4000, desc: 'A tiny royal crown' },
@@ -652,6 +694,17 @@
       profile: PROFILE_STICKERS.map(item => ({ ...item, type: 'profile' }))
     };
     const PROFILE_PFP_OPTIONS = PROFILE_STICKERS.map(item => item.icon);
+    const ROLE_ITEMS = {
+      admin: [
+        { id: 'skin_admin', name: 'Obsidian Red Aura', type: 'skins', price: 0, color: '#111118', desc: 'Admin role skin with red glow' },
+        { id: 'title_admin', name: 'Admin', type: 'titles', price: 0, text: 'ADMIN', color: '#fb7185', desc: 'Role title for administrators' }
+      ],
+      developer: [
+        { id: 'skin_developer', name: 'Pure White Icy Aura', type: 'skins', price: 0, color: '#f8fafc', desc: 'Developer role skin with icy glow' },
+        { id: 'title_developer', name: 'DEV', type: 'titles', price: 0, text: 'DEV', color: '#7dd3fc', desc: 'Role title for developers' }
+      ]
+    };
+
 
     // --- PLAYER STATE ---
     function loadStoredJson(key, fallback) {
@@ -671,11 +724,15 @@
       y: 600,
       vx: 0,
       vy: 0,
-      points: Number.parseInt(localStorage.getItem('sakura_points') || '0', 10) || 0,
+      points: 0,
       equippedSkin: localStorage.getItem('sakura_eq_skin') || 'skin_pink',
       equippedAcc: localStorage.getItem('sakura_eq_acc') || null,
       equippedTitle: localStorage.getItem('sakura_eq_title') || null,
-      inventory: loadStoredJson('sakura_inv', ['skin_pink', 'pfp_sakura']),
+      inventory: loadStoredJson('sakura_inv', ['skin_pink']),
+      role: 'player',
+      equippedEmote: localStorage.getItem('sakura_eq_emote') || null,
+      speechBubble: null,
+      mutedUntil: null,
       activeSpecialEmote: null,
       isJumping: false,
       jumpOffset: 0,
@@ -684,18 +741,13 @@
       landingSquash: 0,
       direction: 'down'
     };
-    if (!Array.isArray(localPlayer.inventory)) localPlayer.inventory = ['skin_pink', 'pfp_sakura'];
+    if (!Array.isArray(localPlayer.inventory)) localPlayer.inventory = ['skin_pink'];
     if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
-    if (!localPlayer.inventory.includes('pfp_sakura')) localPlayer.inventory.push('pfp_sakura');
-    if (!PROFILE_PFP_OPTIONS.includes(localPlayer.pfp)) localPlayer.pfp = '🌸';
-    const savedSticker = PROFILE_STICKERS.find(sticker => sticker.icon === localPlayer.pfp);
-    if (savedSticker && !localPlayer.inventory.includes(savedSticker.id)) localPlayer.inventory.push(savedSticker.id);
+        if (!PROFILE_PFP_OPTIONS.includes(localPlayer.pfp)) localPlayer.pfp = '🌸';
     localStorage.setItem('sakura_inv', JSON.stringify(localPlayer.inventory));
-    if (localStorage.getItem('sakura_economy_v2') !== '1') {
-      localPlayer.points = 0;
-      localStorage.setItem('sakura_points', '0');
-      localStorage.setItem('sakura_economy_v2', '1');
-    }
+    localPlayer.points = 0;
+    localStorage.setItem('sakura_points', '0');
+    localStorage.setItem('sakura_economy_v2', '1');
 
     let authUser = null;
     let remotePlayers = {};
@@ -711,7 +763,12 @@
     let currentChannel = 'sakura-lounge';
     let realtimeChannel = null;
     let selectedPlayerId = null;
+    let selectedPlayerProfile = null;
     let lastStateBroadcastAt = 0;
+    let friendsUnread = localStorage.getItem('sakura_friends_unread') === '1';
+    let guestMode = false;
+    let moderationPollTimer = null;
+    let moderationState = { is_banned: false, mute_until: null, ban_until: null };
 
     // Keys & Joystick Input
     const keys = { up: false, down: false, left: false, right: false };
@@ -794,12 +851,16 @@
     function drawPlayerLabel(c, player, isSelf = false) {
       const labelY = player.y + (isSelf ? 34 : 32);
       const avatarUrl = safeAvatarUrl(player.avatarUrl);
+      const role = player.role === 'developer' ? 'developer' : player.role === 'admin' ? 'admin' : 'player';
+      const roleTag = role === 'developer' ? ' · DEV' : role === 'admin' ? ' · ADMIN' : '';
       c.font = isSelf ? 'bold 12px Plus Jakarta Sans' : 'bold 11px Plus Jakarta Sans';
       c.textAlign = 'center';
       c.lineWidth = 3;
-      c.strokeStyle = 'rgba(38, 18, 35, .6)';
-      c.fillStyle = isSelf ? '#f472b6' : '#ffffff';
-      const text = isSelf ? `${player.name} (You)` : player.name;
+      c.strokeStyle = 'rgba(38, 18, 35, .72)';
+      c.fillStyle = role === 'developer' ? '#a5f3fc' : role === 'admin' ? '#fda4af' : isSelf ? '#f472b6' : '#ffffff';
+      c.shadowColor = role === 'developer' ? '#67e8f9' : role === 'admin' ? '#ef4444' : 'transparent';
+      c.shadowBlur = role === 'player' ? 0 : 12;
+      const text = `${player.name || 'Slime'}${isSelf ? ' (You)' : ''}${roleTag}`;
       if (avatarUrl) {
         let avatar = profileAvatarCache.get(avatarUrl);
         if (!avatar) { avatar = new Image(); avatar.src = avatarUrl; profileAvatarCache.set(avatarUrl, avatar); }
@@ -809,22 +870,25 @@
           c.textAlign = 'left';
           c.strokeText(text, left + 15, labelY);
           c.fillText(text, left + 15, labelY);
+          c.shadowBlur = 0;
           return;
         }
       }
       const fallback = PROFILE_PFP_OPTIONS.includes(player.pfp) ? player.pfp : '🌸';
       c.strokeText(`${fallback} ${text}`, player.x, labelY);
       c.fillText(`${fallback} ${text}`, player.x, labelY);
+      c.shadowBlur = 0;
     }
 
     // Render Helper: Draw Slime model with soft idle wobble and squash on landing.
-    function drawSlimeModel(c, x, y, skinId, accId, titleId, isJumping, jumpOff, activeEmoteAnim, isSelf) {
+    function drawSlimeModel(c, x, y, skinId, accId, titleId, isJumping, jumpOff, activeEmoteAnim, isSelf, role = 'player', motionSpeed = 0, motionX = 0) {
       c.save();
       const phase = Date.now() * 0.008 + x * 0.015;
-      const moving = isSelf ? Math.min(1, Math.hypot(localPlayer.vx, localPlayer.vy) / 190) : 0;
+      const moving = isSelf ? Math.min(1, Math.hypot(localPlayer.vx, localPlayer.vy) / 190) : Math.min(1, motionSpeed / 190);
       const squash = isSelf ? localPlayer.landingSquash : 0;
       c.translate(x + (isSelf ? Math.sin(phase) * moving * 1.5 : 0), y - jumpOff + Math.sin(phase) * (moving ? 1.8 : 0.6));
-      if (isSelf && moving) c.rotate(Math.max(-.08, Math.min(.08, localPlayer.vx / 2500)));
+      const motionXValue = isSelf ? localPlayer.vx : motionX;
+      if (moving) c.rotate(Math.max(-.08, Math.min(.08, motionXValue / 2500)));
 
       if (activeEmoteAnim === 'dance') {
         c.translate(0, Math.sin(Date.now() * 0.01) * 8);
@@ -835,6 +899,9 @@
       }
 
       const skinObj = MARKET_ITEMS.skins.find(s => s.id === skinId) || MARKET_ITEMS.skins[0];
+      const roleColor = role === 'developer' ? '#f8fafc' : role === 'admin' ? '#111118' : skinObj.color;
+      c.shadowColor = role === 'developer' ? '#7dd3fc' : role === 'admin' ? '#ef4444' : 'transparent';
+      c.shadowBlur = role === 'player' ? 0 : 24;
       c.fillStyle = 'rgba(0,0,0,0.22)';
       c.beginPath();
       c.ellipse(0, 18 + jumpOff, 22, 8, 0, 0, Math.PI * 2);
@@ -844,12 +911,13 @@
       const scaleY = 1 - moving * .04 - squash * .25 + (isJumping ? .06 : 0);
       c.save();
       c.scale(scaleX, scaleY);
-      c.fillStyle = skinObj.color;
+      c.fillStyle = roleColor;
       c.beginPath();
       c.ellipse(0, 0, 24, 20, 0, 0, Math.PI * 2);
       c.fill();
 
-      c.fillStyle = 'rgba(255,255,255,0.4)';
+      c.shadowBlur = 0;
+      c.fillStyle = role === 'admin' ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.4)';
       c.beginPath();
       c.ellipse(-8, -8, 7, 4, -Math.PI / 4, 0, Math.PI * 2);
       c.fill();
@@ -869,10 +937,41 @@
         if (accObj) { c.font = '20px sans-serif'; c.textAlign = 'center'; c.fillText(accObj.icon, 0, -18); }
       }
       if (titleId) {
-        const titleObj = MARKET_ITEMS.titles.find(t => t.id === titleId);
+        let titleObj = MARKET_ITEMS.titles.find(t => t.id === titleId);
+        if (!titleObj && role === 'admin') titleObj = ROLE_ITEMS.admin.find(t => t.id === titleId);
+        if (!titleObj && role === 'developer') titleObj = ROLE_ITEMS.developer.find(t => t.id === titleId);
         if (titleObj) { c.font = 'bold 10px Plus Jakarta Sans'; c.textAlign = 'center'; c.fillStyle = titleObj.color; c.fillText(titleObj.text, 0, -32); }
       }
       c.restore();
+      c.restore();
+    }
+
+    function drawSpeechBubble(c, x, y, bubble) {
+      if (!bubble || !bubble.text || (bubble.until && bubble.until < Date.now())) return;
+      const text = String(bubble.text).slice(0, 72);
+      c.save();
+      c.font = 'bold 12px Plus Jakarta Sans, sans-serif';
+      const words = text.split(/\s+/);
+      const lines = [];
+      let line = '';
+      words.forEach(word => {
+        const next = line ? `${line} ${word}` : word;
+        if (c.measureText(next).width > 164 && line) { lines.push(line); line = word; }
+        else line = next;
+      });
+      if (line) lines.push(line);
+      if (lines.length > 3) lines.length = 3;
+      const width = Math.min(190, Math.max(44, ...lines.map(value => c.measureText(value).width + 22)));
+      const height = lines.length * 16 + 16;
+      const left = x - width / 2;
+      const top = y - 58 - height;
+      c.shadowColor = 'rgba(45, 20, 38, .28)'; c.shadowBlur = 10; c.shadowOffsetY = 3;
+      c.fillStyle = 'rgba(255,255,255,.96)'; c.strokeStyle = 'rgba(236,72,153,.7)'; c.lineWidth = 1.5;
+      c.beginPath(); c.roundRect(left, top, width, height, 12); c.fill(); c.stroke();
+      c.shadowColor = 'transparent'; c.shadowBlur = 0; c.shadowOffsetY = 0;
+      c.fillStyle = '#ec4899'; c.beginPath(); c.moveTo(x - 6, top + height - 1); c.lineTo(x + 5, top + height - 1); c.lineTo(x, top + height + 7); c.closePath(); c.fill();
+      c.fillStyle = '#3b1732'; c.textAlign = 'center';
+      lines.forEach((value, index) => c.fillText(value, x, top + 19 + index * 16));
       c.restore();
     }
 
@@ -957,7 +1056,7 @@
       camera.y += (localPlayer.y - canvas.height / 2 - camera.y) * Math.min(1, dt * 8);
 
       const now = performance.now();
-      if (now - lastStateBroadcastAt > 50 && (Math.hypot(localPlayer.vx, localPlayer.vy) > 1.8 || localPlayer.isJumping)) {
+      if (now - lastStateBroadcastAt > 33 && (Math.hypot(localPlayer.vx, localPlayer.vy) > 1 || localPlayer.isJumping || (localPlayer.speechBubble && localPlayer.speechBubble.until > Date.now()) || now - lastStateBroadcastAt > 1000)) {
         lastStateBroadcastAt = now;
         broadcastPlayerState();
       }
@@ -965,12 +1064,17 @@
     }
 
     function updateRemotePlayerMotion(dt) {
-      const blend = 1 - Math.exp(-dt * 20);
+      const blend = 1 - Math.exp(-dt * 30);
       Object.values(remotePlayers).forEach(player => {
         if (!Number.isFinite(player.displayX)) player.displayX = player.x;
         if (!Number.isFinite(player.displayY)) player.displayY = player.y;
-        player.displayX += (player.x - player.displayX) * blend;
-        player.displayY += (player.y - player.displayY) * blend;
+        const lead = Math.min(.045, dt * 1.35);
+        const targetX = player.x + (Number.isFinite(player.vx) ? player.vx * lead : 0);
+        const targetY = player.y + (Number.isFinite(player.vy) ? player.vy * lead : 0);
+        player.displayX += (targetX - player.displayX) * blend;
+        player.displayY += (targetY - player.displayY) * blend;
+        if (!Number.isFinite(player.displayJumpOffset)) player.displayJumpOffset = player.jumpOffset || 0;
+        player.displayJumpOffset += ((player.jumpOffset || 0) - player.displayJumpOffset) * blend;
       });
     }
 
@@ -986,13 +1090,15 @@
         const playerX = Number.isFinite(p.displayX) ? p.displayX : p.x;
         const playerY = Number.isFinite(p.displayY) ? p.displayY : p.y;
         const displayPlayer = { ...p, x: playerX, y: playerY };
-        drawSlimeModel(ctx, playerX, playerY, p.equippedSkin, p.equippedAcc, p.equippedTitle, p.isJumping, p.jumpOffset, p.activeSpecialEmote, false);
+        const jumpHeight = Number.isFinite(p.displayJumpOffset) ? p.displayJumpOffset : (p.jumpOffset || 0);
+        drawSlimeModel(ctx, playerX, playerY, p.equippedSkin, p.equippedAcc, p.equippedTitle, p.isJumping, jumpHeight, p.activeSpecialEmote, false, p.role, Math.hypot(p.vx || 0, p.vy || 0), p.vx || 0);
+        drawSpeechBubble(ctx, playerX, playerY - jumpHeight, p.speechBubble);
         drawPlayerLabel(ctx, displayPlayer);
       });
 
       // Draw Local Player Slime
-      drawSlimeModel(ctx, localPlayer.x, localPlayer.y, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, localPlayer.isJumping, localPlayer.jumpOffset, localPlayer.activeSpecialEmote, true);
-
+      drawSlimeModel(ctx, localPlayer.x, localPlayer.y, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, localPlayer.isJumping, localPlayer.jumpOffset, localPlayer.activeSpecialEmote, true, localPlayer.role);
+      drawSpeechBubble(ctx, localPlayer.x, localPlayer.y - localPlayer.jumpOffset, localPlayer.speechBubble);
       drawPlayerLabel(ctx, localPlayer, true);
 
       ctx.restore();
@@ -1027,16 +1133,19 @@
     function closePlayerCard() {
       document.getElementById('player-card').classList.add('hidden');
       selectedPlayerId = null;
+      selectedPlayerProfile = null;
     }
 
     function showPlayerCard(player) {
       if (!player || !isValidUserId(player.id)) return;
       selectedPlayerId = player.id;
+      selectedPlayerProfile = { ...player };
       const card = document.getElementById('player-card');
       const avatar = document.getElementById('player-card-avatar');
       avatar.innerHTML = '';
       avatar.appendChild(makeAvatar(player, 'w-10 h-10'));
-      document.getElementById('player-card-name').textContent = player.name || 'Slime';
+      const trustedRole = player.id === localPlayer.id ? localPlayer.role : (remotePlayers[player.id] && remotePlayers[player.id].role) || (['admin', 'developer'].includes(player.role) ? player.role : 'player');
+      document.getElementById('player-card-name').textContent = `${player.name || 'Slime'}${trustedRole === 'developer' ? ' · DEV' : trustedRole === 'admin' ? ' · ADMIN' : ''}`;
       const action = document.getElementById('player-card-action');
       const status = document.getElementById('player-card-status');
       const friend = friendList.some(item => item.id === player.id);
@@ -1049,15 +1158,15 @@
       action.className = `mt-2 w-full rounded-xl py-2 text-xs font-bold text-white ${action.disabled ? 'bg-slate-400' : incoming ? 'bg-emerald-500' : 'bg-sky-500'}`;
       card.classList.remove('hidden');
       const container = document.getElementById('canvas-container');
-      const x = (Number.isFinite(player.displayX) ? player.displayX : player.x) - camera.x;
-      const y = (Number.isFinite(player.displayY) ? player.displayY : player.y) - camera.y;
+      const x = (Number.isFinite(player.displayX) ? player.displayX : Number.isFinite(player.x) ? player.x : camera.x + canvas.width / 2) - camera.x;
+      const y = (Number.isFinite(player.displayY) ? player.displayY : Number.isFinite(player.y) ? player.y : camera.y + canvas.height / 2) - camera.y;
       const left = Math.max(8, Math.min(container.clientWidth - card.offsetWidth - 8, x - card.offsetWidth / 2));
       const top = Math.max(8, Math.min(container.clientHeight - card.offsetHeight - 8, y - card.offsetHeight - 54));
       card.style.left = `${left}px`; card.style.top = `${top}px`;
     }
 
     function handlePlayerCardAction() {
-      const player = remotePlayers[selectedPlayerId];
+      const player = remotePlayers[selectedPlayerId] || selectedPlayerProfile;
       if (!player) { closePlayerCard(); return; }
       if (friendList.some(friend => friend.id === player.id)) { showPlayerCard(player); return; }
       if (friendRequests.some(request => request.senderId === player.id)) acceptFriendRequest(player.id);
@@ -1129,24 +1238,20 @@
       document.getElementById('market-item-preview-name').textContent = `Testing: ${item ? item.name : 'None'}`;
     }
 
-    function buyMarketItem(itemId) {
+    async function buyMarketItem(itemId) {
       const allItems = [].concat(...Object.values(MARKET_ITEMS));
       const item = allItems.find(i => i.id === itemId);
-      if (!item) return;
-
+      if (!item || !authUser || guestMode) { alert('Sign in to buy and save market items.'); return; }
       if (localPlayer.inventory.includes(item.id)) return;
-      if (localPlayer.points < item.price) {
-        alert('Not enough points! Collect or earn more.');
-        return;
-      }
-
-      localPlayer.points -= item.price;
-      localPlayer.inventory.push(item.id);
+      const { data, error } = await supabaseClient.rpc('purchase_market_item', { p_item_id: item.id });
+      if (error) { alert(error.message.includes('insufficient') ? 'Not enough points! Collect more points first.' : 'Could not complete this purchase. Apply the supplied Supabase SQL setup first.'); return; }
+      localPlayer.points = Number(data.points) || 0;
+      localPlayer.inventory = Array.isArray(data.inventory) ? data.inventory : localPlayer.inventory;
       savePlayerToStorage();
-      persistProfileToAuth();
       playSound('buy');
       updateUIHeader();
       renderMarketGrid();
+      if (!document.getElementById('inventory-modal').classList.contains('hidden')) renderInventoryGrid();
     }
 
     // Market Preview Canvas
@@ -1170,7 +1275,7 @@
           if (marketTestingItem.type === 'emotes') sEmote = marketTestingItem.anim;
         }
 
-        drawSlimeModel(marketPreviewCtx, 90, 85, sSkin, sAcc, sTitle, false, 0, sEmote, true);
+        drawSlimeModel(marketPreviewCtx, 90, 85, sSkin, sAcc, sTitle, false, 0, sEmote, true, localPlayer.role);
         if (marketTestingItem && marketTestingItem.type === 'profile') {
           marketPreviewCtx.font = '30px sans-serif'; marketPreviewCtx.textAlign = 'center'; marketPreviewCtx.fillText(marketTestingItem.icon, 90, 138);
         }
@@ -1202,53 +1307,52 @@
       const grid = document.getElementById('inventory-items-grid');
       const search = document.getElementById('inv-search-input').value.toLowerCase();
       grid.innerHTML = '';
-
-      const ownedItems = (MARKET_ITEMS[activeInventoryCategory] || []).filter(i => localPlayer.inventory.includes(i.id) && i.name.toLowerCase().includes(search));
-      if (!ownedItems.length) {
+      const ownedItems = [...(MARKET_ITEMS[activeInventoryCategory] || []).filter(i => localPlayer.inventory.includes(i.id)), ...(ROLE_ITEMS[localPlayer.role] || []).filter(i => i.type === activeInventoryCategory)];
+      const matchingItems = ownedItems.filter(item => item.name.toLowerCase().includes(search));
+      if (!matchingItems.length) {
         const empty = document.createElement('p');
         empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-purple-700';
         empty.textContent = 'Nothing here yet. Find items in the market.';
         grid.appendChild(empty);
       }
-      ownedItems.forEach(item => {
-        const isEquipped = localPlayer.equippedSkin === item.id || localPlayer.equippedAcc === item.id || localPlayer.equippedTitle === item.id || (item.type === 'profile' && localPlayer.pfp === item.icon && !localPlayer.avatarUrl);
+      matchingItems.forEach(item => {
+        const isEquipped = localPlayer.equippedSkin === item.id || localPlayer.equippedAcc === item.id || localPlayer.equippedTitle === item.id || localPlayer.equippedEmote === item.id || (item.type === 'profile' && localPlayer.pfp === item.icon && !localPlayer.avatarUrl);
         const card = document.createElement('div');
-        card.className = "p-2.5 rounded-2xl bg-white/80 border border-purple-200 flex flex-col justify-between shadow-sm";
-        card.innerHTML = `
-          <div>
-            <span class="text-xs font-bold text-purple-950">${item.name}</span>
-            <p class="text-[10px] text-purple-600">${item.type.toUpperCase()}</p>
-          </div>
-          <button onclick="equipInventoryItem('${item.id}')" class="mt-2 py-1 rounded-xl text-[10px] font-bold ${isEquipped ? 'bg-emerald-500 text-white' : 'bg-purple-500 text-white hover:bg-purple-600'}">
-            ${isEquipped ? 'Equipped' : 'Equip'}
-          </button>
-        `;
-        grid.appendChild(card);
+        card.className = 'p-2.5 rounded-2xl bg-white/80 border border-purple-200 flex flex-col justify-between shadow-sm';
+        const name = document.createElement('span'); name.className = 'text-xs font-bold text-purple-950'; name.textContent = item.name;
+        const kind = document.createElement('p'); kind.className = 'text-[10px] text-purple-600'; kind.textContent = item.type.toUpperCase();
+        const button = document.createElement('button'); button.className = `mt-2 py-1 rounded-xl text-[10px] font-bold ${isEquipped ? 'bg-emerald-500 text-white' : 'bg-purple-500 text-white hover:bg-purple-600'}`;
+        button.textContent = isEquipped ? 'Equipped' : 'Equip'; button.onclick = () => equipInventoryItem(item.id);
+        card.append(name, kind, button); grid.appendChild(card);
       });
     }
 
-    function equipInventoryItem(itemId) {
-      const allItems = [].concat(...Object.values(MARKET_ITEMS));
+    async function equipInventoryItem(itemId) {
+      const allItems = [].concat(...Object.values(MARKET_ITEMS), ...Object.values(ROLE_ITEMS));
       const item = allItems.find(i => i.id === itemId);
-      if (!item || !localPlayer.inventory.includes(item.id)) return;
-
-      if (item.type === 'skins') localPlayer.equippedSkin = item.id;
+      const roleOwned = (ROLE_ITEMS[localPlayer.role] || []).some(i => i.id === itemId);
+      if (!item || (!localPlayer.inventory.includes(item.id) && !roleOwned)) return;
+      if (item.type === 'skins') localPlayer.equippedSkin = localPlayer.equippedSkin === item.id ? 'skin_pink' : item.id;
       if (item.type === 'accessories') localPlayer.equippedAcc = localPlayer.equippedAcc === item.id ? null : item.id;
       if (item.type === 'titles') localPlayer.equippedTitle = localPlayer.equippedTitle === item.id ? null : item.id;
       if (item.type === 'profile') { localPlayer.pfp = item.icon; localPlayer.avatarUrl = ''; }
-      if (item.type === 'emotes') {
-        localPlayer.activeSpecialEmote = localPlayer.activeSpecialEmote === item.anim ? null : item.anim;
-        const spBtn = document.getElementById('special-emote-btn');
-        if (localPlayer.activeSpecialEmote) spBtn.classList.remove('hidden');
-        else spBtn.classList.add('hidden');
-      }
-
+      if (item.type === 'emotes') localPlayer.equippedEmote = localPlayer.equippedEmote === item.id ? null : item.id;
+      const error = await persistProfileToAuth();
+      if (error) { alert('Could not save this equipped item. ' + error.message); return; }
       savePlayerToStorage();
-      broadcastPlayerState();
-      broadcastProfileUpdate();
-      persistProfileToAuth();
-      renderAvatarPreview();
-      renderInventoryGrid();
+      broadcastPlayerState(); broadcastProfileUpdate();
+      renderAvatarPreview(); renderInventoryGrid(); renderOwnedEmoteButton();
+    }
+
+    function renderOwnedEmoteButton() {
+      const button = document.getElementById('special-emote-btn');
+      if (!button) return;
+      const item = MARKET_ITEMS.emotes.find(entry => entry.id === localPlayer.equippedEmote && localPlayer.inventory.includes(entry.id));
+      const roleEmote = null;
+      if (!item && !roleEmote) { button.classList.add('hidden'); localPlayer.activeSpecialEmote = null; return; }
+      const selected = item || roleEmote;
+      button.textContent = `${selected.icon} ${selected.name}${localPlayer.activeSpecialEmote === selected.anim ? ' ✓' : ''}`;
+      button.classList.remove('hidden');
     }
 
     let invPreviewCanvas = document.getElementById('invPreviewCanvas');
@@ -1258,7 +1362,7 @@
       function anim() {
         if (document.getElementById('inventory-modal').classList.contains('hidden')) return;
         invPreviewCtx.clearRect(0, 0, invPreviewCanvas.width, invPreviewCanvas.height);
-        drawSlimeModel(invPreviewCtx, 90, 85, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, false, 0, localPlayer.activeSpecialEmote, true);
+        drawSlimeModel(invPreviewCtx, 90, 85, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, false, 0, localPlayer.activeSpecialEmote, true, localPlayer.role);
         requestAnimationFrame(anim);
       }
       requestAnimationFrame(anim);
@@ -1266,6 +1370,9 @@
 
     // --- FRIENDS & DIRECT MESSAGES SYSTEM ---
     function openFriendsModal() {
+      friendsUnread = false;
+      localStorage.setItem('sakura_friends_unread', '0');
+      syncFriendsUnreadDot();
       document.getElementById('friends-modal').classList.remove('hidden');
       renderFriendsList();
       renderDMBox();
@@ -1297,12 +1404,18 @@
       localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
       updateFriendRequestBadge();
     }
-    function updateFriendRequestBadge() {
-      const badge = document.getElementById('friend-request-badge');
-      if (!badge) return;
-      badge.textContent = friendRequests.length ? String(friendRequests.length) : '';
-      badge.classList.toggle('hidden', friendRequests.length === 0);
+    function syncFriendsUnreadDot() {
+      const dot = document.getElementById('friends-unread-dot');
+      if (dot) dot.classList.toggle('hidden', !friendsUnread);
     }
+    function markFriendsUnread() {
+      if (!document.getElementById('friends-modal').classList.contains('hidden')) return;
+      friendsUnread = true;
+      localStorage.setItem('sakura_friends_unread', '1');
+      syncFriendsUnreadDot();
+    }
+    function updateFriendRequestBadge() { syncFriendsUnreadDot(); }
+
     function sendSocialBroadcast(event, payload) {
       const channel = socialChannel || realtimeChannel;
       if (channel) channel.send({ type: 'broadcast', event, payload });
@@ -1323,6 +1436,7 @@
     }
 
     function sendFriendRequest(id, name, pfp, avatarUrl = '') {
+      if (!authUser || guestMode) { alert('Sign in to send friend requests.'); return; }
       if (!isValidUserId(id) || id === localPlayer.id) return;
       if (friendList.some(f => f.id === id)) return;
       if (friendRequests.some(r => r.senderId === id)) {
@@ -1345,6 +1459,7 @@
       if (friendList.some(f => f.id === payload.senderId) || friendRequests.some(r => r.senderId === payload.senderId)) return;
       friendRequests.push({ senderId: payload.senderId, name: typeof payload.name === 'string' && payload.name.trim() ? payload.name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(payload.pfp) ? payload.pfp : '🌸', avatarUrl: safeAvatarUrl(payload.avatarUrl), time: Date.now() });
       saveFriendData();
+      markFriendsUnread();
       renderFriendsList();
       if (selectedPlayerId === payload.senderId) showPlayerCard(remotePlayers[payload.senderId] || payload);
     }
@@ -1504,6 +1619,7 @@
       e.preventDefault();
       const input = document.getElementById('dm-text-input');
       const text = input.value.trim();
+      if (!authUser || guestMode) return;
       if (!text || !activeDMUserId || !friendList.some(f => f.id === activeDMUserId && f.accepted)) return;
       if (!dmMessages[activeDMUserId]) dmMessages[activeDMUserId] = [];
       dmMessages[activeDMUserId].push({ senderId: localPlayer.id, text, time: Date.now() });
@@ -1519,6 +1635,7 @@
       modal.classList.toggle('hidden');
       if (!modal.classList.contains('hidden')) {
         document.getElementById('setting-username').value = localPlayer.name;
+        updateRoleUi();
         document.getElementById('profile-image-input').value = '';
         renderAvatarPreview();
       }
@@ -1532,43 +1649,82 @@
 
     async function persistProfileToAuth() {
       if (!authUser) return null;
-      const { data, error } = await supabaseClient.auth.updateUser({ data: {
-        ...(authUser.user_metadata || {}),
-        display_name: localPlayer.name,
-        pfp: localPlayer.pfp,
-        avatar_url: localPlayer.avatarUrl || '',
-        points: localPlayer.points,
-        inventory: localPlayer.inventory,
-        equipped_skin: localPlayer.equippedSkin,
-        equipped_accessory: localPlayer.equippedAcc || '',
-        equipped_title: localPlayer.equippedTitle || ''
-      }});
-      if (data && data.user) authUser = data.user;
+      const { error } = await supabaseClient.rpc('save_my_profile', {
+        p_username: localPlayer.name,
+        p_pfp: localPlayer.pfp,
+        p_avatar_url: localPlayer.avatarUrl || '',
+        p_equipped_skin: localPlayer.equippedSkin || 'skin_pink',
+        p_equipped_accessory: localPlayer.equippedAcc || null,
+        p_equipped_title: localPlayer.equippedTitle || null,
+        p_equipped_emote: localPlayer.equippedEmote || null
+      });
       return error || null;
     }
 
-    function applyAuthProfile(user) {
+    async function applyAuthProfile(user) {
       authUser = user;
+      guestMode = false;
       localPlayer.id = user.id;
-      const metadata = user.user_metadata || {};
-      const hasAccountProfile = Boolean(metadata.display_name || metadata.name || metadata.username || metadata.pfp || metadata.avatar_url || metadata.inventory || metadata.points !== undefined);
-      const hasCustomLocalProfile = !/^Slime_\d{3}$/.test(localPlayer.name) || localPlayer.pfp !== '🌸' || Boolean(localPlayer.avatarUrl);
-      const savedName = metadata.display_name || metadata.name || metadata.username;
-      if (typeof savedName === 'string' && savedName.trim()) localPlayer.name = savedName.trim().slice(0, 15);
-      if (PROFILE_PFP_OPTIONS.includes(metadata.pfp)) localPlayer.pfp = metadata.pfp;
-      if (Object.prototype.hasOwnProperty.call(metadata, 'avatar_url')) localPlayer.avatarUrl = safeAvatarUrl(metadata.avatar_url);
-      if (Number.isFinite(Number(metadata.points)) && metadata.points !== undefined) localPlayer.points = Math.max(0, Number(metadata.points));
-      if (Array.isArray(metadata.inventory)) {
-        const catalogIds = new Set([].concat(...Object.values(MARKET_ITEMS)).map(item => item.id));
-        localPlayer.inventory = metadata.inventory.filter(id => catalogIds.has(id));
+      let { data: profile, error } = await supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote').eq('user_id', user.id).maybeSingle();
+      if (!profile && !error) {
+        const ensured = await supabaseClient.rpc('ensure_my_profile');
+        if (!ensured.error) {
+          const retry = await supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote').eq('user_id', user.id).maybeSingle();
+          profile = retry.data; error = retry.error;
+        }
       }
-      if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
-      if (!localPlayer.inventory.includes('pfp_sakura')) localPlayer.inventory.push('pfp_sakura');
-      if (metadata.equipped_skin && localPlayer.inventory.includes(metadata.equipped_skin)) localPlayer.equippedSkin = metadata.equipped_skin;
-      if (metadata.equipped_accessory && localPlayer.inventory.includes(metadata.equipped_accessory)) localPlayer.equippedAcc = metadata.equipped_accessory;
-      if (metadata.equipped_title && localPlayer.inventory.includes(metadata.equipped_title)) localPlayer.equippedTitle = metadata.equipped_title;
+      if (error) { localPlayer.role = 'player'; updateRoleUi(); return error; }
+      if (profile) {
+        localPlayer.name = (profile.username || 'Slime').slice(0, 15);
+        localPlayer.pfp = PROFILE_PFP_OPTIONS.includes(profile.pfp) ? profile.pfp : '🌸';
+        localPlayer.avatarUrl = safeAvatarUrl(profile.avatar_url);
+        localPlayer.points = Math.max(0, Number(profile.points) || 0);
+        const validItems = new Set([].concat(...Object.values(MARKET_ITEMS)).map(item => item.id));
+        localPlayer.inventory = Array.isArray(profile.inventory) ? profile.inventory.filter(id => validItems.has(id)) : ['skin_pink'];
+        if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
+        localPlayer.equippedSkin = profile.equipped_skin || 'skin_pink';
+        localPlayer.equippedAcc = profile.equipped_accessory || null;
+        localPlayer.equippedTitle = profile.equipped_title || null;
+        localPlayer.equippedEmote = profile.equipped_emote || null;
+      }
+      const { data: role, error: roleError } = await supabaseClient.rpc('get_my_role');
+      localPlayer.role = roleError ? 'player' : (role || 'player');
+      if (!['admin', 'developer'].includes(localPlayer.role)) {
+        if (localPlayer.equippedSkin === 'skin_admin' || localPlayer.equippedSkin === 'skin_developer') localPlayer.equippedSkin = 'skin_pink';
+        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') localPlayer.equippedTitle = null;
+      }
       savePlayerToStorage();
-      return hasAccountProfile || hasCustomLocalProfile ? persistProfileToAuth() : null;
+      updateRoleUi(); renderOwnedEmoteButton();
+      await refreshModerationState();
+      startModerationMonitor();
+      return roleError || null;
+    }
+
+    async function refreshOwnProfile() {
+      if (!authUser || guestMode) return;
+      const { data: profile, error } = await supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote').eq('user_id', authUser.id).maybeSingle();
+      if (error || !profile) return;
+      localPlayer.name = (profile.username || 'Slime').slice(0, 15);
+      localPlayer.pfp = PROFILE_PFP_OPTIONS.includes(profile.pfp) ? profile.pfp : '🌸';
+      localPlayer.avatarUrl = safeAvatarUrl(profile.avatar_url);
+      localPlayer.points = Math.max(0, Number(profile.points) || 0);
+      const validItems = new Set([].concat(...Object.values(MARKET_ITEMS)).map(item => item.id));
+      localPlayer.inventory = (Array.isArray(profile.inventory) ? profile.inventory : ['skin_pink']).filter(id => validItems.has(id));
+      if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
+      localPlayer.equippedSkin = profile.equipped_skin || 'skin_pink';
+      localPlayer.equippedAcc = profile.equipped_accessory || null;
+      localPlayer.equippedTitle = profile.equipped_title || null;
+      localPlayer.equippedEmote = profile.equipped_emote || null;
+      const { data: role } = await supabaseClient.rpc('get_my_role');
+      if (role && ['player', 'admin', 'developer'].includes(role)) localPlayer.role = role;
+      if (!['admin', 'developer'].includes(localPlayer.role)) {
+        if (localPlayer.equippedSkin === 'skin_admin' || localPlayer.equippedSkin === 'skin_developer') localPlayer.equippedSkin = 'skin_pink';
+        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') localPlayer.equippedTitle = null;
+      }
+      savePlayerToStorage(); updateRoleUi(); updateUIHeader(); broadcastPlayerState();
+      if (!document.getElementById('inventory-modal').classList.contains('hidden')) renderInventoryGrid();
+      if (!document.getElementById('settings-modal').classList.contains('hidden')) renderAvatarPreview();
+      syncFriendProfile(localPlayer);
     }
 
     async function handleProfileImageUpload(event) {
@@ -1624,23 +1780,217 @@
       localStorage.setItem('sakura_eq_skin', localPlayer.equippedSkin);
       localStorage.setItem('sakura_eq_acc', localPlayer.equippedAcc || '');
       localStorage.setItem('sakura_eq_title', localPlayer.equippedTitle || '');
+      localStorage.setItem('sakura_eq_emote', localPlayer.equippedEmote || '');
       localStorage.setItem('sakura_inv', JSON.stringify(localPlayer.inventory));
     }
 
     function updateUIHeader() {
       document.getElementById('player-points-display').textContent = localPlayer.points.toLocaleString();
       updateFriendRequestBadge();
+      renderOwnedEmoteButton();
     }
 
     function broadcastProfileUpdate() {
-      sendSocialBroadcast('profile_update', { id: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl });
+      sendSocialBroadcast('profile_update', { id: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role });
+    }
+
+    // Staff actions are routed through a Supabase Edge Function; SQL RPCs re-check role permissions.
+    let staffSearchTimer = null;
+    let walletSearchTimer = null;
+    function updateRoleUi() {
+      const staff = ['admin', 'developer'].includes(localPlayer.role);
+      const developer = localPlayer.role === 'developer';
+      const staffButton = document.getElementById('role-tools-button');
+      const walletButton = document.getElementById('developer-wallet-button');
+      if (staffButton) { staffButton.classList.toggle('hidden', !staff); staffButton.classList.toggle('flex', staff); }
+      if (walletButton) { walletButton.classList.toggle('hidden', !developer); walletButton.classList.toggle('flex', developer); }
+      if (!staff) document.getElementById('role-panel-modal').classList.add('hidden');
+      if (!developer) document.getElementById('developer-wallet-modal').classList.add('hidden');
+      if (document.getElementById('notice-post-form')) document.getElementById('notice-post-form').classList.toggle('hidden', !staff);
+      const profileRole = document.getElementById('profile-role-label');
+      if (profileRole) {
+        const hasRole = ['admin', 'developer'].includes(localPlayer.role);
+        profileRole.classList.toggle('hidden', !hasRole);
+        profileRole.className = `rounded-xl px-3 py-2 text-[10px] font-black tracking-widest ${localPlayer.role === 'developer' ? 'bg-cyan-100 text-cyan-900 border border-cyan-300' : 'bg-rose-100 text-rose-900 border border-rose-300'} ${hasRole ? '' : 'hidden'}`;
+        profileRole.textContent = localPlayer.role === 'developer' ? 'DEV · DEVELOPER' : 'ADMIN';
+      }
+      if (!['admin', 'developer'].includes(localPlayer.role)) {
+        if (localPlayer.equippedSkin === 'skin_admin' || localPlayer.equippedSkin === 'skin_developer') localPlayer.equippedSkin = 'skin_pink';
+        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') localPlayer.equippedTitle = null;
+      }
+      renderOwnedEmoteButton();
+      if (!document.getElementById('inventory-modal').classList.contains('hidden')) renderInventoryGrid();
+    }
+    function openRolePanel() {
+      if (!['admin', 'developer'].includes(localPlayer.role)) return;
+      document.getElementById('role-panel-title').textContent = localPlayer.role === 'developer' ? 'Developer Control Panel' : 'Admin Control Panel';
+      document.getElementById('role-panel-modal').classList.remove('hidden');
+      searchStaffUsers();
+    }
+    function closeRolePanel() { document.getElementById('role-panel-modal').classList.add('hidden'); }
+    function openDeveloperWallet() {
+      if (localPlayer.role !== 'developer') return;
+      document.getElementById('developer-wallet-modal').classList.remove('hidden');
+      searchWalletUsers();
+    }
+    function closeDeveloperWallet() { document.getElementById('developer-wallet-modal').classList.add('hidden'); }
+    async function callStaffFunction(action, values = {}) {
+      const { data, error } = await supabaseClient.functions.invoke('moderation-admin', { body: { action, ...values } });
+      if (error) throw new Error(data && data.error ? data.error : error.message || 'Staff action failed.');
+      if (data && data.error) throw new Error(data.error);
+      return data;
+    }
+    function makeStaffButton(label, style, callback) {
+      const button = document.createElement('button'); button.type = 'button';
+      button.className = `rounded-lg px-2.5 py-1.5 text-[10px] font-bold text-white ${style}`;
+      button.textContent = label; button.onclick = callback; return button;
+    }
+    function staffUserCard(user, mode) {
+      const card = document.createElement('article');
+      card.className = 'rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm';
+      const top = document.createElement('div'); top.className = 'flex items-center gap-2';
+      top.appendChild(makeAvatar({ pfp: user.pfp, avatarUrl: user.avatar_url }, 'w-9 h-9'));
+      const details = document.createElement('div'); details.className = 'min-w-0 flex-1';
+      const name = document.createElement('p'); name.className = 'truncate text-xs font-extrabold text-slate-950'; name.textContent = `${user.username || 'Slime'}${user.role === 'developer' ? ' · DEV' : user.role === 'admin' ? ' · ADMIN' : ''}`;
+      const email = document.createElement('p'); email.className = 'truncate text-[10px] text-slate-600'; email.textContent = user.email || '';
+      details.append(name, email);
+      if (mode === 'staff') {
+        const moderation = document.createElement('p'); moderation.className = 'text-[9px] font-semibold text-rose-700';
+        const muted = user.mute_until && new Date(user.mute_until).getTime() > Date.now();
+        moderation.textContent = user.is_banned ? `Banned${user.ban_until ? ` until ${new Date(user.ban_until).toLocaleString()}` : ' permanently'}` : muted ? `Muted until ${new Date(user.mute_until).toLocaleString()}` : 'No active restrictions';
+        details.appendChild(moderation);
+      }
+      top.appendChild(details);
+      if (mode === 'wallet') {
+        const balance = document.createElement('span'); balance.className = 'rounded-full bg-cyan-50 px-2 py-1 text-[10px] font-bold text-cyan-900'; balance.textContent = `${Number(user.points) || 0} points`; top.appendChild(balance);
+      }
+      card.appendChild(top);
+      if (mode === 'staff') {
+        const input = document.createElement('input'); input.type = 'number'; input.min = '1'; input.max = '43200'; input.value = '60'; input.setAttribute('aria-label', 'Duration in minutes');
+        input.className = 'staff-duration mt-2 w-28 rounded-lg border border-slate-200 px-2 py-1 text-[10px]'; card.appendChild(input);
+        const actions = document.createElement('div'); actions.className = 'mt-2 flex flex-wrap gap-1.5';
+        const run = async (kind, minutes) => {
+          const duration = minutes === undefined ? Math.max(1, Math.min(43200, Number(input.value) || 60)) : minutes;
+          await runStaffAction(async () => callStaffFunction('moderate', { targetId: user.user_id, kind, durationMinutes: duration }), 'staff-panel-status', 'Moderation updated.');
+        };
+        actions.append(
+          makeStaffButton('Mute chat', 'bg-amber-600', () => run('mute')),
+          makeStaffButton('Unmute', 'bg-emerald-600', () => run('unmute', 0)),
+          makeStaffButton('Timed ban', 'bg-rose-600', () => run('ban')),
+          makeStaffButton('Kick + permanent ban', 'bg-slate-900', () => { if (confirm(`Permanently ban ${user.username || 'this player'}?`)) run('kick', 0); }),
+          makeStaffButton('Unban', 'bg-sky-600', () => run('unban', 0))
+        );
+        if (localPlayer.role === 'developer' && user.role !== 'developer') {
+          actions.appendChild(makeStaffButton(user.role === 'admin' ? 'Revoke admin' : 'Make admin', user.role === 'admin' ? 'bg-slate-600' : 'bg-violet-600', async () => {
+            await runStaffAction(async () => callStaffFunction('set_admin', { targetId: user.user_id, enabled: user.role !== 'admin' }), 'staff-panel-status', 'Admin role updated.');
+          }));
+        }
+        card.appendChild(actions);
+        const note = document.createElement('p'); note.className = 'mt-2 text-[9px] text-slate-500'; note.textContent = 'Durations use minutes. A kick permanently bans sign-in until an authorized unban.'; card.appendChild(note);
+      } else {
+        const controls = document.createElement('div'); controls.className = 'mt-2 flex items-center gap-2';
+        const amount = document.createElement('input'); amount.type = 'number'; amount.min = '1'; amount.max = '2147483647'; amount.value = '100'; amount.className = 'w-28 rounded-lg border border-cyan-200 px-2 py-1 text-[10px]'; amount.setAttribute('aria-label', 'Points amount');
+        const adjust = async delta => {
+          const value = Math.max(1, Math.floor(Number(amount.value) || 1));
+          await runStaffAction(async () => callStaffFunction('adjust_points', { targetId: user.user_id, amount: delta * value }), 'wallet-panel-status', 'Wallet updated. Deductions stop at zero.');
+        };
+        controls.append(amount, makeStaffButton('Send points', 'bg-emerald-600', () => adjust(1)), makeStaffButton('Deduct points', 'bg-rose-600', () => adjust(-1)));
+        card.appendChild(controls);
+      }
+      return card;
+    }
+    async function runStaffAction(action, statusId, successText) {
+      const status = document.getElementById(statusId); status.textContent = 'Working…';
+      try {
+        await action(); status.textContent = successText;
+        if (statusId === 'staff-panel-status') await searchStaffUsers(true);
+        else await searchWalletUsers(true);
+      } catch (error) { status.textContent = error.message || 'Could not complete this action.'; }
+    }
+    async function searchStaffUsers(immediate = false) {
+      if (staffSearchTimer) clearTimeout(staffSearchTimer);
+      const query = document.getElementById('staff-user-search').value.trim();
+      if (!immediate && query.length < 2) { document.getElementById('staff-user-results').replaceChildren(); document.getElementById('staff-panel-status').textContent = 'Type at least two characters to search.'; return; }
+      staffSearchTimer = setTimeout(async () => {
+        const status = document.getElementById('staff-panel-status'), results = document.getElementById('staff-user-results');
+        if (!['admin', 'developer'].includes(localPlayer.role)) return;
+        status.textContent = 'Searching…';
+        try {
+          const data = await callStaffFunction('search_users', { query });
+          results.replaceChildren();
+          (data.users || []).forEach(user => results.appendChild(staffUserCard(user, 'staff')));
+          status.textContent = data.users && data.users.length ? `${data.users.length} matching users.` : 'No users found.';
+        } catch (error) { status.textContent = error.message || 'Search failed.'; }
+      }, immediate ? 0 : 350);
+    }
+    async function searchWalletUsers(immediate = false) {
+      if (walletSearchTimer) clearTimeout(walletSearchTimer);
+      const query = document.getElementById('wallet-user-search').value.trim();
+      if (!immediate && query.length < 2) { document.getElementById('wallet-user-results').replaceChildren(); document.getElementById('wallet-panel-status').textContent = 'Type at least two characters to search.'; return; }
+      walletSearchTimer = setTimeout(async () => {
+        const status = document.getElementById('wallet-panel-status'), results = document.getElementById('wallet-user-results');
+        if (localPlayer.role !== 'developer') return;
+        status.textContent = 'Searching…';
+        try {
+          const data = await callStaffFunction('search_users', { query });
+          results.replaceChildren();
+          (data.users || []).forEach(user => results.appendChild(staffUserCard(user, 'wallet')));
+          status.textContent = data.users && data.users.length ? `${data.users.length} matching users.` : 'No users found.';
+        } catch (error) { status.textContent = error.message || 'Search failed.'; }
+      }, immediate ? 0 : 350);
+    }
+
+    async function refreshModerationState() {
+      if (!authUser || guestMode) return false;
+      const { data, error } = await supabaseClient.rpc('get_my_moderation');
+      if (error || !data) return false;
+      moderationState = data;
+      const muted = data.mute_until && new Date(data.mute_until).getTime() > Date.now();
+      localPlayer.mutedUntil = muted ? data.mute_until : null;
+      const input = document.getElementById('chat-input');
+      if (input) { input.disabled = !authUser || guestMode || Boolean(muted) || Boolean(data.is_banned); input.placeholder = muted ? `Muted until ${new Date(data.mute_until).toLocaleString()}` : 'Type global message...'; }
+      if (data.is_banned) await leaveBannedGame();
+      return Boolean(data.is_banned);
+    }
+    async function leaveBannedGame() {
+      if (realtimeChannel) { await realtimeChannel.unsubscribe(); realtimeChannel = null; }
+      if (socialChannel) { await socialChannel.unsubscribe(); socialChannel = null; }
+      guestMode = true;
+      localPlayer.role = 'player'; updateRoleUi();
+      await supabaseClient.auth.signOut({ scope: 'local' });
+      authUser = null;
+      document.getElementById('auth-modal').classList.remove('hidden');
+      showAuthAlert('This account is currently banned from the game. Contact an administrator to request an unban.');
+    }
+    function startModerationMonitor() {
+      if (moderationPollTimer) clearInterval(moderationPollTimer);
+      moderationPollTimer = setInterval(async () => {
+        if (!authUser) return;
+        const { data: role } = await supabaseClient.rpc('get_my_role');
+        if (role && ['player', 'admin', 'developer'].includes(role) && role !== localPlayer.role) {
+          localPlayer.role = role; updateRoleUi(); await persistProfileToAuth(); broadcastPlayerState(); broadcastProfileUpdate();
+        }
+        await refreshOwnProfile();
+        await refreshModerationState();
+        await Promise.allSettled(Object.keys(remotePlayers).map(resolveRemoteRole));
+      }, 15000);
+    }
+
+    async function getTrustedUserRole(userId) {
+      if (!authUser || !isValidUserId(userId)) return 'player';
+      const { data, error } = await supabaseClient.rpc('get_user_role', { p_user_id: userId });
+      return !error && ['admin', 'developer'].includes(data) ? data : 'player';
+    }
+    async function resolveRemoteRole(userId) {
+      const role = await getTrustedUserRole(userId);
+      if (remotePlayers[userId]) { remotePlayers[userId].role = role; }
     }
 
     // --- SUPABASE REALTIME MULTIPLAYER ---
     let socialChannel = null;
     function initSocialChannel() {
-      if (socialChannel) return;
-      socialChannel = supabaseClient.channel('sakura-social')
+      if (socialChannel || !authUser || guestMode) return;
+      socialChannel = supabaseClient.channel('sakura-social', { config: { private: true } })
         .on('broadcast', { event: 'friend_request' }, ({ payload }) => receiveFriendRequest(payload))
         .on('broadcast', { event: 'friend_accept' }, ({ payload }) => {
           if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.friendId)) return;
@@ -1654,24 +2004,27 @@
           handleFriendUserSearch();
         })
         .on('broadcast', { event: 'profile_update' }, ({ payload }) => {
-          if (payload && payload.id !== localPlayer.id) syncFriendProfile(payload);
+          if (!payload || !payload.id) return;
+          if (payload.id === localPlayer.id) refreshOwnProfile();
+          else syncFriendProfile(payload);
         })
         .on('broadcast', { event: 'direct_msg' }, ({ payload }) => {
           if (!payload || payload.targetId !== localPlayer.id || !friendList.some(f => f.id === payload.senderId && f.accepted)) return;
           if (!dmMessages[payload.senderId]) dmMessages[payload.senderId] = [];
           dmMessages[payload.senderId].push({ senderId: payload.senderId, text: payload.text, time: Date.now() });
           localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
-          document.getElementById('unread-dm-badge').classList.remove('hidden');
+          markFriendsUnread();
           if (activeDMUserId === payload.senderId) renderDMBox();
         })
         .subscribe();
     }
     function initSupabaseChannel(channelName) {
+      if (!authUser || guestMode) return;
       initSocialChannel();
       if (realtimeChannel) realtimeChannel.unsubscribe();
 
       realtimeChannel = supabaseClient.channel(`room:${channelName}`, {
-        config: { presence: { key: localPlayer.id } }
+        config: { presence: { key: localPlayer.id }, private: true }
       });
 
       realtimeChannel
@@ -1681,7 +2034,8 @@
           Object.keys(state).forEach(key => {
             if (key !== localPlayer.id) {
               const player = state[key][0];
-              remotePlayers[key] = { ...player, displayX: player.x, displayY: player.y };
+              remotePlayers[key] = { ...player, role: 'player', displayX: player.x, displayY: player.y, displayJumpOffset: player.jumpOffset || 0 };
+              resolveRemoteRole(key);
             }
           });
           Object.values(remotePlayers).forEach(syncFriendProfile);
@@ -1690,15 +2044,20 @@
         .on('broadcast', { event: 'player_update' }, ({ payload }) => {
           if (payload && payload.id !== localPlayer.id) {
             const previous = remotePlayers[payload.id];
-            remotePlayers[payload.id] = { ...payload,
+            remotePlayers[payload.id] = { ...payload, role: previous ? previous.role : 'player',
               displayX: previous && Number.isFinite(previous.displayX) ? previous.displayX : payload.x,
-              displayY: previous && Number.isFinite(previous.displayY) ? previous.displayY : payload.y
+              displayY: previous && Number.isFinite(previous.displayY) ? previous.displayY : payload.y,
+              displayJumpOffset: previous && Number.isFinite(previous.displayJumpOffset) ? previous.displayJumpOffset : (payload.jumpOffset || 0)
             };
             syncFriendProfile(payload);
+            if (!previous) resolveRemoteRole(payload.id);
           }
         })
-        .on('broadcast', { event: 'global_chat' }, ({ payload }) => {
-          appendChatMessage(payload.sender, payload.text, payload.pfp);
+        .on('broadcast', { event: 'global_chat' }, async ({ payload }) => {
+          if (!payload || !isValidUserId(payload.senderId) || payload.senderId === localPlayer.id) return;
+          const verifiedRole = await getTrustedUserRole(payload.senderId);
+          appendChatMessage(payload.sender, payload.text, payload.pfp, false, { senderId: payload.senderId, avatarUrl: payload.avatarUrl, role: verifiedRole });
+          if (remotePlayers[payload.senderId]) remotePlayers[payload.senderId].speechBubble = { text: String(payload.text || '').slice(0, 72), until: Date.now() + 6500 };
         })
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
@@ -1717,38 +2076,57 @@
       }
     }
 
-    // Global Chat Form
+    // Global chat creates a short-lived speech bubble above the sender's slime.
     function handleChatSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
       if (!text) return;
-
-      appendChatMessage(localPlayer.name, text, localPlayer.pfp, true);
-
+      if (!authUser || guestMode) { alert('Sign in to chat in the shared world.'); return; }
+      if (moderationState.is_banned || (localPlayer.mutedUntil && new Date(localPlayer.mutedUntil).getTime() > Date.now())) {
+        input.disabled = true; input.placeholder = 'Chat is unavailable for this account right now.'; return;
+      }
+      const message = text.slice(0, 120);
+      localPlayer.speechBubble = { text: message.slice(0, 72), until: Date.now() + 6500 };
+      appendChatMessage(localPlayer.name, message, localPlayer.pfp, true, { senderId: localPlayer.id, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role });
+      broadcastPlayerState();
       if (realtimeChannel) {
         realtimeChannel.send({
-          type: 'broadcast',
-          event: 'global_chat',
-          payload: { sender: localPlayer.name, text, pfp: localPlayer.pfp }
+          type: 'broadcast', event: 'global_chat',
+          payload: { senderId: localPlayer.id, sender: localPlayer.name, text: message, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role }
         });
       }
       input.value = '';
     }
 
-    function appendChatMessage(sender, text, pfp, isSelf = false) {
+    function openChatPlayerCard(profile) {
+      if (!profile || !isValidUserId(profile.id) || profile.id === localPlayer.id) return;
+      const fromRoom = remotePlayers[profile.id];
+      showPlayerCard(fromRoom || { ...profile, x: camera.x + canvas.width / 2, y: camera.y + canvas.height / 2 });
+    }
+
+    function appendChatMessage(sender, text, pfp, isSelf = false, profile = {}) {
       const chatBox = document.getElementById('chat-messages');
-      const msg = document.createElement('div');
-      msg.className = "space-y-0.5";
-      const senderLabel = document.createElement('span');
-      senderLabel.className = `font-bold ${isSelf ? 'text-pink-300' : 'text-pink-400'}`;
-      senderLabel.textContent = `${PROFILE_PFP_OPTIONS.includes(pfp) ? pfp : '🌸'} ${sender}: `;
-      const messageText = document.createElement('span');
-      messageText.className = 'text-white/90 font-medium';
-      messageText.textContent = text;
-      msg.append(senderLabel, messageText);
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
+      const role = profile.role === 'developer' ? 'developer' : profile.role === 'admin' ? 'admin' : 'player';
+      const card = document.createElement('article');
+      card.className = `rounded-2xl border p-2.5 shadow-sm ${role === 'developer' ? 'border-cyan-300 bg-cyan-950/70 shadow-cyan-500/20' : role === 'admin' ? 'border-rose-400 bg-slate-950/80 shadow-rose-500/25' : isSelf ? 'border-pink-300/40 bg-pink-500/20' : 'border-white/10 bg-white/5'}`;
+      const header = document.createElement('div'); header.className = 'mb-1 flex items-center gap-2';
+      const userId = profile.senderId || profile.id;
+      const avatar = makeAvatar({ pfp, avatarUrl: profile.avatarUrl || '' }, 'w-7 h-7');
+      const nameButton = document.createElement('button'); nameButton.type = 'button';
+      nameButton.className = `min-w-0 truncate text-left text-[11px] font-extrabold ${role === 'developer' ? 'text-cyan-200' : role === 'admin' ? 'text-rose-300' : isSelf ? 'text-pink-200' : 'text-pink-300'}`;
+      nameButton.textContent = `${sender || 'Slime'}${role === 'developer' ? ' · DEV' : role === 'admin' ? ' · ADMIN' : ''}`;
+      if (userId && userId !== localPlayer.id) {
+        avatar.classList.add('cursor-pointer'); avatar.title = 'View profile / add friend'; avatar.onclick = () => openChatPlayerCard({ id: userId, name: sender, pfp, avatarUrl: profile.avatarUrl || '', role });
+        nameButton.onclick = () => openChatPlayerCard({ id: userId, name: sender, pfp, avatarUrl: profile.avatarUrl || '', role });
+      }
+      header.append(avatar, nameButton);
+      if (role !== 'player') {
+        const badge = document.createElement('span'); badge.className = `ml-auto rounded-full px-2 py-0.5 text-[8px] font-black tracking-wider ${role === 'developer' ? 'bg-cyan-300 text-cyan-950' : 'bg-rose-500 text-white'}`;
+        badge.textContent = role === 'developer' ? 'DEV' : 'ADMIN'; header.appendChild(badge);
+      }
+      const message = document.createElement('p'); message.className = 'break-words pl-9 text-[11px] leading-relaxed text-white/95'; message.textContent = text;
+      card.append(header, message); chatBox.appendChild(card); chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     // Room Switch
@@ -1773,19 +2151,19 @@
     function triggerEmote(emoji) {
       localPlayer.emoteEmoji = emoji;
       localPlayer.emoteUntil = Date.now() + 900;
-      playSound('jump');
-      broadcastPlayerState();
+      localPlayer.speechBubble = { text: String(emoji).slice(0, 24), until: Date.now() + 2400 };
+      playSound('jump'); broadcastPlayerState();
       if (window.matchMedia('(max-width: 767px)').matches) {
-        canvas.classList.remove('mobile-jiggle');
-        void canvas.offsetWidth;
-        canvas.classList.add('mobile-jiggle');
+        canvas.classList.remove('mobile-jiggle'); void canvas.offsetWidth; canvas.classList.add('mobile-jiggle');
       }
     }
 
     function toggleActiveSpecialEmote() {
-      localPlayer.activeSpecialEmote = null;
-      document.getElementById('special-emote-btn').classList.add('hidden');
-      broadcastPlayerState();
+      const item = MARKET_ITEMS.emotes.find(entry => entry.id === localPlayer.equippedEmote && localPlayer.inventory.includes(entry.id));
+      if (!item) return;
+      localPlayer.activeSpecialEmote = localPlayer.activeSpecialEmote === item.anim ? null : item.anim;
+      localPlayer.speechBubble = { text: item.icon, until: Date.now() + 2400 };
+      renderOwnedEmoteButton(); broadcastPlayerState();
     }
 
     function toggleChatSidebar() {
@@ -1845,6 +2223,15 @@
       joystick.active = true; joystick.dx = dx / maxDist; joystick.dy = dy / maxDist;
     }
 
+    async function awardGameWin(gameName) {
+      if (!authUser || guestMode) { alert('Sign in to earn points that save to your account.'); return false; }
+      const randomId = window.crypto && typeof window.crypto.randomUUID === 'function' ? window.crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); });
+      const { data, error } = await supabaseClient.rpc('award_game_win', { p_game_key: `${gameName}:${randomId}` });
+      if (error) { alert(error.message || 'Could not save the game reward.'); return false; }
+      localPlayer.points = Number(data.points) || localPlayer.points;
+      savePlayerToStorage(); updateUIHeader(); return true;
+    }
+
     // --- SLIME MEMORIES MATCH GAME ---
     let memoryDeck = [];
     let memoryRevealed = [];
@@ -1883,7 +2270,7 @@
         grid.appendChild(card);
       });
     }
-    function flipMemoryCard(index) {
+    async function flipMemoryCard(index) {
       if (memoryLocked || memoryFinished || memoryMatched.has(index) || memoryRevealed.includes(index)) return;
       memoryRevealed.push(index);
       renderMemoryCards();
@@ -1895,11 +2282,8 @@
         renderMemoryCards();
         if (memoryMatched.size === memoryDeck.length) {
           memoryFinished = true;
-          localPlayer.points += 5;
-          savePlayerToStorage();
-          persistProfileToAuth();
-          updateUIHeader();
-          document.getElementById('memory-status').textContent = 'You won! +5 points 🪙';
+          const awarded = await awardGameWin('memories');
+          document.getElementById('memory-status').textContent = awarded ? 'You won! +5 points 🪙' : 'You won! Sign in to save your 5 points.';
         }
       } else {
         memoryLocked = true;
@@ -1962,7 +2346,7 @@
       };
       sequenceTimer = window.setTimeout(showNext, 350);
     }
-    function clickSequenceSticker(index) {
+    async function clickSequenceSticker(index) {
       if (sequenceLocked || !slimeSequence.length) return;
       sequenceInput.push(index);
       const position = sequenceInput.length - 1;
@@ -1974,8 +2358,8 @@
       if (sequenceInput.length === slimeSequence.length) {
         sequenceLocked = true;
         if (sequenceLevel >= 8) {
-          localPlayer.points += 5; savePlayerToStorage(); persistProfileToAuth(); updateUIHeader();
-          document.getElementById('sequence-status').textContent = 'You won! +5 points 🪙';
+          const awarded = await awardGameWin('sequence');
+          document.getElementById('sequence-status').textContent = awarded ? 'You won! +5 points 🪙' : 'You won! Sign in to save your 5 points.';
         } else {
           document.getElementById('sequence-status').textContent = 'Nice! Get ready for the next round…';
           sequenceTimer = window.setTimeout(advanceSequence, 650);
@@ -1983,35 +2367,20 @@
       }
     }
 
-    // Notice-board writes are checked against protected app_metadata in the UI and by RLS below.
-    // One-time Supabase SQL setup (assign role=admin or role=developer via the Admin API):
-    // create table public.notice_board (id uuid primary key default gen_random_uuid(), title text not null, body text not null, author_id uuid not null references auth.users(id) on delete cascade, author_name text not null, created_at timestamptz not null default now());
-    // alter table public.notice_board enable row level security;
-    // grant select on public.notice_board to anon, authenticated; grant insert on public.notice_board to authenticated;
-    // create policy "Public reads notices" on public.notice_board for select to anon, authenticated using (true);
-    // create policy "Admins and developers post notices" on public.notice_board for insert to authenticated with check (auth.uid() = author_id and (coalesce(auth.jwt()->'app_metadata'->>'role','') in ('admin','developer','dev') or coalesce(auth.jwt()->'app_metadata'->'roles','[]'::jsonb) ?| array['admin','developer','dev']));
-    function isNoticeWriter() {
-      const metadata = authUser && authUser.app_metadata ? authUser.app_metadata : {};
-      const roles = Array.isArray(metadata.roles) ? metadata.roles : [];
-      const allRoles = [...roles, metadata.role].filter(Boolean).map(role => String(role).toLowerCase());
-      return allRoles.some(role => ['admin', 'developer', 'dev'].includes(role));
-    }
+    function isNoticeWriter() { return ['admin', 'developer'].includes(localPlayer.role); }
     async function openNoticeBoard() {
       document.getElementById('notice-board-modal').classList.remove('hidden');
       document.getElementById('notice-post-form').classList.toggle('hidden', !isNoticeWriter());
-      document.getElementById('notice-board-status').textContent = isNoticeWriter() ? 'Loading notices…' : 'Loading the latest notices…';
+      document.getElementById('notice-board-status').textContent = 'Loading notices…';
       await loadNoticeBoard();
     }
     function closeNoticeBoard() { document.getElementById('notice-board-modal').classList.add('hidden'); }
     async function loadNoticeBoard() {
       const list = document.getElementById('notice-board-list');
       const status = document.getElementById('notice-board-status');
-      list.innerHTML = '';
+      list.replaceChildren();
       const { data, error } = await supabaseClient.from('notice_board').select('id,title,body,author_name,created_at').order('created_at', { ascending: false }).limit(30);
-      if (error) {
-        status.textContent = 'The shared notice board needs the notice_board table and admin/developer RLS policy set up in Supabase.';
-        return;
-      }
+      if (error) { status.textContent = 'Apply the supplied Supabase SQL file to enable saved notices.'; return; }
       status.textContent = data.length ? `${data.length} recent notice${data.length === 1 ? '' : 's'}` : 'No notices yet.';
       data.forEach(notice => {
         const card = document.createElement('article'); card.className = 'rounded-2xl border border-amber-200 bg-white/80 p-3';
@@ -2028,12 +2397,13 @@
       if (!isNoticeWriter() || !authUser) { alert('Only an admin or developer account can post notices.'); return; }
       const title = document.getElementById('notice-title-input').value.trim();
       const body = document.getElementById('notice-body-input').value.trim();
+      const recipient = document.getElementById('notice-recipient-input').value.trim().toLowerCase() || null;
       if (!title || !body) return;
-      const status = document.getElementById('notice-board-status');
-      status.textContent = 'Posting…';
-      const { error } = await supabaseClient.from('notice_board').insert({ title, body, author_id: authUser.id, author_name: localPlayer.name });
-      if (error) { status.textContent = 'Could not post this notice. Check the notice_board table and its RLS policy.'; return; }
+      const status = document.getElementById('notice-board-status'); status.textContent = 'Posting…';
+      const { error } = await supabaseClient.rpc('post_notice', { p_title: title, p_body: body, p_recipient_email: recipient });
+      if (error) { status.textContent = 'Could not post. Apply the supplied SQL and confirm your staff role.'; return; }
       document.getElementById('notice-post-form').reset();
+      document.getElementById('notice-recipient-input').value = 'phantomromeo9@gmail.com';
       await loadNoticeBoard();
     }
 
@@ -2053,9 +2423,9 @@
     }
 
     function loginAsGuest() {
-      authUser = null;
+      authUser = null; guestMode = true; localPlayer.role = 'player'; updateRoleUi();
       document.getElementById('auth-modal').classList.add('hidden');
-      initSocialChannel(); initSupabaseChannel(currentChannel);
+      const input = document.getElementById('chat-input'); input.disabled = true; input.placeholder = 'Sign in for global chat';
     }
 
     async function handleAuthSubmit(event) {
@@ -2088,6 +2458,7 @@
           if (result.error) throw result.error;
         }
         const profileError = await applyAuthProfile(result.data.user);
+        if (moderationState.is_banned) throw new Error('This account is banned from the game.');
         document.getElementById('auth-modal').classList.add('hidden');
         initSocialChannel(); initSupabaseChannel(currentChannel); broadcastProfileUpdate(); updateUIHeader();
         if (profileError) alert('Signed in, but this profile could not sync to the account yet. ' + profileError.message);
@@ -2109,6 +2480,7 @@
         const { data } = await supabaseClient.auth.getSession();
         if (data && data.session && data.session.user) {
           const error = await applyAuthProfile(data.session.user);
+          if (moderationState.is_banned) { showAuthAlert('This account is banned from the game. Contact an administrator to request an unban.'); return; }
           document.getElementById('auth-modal').classList.add('hidden');
           initSocialChannel(); initSupabaseChannel(currentChannel); broadcastProfileUpdate(); updateUIHeader();
           if (error) alert('Signed in, but this profile could not sync to the account yet. ' + error.message);
