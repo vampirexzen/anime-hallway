@@ -58,7 +58,7 @@
     }
   </style>
 </head>
-<body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950 text-slate-100">
+<body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950 text-slate-100" onclick="unlockAudioContext()">
 
   <!-- AUTH MODAL OVERLAY -->
   <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/80 backdrop-blur-md flex items-center justify-center p-4">
@@ -104,8 +104,8 @@
   </div>
 
   <!-- TOP HEADER NAVBAR -->
-  <header class="h-12 sm:h-14 glass px-3 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm text-pink-950">
-    <div class="flex items-center gap-2">
+  <header class="h-12 sm:h-14 glass px-2 sm:px-4 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm text-pink-950">
+    <div class="flex items-center gap-1.5 sm:gap-2">
       <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shrink-0">
         <i data-lucide="flower-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style="animation-duration: 12s;"></i>
       </div>
@@ -116,18 +116,22 @@
     </div>
 
     <!-- Points HUD Pill -->
-    <div class="flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-xl shadow-sm text-xs font-black">
+    <div class="flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2 sm:px-2.5 py-1 rounded-xl shadow-sm text-xs font-black">
       <span>🪙</span>
       <span id="user-points-display">1000</span>
     </div>
 
-    <div class="flex items-center gap-1.5">
+    <div class="flex items-center gap-1 sm:gap-1.5">
       <!-- Audio WebSynth Trigger -->
-      <div class="flex items-center bg-pink-100/90 rounded-xl p-1 border border-pink-200">
-        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Music Synth">
-          <i data-lucide="music" id="music-icon" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-600"></i>
-        </button>
-      </div>
+      <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-bold" title="Toggle Lo-Fi Music Synth">
+        <i data-lucide="music" id="music-icon" class="w-4 h-4 text-pink-600"></i>
+      </button>
+
+      <!-- Mobile Top Chat Toggle Button -->
+      <button onclick="toggleChatSidebar()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-bold" title="Toggle Chat">
+        <i data-lucide="message-square" class="w-4 h-4 text-pink-600"></i>
+        <span class="hidden sm:inline">Chat</span>
+      </button>
 
       <!-- Inventory Button -->
       <button onclick="openModal('inventory-modal')" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-bold" title="Inventory">
@@ -196,11 +200,8 @@
         </div>
       </div>
 
-      <!-- Mobile Right Chat & Jump Controls -->
+      <!-- Mobile Right Jump Control -->
       <div class="absolute bottom-3 right-3 z-20 pointer-events-auto flex items-center gap-2 md:hidden">
-        <button onclick="toggleChatSidebar()" class="w-11 h-11 rounded-full bg-white text-pink-900 border-2 border-pink-400 font-bold shadow-lg active:scale-90 flex items-center justify-center">
-          <i data-lucide="message-square" class="w-5 h-5 text-pink-600"></i>
-        </button>
         <button onclick="triggerJump()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-xs font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
           JUMP
         </button>
@@ -411,7 +412,7 @@
     let musicPlaying = false;
     let musicTimer = null;
 
-    function initAudio() {
+    function unlockAudioContext() {
       if (!audioCtx) {
         audioCtx = new AudioCtx();
       }
@@ -423,7 +424,7 @@
     const NOTES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
     function playAudioNote() {
       if (!musicPlaying) return;
-      initAudio();
+      unlockAudioContext();
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -442,7 +443,7 @@
     }
 
     function toggleBackgroundMusic() {
-      initAudio();
+      unlockAudioContext();
       musicPlaying = !musicPlaying;
       const btn = document.getElementById('music-toggle-btn');
       if (musicPlaying) {
@@ -454,7 +455,7 @@
       }
     }
 
-    // --- GAME CATALOG DATA ---
+    // --- GAME CATALOG DATA WITH EXTENDED STICKERS ---
     const MARKET_CATALOG = {
       accessories: [
         { id: 'hat_bow', name: 'Pink Bowtie', type: 'accessory', price: 1000, icon: '🎀' },
@@ -476,6 +477,7 @@
       stickers: [
         { id: 'stk_cat', name: 'Kitty Sticker', type: 'sticker', price: 500, url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=100&auto=format&fit=crop&q=80' },
         { id: 'stk_sakura', name: 'Sakura Blossom', type: 'sticker', price: 1500, url: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=100&auto=format&fit=crop&q=80' },
+        { id: 'stk_fox', name: 'Mystic Fox', type: 'sticker', price: 3500, url: 'https://images.unsplash.com/photo-1516934024742-b461fba47600?w=100&auto=format&fit=crop&q=80' },
         { id: 'stk_dragon', name: 'Golden Dragon', type: 'sticker', price: 10000, url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=100&auto=format&fit=crop&q=80' }
       ]
     };
@@ -504,13 +506,27 @@
     let friendRequests = JSON.parse(localStorage.getItem('sakura_friend_reqs') || '[]');
     let activeDMFriend = null;
 
-    // Filter Out Undefined Friends
-    friends = friends.filter(f => f && f.id && f.name && f.name !== 'undefined');
-    friendRequests = friendRequests.filter(f => f && f.id && f.name && f.name !== 'undefined');
+    // Filter Out Undefined Friends & Invalid Objects
+    function cleanFriendArrays() {
+      friends = friends.filter(f => f && f.id && f.name && f.name !== 'undefined');
+      friendRequests = friendRequests.filter(f => f && f.id && f.name && f.name !== 'undefined');
+      localStorage.setItem('sakura_friends_list', JSON.stringify(friends));
+      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
+    }
+    cleanFriendArrays();
 
     let currentChannel = 'sakura-lounge';
     let realtimeChannel = null;
     let camera = { x: 600, y: 600 };
+
+    // Park Animated Petals
+    let sakuraPetals = Array.from({ length: 30 }, () => ({
+      x: Math.random() * 1600,
+      y: Math.random() * 1200,
+      speedY: 0.8 + Math.random() * 1.2,
+      speedX: Math.sin(Math.random() * Math.PI) * 0.5,
+      radius: 3 + Math.random() * 3
+    }));
 
     // --- MOVEMENT & PHYSICS ---
     const keys = { up: false, down: false, left: false, right: false };
@@ -570,7 +586,6 @@
             if (p && p.id !== localPlayer.id) {
               activeIds.add(p.id);
               remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
-              // Sync Name in Friends List if changed
               syncFriendNameUpdate(p.id, p.name);
             }
           }
@@ -624,7 +639,7 @@
       }
     }
 
-    // --- FRIENDS & ACCEPT LOGIC ---
+    // --- FRIENDS & ACCEPT LOGIC (ONLY 1 ACCEPTANCE NEEDED) ---
     function syncFriendNameUpdate(id, newName) {
       if (!newName || newName === 'undefined') return;
       let f = friends.find(item => item.id === id);
@@ -649,16 +664,19 @@
     }
 
     function sendFriendRequestTo(target) {
+      if (!target || !target.id) return;
       if (friends.some(f => f.id === target.id)) return;
-      realtimeChannel.send({
-        type: 'broadcast',
-        event: 'friend_request',
-        payload: { targetId: target.id, from: { id: localPlayer.id, name: localPlayer.name, profilePic: localPlayer.profilePic } }
-      });
+      if (realtimeChannel) {
+        realtimeChannel.send({
+          type: 'broadcast',
+          event: 'friend_request',
+          payload: { targetId: target.id, from: { id: localPlayer.id, name: localPlayer.name, profilePic: localPlayer.profilePic } }
+        });
+      }
     }
 
     function receiveFriendRequest(fromUser) {
-      if (!fromUser || !fromUser.id || !fromUser.name) return;
+      if (!fromUser || !fromUser.id || !fromUser.name || fromUser.name === 'undefined') return;
       if (friends.some(f => f.id === fromUser.id) || friendRequests.some(r => r.id === fromUser.id)) return;
       
       friendRequests.push(fromUser);
@@ -669,10 +687,11 @@
     }
 
     function acceptFriendRequest(req) {
+      if (!req || !req.id) return;
       friendRequests = friendRequests.filter(r => r.id !== req.id);
       addFriendDirectly(req);
       
-      // Notify sender that 1 of them accepted
+      // Send single acceptance back so other user becomes friend instantly
       if (realtimeChannel) {
         realtimeChannel.send({
           type: 'broadcast',
@@ -699,10 +718,7 @@
     }
 
     function saveFriendsToStorage() {
-      friends = friends.filter(f => f && f.id && f.name && f.name !== 'undefined');
-      friendRequests = friendRequests.filter(f => f && f.id && f.name && f.name !== 'undefined');
-      localStorage.setItem('sakura_friends_list', JSON.stringify(friends));
-      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
+      cleanFriendArrays();
     }
 
     // --- MARKET & INVENTORY SYSTEM ---
@@ -726,10 +742,10 @@
       items.forEach(item => {
         const owned = localPlayer.inventory.includes(item.id);
         const card = document.createElement('div');
-        card.className = "bg-white/80 p-2.5 rounded-2xl border border-pink-200 flex flex-col items-center text-center justify-between";
+        card.className = "bg-white/80 p-2.5 rounded-2xl border border-pink-200 flex flex-col items-center text-center justify-between shadow-sm";
         
         let visual = `<span class="text-2xl">${item.icon || '✨'}</span>`;
-        if (item.type === 'skin') visual = `<div class="w-8 h-8 rounded-full shadow" style="background:${item.color}"></div>`;
+        if (item.type === 'skin') visual = `<div class="w-8 h-8 rounded-full shadow border" style="background:${item.color}"></div>`;
         if (item.type === 'sticker') visual = `<img src="${item.url}" class="w-10 h-10 rounded-lg object-cover border" />`;
 
         card.innerHTML = `
@@ -807,7 +823,7 @@
       broadcastState();
     }
 
-    // --- PROFILE & SUPABASE DISPLAY NAME REFRESH ---
+    // --- PROFILE IMAGE UPLOAD & DISPLAY REFRESH ---
     function handleImageUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -834,7 +850,7 @@
       closeModal('profile-modal');
       broadcastState();
       
-      // Sync in friend lists
+      // Update Name across active friends via broadcast
       friends.forEach(f => {
         if (realtimeChannel) {
           realtimeChannel.send({
@@ -862,7 +878,7 @@
       updateProfileDisplay();
     }
 
-    // --- SLIME MEMORIES MINI-GAME ---
+    // --- SLIME MEMORIES MINI-GAME (+5 POINTS) ---
     let memoryCards = [];
     let flippedCards = [];
     function openSlimeMemoriesGame() {
@@ -872,6 +888,7 @@
       
       memoryCards = deck.map((sym, idx) => ({ id: idx, symbol: sym, flipped: false, matched: false }));
       flippedCards = [];
+      document.getElementById('memory-game-status').textContent = 'Match pairs to win +5 Points!';
       renderMemoryGrid();
     }
 
@@ -948,6 +965,7 @@
     }
 
     function openDMWith(friend) {
+      if (!friend || !friend.id) return;
       activeDMFriend = friend;
       document.getElementById('chat-mode-label').textContent = `DM: ${friend.name}`;
       document.getElementById('close-dm-btn').classList.remove('hidden');
@@ -961,7 +979,7 @@
       document.getElementById('close-dm-btn').classList.add('hidden');
     }
 
-    // --- RENDER & GAME LOOP WITH BOUNCE PHYSICS ---
+    // --- DYNAMIC BOUNCE PHYSICS & JIGGLE ANIMATION ---
     function updatePhysics() {
       let dx = 0, dy = 0;
       if (keys.up) dy -= 1;
@@ -974,30 +992,33 @@
         dy = joystick.dy;
       }
 
-      // Movement & Bounce Jiggle Physics
+      // Movement & Elastic Squish/Stretch
       if (dx !== 0 || dy !== 0) {
-        localPlayer.vx = dx * 3.5;
-        localPlayer.vy = dy * 3.5;
-        localPlayer.jigglePhase += 0.25;
-        localPlayer.scaleX = 1 + Math.sin(localPlayer.jigglePhase) * 0.15;
-        localPlayer.scaleY = 1 - Math.sin(localPlayer.jigglePhase) * 0.15;
+        localPlayer.vx = dx * 3.8;
+        localPlayer.vy = dy * 3.8;
+        localPlayer.jigglePhase += 0.28;
+        localPlayer.scaleX = 1 + Math.sin(localPlayer.jigglePhase) * 0.18;
+        localPlayer.scaleY = 1 - Math.sin(localPlayer.jigglePhase) * 0.18;
       } else {
         localPlayer.vx *= 0.8;
         localPlayer.vy *= 0.8;
-        localPlayer.scaleX += (1 - localPlayer.scaleX) * 0.1;
-        localPlayer.scaleY += (1 - localPlayer.scaleY) * 0.1;
+        localPlayer.scaleX += (1 - localPlayer.scaleX) * 0.12;
+        localPlayer.scaleY += (1 - localPlayer.scaleY) * 0.12;
       }
 
       localPlayer.x += localPlayer.vx;
       localPlayer.y += localPlayer.vy;
 
-      // Jump Physics
+      // Jump Physics with Bounce Landing
       if (localPlayer.isJumping) {
         localPlayer.jumpZ += localPlayer.jumpVZ;
-        localPlayer.jumpVZ -= 0.6;
+        localPlayer.jumpVZ -= 0.65;
         if (localPlayer.jumpZ <= 0) {
           localPlayer.jumpZ = 0;
           localPlayer.isJumping = false;
+          // Landing Bounce Impact
+          localPlayer.scaleX = 1.3;
+          localPlayer.scaleY = 0.7;
         }
       }
 
@@ -1011,7 +1032,9 @@
     function triggerJump() {
       if (!localPlayer.isJumping) {
         localPlayer.isJumping = true;
-        localPlayer.jumpVZ = 7.5;
+        localPlayer.jumpVZ = 8.2;
+        localPlayer.scaleX = 0.75;
+        localPlayer.scaleY = 1.35;
       }
     }
 
@@ -1019,6 +1042,83 @@
       localPlayer.activeEmote = emote;
       setTimeout(() => localPlayer.activeEmote = null, 2500);
       broadcastState();
+    }
+
+    // --- ENHANCED PARK & ZONE DECORATIONS ---
+    function renderZoneDecorations() {
+      // Zone Background Grass / Floor
+      if (currentChannel === 'arcade-lounge') {
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, 1600, 1200);
+        // Neon Grid Lines
+        ctx.strokeStyle = 'rgba(236, 72, 153, 0.15)';
+        ctx.lineWidth = 2;
+        for (let x = 0; x < 1600; x += 80) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1200); ctx.stroke();
+        }
+        for (let y = 0; y < 1200; y += 80) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1600, y); ctx.stroke();
+        }
+      } else if (currentChannel === 'onsen-hotspring') {
+        // Detailed Park Ground
+        ctx.fillStyle = '#14532d';
+        ctx.fillRect(0, 0, 1600, 1200);
+
+        // Cobblestone Pathways
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.roundRect(100, 550, 1400, 100, 20);
+        ctx.fill();
+
+        // Koi Pond
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath();
+        ctx.ellipse(800, 400, 220, 140, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 8;
+        ctx.stroke();
+
+        // Wooden Bridge over Pond
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(740, 260, 120, 280);
+        ctx.fillStyle = '#451a03';
+        for (let i = 270; i < 530; i += 20) {
+          ctx.fillRect(735, i, 130, 4);
+        }
+
+        // Sakura Trees & Stone Lanterns
+        for (let i = 0; i < 8; i++) {
+          let tx = 200 + (i % 4) * 380;
+          let ty = 180 + Math.floor(i / 4) * 650;
+          ctx.fillStyle = '#f472b6';
+          ctx.beginPath(); ctx.arc(tx, ty, 60, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#fda4af';
+          ctx.beginPath(); ctx.arc(tx - 12, ty - 12, 35, 0, Math.PI * 2); ctx.fill();
+
+          // Stone Lantern
+          ctx.fillStyle = '#64748b';
+          ctx.fillRect(tx + 70, ty + 40, 16, 24);
+          ctx.fillStyle = '#fef08a';
+          ctx.fillRect(tx + 68, ty + 30, 20, 10);
+        }
+
+        // Falling Petals Animation
+        ctx.fillStyle = '#f472b6';
+        sakuraPetals.forEach(pt => {
+          pt.y += pt.speedY;
+          pt.x += Math.sin(pt.y * 0.02) * pt.speedX;
+          if (pt.y > 1200) pt.y = 0;
+          if (pt.x > 1600) pt.x = 0;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      } else {
+        // Zen Garden Lounge
+        ctx.fillStyle = '#831843';
+        ctx.fillRect(0, 0, 1600, 1200);
+      }
     }
 
     function renderWorld() {
@@ -1037,34 +1137,6 @@
       renderSlime(localPlayer);
 
       ctx.restore();
-    }
-
-    function renderZoneDecorations() {
-      // Zone Background Grass / Floor
-      ctx.fillStyle = currentChannel === 'arcade-lounge' ? '#1e1b4b' : (currentChannel === 'onsen-hotspring' ? '#14532d' : '#831843');
-      ctx.fillRect(0, 0, 1600, 1200);
-
-      // Enhanced Park Decorator
-      if (currentChannel === 'onsen-hotspring') {
-        // Decorative Pond
-        ctx.fillStyle = '#0284c7';
-        ctx.beginPath();
-        ctx.ellipse(800, 600, 180, 110, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 6;
-        ctx.stroke();
-
-        // Sakura Trees
-        for (let i = 0; i < 8; i++) {
-          let tx = 200 + (i % 4) * 400;
-          let ty = 200 + Math.floor(i / 4) * 700;
-          ctx.fillStyle = '#f472b6';
-          ctx.beginPath(); ctx.arc(tx, ty, 50, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = '#fda4af';
-          ctx.beginPath(); ctx.arc(tx - 10, ty - 10, 30, 0, Math.PI * 2); ctx.fill();
-        }
-      }
     }
 
     function renderSlime(p) {
@@ -1188,6 +1260,7 @@
     }
 
     function renderFriendsList(tab = 'friends') {
+      cleanFriendArrays();
       const container = document.getElementById('friends-list-container');
       container.innerHTML = '';
 
