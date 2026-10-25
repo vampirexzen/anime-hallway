@@ -15,146 +15,246 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Yuji+Mai&display=swap" rel="stylesheet" />
 
   <style>
+    /* Viewport & Touch Setup */
     html, body {
-      height: 100%; height: 100dvh; width: 100%; width: 100dvw;
-      margin: 0; padding: 0; overflow: hidden; touch-action: none;
-      -webkit-user-select: none; user-select: none; background: #0f050d;
+      height: 100%;
+      height: 100dvh;
+      width: 100%;
+      width: 100dvw;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+      background: #180914;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    .font-sakura { font-family: 'Yuji Mai', serif; }
+
+    .font-sakura {
+      font-family: 'Yuji Mai', serif;
+    }
+
+    /* Glassmorphism Classes */
     .glass {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.9);
     }
+
     .glass-dark {
-      background: rgba(22, 10, 20, 0.92);
-      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      background: rgba(30, 15, 28, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(244, 114, 182, 0.25);
     }
+
     .glass-input {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(244, 114, 182, 0.4);
     }
+
     .glass-input:focus {
-      border-color: #ec4899; outline: none;
+      border-color: #ec4899;
+      outline: none;
       box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25);
     }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(244, 114, 182, 0.5); border-radius: 10px; }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(244, 114, 182, 0.5);
+      border-radius: 10px;
+    }
+
+    /* Mobile Virtual Joystick */
     .joystick-base {
-      width: 96px; height: 96px; border-radius: 50%;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
       background: rgba(255, 255, 255, 0.25);
       border: 2px solid rgba(244, 114, 182, 0.6);
-      backdrop-filter: blur(8px); position: relative; touch-action: none;
+      backdrop-filter: blur(8px);
+      position: relative;
+      touch-action: none;
     }
     .joystick-stick {
-      width: 42px; height: 42px; border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
       background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
-      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.6);
-      position: absolute; top: 27px; left: 27px; pointer-events: none;
+      box-shadow: 0 4px 10px rgba(236, 72, 153, 0.5);
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      pointer-events: none;
+      transition: transform 0.04s ease-out;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(244, 114, 182, 0.5);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+    }
+    .action-btn:active {
+      transform: scale(0.92);
+      background: #ec4899;
+      color: white;
+    }
+
+    /* Tab Indicators */
+    .tab-active {
+      background-color: #ec4899;
+      color: #ffffff;
+    }
+    .tab-inactive {
+      background-color: rgba(255, 255, 255, 0.6);
+      color: #831843;
+    }
+    #gameCanvas { touch-action: none; }
+    .overflow-y-auto { touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+    .overflow-x-auto { touch-action: pan-x pan-y; }
+    .mobile-top-action { min-width: 34px; min-height: 34px; }
+    @keyframes mobile-jiggle {
+      0%, 100% { transform: rotate(0deg) translateY(0); }
+      25% { transform: rotate(-2deg) translateY(-1px); }
+      75% { transform: rotate(2deg) translateY(-1px); }
+    }
+    .mobile-jiggle { animation: mobile-jiggle .28s ease-in-out; }
+    @media (max-width: 767px) {
+      header { height: auto !important; min-height: 3.5rem; align-items: center; }
+      header > div:last-child { max-width: 70vw; flex-wrap: wrap; justify-content: flex-end; gap: .25rem; }
+      header > div:last-child > button { padding: .25rem !important; min-width: 34px; min-height: 34px; justify-content: center; }
+      header > div:first-child { min-width: 0; }
+      header h1 { font-size: 11px; }
+      .joystick-base { width: 82px; height: 82px; }
+      .joystick-stick { top: 20px; left: 20px; }
+      #chat-sidebar { background: rgba(30, 15, 28, .96); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; }
     }
   </style>
 </head>
-<body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950 text-slate-100" onclick="unlockAudioContext()">
+<body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
 
   <!-- AUTH MODAL OVERLAY -->
-  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="glass text-pink-950 w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-white space-y-4 max-h-[90dvh] overflow-y-auto">
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-pink-950/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90dvh] overflow-y-auto">
       <div class="text-center space-y-1">
         <div class="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-400 text-white shadow-lg shadow-pink-300 mb-1">
           <i data-lucide="sparkles" class="w-6 h-6"></i>
         </div>
-        <h2 class="font-sakura text-2xl font-bold">Sakura Slime World 🌸</h2>
-        <p class="text-xs text-pink-600 font-semibold">Live Multiplayer Slime Lounge & Park</p>
+        <h2 class="font-sakura text-2xl font-bold text-pink-950">Sakura Slime World</h2>
+        <p class="text-xs text-pink-600 font-medium">Explore virtual zen rooms, make friends & collect skins!</p>
       </div>
+
       <div class="grid grid-cols-2 gap-1 p-1 bg-pink-100/80 rounded-2xl text-xs font-bold text-pink-800">
-        <button id="tab-signin" onclick="switchAuthTab('signin')" class="py-2 rounded-xl bg-white shadow text-pink-900">Sign In</button>
-        <button id="tab-signup" onclick="switchAuthTab('signup')" class="py-2 rounded-xl text-pink-600 hover:text-pink-900">Sign Up</button>
+        <button id="tab-signin" onclick="switchAuthTab('signin')" class="py-2 rounded-xl bg-white shadow text-pink-900 transition">Sign In</button>
+        <button id="tab-signup" onclick="switchAuthTab('signup')" class="py-2 rounded-xl transition text-pink-600 hover:text-pink-900">Sign Up</button>
       </div>
+
       <div id="auth-alert" class="hidden text-xs p-3 rounded-xl border font-medium"></div>
+
       <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-3">
         <div class="space-y-1">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-pink-800">Email Address</label>
+          <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Email Address</label>
           <input type="email" id="auth-email" required placeholder="slime@sakura.com" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm font-semibold text-pink-950" />
         </div>
         <div class="space-y-1">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-pink-800">Password</label>
+          <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Password</label>
           <input type="password" id="auth-password" required minlength="6" placeholder="••••••••" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm font-semibold text-pink-950" />
         </div>
         <div id="username-field" class="space-y-1 hidden">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-pink-800">Slime Display Name</label>
+          <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Slime Display Name</label>
           <input type="text" id="auth-username" maxlength="15" placeholder="BouncySlime" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm font-semibold text-pink-950" />
         </div>
+
         <button type="submit" id="auth-submit-btn" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs mt-2">
           <span>Sign In</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </button>
       </form>
+
       <div class="relative flex items-center justify-center my-1">
         <div class="border-t border-pink-200 w-full"></div>
         <span class="bg-white/90 px-3 text-[10px] font-bold uppercase text-pink-400 absolute">or</span>
       </div>
+
       <button onclick="loginAsGuest()" class="w-full bg-white hover:bg-pink-50 text-pink-800 font-semibold py-2 rounded-2xl border border-pink-200 transition active:scale-95 text-xs flex items-center justify-center gap-1.5 shadow-sm">
-        <i data-lucide="user" class="w-4 h-4 text-pink-500"></i> Play as Guest
+        <i data-lucide="user" class="w-4 h-4 text-pink-500"></i> Continue as Guest
       </button>
     </div>
   </div>
 
   <!-- TOP HEADER NAVBAR -->
-  <header class="h-12 sm:h-14 glass px-2 sm:px-4 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm text-pink-950">
-    <div class="flex items-center gap-1.5 sm:gap-2">
-      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shrink-0">
+  <header class="h-12 sm:h-14 glass px-3 flex items-center justify-between z-30 shrink-0 border-b border-pink-200/60 shadow-sm">
+    <div class="flex items-center gap-2">
+      <div class="bg-gradient-to-tr from-pink-500 to-rose-400 text-white p-1.5 rounded-xl shadow-md shadow-pink-300 shrink-0">
         <i data-lucide="flower-2" class="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style="animation-duration: 12s;"></i>
       </div>
       <div>
-        <h1 class="font-sakura text-xs sm:text-base font-bold tracking-wide leading-none">Sakura Slime World 🌸</h1>
+        <h1 class="font-sakura text-xs sm:text-base text-pink-950 font-bold tracking-wide leading-none">Sakura Slime 🌸</h1>
         <p class="text-[9px] sm:text-[10px] text-pink-600 font-semibold uppercase mt-0.5" id="room-indicator">#sakura-lounge</p>
       </div>
     </div>
 
-    <!-- Points HUD Pill -->
-    <div class="flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2 sm:px-2.5 py-1 rounded-xl shadow-sm text-xs font-black">
-      <span>🪙</span>
-      <span id="user-points-display">1000</span>
-    </div>
+    <!-- Currency & Toolbar -->
+    <div class="flex items-center gap-2">
+      <!-- Player Points Badge -->
+      <div class="flex items-center gap-1.5 px-3 py-1 rounded-2xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-extrabold shadow-sm">
+        <span class="text-sm">🪙</span>
+        <span id="player-points-display">10,000</span>
+      </div>
 
-    <div class="flex items-center gap-1 sm:gap-1.5">
-      <!-- Audio WebSynth Trigger -->
-      <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-bold" title="Toggle Lo-Fi Music Synth">
-        <i data-lucide="music" id="music-icon" class="w-4 h-4 text-pink-600"></i>
+      <!-- Music Toggle -->
+      <div class="flex items-center bg-pink-100/90 rounded-xl p-1 border border-pink-200">
+        <button onclick="toggleBackgroundMusic()" id="music-toggle-btn" class="p-1 rounded-lg hover:bg-white text-pink-800 transition flex items-center gap-1 text-xs" title="Toggle Music">
+          <i data-lucide="music" id="music-icon" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-600"></i>
+        </button>
+      </div>
+
+      <!-- Market Modal Button -->
+      <button onclick="openMarketModal()" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-400 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:brightness-110 active:scale-95">
+        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">Market</span>
       </button>
 
-      <!-- Mobile Top Chat Toggle Button -->
-      <button onclick="toggleChatSidebar()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-bold" title="Toggle Chat">
-        <i data-lucide="message-square" class="w-4 h-4 text-pink-600"></i>
-        <span class="hidden sm:inline">Chat</span>
+      <!-- Inventory Modal Button -->
+      <button onclick="openInventoryModal()" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-purple-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-purple-600 active:scale-95">
+        <i data-lucide="box" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">Inventory</span>
       </button>
 
-      <!-- Inventory Button -->
-      <button onclick="openModal('inventory-modal')" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-bold" title="Inventory">
-        <i data-lucide="package" class="w-4 h-4 text-pink-600"></i>
-        <span class="hidden sm:inline">Inv</span>
+      <button onclick="openMemoriesModal()" class="mobile-top-action p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-emerald-600 active:scale-95" title="Slime Memories">
+        <i data-lucide="brain" class="w-4 h-4"></i><span class="hidden sm:inline">Memories</span>
       </button>
 
-      <!-- Market Button -->
-      <button onclick="openModal('market-modal')" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-bold" title="Market">
-        <i data-lucide="shopping-bag" class="w-4 h-4 text-rose-600"></i>
-        <span class="hidden sm:inline">Shop</span>
+      <!-- Chat button stays in the top toolbar on mobile, next to Friends. -->
+      <button onclick="toggleChatSidebar()" class="mobile-top-action p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-fuchsia-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-fuchsia-600 active:scale-95" title="Open chat">
+        <i data-lucide="message-circle" class="w-4 h-4"></i><span class="hidden sm:inline">Chat</span>
       </button>
 
-      <!-- Friends Button -->
-      <button onclick="openModal('friends-modal')" class="relative p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95 flex items-center gap-1 text-xs font-bold" title="Friends">
-        <i data-lucide="users" class="w-4 h-4 text-pink-600"></i>
+      <!-- Friends Modal Button -->
+      <button onclick="openFriendsModal()" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-sky-500 text-white font-bold text-xs flex items-center gap-1 shadow-md hover:bg-sky-600 active:scale-95 relative">
+        <i data-lucide="users" class="w-4 h-4"></i>
         <span class="hidden sm:inline">Friends</span>
-        <span id="friend-req-badge" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full animate-pulse"></span>
+        <span id="unread-dm-badge" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+        <span id="friend-request-badge" class="hidden absolute -top-1 -left-1 min-w-3 h-3 px-1 bg-rose-600 border border-white rounded-full text-[8px] text-white"></span>
       </button>
 
-      <!-- Profile Button -->
-      <button onclick="openModal('profile-modal')" class="p-1 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Profile Settings">
-        <img id="nav-profile-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-6 h-6 rounded-lg object-cover border border-pink-300" />
+      <!-- Profile Customization -->
+      <button onclick="toggleSettingsModal()" class="p-1.5 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-800 border border-pink-200 shadow-sm active:scale-95" title="Profile Settings">
+        <i data-lucide="user-cog" class="w-4 h-4"></i>
       </button>
     </div>
   </header>
@@ -162,12 +262,12 @@
   <!-- MAIN VIEWPORT CONTAINER -->
   <div class="flex-1 relative flex overflow-hidden w-full h-full">
 
-    <!-- CANVAS VIEW (Full World Rendering) -->
-    <div class="flex-1 relative bg-pink-950 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
+    <!-- CANVAS VIEW (Camera Follows Slime) -->
+    <div class="flex-1 relative bg-pink-950/20 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
       <canvas id="gameCanvas" class="block w-full h-full cursor-pointer touch-none"></canvas>
 
-      <!-- Top Overlay Room Quick Switcher Pills -->
-      <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[95vw] overflow-x-auto text-pink-950">
+      <!-- Room Quick Switcher -->
+      <div class="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[95vw] overflow-x-auto">
         <button onclick="switchChannel('sakura-lounge')" id="quick-btn-sakura-lounge" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold bg-pink-500 text-white shadow-sm transition whitespace-nowrap">
           🌸 Zen Garden
         </button>
@@ -175,22 +275,26 @@
           🕹️ Neon Arcade
         </button>
         <button onclick="switchChannel('onsen-hotspring')" id="quick-btn-onsen-hotspring" class="quick-chan-btn px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold text-pink-800 hover:bg-pink-100 transition whitespace-nowrap">
-          🎋 Sakura Park
+          🎋 Onsen Spring
         </button>
       </div>
 
-      <!-- Emote Toolbar Overlay (Bottom Center) -->
-      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2.5 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1.5 sm:gap-2">
-        <button onclick="triggerJump()" class="px-2.5 py-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl text-xs font-black shadow-md active:scale-95 flex items-center gap-1" title="Bounce Jump">
-          <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i>
-          <span>Jump</span>
+      <!-- Quick Action Floating Emote Bar -->
+      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2">
+        <button onclick="triggerJump()" class="action-btn px-2 py-0.5 rounded-xl text-xs font-black text-pink-800 flex items-center gap-1">
+          <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5 text-pink-600"></i>
+          <span class="hidden sm:inline">Jump</span>
         </button>
         <span class="text-pink-300">|</span>
-        <button onclick="triggerEmote('🌸')" class="hover:scale-125 active:scale-90 transition text-base">🌸</button>
-        <button onclick="triggerEmote('❤️')" class="hover:scale-125 active:scale-90 transition text-base">❤️</button>
-        <button onclick="triggerEmote('✨')" class="hover:scale-125 active:scale-90 transition text-base">✨</button>
-        <button onclick="triggerEmote('🍵')" class="hover:scale-125 active:scale-90 transition text-base">🍵</button>
-        <button onclick="triggerEmote('🎮')" class="hover:scale-125 active:scale-90 transition text-base">🎮</button>
+        <button onclick="triggerEmote('🌸')" class="hover:scale-125 transition text-lg">🌸</button>
+        <button onclick="triggerEmote('❤️')" class="hover:scale-125 transition text-lg">❤️</button>
+        <button onclick="triggerEmote('✨')" class="hover:scale-125 transition text-lg">✨</button>
+        <button onclick="triggerEmote('🎮')" class="hover:scale-125 transition text-lg">🎮</button>
+
+        <!-- Active Special Emote Trigger (Dance/Jump loops) -->
+        <button id="special-emote-btn" onclick="toggleActiveSpecialEmote()" class="hidden px-2 py-0.5 rounded-xl bg-purple-500 text-white text-[10px] font-bold shadow animate-pulse">
+          💃 Dance!
+        </button>
       </div>
 
       <!-- Mobile D-Pad Touch Joystick -->
@@ -200,57 +304,40 @@
         </div>
       </div>
 
-      <!-- Mobile Right Jump Control -->
-      <div class="absolute bottom-3 right-3 z-20 pointer-events-auto flex items-center gap-2 md:hidden">
+      <!-- Mobile Right Jump Button -->
+      <div class="absolute bottom-3 right-3 z-20 pointer-events-auto md:hidden">
         <button onclick="triggerJump()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-xs font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
           JUMP
         </button>
       </div>
     </div>
 
-    <!-- SIDEBAR CHAT & DM PANEL -->
-    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/30 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
-      <div class="p-3 border-b border-pink-200/30 bg-white/5 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2">
-          <span id="chat-header-title" class="text-xs font-bold text-pink-200 uppercase tracking-wider flex items-center gap-1.5">
-            <i data-lucide="message-square" class="w-4 h-4 text-pink-400"></i> <span id="chat-mode-label">Global Chat</span>
-          </span>
-        </div>
-        <div class="flex items-center gap-1">
-          <button id="close-dm-btn" onclick="closeDM()" class="hidden text-xs bg-rose-500/20 text-rose-300 px-2 py-1 rounded-lg border border-rose-500/40 hover:bg-rose-500/40">Exit DM</button>
-          <button onclick="toggleChatSidebar()" class="md:hidden text-pink-300 hover:text-white p-1">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
-        </div>
+    <!-- CHAT SIDEBAR PANEL -->
+    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
+      <div class="p-3 border-b border-pink-200/30 bg-white/10 flex items-center justify-between shrink-0">
+        <span class="text-xs font-bold text-pink-200 uppercase tracking-wider flex items-center gap-1.5">
+          <i data-lucide="message-square" class="w-4 h-4 text-pink-400"></i> Global Lounge Chat
+        </span>
+        <button onclick="toggleChatSidebar()" class="md:hidden text-pink-300 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
 
-      <!-- Quick Slime Memories Game Banner Launcher -->
-      <div class="p-2 bg-pink-900/40 border-b border-pink-200/20 shrink-0 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-base">🧠</span>
-          <div>
-            <h4 class="text-xs font-bold text-pink-200">Slime Memories</h4>
-            <p class="text-[9px] text-pink-400">Match cards to earn 5 pts!</p>
-          </div>
-        </div>
-        <button onclick="openSlimeMemoriesGame()" class="px-2.5 py-1 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs shadow">Play</button>
-      </div>
-
-      <!-- Chat Log Stream -->
-      <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2.5"></div>
+      <!-- Chat Messages Container -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2 text-xs"></div>
 
       <!-- Chat Input Form -->
       <div class="p-2.5 bg-pink-950/80 border-t border-pink-200/30 shrink-0">
-        <form id="chat-form" onsubmit="handleSendChatMessage(event)" class="flex items-center gap-2">
+        <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex items-center gap-2">
           <input 
             type="text" 
             id="chat-input" 
-            placeholder="Type a message..." 
+            placeholder="Type global message..." 
             maxlength="120"
             autocomplete="off"
             class="glass-input flex-1 px-3 py-2 rounded-xl text-xs text-pink-950 placeholder-pink-400 font-medium"
           />
-          <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl shadow-md active:scale-95 shrink-0">
+          <button type="submit" class="bg-pink-500 hover:bg-pink-600 text-white p-2 rounded-xl shadow-md transition shrink-0">
             <i data-lucide="send" class="w-4 h-4"></i>
           </button>
         </form>
@@ -258,280 +345,373 @@
     </aside>
   </div>
 
-  <!-- PROFILE MODAL (Avatar, Name, Supabase Sync) -->
-  <div id="profile-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass text-pink-950 w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 max-h-[90dvh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
-        <h3 class="font-bold text-pink-950 text-base flex items-center gap-1.5"><i data-lucide="user" class="w-5 h-5 text-pink-600"></i> Profile Settings</h3>
-        <button onclick="closeModal('profile-modal')" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
-      </div>
-
-      <div class="flex flex-col items-center space-y-2">
-        <div class="relative group">
-          <img id="profile-preview-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-20 h-20 rounded-2xl object-cover border-2 border-pink-400 shadow-md" />
-          <label class="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer text-white text-[10px] font-bold">
-            Upload
-            <input type="file" id="profile-upload-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)" />
-          </label>
-        </div>
-        <button onclick="resetProfilePicture()" class="text-[10px] text-pink-600 hover:text-pink-800 font-bold underline">Reset Default Avatar</button>
-      </div>
-
-      <div class="space-y-1">
-        <label class="text-[10px] font-bold uppercase tracking-wider text-pink-800">Slime Display Name</label>
-        <input type="text" id="profile-name-input" maxlength="15" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs font-semibold text-pink-950" placeholder="Display Name..." />
-      </div>
-
-      <button onclick="saveProfileChanges()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-xs">
-        <i data-lucide="check" class="w-4 h-4"></i> Save & Refresh World
-      </button>
-    </div>
-  </div>
-
-  <!-- MARKET SHOP MODAL -->
-  <div id="market-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass text-pink-950 w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white space-y-3 max-h-[90dvh] flex flex-col">
-      <div class="flex items-center justify-between border-b border-pink-200 pb-2 shrink-0">
+  <!-- MARKET MODAL -->
+  <div id="market-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+    <div class="glass w-full max-w-2xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-3 shrink-0">
         <div class="flex items-center gap-2">
-          <i data-lucide="shopping-bag" class="w-5 h-5 text-rose-600"></i>
-          <h3 class="font-bold text-pink-950 text-base">Slime Market</h3>
+          <div class="p-2 rounded-xl bg-pink-500 text-white"><i data-lucide="shopping-bag" class="w-5 h-5"></i></div>
+          <div>
+            <h3 class="font-extrabold text-pink-950 text-base sm:text-lg">Slime Market</h3>
+            <p class="text-[10px] text-pink-600">Buy exclusive accessories, skins, titles & animated emotes!</p>
+          </div>
         </div>
-        <button onclick="closeModal('market-modal')" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="closeMarketModal()" class="text-pink-700 hover:text-pink-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <!-- Shop Category Switcher -->
-      <div class="grid grid-cols-4 gap-1 bg-pink-100/80 p-1 rounded-xl text-[10px] font-bold text-pink-800 shrink-0">
-        <button onclick="switchMarketCategory('accessories')" id="mcat-accessories" class="py-1.5 rounded-lg bg-white shadow">Accessories</button>
-        <button onclick="switchMarketCategory('skins')" id="mcat-skins" class="py-1.5 rounded-lg">Skins</button>
-        <button onclick="switchMarketCategory('titles')" id="mcat-titles" class="py-1.5 rounded-lg">Titles</button>
-        <button onclick="switchMarketCategory('stickers')" id="mcat-stickers" class="py-1.5 rounded-lg">Stickers</button>
-      </div>
+      <!-- Market Layout Grid (Preview + Shop List) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 flex-1 overflow-hidden">
+        <!-- Live Preview Canvas Box -->
+        <div class="bg-pink-100/70 border border-pink-200 rounded-2xl p-3 flex flex-col items-center justify-center relative">
+          <span class="text-[10px] font-bold text-pink-700 uppercase tracking-wider mb-1">Live Slime Preview</span>
+          <canvas id="marketPreviewCanvas" width="180" height="150" class="bg-pink-900/10 rounded-xl border border-pink-300 shadow-inner"></canvas>
+          <p id="market-item-preview-name" class="text-xs font-bold text-pink-950 mt-2 text-center">Testing: Select Item</p>
+        </div>
 
-      <!-- Search Area -->
-      <div class="relative shrink-0">
-        <input type="text" id="market-search" oninput="renderMarketItems()" placeholder="Search item by name..." class="glass-input w-full px-3 py-1.5 rounded-xl text-xs text-pink-950 pl-8" />
-        <i data-lucide="search" class="w-3.5 h-3.5 text-pink-400 absolute left-2.5 top-2.5"></i>
-      </div>
+        <!-- Shop Catalog Section -->
+        <div class="md:col-span-2 flex flex-col overflow-hidden">
+          <!-- Market Category Tabs -->
+          <div class="flex items-center gap-1 border-b border-pink-200 pb-2 overflow-x-auto shrink-0">
+            <button onclick="filterMarketCategory('accessories')" id="mcat-accessories" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-active">Hats & Ears</button>
+            <button onclick="filterMarketCategory('skins')" id="mcat-skins" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Skins</button>
+            <button onclick="filterMarketCategory('titles')" id="mcat-titles" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Titles</button>
+            <button onclick="filterMarketCategory('emotes')" id="mcat-emotes" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Emotes</button>
+            <button onclick="filterMarketCategory('profile')" id="mcat-profile" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Profile Stickers</button>
+          </div>
 
-      <!-- Market Items Container -->
-      <div id="market-items-grid" class="flex-1 overflow-y-auto grid grid-cols-2 gap-2 p-1"></div>
+          <!-- Item Grid Container -->
+          <div id="market-items-grid" class="grid grid-cols-2 gap-2 mt-3 overflow-y-auto pr-1 flex-1"></div>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- INVENTORY MODAL -->
-  <div id="inventory-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass text-pink-950 w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white space-y-3 max-h-[90dvh] flex flex-col">
-      <div class="flex items-center justify-between border-b border-pink-200 pb-2 shrink-0">
+  <div id="inventory-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+    <div class="glass w-full max-w-2xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-3 shrink-0">
         <div class="flex items-center gap-2">
-          <i data-lucide="package" class="w-5 h-5 text-pink-600"></i>
-          <h3 class="font-bold text-pink-950 text-base">Slime Inventory</h3>
+          <div class="p-2 rounded-xl bg-purple-500 text-white"><i data-lucide="box" class="w-5 h-5"></i></div>
+          <div>
+            <h3 class="font-extrabold text-pink-950 text-base sm:text-lg">Slime Inventory</h3>
+            <p class="text-[10px] text-pink-600">Test & equip your unlocked items</p>
+          </div>
         </div>
-        <button onclick="closeModal('inventory-modal')" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="closeInventoryModal()" class="text-pink-700 hover:text-pink-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <!-- Slime Real-time Preview Stage -->
-      <div class="bg-pink-900/20 border border-pink-300 rounded-2xl p-3 flex flex-col items-center justify-center shrink-0 relative min-h-[110px]">
-        <canvas id="inventoryPreviewCanvas" width="160" height="90" class="block"></canvas>
-        <p class="text-[10px] text-pink-700 font-bold mt-1">Live Outfit Preview</p>
-      </div>
+      <!-- Inventory Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 flex-1 overflow-hidden">
+        <!-- Live Inventory Preview Box -->
+        <div class="bg-purple-100/70 border border-purple-200 rounded-2xl p-3 flex flex-col items-center justify-center relative">
+          <span class="text-[10px] font-bold text-purple-800 uppercase tracking-wider mb-1">Equipment Preview</span>
+          <canvas id="invPreviewCanvas" width="180" height="150" class="bg-purple-900/10 rounded-xl border border-purple-300 shadow-inner"></canvas>
+          <div id="inv-equipped-info" class="text-center mt-2 space-y-0.5">
+            <p class="text-xs font-bold text-purple-950" id="inv-skin-label">Skin: Pink</p>
+            <p class="text-[10px] font-semibold text-purple-700" id="inv-title-label">Title: None</p>
+          </div>
+        </div>
 
-      <!-- Category Filter -->
-      <div class="grid grid-cols-4 gap-1 bg-pink-100/80 p-1 rounded-xl text-[10px] font-bold text-pink-800 shrink-0">
-        <button onclick="switchInvCategory('all')" id="icat-all" class="py-1 rounded-lg bg-white shadow">All</button>
-        <button onclick="switchInvCategory('skins')" id="icat-skins" class="py-1 rounded-lg">Skins</button>
-        <button onclick="switchInvCategory('accessories')" id="icat-accessories" class="py-1 rounded-lg">Acc</button>
-        <button onclick="switchInvCategory('titles')" id="icat-titles" class="py-1 rounded-lg">Titles</button>
-      </div>
+        <!-- Inventory List & Search -->
+        <div class="md:col-span-2 flex flex-col overflow-hidden">
+          <div class="flex items-center gap-2 mb-2 shrink-0">
+            <input 
+              type="text" 
+              id="inv-search-input" 
+              oninput="renderInventoryGrid()" 
+              placeholder="Search items by name..." 
+              class="glass-input flex-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-pink-950"
+            />
+          </div>
 
-      <div class="relative shrink-0">
-        <input type="text" id="inv-search" oninput="renderInventoryItems()" placeholder="Search owned items..." class="glass-input w-full px-3 py-1 rounded-xl text-xs text-pink-950 pl-8" />
-        <i data-lucide="search" class="w-3.5 h-3.5 text-pink-400 absolute left-2.5 top-2"></i>
+          <div id="inventory-items-grid" class="grid grid-cols-2 gap-2 overflow-y-auto pr-1 flex-1"></div>
+        </div>
       </div>
-
-      <!-- Inventory Items List -->
-      <div id="inventory-items-grid" class="flex-1 overflow-y-auto grid grid-cols-2 gap-2 p-1"></div>
     </div>
   </div>
 
-  <!-- FRIENDS & DM MODAL -->
-  <div id="friends-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass text-pink-950 w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-3 max-h-[90dvh] flex flex-col">
-      <div class="flex items-center justify-between border-b border-pink-200 pb-2 shrink-0">
+  <!-- FRIENDS & DIRECT MESSAGES MODAL -->
+  <div id="friends-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+    <div class="glass w-full max-w-2xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-3 shrink-0">
         <div class="flex items-center gap-2">
-          <i data-lucide="users" class="w-5 h-5 text-pink-600"></i>
-          <h3 class="font-bold text-pink-950 text-base">Friends System</h3>
+          <div class="p-2 rounded-xl bg-sky-500 text-white"><i data-lucide="users" class="w-5 h-5"></i></div>
+          <div>
+            <h3 class="font-extrabold text-pink-950 text-base sm:text-lg">Friends & Direct Messages</h3>
+            <p class="text-[10px] text-sky-700">Add friends, search players, or chat privately</p>
+          </div>
         </div>
-        <button onclick="closeModal('friends-modal')" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="closeFriendsModal()" class="text-pink-700 hover:text-pink-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <!-- Search User Area -->
-      <div class="space-y-1 shrink-0">
-        <label class="text-[10px] font-bold uppercase tracking-wider text-pink-800">Search User by Name</label>
-        <div class="flex items-center gap-1.5">
-          <input type="text" id="friend-search-input" placeholder="Type username..." class="glass-input flex-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-pink-950" />
-          <button onclick="searchAndAddFriend()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow">Add</button>
+      <!-- Friends Content Tabs -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 flex-1 overflow-hidden">
+        <!-- Friends List & Player Search Panel -->
+        <div class="flex flex-col border-r border-pink-200/60 pr-2">
+          <div class="space-y-1.5 mb-2 shrink-0">
+            <input 
+              type="text" 
+              id="friend-search-input" 
+              oninput="handleFriendUserSearch()" 
+              placeholder="Search user by name..." 
+              class="glass-input w-full px-3 py-1.5 rounded-xl text-xs font-semibold text-pink-950"
+            />
+          </div>
+
+          <div id="friend-requests-container" class="shrink-0 space-y-1.5 max-h-28 overflow-y-auto"></div>
+          <div id="friends-list-container" class="flex-1 overflow-y-auto space-y-1.5 pr-1"></div>
+        </div>
+
+        <!-- DM Chat Area -->
+        <div class="md:col-span-2 flex flex-col bg-white/40 rounded-2xl p-3 border border-pink-200">
+          <div id="dm-header" class="border-b border-pink-200 pb-2 mb-2 flex items-center justify-between shrink-0">
+            <p class="text-xs font-extrabold text-pink-950" id="dm-active-target">Select a friend to message</p>
+            <span class="text-[10px] bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full font-bold" id="dm-status-tag">Friend Required</span>
+          </div>
+
+          <div id="dm-messages-container" class="flex-1 overflow-y-auto space-y-2 p-1 text-xs"></div>
+
+          <form id="dm-input-form" onsubmit="handleDMSubmit(event)" class="mt-2 flex items-center gap-2 shrink-0">
+            <input 
+              type="text" 
+              id="dm-text-input" 
+              disabled 
+              placeholder="Can't send messages unless friend request accepted" 
+              class="glass-input flex-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-pink-950 disabled:opacity-50"
+            />
+            <button type="submit" id="dm-send-btn" disabled class="bg-sky-500 text-white p-2 rounded-xl shadow disabled:opacity-50">
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </form>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Friends List Tabs -->
-      <div class="grid grid-cols-2 gap-1 bg-pink-100/80 p-1 rounded-xl text-[10px] font-bold text-pink-800 shrink-0">
-        <button onclick="switchFriendTab('friends')" id="ftab-friends" class="py-1 rounded-lg bg-white shadow">Friends</button>
-        <button onclick="switchFriendTab('requests')" id="ftab-requests" class="py-1 rounded-lg relative">
-          Requests
-          <span id="ftab-badge" class="hidden absolute top-0.5 right-2 w-2 h-2 bg-rose-500 rounded-full"></span>
+  <!-- SLIME MEMORIES GAME -->
+  <div id="memories-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+    <div class="glass w-full max-w-md rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
+      <div class="flex items-center justify-between border-b border-emerald-200 pb-3">
+        <div>
+          <h3 class="font-extrabold text-emerald-950 text-base sm:text-lg">Slime Memories</h3>
+          <p class="text-[10px] text-emerald-700">Match all 8 pairs to earn 5 points.</p>
+        </div>
+        <button onclick="closeMemoriesModal()" class="text-emerald-800 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="flex items-center justify-between py-2">
+        <p id="memory-status" class="text-xs font-bold text-emerald-900">Find the matching stickers!</p>
+        <button onclick="startMemoriesGame()" class="px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-bold">New game</button>
+      </div>
+      <div id="memory-grid" class="grid grid-cols-4 gap-2"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE & SETTINGS MODAL -->
+  <div id="settings-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-white space-y-4 animate-in fade-in zoom-in-95 max-h-[90dvh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
+        <div class="flex items-center gap-2">
+          <i data-lucide="user-cog" class="w-5 h-5 text-pink-600"></i>
+          <h3 class="font-bold text-pink-950 text-base">Profile Settings</h3>
+        </div>
+        <button onclick="toggleSettingsModal()" class="text-pink-700 hover:text-pink-900 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <div id="friends-list-container" class="flex-1 overflow-y-auto space-y-1.5 pr-1"></div>
-    </div>
-  </div>
-
-  <!-- SLIME MEMORIES GAME MODAL -->
-  <div id="memories-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass text-pink-950 w-full max-w-xs rounded-3xl p-5 shadow-2xl border border-white space-y-3 animate-in fade-in">
-      <div class="flex items-center justify-between border-b border-pink-200 pb-2">
-        <h3 class="font-bold text-pink-950 text-xs flex items-center gap-1.5">
-          🧠 Slime Memories
-        </h3>
-        <button onclick="closeModal('memories-modal')" class="text-pink-700 hover:text-pink-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+      <!-- Avatar Profile Picture Selection -->
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Profile Icon Picture</label>
+        <div class="grid grid-cols-4 gap-2" id="pfp-picker-grid"></div>
       </div>
-      <div class="grid grid-cols-4 gap-2" id="memory-cards-grid"></div>
-      <p class="text-[11px] text-pink-800 font-bold text-center" id="memory-game-status">Match pairs to win +5 Points!</p>
+
+      <div class="space-y-2">
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Profile Image</label>
+        <div class="flex items-center gap-3 rounded-2xl border border-pink-200 bg-pink-50/80 p-2.5">
+          <div id="profile-avatar-preview" class="w-12 h-12 rounded-full bg-white border-2 border-pink-200 flex items-center justify-center overflow-hidden text-2xl">🌸</div>
+          <div class="min-w-0 flex-1">
+            <input id="profile-image-input" type="file" accept="image/*" onchange="handleProfileImageUpload(event)" class="block w-full text-[10px] text-pink-800 file:mr-2 file:rounded-lg file:border-0 file:bg-pink-500 file:px-2 file:py-1 file:text-[10px] file:font-bold file:text-white" />
+            <button type="button" onclick="clearProfileImage()" class="mt-1 text-[10px] font-bold text-pink-600 hover:text-pink-900">Use selected sticker instead</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-pink-800 uppercase tracking-wider">Display Name</label>
+        <input type="text" id="setting-username" maxlength="15" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs font-semibold text-pink-950" placeholder="Your Slime Name..." />
+      </div>
+
+      <button onclick="saveProfileSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs">
+        <i data-lucide="check" class="w-4 h-4"></i> Save & Refresh Everywhere
+      </button>
     </div>
   </div>
 
   <script>
-    // --- SUPABASE SETUP ---
+    // --- SUPABASE CLIENT SETUP ---
     const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- SOUND SYNTHESIZER FIX ---
+    // --- GAME CATALOG ---
+    const PROFILE_STICKERS = [
+      { id: 'pfp_sakura', name: 'Sakura Blossom', icon: '🌸', price: 500, desc: 'Your starter profile sticker' },
+      { id: 'pfp_cat', name: 'Sakura Cat', icon: '🐱', price: 1200, desc: 'A little lucky cat' },
+      { id: 'pfp_fox', name: 'Clever Fox', icon: '🦊', price: 2500, desc: 'A bright fox sticker' },
+      { id: 'pfp_crown', name: 'Royal Crown', icon: '👑', price: 4000, desc: 'A tiny royal crown' },
+      { id: 'pfp_bunny', name: 'Moon Bunny', icon: '🐰', price: 6000, desc: 'A fluffy bunny friend' },
+      { id: 'pfp_star', name: 'Lucky Star', icon: '⭐', price: 7500, desc: 'A sparkling star sticker' },
+      { id: 'pfp_panda', name: 'Panda Pal', icon: '🐼', price: 9000, desc: 'A sleepy panda face' },
+      { id: 'pfp_unicorn', name: 'Dream Unicorn', icon: '🦄', price: 10000, desc: 'A magical unicorn sticker' }
+    ];
+    const MARKET_ITEMS = {
+      skins: [
+        { id: 'skin_pink', name: 'Pink Slime', type: 'skins', price: 0, color: '#f472b6', desc: 'Default cute pink slime skin' },
+        { id: 'skin_blue', name: 'Ocean Blue Slime', type: 'skins', price: 1000, color: '#38bdf8', desc: 'Refreshing ocean blue tone' },
+        { id: 'skin_matcha', name: 'Matcha Green Slime', type: 'skins', price: 2500, color: '#4ade80', desc: 'Peaceful matcha green' },
+        { id: 'skin_golden', name: 'Golden Glow Slime', type: 'skins', price: 8000, color: '#fbbf24', desc: 'Shining rich golden essence' },
+        { id: 'skin_midnight', name: 'Midnight Purple Slime', type: 'skins', price: 10000, color: '#a855f7', desc: 'Deep cosmic star purple' }
+      ],
+      accessories: [
+        { id: 'acc_tophat', name: 'Fancy Tophat', type: 'accessories', price: 1500, icon: '🎩', desc: 'Classic black dapper hat' },
+        { id: 'acc_bowtie', name: 'Red Bowtie', type: 'accessories', price: 3000, icon: '🎀', desc: 'Cute red bowtie' },
+        { id: 'acc_bunny', name: 'Bunny Ears', type: 'accessories', price: 5000, icon: '🐰', desc: 'Fluffy bunny ears' },
+        { id: 'acc_crown', name: 'Royal Crown', type: 'accessories', price: 10000, icon: '👑', desc: 'Sparkling monarch crown' }
+      ],
+      titles: [
+        { id: 'title_zen', name: 'Zen Master', type: 'titles', price: 2000, text: '🧘 Zen Master', color: '#34d399', desc: 'Displayed right above your slime' },
+        { id: 'title_sakura', name: 'Sakura Blossom', type: 'titles', price: 4500, text: '🌸 Sakura Blossom', color: '#f472b6', desc: 'Blooming cherry title' },
+        { id: 'title_king', name: 'Slime King', type: 'titles', price: 10000, text: '👑 Slime King', color: '#fbbf24', desc: 'Royalty status tag' }
+      ],
+      emotes: [
+        { id: 'emote_dance', name: 'Dance Emote', type: 'emotes', price: 5000, anim: 'dance', icon: '💃', desc: 'Looping dance bounce animation' },
+        { id: 'emote_bounce', name: 'Non-Stop Jump', type: 'emotes', price: 7500, anim: 'jump_loop', icon: '🦘', desc: 'Endless bounce jump emote' },
+        { id: 'emote_spin', name: 'Spinning Whirl', type: 'emotes', price: 10000, anim: 'spin', icon: '🌀', desc: 'Rapid slime rotation' }
+      ],
+      profile: PROFILE_STICKERS.map(item => ({ ...item, type: 'profile' }))
+    };
+    const PROFILE_PFP_OPTIONS = PROFILE_STICKERS.map(item => item.icon);
+
+    // --- PLAYER STATE ---
+    function loadStoredJson(key, fallback) {
+      try { const value = JSON.parse(localStorage.getItem(key)); return value == null ? fallback : value; }
+      catch (e) { return fallback; }
+    }
+    let localPlayer = {
+      id: localStorage.getItem('sakura_user_id') || (() => {
+        const id = 'usr_' + Math.random().toString(36).substring(2, 9);
+        localStorage.setItem('sakura_user_id', id);
+        return id;
+      })(),
+      name: localStorage.getItem('sakura_name') || 'Slime_' + Math.floor(100 + Math.random() * 900),
+      pfp: localStorage.getItem('sakura_pfp') || '🌸',
+      avatarUrl: localStorage.getItem('sakura_avatar') || '',
+      x: 600,
+      y: 600,
+      vx: 0,
+      vy: 0,
+      points: Number.parseInt(localStorage.getItem('sakura_points') || '10000', 10) || 0,
+      equippedSkin: localStorage.getItem('sakura_eq_skin') || 'skin_pink',
+      equippedAcc: localStorage.getItem('sakura_eq_acc') || null,
+      equippedTitle: localStorage.getItem('sakura_eq_title') || null,
+      inventory: loadStoredJson('sakura_inv', ['skin_pink', 'pfp_sakura']),
+      activeSpecialEmote: null,
+      isJumping: false,
+      jumpOffset: 0,
+      jumpVelocity: 0,
+      bounceCount: 0,
+      landingSquash: 0,
+      direction: 'down'
+    };
+    if (!Array.isArray(localPlayer.inventory)) localPlayer.inventory = ['skin_pink', 'pfp_sakura'];
+    if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
+    if (!localPlayer.inventory.includes('pfp_sakura')) localPlayer.inventory.push('pfp_sakura');
+    if (!PROFILE_PFP_OPTIONS.includes(localPlayer.pfp)) localPlayer.pfp = '🌸';
+    const savedSticker = PROFILE_STICKERS.find(sticker => sticker.icon === localPlayer.pfp);
+    if (savedSticker && !localPlayer.inventory.includes(savedSticker.id)) localPlayer.inventory.push(savedSticker.id);
+    localStorage.setItem('sakura_inv', JSON.stringify(localPlayer.inventory));
+
+    let remotePlayers = {};
+    const isValidUserId = value => typeof value === 'string' && value.trim() && value !== 'undefined' && value !== 'null';
+    let friendList = (Array.isArray(loadStoredJson('sakura_friends', [])) ? loadStoredJson('sakura_friends', []) : []).filter(f => f && isValidUserId(f.id) && typeof f.name === 'string' && f.name.trim() && f.name !== 'undefined');
+    friendList = Array.from(new Map(friendList.map(f => [f.id, { ...f, name: f.name.trim(), pfp: PROFILE_PFP_OPTIONS.includes(f.pfp) ? f.pfp : '🌸', accepted: true }])).values());
+    let friendRequests = (Array.isArray(loadStoredJson('sakura_friend_reqs', [])) ? loadStoredJson('sakura_friend_reqs', []) : []).filter(r => r && isValidUserId(r.senderId) && typeof r.name === 'string' && r.name.trim());
+    let outgoingFriendRequests = (Array.isArray(loadStoredJson('sakura_friend_outgoing', [])) ? loadStoredJson('sakura_friend_outgoing', []) : []).filter(r => r && isValidUserId(r.targetId));
+    localStorage.setItem('sakura_friends', JSON.stringify(friendList));
+    localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
+    let dmMessages = loadStoredJson('sakura_dms', {});
+    let activeDMUserId = null;
+    let currentChannel = 'sakura-lounge';
+    let realtimeChannel = null;
+    let lastStateBroadcastAt = 0;
+
+    // Keys & Joystick Input
+    const keys = { up: false, down: false, left: false, right: false };
+    const joystick = { active: false, dx: 0, dy: 0 };
+
+    let camera = { x: 0, y: 0 };
+
+    // --- AUDIO & AMBIENT MUSIC ---
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     let musicPlaying = false;
     let musicTimer = null;
+    let musicNoteIndex = 0;
+    const musicNotes = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46];
 
-    function unlockAudioContext() {
-      if (!audioCtx) {
-        audioCtx = new AudioCtx();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+    function initAudio() {
+      if (!AudioCtx) return false;
+      if (!audioCtx) audioCtx = new AudioCtx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return true;
     }
 
-    const NOTES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
-    function playAudioNote() {
-      if (!musicPlaying) return;
-      unlockAudioContext();
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        const freq = NOTES[Math.floor(Math.random() * NOTES.length)];
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 1.2);
-      } catch (e) {}
-      musicTimer = setTimeout(playAudioNote, Math.random() * 500 + 400);
+    function playTone(frequency, duration, volume, type = 'sine') {
+      if (!initAudio()) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+      osc.type = type;
+      osc.frequency.setValueAtTime(frequency, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + duration + 0.03);
+    }
+
+    function playSound(type) {
+      const notes = type === 'buy' ? [659.25, 880] : type === 'match' ? [784, 988] : [392, 587];
+      playTone(notes[0], .16, .045, 'sine');
+      if (notes[1]) window.setTimeout(() => playTone(notes[1], .22, .04, 'sine'), 80);
+    }
+
+    function playNextMusicNote() {
+      if (!musicPlaying || !audioCtx) return;
+      const frequency = musicNotes[musicNoteIndex % musicNotes.length];
+      musicNoteIndex++;
+      playTone(frequency, .34, .018, 'triangle');
     }
 
     function toggleBackgroundMusic() {
-      unlockAudioContext();
+      if (!initAudio()) return;
       musicPlaying = !musicPlaying;
-      const btn = document.getElementById('music-toggle-btn');
+      const icon = document.getElementById('music-icon');
       if (musicPlaying) {
-        btn.classList.add('bg-pink-300', 'text-pink-950');
-        playAudioNote();
+        icon.setAttribute('data-lucide', 'volume-2');
+        playNextMusicNote();
+        musicTimer = window.setInterval(playNextMusicNote, 420);
       } else {
-        btn.classList.remove('bg-pink-300', 'text-pink-950');
-        clearTimeout(musicTimer);
+        icon.setAttribute('data-lucide', 'music');
+        window.clearInterval(musicTimer);
+        musicTimer = null;
       }
+      lucide.createIcons();
     }
 
-    // --- GAME CATALOG DATA WITH EXTENDED STICKERS ---
-    const MARKET_CATALOG = {
-      accessories: [
-        { id: 'hat_bow', name: 'Pink Bowtie', type: 'accessory', price: 1000, icon: '🎀' },
-        { id: 'hat_bunny', name: 'Bunny Ears', type: 'accessory', price: 2500, icon: '🐰' },
-        { id: 'hat_crown', name: 'Royal Crown', type: 'accessory', price: 5000, icon: '👑' },
-        { id: 'hat_wizard', name: 'Wizard Hat', type: 'accessory', price: 8000, icon: '🧙' }
-      ],
-      skins: [
-        { id: 'skin_pink', name: 'Classic Pink', type: 'skin', price: 0, color: '#f472b6', eyeColor: '#000' },
-        { id: 'skin_matcha', name: 'Matcha Green', type: 'skin', price: 3000, color: '#4ade80', eyeColor: '#064e3b' },
-        { id: 'skin_ocean', name: 'Ocean Blue', type: 'skin', price: 7000, color: '#38bdf8', eyeColor: '#0c4a6e' },
-        { id: 'skin_lava', name: 'Lava Flame', type: 'skin', price: 15000, color: '#f97316', eyeColor: '#7c2d12' }
-      ],
-      titles: [
-        { id: 'title_novice', name: 'Bouncy Slime', type: 'title', price: 1000, label: '✨ Bouncy Slime' },
-        { id: 'title_zen', name: 'Zen Master', type: 'title', price: 6000, label: '🌸 Zen Master' },
-        { id: 'title_legend', name: 'Slime Overlord', type: 'title', price: 20000, label: '👑 Slime Overlord' }
-      ],
-      stickers: [
-        { id: 'stk_cat', name: 'Kitty Sticker', type: 'sticker', price: 500, url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=100&auto=format&fit=crop&q=80' },
-        { id: 'stk_sakura', name: 'Sakura Blossom', type: 'sticker', price: 1500, url: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=100&auto=format&fit=crop&q=80' },
-        { id: 'stk_fox', name: 'Mystic Fox', type: 'sticker', price: 3500, url: 'https://images.unsplash.com/photo-1516934024742-b461fba47600?w=100&auto=format&fit=crop&q=80' },
-        { id: 'stk_dragon', name: 'Golden Dragon', type: 'sticker', price: 10000, url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=100&auto=format&fit=crop&q=80' }
-      ]
-    };
-
-    // Default Profile Pic
-    const DEFAULT_PROFILE_PIC = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
-
-    // --- USER STATE ---
-    let localPlayer = {
-      id: 'usr_' + Math.random().toString(36).substring(2, 9),
-      name: localStorage.getItem('sakura_slime_name') || 'Slime_' + Math.floor(100 + Math.random() * 900),
-      profilePic: localStorage.getItem('sakura_profile_pic') || DEFAULT_PROFILE_PIC,
-      points: parseInt(localStorage.getItem('sakura_slime_pts') || '1000'),
-      equippedSkin: localStorage.getItem('sakura_eq_skin') || 'skin_pink',
-      equippedAccessory: localStorage.getItem('sakura_eq_acc') || null,
-      equippedTitle: localStorage.getItem('sakura_eq_title') || null,
-      inventory: JSON.parse(localStorage.getItem('sakura_inventory') || '["skin_pink"]'),
-      x: 600, y: 600, vx: 0, vy: 0,
-      scaleX: 1, scaleY: 1, jigglePhase: 0,
-      isJumping: false, jumpZ: 0, jumpVZ: 0,
-      activeEmote: null, emoteTimer: 0
-    };
-
-    let remotePlayers = {};
-    let friends = JSON.parse(localStorage.getItem('sakura_friends_list') || '[]');
-    let friendRequests = JSON.parse(localStorage.getItem('sakura_friend_reqs') || '[]');
-    let activeDMFriend = null;
-
-    // Filter Out Undefined Friends & Invalid Objects
-    function cleanFriendArrays() {
-      friends = friends.filter(f => f && f.id && f.name && f.name !== 'undefined');
-      friendRequests = friendRequests.filter(f => f && f.id && f.name && f.name !== 'undefined');
-      localStorage.setItem('sakura_friends_list', JSON.stringify(friends));
-      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
-    }
-    cleanFriendArrays();
-
-    let currentChannel = 'sakura-lounge';
-    let realtimeChannel = null;
-    let camera = { x: 600, y: 600 };
-
-    // Park Animated Petals
-    let sakuraPetals = Array.from({ length: 30 }, () => ({
-      x: Math.random() * 1600,
-      y: Math.random() * 1200,
-      speedY: 0.8 + Math.random() * 1.2,
-      speedX: Math.sin(Math.random() * Math.PI) * 0.5,
-      radius: 3 + Math.random() * 3
-    }));
-
-    // --- MOVEMENT & PHYSICS ---
-    const keys = { up: false, down: false, left: false, right: false };
-    const joystick = { active: false, dx: 0, dy: 0 };
-
+    // --- CAMERA & CANVAS RENDERING ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -540,825 +720,1053 @@
       canvas.width = container.clientWidth;
       canvas.height = container.clientHeight;
     }
+    window.addEventListener('resize', resizeCanvas);
 
-    // --- AUTH MODAL HANDLERS ---
-    let authMode = 'signin';
-    function switchAuthTab(mode) {
-      authMode = mode;
-      document.getElementById('tab-signin').className = mode === 'signin' ? "py-2 rounded-xl bg-white shadow text-pink-900" : "py-2 rounded-xl text-pink-600 hover:text-pink-900";
-      document.getElementById('tab-signup').className = mode === 'signup' ? "py-2 rounded-xl bg-white shadow text-pink-900" : "py-2 rounded-xl text-pink-600 hover:text-pink-900";
-      document.getElementById('username-field').classList.toggle('hidden', mode === 'signin');
+    const profileAvatarCache = new Map();
+    function drawPlayerLabel(c, player, isSelf = false) {
+      const labelY = player.y + (isSelf ? 34 : 32);
+      const avatarUrl = safeAvatarUrl(player.avatarUrl);
+      c.font = isSelf ? 'bold 12px Plus Jakarta Sans' : 'bold 11px Plus Jakarta Sans';
+      c.textAlign = 'center';
+      c.lineWidth = 3;
+      c.strokeStyle = 'rgba(38, 18, 35, .6)';
+      c.fillStyle = isSelf ? '#f472b6' : '#ffffff';
+      const text = isSelf ? `${player.name} (You)` : player.name;
+      if (avatarUrl) {
+        let avatar = profileAvatarCache.get(avatarUrl);
+        if (!avatar) { avatar = new Image(); avatar.src = avatarUrl; profileAvatarCache.set(avatarUrl, avatar); }
+        if (avatar.complete && avatar.naturalWidth) {
+          const left = player.x - 48;
+          c.save(); c.beginPath(); c.arc(left, labelY - 4, 10, 0, Math.PI * 2); c.clip(); c.drawImage(avatar, left - 10, labelY - 14, 20, 20); c.restore();
+          c.textAlign = 'left';
+          c.strokeText(text, left + 15, labelY);
+          c.fillText(text, left + 15, labelY);
+          return;
+        }
+      }
+      const fallback = PROFILE_PFP_OPTIONS.includes(player.pfp) ? player.pfp : '🌸';
+      c.strokeText(`${fallback} ${text}`, player.x, labelY);
+      c.fillText(`${fallback} ${text}`, player.x, labelY);
     }
 
-    function handleAuthSubmit(e) {
+    // Render Helper: Draw Slime model with soft idle wobble and squash on landing.
+    function drawSlimeModel(c, x, y, skinId, accId, titleId, isJumping, jumpOff, activeEmoteAnim, isSelf) {
+      c.save();
+      const phase = Date.now() * 0.008 + x * 0.015;
+      const moving = isSelf ? Math.min(1, Math.hypot(localPlayer.vx, localPlayer.vy) / 190) : 0;
+      const squash = isSelf ? localPlayer.landingSquash : 0;
+      c.translate(x + (isSelf ? Math.sin(phase) * moving * 1.5 : 0), y - jumpOff + Math.sin(phase) * (moving ? 1.8 : 0.6));
+      if (isSelf && moving) c.rotate(Math.max(-.08, Math.min(.08, localPlayer.vx / 2500)));
+
+      if (activeEmoteAnim === 'dance') {
+        c.translate(0, Math.sin(Date.now() * 0.01) * 8);
+      } else if (activeEmoteAnim === 'spin') {
+        c.rotate((Date.now() * 0.008) % (Math.PI * 2));
+      } else if (activeEmoteAnim === 'jump_loop') {
+        c.translate(0, -Math.abs(Math.sin(Date.now() * 0.008) * 20));
+      }
+
+      const skinObj = MARKET_ITEMS.skins.find(s => s.id === skinId) || MARKET_ITEMS.skins[0];
+      c.fillStyle = 'rgba(0,0,0,0.22)';
+      c.beginPath();
+      c.ellipse(0, 18 + jumpOff, 22, 8, 0, 0, Math.PI * 2);
+      c.fill();
+
+      const scaleX = 1 + moving * .045 + squash * .24 - (isJumping ? .035 : 0);
+      const scaleY = 1 - moving * .04 - squash * .25 + (isJumping ? .06 : 0);
+      c.save();
+      c.scale(scaleX, scaleY);
+      c.fillStyle = skinObj.color;
+      c.beginPath();
+      c.ellipse(0, 0, 24, 20, 0, 0, Math.PI * 2);
+      c.fill();
+
+      c.fillStyle = 'rgba(255,255,255,0.4)';
+      c.beginPath();
+      c.ellipse(-8, -8, 7, 4, -Math.PI / 4, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = '#1e1b4b';
+      c.beginPath();
+      c.arc(-7, -2, 3, 0, Math.PI * 2);
+      c.arc(7, -2, 3, 0, Math.PI * 2);
+      c.fill();
+      c.fillStyle = 'rgba(244, 114, 182, 0.6)';
+      c.beginPath();
+      c.arc(-11, 3, 3, 0, Math.PI * 2);
+      c.arc(11, 3, 3, 0, Math.PI * 2);
+      c.fill();
+
+      if (accId) {
+        const accObj = MARKET_ITEMS.accessories.find(a => a.id === accId);
+        if (accObj) { c.font = '20px sans-serif'; c.textAlign = 'center'; c.fillText(accObj.icon, 0, -18); }
+      }
+      if (titleId) {
+        const titleObj = MARKET_ITEMS.titles.find(t => t.id === titleId);
+        if (titleObj) { c.font = 'bold 10px Plus Jakarta Sans'; c.textAlign = 'center'; c.fillStyle = titleObj.color; c.fillText(titleObj.text, 0, -32); }
+      }
+      c.restore();
+      c.restore();
+    }
+
+    function drawZoneDecorations() {
+      const garden = currentChannel === 'sakura-lounge';
+      const arcade = currentChannel === 'arcade-lounge';
+      ctx.fillStyle = garden ? '#f8e7ed' : arcade ? '#100b2d' : '#e2efd9';
+      ctx.fillRect(0, 0, 2100, 2100);
+
+      if (garden) {
+        ctx.strokeStyle = 'rgba(214, 169, 184, .22)'; ctx.lineWidth = 2;
+        for (let n = 0; n <= 2100; n += 80) { ctx.beginPath(); ctx.moveTo(n, 0); ctx.lineTo(n, 2100); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, n); ctx.lineTo(2100, n); ctx.stroke(); }
+        ctx.strokeStyle = '#dfcba8'; ctx.lineWidth = 68; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(130, 1120); ctx.bezierCurveTo(500, 950, 850, 1060, 1210, 890); ctx.bezierCurveTo(1480, 760, 1720, 520, 1980, 610); ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,255,255,.58)'; ctx.lineWidth = 5; ctx.setLineDash([4, 24]); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = '#a9dce2'; ctx.beginPath(); ctx.ellipse(1470, 440, 205, 118, -.18, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#77b9c3'; ctx.lineWidth = 8; ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.beginPath(); ctx.ellipse(1415, 405, 52, 15, -.22, 0, Math.PI * 2); ctx.fill();
+        const trees = [[240,250],[660,240],[1110,230],[1860,300],[270,740],[950,540],[1810,850],[380,1580],[880,1840],[1580,1660],[1880,1350]];
+        trees.forEach(([x,y],i) => {
+          ctx.fillStyle = 'rgba(69, 49, 48, .18)'; ctx.beginPath(); ctx.ellipse(x,y+20,39,12,0,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle = '#815d52'; ctx.fillRect(x-6,y-8,12,48);
+          const colors=['#f7a9c4','#ffd0dc','#f58fb4'];
+          [[-18,-24],[0,-37],[18,-23],[-9,-8],[12,-7]].forEach(([ox,oy],j)=>{ctx.fillStyle=colors[(i+j)%colors.length];ctx.beginPath();ctx.arc(x+ox,y+oy,15,0,Math.PI*2);ctx.fill();});
+          ctx.fillStyle='#fff5c2';ctx.beginPath();ctx.arc(x,y-23,4,0,Math.PI*2);ctx.fill();
+        });
+        [[520,420],[820,1220],[1710,1170],[1140,1510]].forEach(([x,y])=>{
+          ctx.fillStyle='#8c6a5d';ctx.fillRect(x-22,y-5,44,10);ctx.fillRect(x-17,y+5,5,18);ctx.fillRect(x+12,y+5,5,18);
+          ctx.fillStyle='#bb8e80';ctx.fillRect(x-25,y-11,50,7);
+        });
+        for(let i=0;i<70;i++){const x=(i*173+91)%2050,y=(i*271+53)%2050;ctx.fillStyle='rgba(236,72,153,.27)';ctx.beginPath();ctx.ellipse(x,y,3,6,(i%7)*.3,0,Math.PI*2);ctx.fill();}
+        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(131,24,67,.55)';ctx.fillText('🌸 SAKURA ZEN PARK',75,78);
+      } else if (arcade) {
+        ctx.strokeStyle='rgba(34,211,238,.18)';ctx.lineWidth=2;
+        for(let n=0;n<=2100;n+=80){ctx.beginPath();ctx.moveTo(n,0);ctx.lineTo(n,2100);ctx.stroke();ctx.beginPath();ctx.moveTo(0,n);ctx.lineTo(2100,n);ctx.stroke();}
+        ctx.fillStyle='#28204a';ctx.fillRect(145,300,180,86);ctx.fillRect(440,300,180,86);ctx.fillRect(735,300,180,86);ctx.fillRect(1030,300,180,86);ctx.fillRect(1325,300,180,86);ctx.fillRect(1620,300,180,86);
+        const machines=[[230,343,'💖'],[525,343,'👾'],[820,343,'🛸'],[1115,343,'🎮'],[1410,343,'⭐'],[1705,343,'🍬']];
+        machines.forEach(([x,y,icon],i)=>{ctx.save();ctx.shadowColor=i%2?'#f472b6':'#22d3ee';ctx.shadowBlur=20;ctx.strokeStyle=i%2?'#f472b6':'#22d3ee';ctx.lineWidth=3;ctx.strokeRect(x-40,y-50,80,104);ctx.restore();ctx.fillStyle='#190f35';ctx.fillRect(x-34,y-44,68,43);ctx.font='25px sans-serif';ctx.textAlign='center';ctx.fillText(icon,x,y-12);ctx.fillStyle='#a78bfa';ctx.fillRect(x-30,y+8,60,8);ctx.fillStyle='#f8fafc';ctx.font='10px sans-serif';ctx.fillText('PLAY',x,y+38);});
+        ctx.fillStyle='rgba(244,114,182,.24)';ctx.fillRect(120,850,1860,28);ctx.fillRect(120,1450,1860,28);
+        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='#c4b5fd';ctx.fillText('🕹️ NEON ARCADE',75,78);
+      } else {
+        ctx.fillStyle='#c3d8a9';ctx.fillRect(0,0,2100,2100);
+        ctx.fillStyle='#d4bd91';ctx.fillRect(120,520,1860,155);ctx.fillRect(930,120,155,1860);
+        ctx.strokeStyle='rgba(119,89,56,.23)';ctx.lineWidth=4;
+        for(let n=130;n<1980;n+=72){ctx.beginPath();ctx.moveTo(n,520);ctx.lineTo(n,675);ctx.stroke();ctx.beginPath();ctx.moveTo(930,n);ctx.lineTo(1085,n);ctx.stroke();}
+        ctx.fillStyle='#93cfd0';ctx.beginPath();ctx.ellipse(1420,1260,280,190,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#799a69';ctx.lineWidth=20;ctx.stroke();
+        ctx.fillStyle='rgba(255,255,255,.65)';ctx.beginPath();ctx.ellipse(1360,1205,82,19,-.2,0,Math.PI*2);ctx.fill();
+        for(let i=0;i<14;i++){const x=160+(i*149)%1780,y=150+(i*263)%1780;ctx.strokeStyle='#47794b';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x,y+54);ctx.lineTo(x,y-50-(i%3)*16);ctx.stroke();for(let j=0;j<5;j++){ctx.fillStyle=j%2?'#6caa65':'#83b777';ctx.beginPath();ctx.ellipse(x+(j%2?10:-10),y-30-j*12,9,17,j%2?.6:-.6,0,Math.PI*2);ctx.fill();}}
+        [[690,760],[1270,790],[680,1500],[1720,430]].forEach(([x,y])=>{ctx.fillStyle='#77796d';ctx.beginPath();ctx.ellipse(x,y,35,22,.1,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9a9b8f';ctx.beginPath();ctx.ellipse(x-5,y-7,22,11,0,0,Math.PI*2);ctx.fill();});
+        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(52,83,43,.65)';ctx.fillText('🎋 ONSEN GARDEN',75,78);
+      }
+    }
+
+    // --- GAME LOOP ---
+    function updatePlayerMovement(dt) {
+      let dx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+      let dy = (keys.down ? 1 : 0) - (keys.up ? 1 : 0);
+      if (joystick.active) { dx = joystick.dx; dy = joystick.dy; }
+      const inputLength = Math.hypot(dx, dy);
+      if (inputLength > 1) { dx /= inputLength; dy /= inputLength; }
+      const blend = Math.min(1, dt * 12);
+      localPlayer.vx += (dx * 190 - localPlayer.vx) * blend;
+      localPlayer.vy += (dy * 190 - localPlayer.vy) * blend;
+      localPlayer.x = Math.max(50, Math.min(2050, localPlayer.x + localPlayer.vx * dt));
+      localPlayer.y = Math.max(50, Math.min(2050, localPlayer.y + localPlayer.vy * dt));
+      localPlayer.landingSquash = Math.max(0, localPlayer.landingSquash - dt * 4.5);
+
+      if (localPlayer.isJumping) {
+        localPlayer.jumpOffset += localPlayer.jumpVelocity * dt;
+        localPlayer.jumpVelocity -= 1450 * dt;
+        if (localPlayer.jumpOffset <= 0 && localPlayer.jumpVelocity < 0) {
+          const impact = -localPlayer.jumpVelocity;
+          localPlayer.jumpOffset = 0;
+          localPlayer.landingSquash = 1;
+          if (impact > 100 && localPlayer.bounceCount < 1) {
+            localPlayer.jumpVelocity = impact * .32;
+            localPlayer.bounceCount++;
+          } else {
+            localPlayer.jumpVelocity = 0;
+            localPlayer.isJumping = false;
+          }
+        }
+      }
+      camera.x += (localPlayer.x - canvas.width / 2 - camera.x) * Math.min(1, dt * 8);
+      camera.y += (localPlayer.y - canvas.height / 2 - camera.y) * Math.min(1, dt * 8);
+
+      const now = performance.now();
+      if (now - lastStateBroadcastAt > 100) {
+        lastStateBroadcastAt = now;
+        broadcastPlayerState();
+      }
+    }
+
+    function renderGameWorld() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      ctx.translate(-camera.x, -camera.y);
+      drawZoneDecorations();
+
+      // Draw Remote Players
+      Object.values(remotePlayers).forEach(p => {
+        drawSlimeModel(ctx, p.x, p.y, p.equippedSkin, p.equippedAcc, p.equippedTitle, p.isJumping, p.jumpOffset, p.activeSpecialEmote, false);
+
+        drawPlayerLabel(ctx, p);
+      });
+
+      // Draw Local Player Slime
+      drawSlimeModel(ctx, localPlayer.x, localPlayer.y, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, localPlayer.isJumping, localPlayer.jumpOffset, localPlayer.activeSpecialEmote, true);
+
+      drawPlayerLabel(ctx, localPlayer, true);
+
+      ctx.restore();
+    }
+
+    let previousFrameTime = 0;
+    function gameLoop(timestamp) {
+      const dt = previousFrameTime ? Math.min(.05, (timestamp - previousFrameTime) / 1000) : 1 / 60;
+      previousFrameTime = timestamp;
+      updatePlayerMovement(dt);
+      renderGameWorld();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // --- INTERACTION & CLICK ON CANVAS TO ADD FRIEND ---
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clickWorldX = e.clientX - rect.left + camera.x;
+      const clickWorldY = e.clientY - rect.top + camera.y;
+
+      // Check click on remote player slimes
+      Object.values(remotePlayers).forEach(p => {
+        const dist = Math.hypot(p.x - clickWorldX, p.y - clickWorldY);
+        if (dist < 35) {
+          promptAddFriend(p);
+        }
+      });
+    });
+
+    function promptAddFriend(player) {
+      if (friendList.some(friend => friend.id === player.id)) return;
+      if (confirm(`Send ${player.name} a friend request?`)) {
+        sendFriendRequest(player.id, player.name, player.pfp, player.avatarUrl);
+      }
+    }
+
+    // --- MARKET & INVENTORY SYSTEM ---
+    let activeMarketCategory = 'accessories';
+    let marketTestingItem = null;
+
+    function openMarketModal() {
+      document.getElementById('market-modal').classList.remove('hidden');
+      renderMarketGrid();
+      startMarketPreviewLoop();
+    }
+    function closeMarketModal() {
+      document.getElementById('market-modal').classList.add('hidden');
+    }
+
+    function filterMarketCategory(cat) {
+      activeMarketCategory = cat;
+      ['accessories', 'skins', 'titles', 'emotes', 'profile'].forEach(c => {
+        const btn = document.getElementById('mcat-' + c);
+        if (c === cat) btn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-active';
+        else btn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive';
+      });
+      renderMarketGrid();
+    }
+
+    function renderMarketGrid() {
+      const grid = document.getElementById('market-items-grid');
+      grid.innerHTML = '';
+      const items = MARKET_ITEMS[activeMarketCategory] || [];
+
+      items.forEach(item => {
+        const isOwned = localPlayer.inventory.includes(item.id);
+        const card = document.createElement('div');
+        card.className = "p-2.5 rounded-2xl bg-white/80 border border-pink-200 flex flex-col justify-between shadow-sm hover:border-pink-400 transition";
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-pink-950">${item.icon ? item.icon + ' ' : ''}${item.name}</span>
+              <span class="text-xs font-extrabold text-amber-700">🪙 ${item.price}</span>
+            </div>
+            <p class="text-[10px] text-pink-600 mt-0.5 line-clamp-1">${item.desc}</p>
+          </div>
+          <div class="flex items-center gap-1 mt-2">
+            <button onclick="testMarketItem('${item.id}')" class="flex-1 py-1 rounded-xl bg-pink-100 hover:bg-pink-200 text-pink-900 text-[10px] font-bold">
+              Test
+            </button>
+            ${isOwned ? 
+              `<span class="px-2 py-1 rounded-xl bg-emerald-100 text-emerald-800 text-[10px] font-bold">Owned</span>` : 
+              `<button onclick="buyMarketItem('${item.id}')" class="flex-1 py-1 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-[10px] font-bold">
+                Buy
+              </button>`
+            }
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function testMarketItem(itemId) {
+      const allItems = [].concat(...Object.values(MARKET_ITEMS));
+      const item = allItems.find(i => i.id === itemId);
+      marketTestingItem = item;
+      document.getElementById('market-item-preview-name').textContent = `Testing: ${item ? item.name : 'None'}`;
+    }
+
+    function buyMarketItem(itemId) {
+      const allItems = [].concat(...Object.values(MARKET_ITEMS));
+      const item = allItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      if (localPlayer.inventory.includes(item.id)) return;
+      if (localPlayer.points < item.price) {
+        alert('Not enough points! Collect or earn more.');
+        return;
+      }
+
+      localPlayer.points -= item.price;
+      localPlayer.inventory.push(item.id);
+      savePlayerToStorage();
+      playSound('buy');
+      updateUIHeader();
+      renderMarketGrid();
+    }
+
+    // Market Preview Canvas
+    let marketPreviewCanvas = document.getElementById('marketPreviewCanvas');
+    let marketPreviewCtx = marketPreviewCanvas.getContext('2d');
+
+    function startMarketPreviewLoop() {
+      function anim() {
+        if (document.getElementById('market-modal').classList.contains('hidden')) return;
+        marketPreviewCtx.clearRect(0, 0, marketPreviewCanvas.width, marketPreviewCanvas.height);
+
+        let sSkin = localPlayer.equippedSkin;
+        let sAcc = localPlayer.equippedAcc;
+        let sTitle = localPlayer.equippedTitle;
+        let sEmote = null;
+
+        if (marketTestingItem) {
+          if (marketTestingItem.type === 'skins') sSkin = marketTestingItem.id;
+          if (marketTestingItem.type === 'accessories') sAcc = marketTestingItem.id;
+          if (marketTestingItem.type === 'titles') sTitle = marketTestingItem.id;
+          if (marketTestingItem.type === 'emotes') sEmote = marketTestingItem.anim;
+        }
+
+        drawSlimeModel(marketPreviewCtx, 90, 85, sSkin, sAcc, sTitle, false, 0, sEmote, true);
+        if (marketTestingItem && marketTestingItem.type === 'profile') {
+          marketPreviewCtx.font = '30px sans-serif'; marketPreviewCtx.textAlign = 'center'; marketPreviewCtx.fillText(marketTestingItem.icon, 90, 138);
+        }
+        requestAnimationFrame(anim);
+      }
+      requestAnimationFrame(anim);
+    }
+
+    // Inventory Modal
+    function openInventoryModal() {
+      document.getElementById('inventory-modal').classList.remove('hidden');
+      renderInventoryGrid();
+      startInvPreviewLoop();
+    }
+    function closeInventoryModal() {
+      document.getElementById('inventory-modal').classList.add('hidden');
+    }
+
+    function renderInventoryGrid() {
+      const grid = document.getElementById('inventory-items-grid');
+      const search = document.getElementById('inv-search-input').value.toLowerCase();
+      grid.innerHTML = '';
+
+      const allItems = [].concat(...Object.values(MARKET_ITEMS));
+      const ownedItems = allItems.filter(i => localPlayer.inventory.includes(i.id) && i.name.toLowerCase().includes(search));
+
+      ownedItems.forEach(item => {
+        const isEquipped = localPlayer.equippedSkin === item.id || localPlayer.equippedAcc === item.id || localPlayer.equippedTitle === item.id || (item.type === 'profile' && localPlayer.pfp === item.icon && !localPlayer.avatarUrl);
+        const card = document.createElement('div');
+        card.className = "p-2.5 rounded-2xl bg-white/80 border border-purple-200 flex flex-col justify-between shadow-sm";
+        card.innerHTML = `
+          <div>
+            <span class="text-xs font-bold text-purple-950">${item.name}</span>
+            <p class="text-[10px] text-purple-600">${item.type.toUpperCase()}</p>
+          </div>
+          <button onclick="equipInventoryItem('${item.id}')" class="mt-2 py-1 rounded-xl text-[10px] font-bold ${isEquipped ? 'bg-emerald-500 text-white' : 'bg-purple-500 text-white hover:bg-purple-600'}">
+            ${isEquipped ? 'Equipped' : 'Equip'}
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function equipInventoryItem(itemId) {
+      const allItems = [].concat(...Object.values(MARKET_ITEMS));
+      const item = allItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      if (item.type === 'skins') localPlayer.equippedSkin = item.id;
+      if (item.type === 'accessories') localPlayer.equippedAcc = localPlayer.equippedAcc === item.id ? null : item.id;
+      if (item.type === 'titles') localPlayer.equippedTitle = localPlayer.equippedTitle === item.id ? null : item.id;
+      if (item.type === 'profile') { localPlayer.pfp = item.icon; localPlayer.avatarUrl = ''; }
+      if (item.type === 'emotes') {
+        localPlayer.activeSpecialEmote = localPlayer.activeSpecialEmote === item.anim ? null : item.anim;
+        const spBtn = document.getElementById('special-emote-btn');
+        if (localPlayer.activeSpecialEmote) spBtn.classList.remove('hidden');
+        else spBtn.classList.add('hidden');
+      }
+
+      savePlayerToStorage();
+      broadcastPlayerState();
+      broadcastProfileUpdate();
+      renderAvatarPreview();
+      renderPfpPicker();
+      renderInventoryGrid();
+    }
+
+    let invPreviewCanvas = document.getElementById('invPreviewCanvas');
+    let invPreviewCtx = invPreviewCanvas.getContext('2d');
+
+    function startInvPreviewLoop() {
+      function anim() {
+        if (document.getElementById('inventory-modal').classList.contains('hidden')) return;
+        invPreviewCtx.clearRect(0, 0, invPreviewCanvas.width, invPreviewCanvas.height);
+        drawSlimeModel(invPreviewCtx, 90, 85, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, false, 0, localPlayer.activeSpecialEmote, true);
+        requestAnimationFrame(anim);
+      }
+      requestAnimationFrame(anim);
+    }
+
+    // --- FRIENDS & DIRECT MESSAGES SYSTEM ---
+    function openFriendsModal() {
+      document.getElementById('friends-modal').classList.remove('hidden');
+      renderFriendsList();
+      renderDMBox();
+    }
+    function closeFriendsModal() { document.getElementById('friends-modal').classList.add('hidden'); }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+    }
+    function safeAvatarUrl(value) {
+      return typeof value === 'string' && /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(value) ? value : '';
+    }
+    function makeAvatar(profile, size = 'w-8 h-8') {
+      const wrap = document.createElement('span');
+      wrap.className = `${size} rounded-full bg-pink-100 border border-pink-200 flex items-center justify-center overflow-hidden shrink-0 text-base`;
+      const imageUrl = safeAvatarUrl(profile.avatarUrl);
+      if (imageUrl) {
+        const image = document.createElement('img');
+        image.src = imageUrl; image.alt = ''; image.className = 'w-full h-full object-cover';
+        wrap.appendChild(image);
+      } else {
+        wrap.textContent = PROFILE_PFP_OPTIONS.includes(profile.pfp) ? profile.pfp : '🌸';
+      }
+      return wrap;
+    }
+    function saveFriendData() {
+      localStorage.setItem('sakura_friends', JSON.stringify(friendList));
+      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
+      localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
+      updateFriendRequestBadge();
+    }
+    function updateFriendRequestBadge() {
+      const badge = document.getElementById('friend-request-badge');
+      if (!badge) return;
+      badge.textContent = friendRequests.length ? String(friendRequests.length) : '';
+      badge.classList.toggle('hidden', friendRequests.length === 0);
+    }
+    function sendSocialBroadcast(event, payload) {
+      const channel = socialChannel || realtimeChannel;
+      if (channel) channel.send({ type: 'broadcast', event, payload });
+    }
+
+    function addFriend(id, name, pfp, avatarUrl = '') {
+      if (!isValidUserId(id) || id === localPlayer.id) return;
+      const known = friendList.find(f => f.id === id);
+      const profile = { id, name: typeof name === 'string' && name.trim() ? name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(pfp) ? pfp : '🌸', avatarUrl: safeAvatarUrl(avatarUrl), accepted: true };
+      if (known) Object.assign(known, profile);
+      else friendList.push(profile);
+      friendRequests = friendRequests.filter(r => r.senderId !== id);
+      outgoingFriendRequests = outgoingFriendRequests.filter(r => r.targetId !== id);
+      saveFriendData();
+      renderFriendsList();
+      if (activeDMUserId === id) renderDMBox();
+    }
+
+    function sendFriendRequest(id, name, pfp, avatarUrl = '') {
+      if (!isValidUserId(id) || id === localPlayer.id) return;
+      if (friendList.some(f => f.id === id)) return;
+      if (friendRequests.some(r => r.senderId === id)) {
+        acceptFriendRequest(id);
+        return;
+      }
+      if (outgoingFriendRequests.some(r => r.targetId === id)) return;
+      const request = { targetId: id, name: typeof name === 'string' && name.trim() ? name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(pfp) ? pfp : '🌸', avatarUrl: safeAvatarUrl(avatarUrl), time: Date.now() };
+      outgoingFriendRequests.push(request);
+      localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
+      sendSocialBroadcast('friend_request', { targetId: id, senderId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl });
+      handleFriendUserSearch();
+    }
+
+    function receiveFriendRequest(payload) {
+      if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.senderId) || payload.senderId === localPlayer.id) return;
+      if (friendList.some(f => f.id === payload.senderId) || friendRequests.some(r => r.senderId === payload.senderId)) return;
+      friendRequests.push({ senderId: payload.senderId, name: typeof payload.name === 'string' && payload.name.trim() ? payload.name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(payload.pfp) ? payload.pfp : '🌸', avatarUrl: safeAvatarUrl(payload.avatarUrl), time: Date.now() });
+      saveFriendData();
+      renderFriendsList();
+    }
+
+    function acceptFriendRequest(senderId) {
+      const request = friendRequests.find(r => r.senderId === senderId);
+      if (!request) return;
+      friendRequests = friendRequests.filter(r => r.senderId !== senderId);
+      addFriend(senderId, request.name, request.pfp, request.avatarUrl);
+      sendSocialBroadcast('friend_accept', { targetId: senderId, friendId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl });
+      playSound('match');
+    }
+
+    function declineFriendRequest(senderId) {
+      friendRequests = friendRequests.filter(r => r.senderId !== senderId);
+      saveFriendData();
+      sendSocialBroadcast('friend_decline', { targetId: senderId, userId: localPlayer.id });
+      renderFriendsList();
+    }
+
+    function removeFriend(id) {
+      friendList = friendList.filter(f => f.id !== id);
+      saveFriendData();
+      renderFriendsList();
+      if (activeDMUserId === id) activeDMUserId = null;
+      renderDMBox();
+    }
+
+    function renderFriendsList() {
+      const container = document.getElementById('friends-list-container');
+      const requestsContainer = document.getElementById('friend-requests-container');
+      container.innerHTML = '';
+      requestsContainer.innerHTML = '';
+      if (friendRequests.length) {
+        const title = document.createElement('p');
+        title.className = 'text-[10px] font-extrabold uppercase tracking-wide text-sky-700';
+        title.textContent = 'Friend requests'; requestsContainer.appendChild(title);
+        friendRequests.forEach(request => {
+          const row = document.createElement('div');
+          row.className = 'p-2 rounded-xl bg-sky-50 border border-sky-200 flex items-center gap-2';
+          row.appendChild(makeAvatar(request));
+          const name = document.createElement('span'); name.className = 'min-w-0 flex-1 truncate text-xs font-bold text-pink-950'; name.textContent = request.name;
+          row.appendChild(name);
+          const accept = document.createElement('button'); accept.className = 'px-2 py-1 rounded-lg bg-emerald-500 text-white text-[10px] font-bold'; accept.textContent = 'Accept'; accept.onclick = () => acceptFriendRequest(request.senderId);
+          const decline = document.createElement('button'); decline.className = 'px-2 py-1 rounded-lg bg-white text-slate-600 text-[10px] font-bold'; decline.textContent = '✕'; decline.title = 'Decline'; decline.onclick = () => declineFriendRequest(request.senderId);
+          row.append(accept, decline); requestsContainer.appendChild(row);
+        });
+      }
+      if (friendList.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'text-[10px] text-pink-600 text-center py-4';
+        empty.textContent = 'No friends yet. Search players above to send a request.';
+        container.appendChild(empty);
+      }
+      friendList.forEach(friend => {
+        const row = document.createElement('div');
+        row.className = `p-2 rounded-xl flex items-center justify-between border ${activeDMUserId === friend.id ? 'bg-sky-100 border-sky-400' : 'bg-white/80 border-pink-200'}`;
+        const select = document.createElement('button'); select.type = 'button'; select.className = 'min-w-0 flex items-center gap-2 text-left'; select.onclick = () => selectFriendForDM(friend.id);
+        select.appendChild(makeAvatar(friend));
+        const name = document.createElement('span'); name.className = 'truncate text-xs font-bold text-pink-950'; name.textContent = friend.name;
+        select.appendChild(name);
+        const remove = document.createElement('button'); remove.className = 'text-red-500 hover:text-red-700 text-[10px] font-bold shrink-0'; remove.textContent = 'Unfriend'; remove.onclick = () => removeFriend(friend.id);
+        row.append(select, remove); container.appendChild(row);
+      });
+    }
+
+    function handleFriendUserSearch() {
+      const query = document.getElementById('friend-search-input').value.toLowerCase().trim();
+      const container = document.getElementById('friends-list-container');
+      if (!query) { renderFriendsList(); return; }
+      container.innerHTML = '';
+      const matching = Object.values(remotePlayers).filter(p => p && p.id !== localPlayer.id && typeof p.name === 'string' && p.name.toLowerCase().includes(query));
+      if (!matching.length) {
+        const empty = document.createElement('p'); empty.className = 'text-[10px] text-pink-600 text-center py-3'; empty.textContent = 'No online players found in this room.'; container.appendChild(empty);
+      }
+      matching.forEach(player => {
+        const row = document.createElement('div'); row.className = 'p-2 rounded-xl bg-white/90 border border-pink-200 flex items-center gap-2';
+        row.appendChild(makeAvatar(player));
+        const name = document.createElement('span'); name.className = 'min-w-0 flex-1 truncate text-xs font-bold text-pink-950'; name.textContent = player.name; row.appendChild(name);
+        const isFriend = friendList.some(f => f.id === player.id);
+        const outgoing = outgoingFriendRequests.some(r => r.targetId === player.id);
+        const incoming = friendRequests.some(r => r.senderId === player.id);
+        if (isFriend) {
+          const tag = document.createElement('span'); tag.className = 'text-[10px] text-emerald-600 font-bold'; tag.textContent = 'Friends'; row.appendChild(tag);
+        } else if (incoming) {
+          const accept = document.createElement('button'); accept.className = 'px-2 py-1 bg-emerald-500 text-white rounded-lg text-[10px] font-bold'; accept.textContent = 'Accept'; accept.onclick = () => acceptFriendRequest(player.id); row.appendChild(accept);
+        } else if (outgoing) {
+          const tag = document.createElement('span'); tag.className = 'text-[10px] text-sky-700 font-bold'; tag.textContent = 'Sent'; row.appendChild(tag);
+        } else {
+          const add = document.createElement('button'); add.className = 'px-2 py-1 bg-sky-500 text-white rounded-lg text-[10px] font-bold'; add.textContent = 'Add'; add.onclick = () => sendFriendRequest(player.id, player.name, player.pfp, player.avatarUrl); row.appendChild(add);
+        }
+        container.appendChild(row);
+      });
+    }
+
+    function syncFriendProfile(player) {
+      if (!player || !isValidUserId(player.id)) return;
+      let changed = false;
+      friendList.forEach(friend => {
+        if (friend.id === player.id) {
+          friend.name = player.name || friend.name;
+          friend.pfp = player.pfp || friend.pfp;
+          friend.avatarUrl = Object.prototype.hasOwnProperty.call(player, 'avatarUrl') ? safeAvatarUrl(player.avatarUrl) : (friend.avatarUrl || '');
+          changed = true;
+        }
+      });
+      friendRequests.forEach(request => {
+        if (request.senderId === player.id) {
+          request.name = player.name || request.name;
+          request.pfp = player.pfp || request.pfp;
+          request.avatarUrl = Object.prototype.hasOwnProperty.call(player, 'avatarUrl') ? safeAvatarUrl(player.avatarUrl) : (request.avatarUrl || '');
+          changed = true;
+        }
+      });
+      if (changed) saveFriendData();
+      if (!document.getElementById('friends-modal').classList.contains('hidden')) {
+        if (document.getElementById('friend-search-input').value.trim()) handleFriendUserSearch();
+        else renderFriendsList();
+        if (activeDMUserId === player.id) renderDMBox();
+      }
+    }
+
+    function selectFriendForDM(friendId) {
+      activeDMUserId = friendId;
+      renderFriendsList();
+      renderDMBox();
+    }
+
+    function renderDMBox() {
+      const targetLabel = document.getElementById('dm-active-target');
+      const statusTag = document.getElementById('dm-status-tag');
+      const input = document.getElementById('dm-text-input');
+      const sendBtn = document.getElementById('dm-send-btn');
+      const container = document.getElementById('dm-messages-container');
+      container.innerHTML = '';
+      if (!activeDMUserId) {
+        targetLabel.textContent = 'Select a friend to message'; statusTag.textContent = 'Friend Required'; input.disabled = true; sendBtn.disabled = true; input.placeholder = 'Accept a friend request to start chatting'; return;
+      }
+      const friend = friendList.find(f => f.id === activeDMUserId);
+      if (!friend || !friend.accepted) {
+        targetLabel.textContent = friend ? friend.name : 'Unknown User'; statusTag.textContent = 'Friend Required'; input.disabled = true; sendBtn.disabled = true; input.placeholder = 'Accept a friend request to start chatting'; return;
+      }
+      targetLabel.textContent = `Chatting with ${friend.name}`; statusTag.textContent = 'Friends'; input.disabled = false; sendBtn.disabled = false; input.placeholder = `Message ${friend.name}...`;
+      const msgs = dmMessages[activeDMUserId] || [];
+      msgs.forEach(message => {
+        const bubble = document.createElement('div'); const isMe = message.senderId === localPlayer.id;
+        bubble.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+        const text = document.createElement('div'); text.className = `px-3 py-1.5 rounded-2xl max-w-[80%] ${isMe ? 'bg-sky-500 text-white' : 'bg-pink-100 text-pink-950'} font-medium`; text.textContent = message.text;
+        bubble.appendChild(text); container.appendChild(bubble);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function handleDMSubmit(e) {
       e.preventDefault();
-      const email = document.getElementById('auth-email').value;
-      const username = document.getElementById('auth-username').value.trim();
-      localPlayer.name = username || email.split('@')[0];
-      completeLogin();
+      const input = document.getElementById('dm-text-input');
+      const text = input.value.trim();
+      if (!text || !activeDMUserId || !friendList.some(f => f.id === activeDMUserId && f.accepted)) return;
+      if (!dmMessages[activeDMUserId]) dmMessages[activeDMUserId] = [];
+      dmMessages[activeDMUserId].push({ senderId: localPlayer.id, text, time: Date.now() });
+      localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
+      sendSocialBroadcast('direct_msg', { targetId: activeDMUserId, senderId: localPlayer.id, text });
+      input.value = '';
+      renderDMBox();
     }
 
-    function loginAsGuest() {
-      completeLogin();
+    // --- PROFILE & SETTINGS ---
+    function toggleSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) {
+        document.getElementById('setting-username').value = localPlayer.name;
+        document.getElementById('profile-image-input').value = '';
+        renderAvatarPreview();
+        renderPfpPicker();
+      }
     }
 
-    function completeLogin() {
-      document.getElementById('auth-modal').classList.add('hidden');
-      document.getElementById('profile-name-input').value = localPlayer.name;
-      updateProfileDisplay();
-      initSupabaseChannel();
+    function renderAvatarPreview() {
+      const preview = document.getElementById('profile-avatar-preview');
+      preview.innerHTML = '';
+      preview.appendChild(makeAvatar(localPlayer, 'w-12 h-12'));
     }
 
-    // --- SUPABASE REALTIME SYNC ---
-    function initSupabaseChannel() {
+    function handleProfileImageUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { alert('Choose an image file.'); event.target.value = ''; return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const image = new Image();
+        image.onload = () => {
+          const scale = Math.min(1, 256 / Math.max(image.width, image.height));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(image.width * scale));
+          canvas.height = Math.max(1, Math.round(image.height * scale));
+          canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+          localPlayer.avatarUrl = canvas.toDataURL('image/jpeg', .82);
+          savePlayerToStorage();
+          renderAvatarPreview();
+          broadcastProfileUpdate();
+          renderFriendsList();
+        };
+        image.onerror = () => alert('That image could not be opened.');
+        image.src = reader.result;
+      };
+      reader.onerror = () => alert('The image could not be read.');
+      reader.readAsDataURL(file);
+    }
+
+    function clearProfileImage() {
+      localPlayer.avatarUrl = '';
+      savePlayerToStorage();
+      renderAvatarPreview();
+      broadcastProfileUpdate();
+      renderFriendsList();
+    }
+
+    function renderPfpPicker() {
+      const grid = document.getElementById('pfp-picker-grid');
+      grid.innerHTML = '';
+      PROFILE_PFP_OPTIONS.forEach(p => {
+        const sticker = PROFILE_STICKERS.find(item => item.icon === p);
+        const owned = sticker && localPlayer.inventory.includes(sticker.id);
+        const btn = document.createElement('button');
+        btn.className = `p-2 rounded-xl text-lg border ${localPlayer.pfp === p && !localPlayer.avatarUrl ? 'bg-pink-500 text-white border-pink-600' : 'bg-white/80 border-pink-200'} ${owned ? '' : 'opacity-40'}`;
+        btn.textContent = p;
+        btn.title = owned ? `Use ${sticker.name}` : `${sticker.name} is in the market`;
+        btn.disabled = !owned;
+        btn.onclick = () => { localPlayer.pfp = p; localPlayer.avatarUrl = ''; renderAvatarPreview(); renderPfpPicker(); };
+        grid.appendChild(btn);
+      });
+    }
+
+    function saveProfileSettings() {
+      const newName = document.getElementById('setting-username').value.trim() || localPlayer.name;
+      localPlayer.name = newName.slice(0, 15);
+      savePlayerToStorage();
+      broadcastPlayerState();
+      broadcastProfileUpdate();
+      toggleSettingsModal();
+      syncFriendProfile(localPlayer);
+      alert('Profile updated and refreshed everywhere!');
+    }
+
+    // Storage & Header UI Update Helper
+    function savePlayerToStorage() {
+      localStorage.setItem('sakura_user_id', localPlayer.id);
+      localStorage.setItem('sakura_name', localPlayer.name);
+      localStorage.setItem('sakura_pfp', localPlayer.pfp);
+      localStorage.setItem('sakura_avatar', localPlayer.avatarUrl || '');
+      localStorage.setItem('sakura_points', localPlayer.points.toString());
+      localStorage.setItem('sakura_eq_skin', localPlayer.equippedSkin);
+      localStorage.setItem('sakura_eq_acc', localPlayer.equippedAcc || '');
+      localStorage.setItem('sakura_eq_title', localPlayer.equippedTitle || '');
+      localStorage.setItem('sakura_inv', JSON.stringify(localPlayer.inventory));
+    }
+
+    function updateUIHeader() {
+      document.getElementById('player-points-display').textContent = localPlayer.points.toLocaleString();
+      updateFriendRequestBadge();
+    }
+
+    function broadcastProfileUpdate() {
+      sendSocialBroadcast('profile_update', { id: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl });
+    }
+
+    // --- SUPABASE REALTIME MULTIPLAYER ---
+    let socialChannel = null;
+    function initSocialChannel() {
+      if (socialChannel) return;
+      socialChannel = supabaseClient.channel('sakura-social')
+        .on('broadcast', { event: 'friend_request' }, ({ payload }) => receiveFriendRequest(payload))
+        .on('broadcast', { event: 'friend_accept' }, ({ payload }) => {
+          if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.friendId)) return;
+          addFriend(payload.friendId, payload.name, payload.pfp, payload.avatarUrl);
+          playSound('match');
+        })
+        .on('broadcast', { event: 'friend_decline' }, ({ payload }) => {
+          if (!payload || payload.targetId !== localPlayer.id) return;
+          outgoingFriendRequests = outgoingFriendRequests.filter(r => r.targetId !== payload.userId);
+          localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
+          handleFriendUserSearch();
+        })
+        .on('broadcast', { event: 'profile_update' }, ({ payload }) => {
+          if (payload && payload.id !== localPlayer.id) syncFriendProfile(payload);
+        })
+        .on('broadcast', { event: 'direct_msg' }, ({ payload }) => {
+          if (!payload || payload.targetId !== localPlayer.id || !friendList.some(f => f.id === payload.senderId && f.accepted)) return;
+          if (!dmMessages[payload.senderId]) dmMessages[payload.senderId] = [];
+          dmMessages[payload.senderId].push({ senderId: payload.senderId, text: payload.text, time: Date.now() });
+          localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
+          document.getElementById('unread-dm-badge').classList.remove('hidden');
+          if (activeDMUserId === payload.senderId) renderDMBox();
+        })
+        .subscribe();
+    }
+    function initSupabaseChannel(channelName) {
+      initSocialChannel();
       if (realtimeChannel) realtimeChannel.unsubscribe();
 
-      realtimeChannel = supabaseClient.channel(`room_${currentChannel}`, {
+      realtimeChannel = supabaseClient.channel(`room:${channelName}`, {
         config: { presence: { key: localPlayer.id } }
       });
 
       realtimeChannel
         .on('presence', { event: 'sync' }, () => {
           const state = realtimeChannel.presenceState();
-          const activeIds = new Set();
-          for (let id in state) {
-            const p = state[id][0];
-            if (p && p.id !== localPlayer.id) {
-              activeIds.add(p.id);
-              remotePlayers[p.id] = { ...remotePlayers[p.id], ...p };
-              syncFriendNameUpdate(p.id, p.name);
-            }
-          }
-          for (let id in remotePlayers) {
-            if (!activeIds.has(id)) delete remotePlayers[id];
+          remotePlayers = {};
+          Object.keys(state).forEach(key => {
+            if (key !== localPlayer.id) remotePlayers[key] = state[key][0];
+          });
+          Object.values(remotePlayers).forEach(syncFriendProfile);
+          if (document.getElementById('friend-search-input').value.trim()) handleFriendUserSearch();
+        })
+        .on('broadcast', { event: 'player_update' }, ({ payload }) => {
+          if (payload && payload.id !== localPlayer.id) {
+            remotePlayers[payload.id] = payload;
+            syncFriendProfile(payload);
           }
         })
-        .on('broadcast', { event: 'chat' }, payload => {
-          appendChatMessage(payload.payload);
-        })
-        .on('broadcast', { event: 'dm' }, payload => {
-          if (payload.payload.targetId === localPlayer.id) {
-            appendChatMessage(payload.payload, true);
-          }
-        })
-        .on('broadcast', { event: 'friend_request' }, payload => {
-          if (payload.payload.targetId === localPlayer.id) {
-            receiveFriendRequest(payload.payload.from);
-          }
-        })
-        .on('broadcast', { event: 'friend_accepted' }, payload => {
-          if (payload.payload.targetId === localPlayer.id) {
-            addFriendDirectly(payload.payload.from);
-          }
+        .on('broadcast', { event: 'global_chat' }, ({ payload }) => {
+          appendChatMessage(payload.sender, payload.text, payload.pfp);
         })
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
-            await realtimeChannel.track(getPublicPlayerState());
+            await realtimeChannel.track(localPlayer);
           }
         });
     }
 
-    function getPublicPlayerState() {
-      return {
-        id: localPlayer.id,
-        name: localPlayer.name,
-        profilePic: localPlayer.profilePic,
-        x: localPlayer.x, y: localPlayer.y,
-        equippedSkin: localPlayer.equippedSkin,
-        equippedAccessory: localPlayer.equippedAccessory,
-        equippedTitle: localPlayer.equippedTitle,
-        scaleX: localPlayer.scaleX, scaleY: localPlayer.scaleY,
-        jumpZ: localPlayer.jumpZ,
-        activeEmote: localPlayer.activeEmote
-      };
-    }
-
-    function broadcastState() {
-      if (realtimeChannel) {
-        realtimeChannel.track(getPublicPlayerState());
-      }
-    }
-
-    // --- FRIENDS & ACCEPT LOGIC (ONLY 1 ACCEPTANCE NEEDED) ---
-    function syncFriendNameUpdate(id, newName) {
-      if (!newName || newName === 'undefined') return;
-      let f = friends.find(item => item.id === id);
-      if (f && f.name !== newName) {
-        f.name = newName;
-        saveFriendsToStorage();
-        renderFriendsList();
-      }
-    }
-
-    function searchAndAddFriend() {
-      const val = document.getElementById('friend-search-input').value.trim();
-      if (!val) return;
-      
-      let found = Object.values(remotePlayers).find(p => p.name.toLowerCase() === val.toLowerCase());
-      if (found) {
-        sendFriendRequestTo(found);
-        alert(`Friend request sent to ${found.name}!`);
-      } else {
-        alert('Player not found in current room.');
-      }
-    }
-
-    function sendFriendRequestTo(target) {
-      if (!target || !target.id) return;
-      if (friends.some(f => f.id === target.id)) return;
+    function broadcastPlayerState() {
       if (realtimeChannel) {
         realtimeChannel.send({
           type: 'broadcast',
-          event: 'friend_request',
-          payload: { targetId: target.id, from: { id: localPlayer.id, name: localPlayer.name, profilePic: localPlayer.profilePic } }
+          event: 'player_update',
+          payload: localPlayer
         });
       }
     }
 
-    function receiveFriendRequest(fromUser) {
-      if (!fromUser || !fromUser.id || !fromUser.name || fromUser.name === 'undefined') return;
-      if (friends.some(f => f.id === fromUser.id) || friendRequests.some(r => r.id === fromUser.id)) return;
-      
-      friendRequests.push(fromUser);
-      saveFriendsToStorage();
-      document.getElementById('friend-req-badge').classList.remove('hidden');
-      document.getElementById('ftab-badge').classList.remove('hidden');
-      renderFriendsList();
-    }
-
-    function acceptFriendRequest(req) {
-      if (!req || !req.id) return;
-      friendRequests = friendRequests.filter(r => r.id !== req.id);
-      addFriendDirectly(req);
-      
-      // Send single acceptance back so other user becomes friend instantly
-      if (realtimeChannel) {
-        realtimeChannel.send({
-          type: 'broadcast',
-          event: 'friend_accepted',
-          payload: { targetId: req.id, from: { id: localPlayer.id, name: localPlayer.name, profilePic: localPlayer.profilePic } }
-        });
-      }
-    }
-
-    function addFriendDirectly(user) {
-      if (!user || !user.id || !user.name || user.name === 'undefined') return;
-      if (!friends.some(f => f.id === user.id)) {
-        friends.push(user);
-        saveFriendsToStorage();
-        renderFriendsList();
-      }
-    }
-
-    function unfriendUser(id) {
-      friends = friends.filter(f => f.id !== id);
-      if (activeDMFriend && activeDMFriend.id === id) closeDM();
-      saveFriendsToStorage();
-      renderFriendsList();
-    }
-
-    function saveFriendsToStorage() {
-      cleanFriendArrays();
-    }
-
-    // --- MARKET & INVENTORY SYSTEM ---
-    let currentMarketCat = 'accessories';
-    let currentInvCat = 'all';
-
-    function switchMarketCategory(cat) {
-      currentMarketCat = cat;
-      ['accessories', 'skins', 'titles', 'stickers'].forEach(c => {
-        document.getElementById(`mcat-${c}`).className = c === cat ? "py-1.5 rounded-lg bg-white shadow" : "py-1.5 rounded-lg";
-      });
-      renderMarketItems();
-    }
-
-    function renderMarketItems() {
-      const grid = document.getElementById('market-items-grid');
-      const search = document.getElementById('market-search').value.toLowerCase();
-      grid.innerHTML = '';
-
-      const items = MARKET_CATALOG[currentMarketCat].filter(i => i.name.toLowerCase().includes(search));
-      items.forEach(item => {
-        const owned = localPlayer.inventory.includes(item.id);
-        const card = document.createElement('div');
-        card.className = "bg-white/80 p-2.5 rounded-2xl border border-pink-200 flex flex-col items-center text-center justify-between shadow-sm";
-        
-        let visual = `<span class="text-2xl">${item.icon || '✨'}</span>`;
-        if (item.type === 'skin') visual = `<div class="w-8 h-8 rounded-full shadow border" style="background:${item.color}"></div>`;
-        if (item.type === 'sticker') visual = `<img src="${item.url}" class="w-10 h-10 rounded-lg object-cover border" />`;
-
-        card.innerHTML = `
-          ${visual}
-          <div class="my-1">
-            <h4 class="text-xs font-bold text-pink-950">${item.name}</h4>
-            <p class="text-[10px] text-amber-700 font-black">🪙 ${item.price}</p>
-          </div>
-          <button onclick="buyMarketItem('${item.id}', '${currentMarketCat}')" ${owned ? 'disabled' : ''} class="w-full py-1 rounded-xl text-xs font-bold ${owned ? 'bg-slate-200 text-slate-500' : 'bg-pink-500 hover:bg-pink-600 text-white shadow'}">
-            ${owned ? 'Owned' : 'Buy'}
-          </button>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function buyMarketItem(id, cat) {
-      const item = MARKET_CATALOG[cat].find(i => i.id === id);
-      if (!item) return;
-      if (localPlayer.points < item.price) {
-        alert('Not enough points!');
-        return;
-      }
-      localPlayer.points -= item.price;
-      localPlayer.inventory.push(id);
-      saveLocalPlayerState();
-      renderMarketItems();
-      alert(`Bought ${item.name}!`);
-    }
-
-    function switchInvCategory(cat) {
-      currentInvCat = cat;
-      ['all', 'skins', 'accessories', 'titles'].forEach(c => {
-        document.getElementById(`icat-${c}`).className = c === cat ? "py-1 rounded-lg bg-white shadow" : "py-1 rounded-lg";
-      });
-      renderInventoryItems();
-    }
-
-    function renderInventoryItems() {
-      const grid = document.getElementById('inventory-items-grid');
-      const search = document.getElementById('inv-search').value.toLowerCase();
-      grid.innerHTML = '';
-
-      let allItems = [];
-      Object.values(MARKET_CATALOG).forEach(arr => allItems.push(...arr));
-      
-      const ownedItems = allItems.filter(i => localPlayer.inventory.includes(i.id) && i.name.toLowerCase().includes(search));
-
-      ownedItems.forEach(item => {
-        if (currentInvCat !== 'all' && item.type !== currentInvCat) return;
-
-        let isEquipped = localPlayer.equippedSkin === item.id || localPlayer.equippedAccessory === item.id || localPlayer.equippedTitle === item.id;
-        const card = document.createElement('div');
-        card.className = "bg-white/80 p-2 rounded-2xl border border-pink-200 flex flex-col items-center justify-between text-center";
-        
-        card.innerHTML = `
-          <span class="text-lg">${item.icon || '✨'}</span>
-          <h5 class="text-[11px] font-bold text-pink-950 my-1">${item.name}</h5>
-          <button onclick="equipItem('${item.id}', '${item.type}')" class="w-full py-1 rounded-xl text-[10px] font-bold ${isEquipped ? 'bg-emerald-500 text-white' : 'bg-pink-500 text-white'}">
-            ${isEquipped ? 'Equipped' : 'Equip'}
-          </button>
-        `;
-        grid.appendChild(card);
-      });
-      renderInventoryPreview();
-    }
-
-    function equipItem(id, type) {
-      if (type === 'skin') localPlayer.equippedSkin = id;
-      if (type === 'accessory') localPlayer.equippedAccessory = localPlayer.equippedAccessory === id ? null : id;
-      if (type === 'title') localPlayer.equippedTitle = localPlayer.equippedTitle === id ? null : id;
-      
-      saveLocalPlayerState();
-      renderInventoryItems();
-      broadcastState();
-    }
-
-    // --- PROFILE IMAGE UPLOAD & DISPLAY REFRESH ---
-    function handleImageUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        localPlayer.profilePic = evt.target.result;
-        document.getElementById('profile-preview-img').src = localPlayer.profilePic;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function resetProfilePicture() {
-      localPlayer.profilePic = DEFAULT_PROFILE_PIC;
-      document.getElementById('profile-preview-img').src = DEFAULT_PROFILE_PIC;
-    }
-
-    function saveProfileChanges() {
-      const newName = document.getElementById('profile-name-input').value.trim();
-      if (newName && newName !== 'undefined') {
-        localPlayer.name = newName;
-      }
-      saveLocalPlayerState();
-      updateProfileDisplay();
-      closeModal('profile-modal');
-      broadcastState();
-      
-      // Update Name across active friends via broadcast
-      friends.forEach(f => {
-        if (realtimeChannel) {
-          realtimeChannel.send({
-            type: 'broadcast',
-            event: 'friend_accepted',
-            payload: { targetId: f.id, from: { id: localPlayer.id, name: localPlayer.name, profilePic: localPlayer.profilePic } }
-          });
-        }
-      });
-    }
-
-    function updateProfileDisplay() {
-      document.getElementById('user-points-display').textContent = localPlayer.points;
-      document.getElementById('nav-profile-avatar').src = localPlayer.profilePic;
-    }
-
-    function saveLocalPlayerState() {
-      localStorage.setItem('sakura_slime_name', localPlayer.name);
-      localStorage.setItem('sakura_profile_pic', localPlayer.profilePic);
-      localStorage.setItem('sakura_slime_pts', localPlayer.points.toString());
-      localStorage.setItem('sakura_eq_skin', localPlayer.equippedSkin);
-      if (localPlayer.equippedAccessory) localStorage.setItem('sakura_eq_acc', localPlayer.equippedAccessory);
-      if (localPlayer.equippedTitle) localStorage.setItem('sakura_eq_title', localPlayer.equippedTitle);
-      localStorage.setItem('sakura_inventory', JSON.stringify(localPlayer.inventory));
-      updateProfileDisplay();
-    }
-
-    // --- SLIME MEMORIES MINI-GAME (+5 POINTS) ---
-    let memoryCards = [];
-    let flippedCards = [];
-    function openSlimeMemoriesGame() {
-      openModal('memories-modal');
-      const symbols = ['🌸', '🐱', '🦊', '🍵', '👑', '🐰'];
-      const deck = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
-      
-      memoryCards = deck.map((sym, idx) => ({ id: idx, symbol: sym, flipped: false, matched: false }));
-      flippedCards = [];
-      document.getElementById('memory-game-status').textContent = 'Match pairs to win +5 Points!';
-      renderMemoryGrid();
-    }
-
-    function renderMemoryGrid() {
-      const grid = document.getElementById('memory-cards-grid');
-      grid.innerHTML = '';
-      memoryCards.forEach((c) => {
-        const btn = document.createElement('button');
-        btn.className = `w-12 h-12 rounded-xl text-lg font-bold flex items-center justify-center transition ${c.flipped || c.matched ? 'bg-white text-pink-950 shadow' : 'bg-pink-500 text-transparent'}`;
-        btn.textContent = c.symbol;
-        btn.onclick = () => flipMemoryCard(c);
-        grid.appendChild(btn);
-      });
-    }
-
-    function flipMemoryCard(card) {
-      if (card.flipped || card.matched || flippedCards.length >= 2) return;
-      card.flipped = true;
-      flippedCards.push(card);
-      renderMemoryGrid();
-
-      if (flippedCards.length === 2) {
-        if (flippedCards[0].symbol === flippedCards[1].symbol) {
-          flippedCards[0].matched = true;
-          flippedCards[1].matched = true;
-          flippedCards = [];
-          if (memoryCards.every(c => c.matched)) {
-            localPlayer.points += 5;
-            saveLocalPlayerState();
-            document.getElementById('memory-game-status').textContent = '🎉 You won! +5 Points Added!';
-          }
-        } else {
-          setTimeout(() => {
-            flippedCards.forEach(c => c.flipped = false);
-            flippedCards = [];
-            renderMemoryGrid();
-          }, 700);
-        }
-      }
-    }
-
-    // --- CHAT & DM ENGINE ---
-    function handleSendChatMessage(e) {
+    // Global Chat Form
+    function handleChatSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
       if (!text) return;
 
-      const msg = {
-        senderId: localPlayer.id,
-        senderName: localPlayer.name,
-        text,
-        isDM: !!activeDMFriend
-      };
+      appendChatMessage(localPlayer.name, text, localPlayer.pfp, true);
 
-      if (activeDMFriend) {
-        msg.targetId = activeDMFriend.id;
-        realtimeChannel.send({ type: 'broadcast', event: 'dm', payload: msg });
-        appendChatMessage(msg, true);
-      } else {
-        realtimeChannel.send({ type: 'broadcast', event: 'chat', payload: msg });
-        appendChatMessage(msg);
+      if (realtimeChannel) {
+        realtimeChannel.send({
+          type: 'broadcast',
+          event: 'global_chat',
+          payload: { sender: localPlayer.name, text, pfp: localPlayer.pfp }
+        });
       }
       input.value = '';
     }
 
-    function appendChatMessage(msg, isDM = false) {
-      const log = document.getElementById('chat-messages');
-      const div = document.createElement('div');
-      div.className = `p-2 rounded-xl text-xs ${msg.senderId === localPlayer.id ? 'bg-pink-500/30 text-white ml-4' : 'bg-white/10 text-pink-100 mr-4'}`;
-      div.innerHTML = `<strong class="text-pink-300">${msg.senderName}:</strong> ${msg.text}`;
-      log.appendChild(div);
-      log.scrollTop = log.scrollHeight;
+    function appendChatMessage(sender, text, pfp, isSelf = false) {
+      const chatBox = document.getElementById('chat-messages');
+      const msg = document.createElement('div');
+      msg.className = "space-y-0.5";
+      const senderLabel = document.createElement('span');
+      senderLabel.className = `font-bold ${isSelf ? 'text-pink-300' : 'text-pink-400'}`;
+      senderLabel.textContent = `${PROFILE_PFP_OPTIONS.includes(pfp) ? pfp : '🌸'} ${sender}: `;
+      const messageText = document.createElement('span');
+      messageText.className = 'text-white/90 font-medium';
+      messageText.textContent = text;
+      msg.append(senderLabel, messageText);
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function openDMWith(friend) {
-      if (!friend || !friend.id) return;
-      activeDMFriend = friend;
-      document.getElementById('chat-mode-label').textContent = `DM: ${friend.name}`;
-      document.getElementById('close-dm-btn').classList.remove('hidden');
-      closeModal('friends-modal');
-      toggleChatSidebar(true);
+    // Room Switch
+    function switchChannel(channelName) {
+      currentChannel = channelName;
+      document.getElementById('room-indicator').textContent = '#' + channelName;
+      initSupabaseChannel(channelName);
     }
 
-    function closeDM() {
-      activeDMFriend = null;
-      document.getElementById('chat-mode-label').textContent = 'Global Chat';
-      document.getElementById('close-dm-btn').classList.add('hidden');
-    }
-
-    // --- DYNAMIC BOUNCE PHYSICS & JIGGLE ANIMATION ---
-    function updatePhysics() {
-      let dx = 0, dy = 0;
-      if (keys.up) dy -= 1;
-      if (keys.down) dy += 1;
-      if (keys.left) dx -= 1;
-      if (keys.right) dx += 1;
-
-      if (joystick.active) {
-        dx = joystick.dx;
-        dy = joystick.dy;
-      }
-
-      // Movement & Elastic Squish/Stretch
-      if (dx !== 0 || dy !== 0) {
-        localPlayer.vx = dx * 3.8;
-        localPlayer.vy = dy * 3.8;
-        localPlayer.jigglePhase += 0.28;
-        localPlayer.scaleX = 1 + Math.sin(localPlayer.jigglePhase) * 0.18;
-        localPlayer.scaleY = 1 - Math.sin(localPlayer.jigglePhase) * 0.18;
-      } else {
-        localPlayer.vx *= 0.8;
-        localPlayer.vy *= 0.8;
-        localPlayer.scaleX += (1 - localPlayer.scaleX) * 0.12;
-        localPlayer.scaleY += (1 - localPlayer.scaleY) * 0.12;
-      }
-
-      localPlayer.x += localPlayer.vx;
-      localPlayer.y += localPlayer.vy;
-
-      // Jump Physics with Bounce Landing
-      if (localPlayer.isJumping) {
-        localPlayer.jumpZ += localPlayer.jumpVZ;
-        localPlayer.jumpVZ -= 0.65;
-        if (localPlayer.jumpZ <= 0) {
-          localPlayer.jumpZ = 0;
-          localPlayer.isJumping = false;
-          // Landing Bounce Impact
-          localPlayer.scaleX = 1.3;
-          localPlayer.scaleY = 0.7;
-        }
-      }
-
-      // Camera Follow Smooth Tracking
-      camera.x += (localPlayer.x - camera.x) * 0.08;
-      camera.y += (localPlayer.y - camera.y) * 0.08;
-
-      broadcastState();
-    }
-
+    // Actions & Controls
     function triggerJump() {
       if (!localPlayer.isJumping) {
         localPlayer.isJumping = true;
-        localPlayer.jumpVZ = 8.2;
-        localPlayer.scaleX = 0.75;
-        localPlayer.scaleY = 1.35;
+        localPlayer.jumpVelocity = 520;
+        localPlayer.jumpOffset = 0;
+        localPlayer.bounceCount = 0;
+        playSound('jump');
+        broadcastPlayerState();
       }
     }
 
-    function triggerEmote(emote) {
-      localPlayer.activeEmote = emote;
-      setTimeout(() => localPlayer.activeEmote = null, 2500);
-      broadcastState();
-    }
-
-    // --- ENHANCED PARK & ZONE DECORATIONS ---
-    function renderZoneDecorations() {
-      // Zone Background Grass / Floor
-      if (currentChannel === 'arcade-lounge') {
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 0, 1600, 1200);
-        // Neon Grid Lines
-        ctx.strokeStyle = 'rgba(236, 72, 153, 0.15)';
-        ctx.lineWidth = 2;
-        for (let x = 0; x < 1600; x += 80) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1200); ctx.stroke();
-        }
-        for (let y = 0; y < 1200; y += 80) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1600, y); ctx.stroke();
-        }
-      } else if (currentChannel === 'onsen-hotspring') {
-        // Detailed Park Ground
-        ctx.fillStyle = '#14532d';
-        ctx.fillRect(0, 0, 1600, 1200);
-
-        // Cobblestone Pathways
-        ctx.fillStyle = '#334155';
-        ctx.beginPath();
-        ctx.roundRect(100, 550, 1400, 100, 20);
-        ctx.fill();
-
-        // Koi Pond
-        ctx.fillStyle = '#0284c7';
-        ctx.beginPath();
-        ctx.ellipse(800, 400, 220, 140, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 8;
-        ctx.stroke();
-
-        // Wooden Bridge over Pond
-        ctx.fillStyle = '#78350f';
-        ctx.fillRect(740, 260, 120, 280);
-        ctx.fillStyle = '#451a03';
-        for (let i = 270; i < 530; i += 20) {
-          ctx.fillRect(735, i, 130, 4);
-        }
-
-        // Sakura Trees & Stone Lanterns
-        for (let i = 0; i < 8; i++) {
-          let tx = 200 + (i % 4) * 380;
-          let ty = 180 + Math.floor(i / 4) * 650;
-          ctx.fillStyle = '#f472b6';
-          ctx.beginPath(); ctx.arc(tx, ty, 60, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = '#fda4af';
-          ctx.beginPath(); ctx.arc(tx - 12, ty - 12, 35, 0, Math.PI * 2); ctx.fill();
-
-          // Stone Lantern
-          ctx.fillStyle = '#64748b';
-          ctx.fillRect(tx + 70, ty + 40, 16, 24);
-          ctx.fillStyle = '#fef08a';
-          ctx.fillRect(tx + 68, ty + 30, 20, 10);
-        }
-
-        // Falling Petals Animation
-        ctx.fillStyle = '#f472b6';
-        sakuraPetals.forEach(pt => {
-          pt.y += pt.speedY;
-          pt.x += Math.sin(pt.y * 0.02) * pt.speedX;
-          if (pt.y > 1200) pt.y = 0;
-          if (pt.x > 1600) pt.x = 0;
-          ctx.beginPath();
-          ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
-          ctx.fill();
-        });
-      } else {
-        // Zen Garden Lounge
-        ctx.fillStyle = '#831843';
-        ctx.fillRect(0, 0, 1600, 1200);
+    function triggerEmote(emoji) {
+      localPlayer.emoteEmoji = emoji;
+      localPlayer.emoteUntil = Date.now() + 900;
+      playSound('jump');
+      broadcastPlayerState();
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        canvas.classList.remove('mobile-jiggle');
+        void canvas.offsetWidth;
+        canvas.classList.add('mobile-jiggle');
       }
     }
 
-    function renderWorld() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      ctx.save();
-      ctx.translate(canvas.width / 2 - camera.x, canvas.height / 2 - camera.y);
-
-      // Environment Decorator
-      renderZoneDecorations();
-
-      // Render All Remote Players
-      Object.values(remotePlayers).forEach(p => renderSlime(p));
-
-      // Render Local Player
-      renderSlime(localPlayer);
-
-      ctx.restore();
+    function toggleActiveSpecialEmote() {
+      localPlayer.activeSpecialEmote = null;
+      document.getElementById('special-emote-btn').classList.add('hidden');
+      broadcastPlayerState();
     }
 
-    function renderSlime(p) {
-      ctx.save();
-      ctx.translate(p.x, p.y - (p.jumpZ || 0));
-      ctx.scale(p.scaleX || 1, p.scaleY || 1);
-
-      // Slime Body Skin
-      let skin = MARKET_CATALOG.skins.find(s => s.id === p.equippedSkin) || MARKET_CATALOG.skins[0];
-      ctx.fillStyle = skin.color;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 24, 20, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Slime Eyes
-      ctx.fillStyle = '#000';
-      ctx.beginPath(); ctx.arc(-7, -3, 3, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(7, -3, 3, 0, Math.PI * 2); ctx.fill();
-
-      // Accessory Overlay
-      if (p.equippedAccessory) {
-        let acc = MARKET_CATALOG.accessories.find(a => a.id === p.equippedAccessory);
-        if (acc) {
-          ctx.font = '16px sans-serif';
-          ctx.fillText(acc.icon, -8, -18);
-        }
-      }
-
-      // Title Overlay
-      if (p.equippedTitle) {
-        let title = MARKET_CATALOG.titles.find(t => t.id === p.equippedTitle);
-        if (title) {
-          ctx.fillStyle = '#fef08a';
-          ctx.font = 'bold 10px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(title.label, 0, -32);
-        }
-      }
-
-      // Name Tag
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 11px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(p.name, 0, 32);
-
-      // Emote
-      if (p.activeEmote) {
-        ctx.font = '20px sans-serif';
-        ctx.fillText(p.activeEmote, 0, -45);
-      }
-
-      ctx.restore();
+    function toggleChatSidebar() {
+      document.getElementById('chat-sidebar').classList.toggle('translate-x-full');
     }
 
-    function renderInventoryPreview() {
-      const pcanvas = document.getElementById('inventoryPreviewCanvas');
-      const pctx = pcanvas.getContext('2d');
-      pctx.clearRect(0, 0, pcanvas.width, pcanvas.height);
-
-      pctx.save();
-      pctx.translate(pcanvas.width / 2, pcanvas.height / 2 + 10);
-
-      renderSlimeInContext(pctx, localPlayer);
-      pctx.restore();
-    }
-
-    function renderSlimeInContext(pctx, p) {
-      let skin = MARKET_CATALOG.skins.find(s => s.id === p.equippedSkin) || MARKET_CATALOG.skins[0];
-      pctx.fillStyle = skin.color;
-      pctx.beginPath(); pctx.ellipse(0, 0, 28, 22, 0, 0, Math.PI * 2); pctx.fill();
-
-      pctx.fillStyle = '#000';
-      pctx.beginPath(); pctx.arc(-8, -3, 3.5, 0, Math.PI * 2); pctx.fill();
-      pctx.beginPath(); pctx.arc(8, -3, 3.5, 0, Math.PI * 2); pctx.fill();
-
-      if (p.equippedAccessory) {
-        let acc = MARKET_CATALOG.accessories.find(a => a.id === p.equippedAccessory);
-        if (acc) { pctx.font = '20px sans-serif'; pctx.fillText(acc.icon, -10, -20); }
-      }
-      if (p.equippedTitle) {
-        let title = MARKET_CATALOG.titles.find(t => t.id === p.equippedTitle);
-        if (title) { pctx.fillStyle = '#fef08a'; pctx.font = 'bold 11px sans-serif'; pctx.textAlign = 'center'; pctx.fillText(title.label, 0, -36); }
-      }
-    }
-
-    function gameLoop() {
-      updatePhysics();
-      renderWorld();
-      requestAnimationFrame(gameLoop);
-    }
-
-    // --- CHANNEL & UI SWITCHERS ---
-    function switchChannel(channel) {
-      currentChannel = channel;
-      document.getElementById('room-indicator').textContent = `#${channel}`;
-      initSupabaseChannel();
-    }
-
-    function toggleChatSidebar(forceOpen = false) {
-      const sb = document.getElementById('chat-sidebar');
-      if (forceOpen) sb.classList.remove('translate-x-full');
-      else sb.classList.toggle('translate-x-full');
-    }
-
-    function openModal(id) {
-      document.getElementById(id).classList.remove('hidden');
-      if (id === 'market-modal') renderMarketItems();
-      if (id === 'inventory-modal') renderInventoryItems();
-      if (id === 'friends-modal') renderFriendsList();
-      lucide.createIcons();
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
-    }
-
-    function switchFriendTab(tab) {
-      document.getElementById('ftab-friends').className = tab === 'friends' ? "py-1 rounded-lg bg-white shadow" : "py-1 rounded-lg relative";
-      document.getElementById('ftab-requests').className = tab === 'requests' ? "py-1 rounded-lg bg-white shadow" : "py-1 rounded-lg relative";
-      renderFriendsList(tab);
-    }
-
-    function renderFriendsList(tab = 'friends') {
-      cleanFriendArrays();
-      const container = document.getElementById('friends-list-container');
-      container.innerHTML = '';
-
-      if (tab === 'friends') {
-        friends.forEach(f => {
-          const div = document.createElement('div');
-          div.className = "bg-white/80 p-2 rounded-xl flex items-center justify-between border border-pink-200 text-xs";
-          div.innerHTML = `
-            <div class="flex items-center gap-2">
-              <img src="${f.profilePic || DEFAULT_PROFILE_PIC}" class="w-7 h-7 rounded-lg object-cover" />
-              <span class="font-bold text-pink-950">${f.name}</span>
-            </div>
-            <div class="flex items-center gap-1">
-              <button onclick='openDMWith(${JSON.stringify(f)})' class="px-2 py-1 bg-pink-500 text-white rounded-lg text-[10px] font-bold">DM</button>
-              <button onclick="unfriendUser('${f.id}')" class="px-2 py-1 bg-rose-100 text-rose-700 rounded-lg text-[10px] font-bold">Unfriend</button>
-            </div>
-          `;
-          container.appendChild(div);
-        });
-      } else {
-        friendRequests.forEach(req => {
-          const div = document.createElement('div');
-          div.className = "bg-white/80 p-2 rounded-xl flex items-center justify-between border border-pink-200 text-xs";
-          div.innerHTML = `
-            <div class="flex items-center gap-2">
-              <img src="${req.profilePic || DEFAULT_PROFILE_PIC}" class="w-7 h-7 rounded-lg object-cover" />
-              <span class="font-bold text-pink-950">${req.name}</span>
-            </div>
-            <button onclick='acceptFriendRequest(${JSON.stringify(req)})' class="px-2.5 py-1 bg-emerald-500 text-white rounded-lg text-[10px] font-bold">Accept</button>
-          `;
-          container.appendChild(div);
-        });
-      }
-    }
-
-    // --- CONTROLS LISTENERS ---
-    window.addEventListener('keydown', e => {
-      if (e.key === 'ArrowUp' || e.key === 'w') keys.up = true;
-      if (e.key === 'ArrowDown' || e.key === 's') keys.down = true;
-      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
-      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
-      if (e.key === ' ') triggerJump();
+    // Keyboard Listeners
+    window.addEventListener('keydown', (e) => {
+      if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+      const key = e.key.toLowerCase();
+      if (key === 'w' || e.key === 'ArrowUp') keys.up = true;
+      if (key === 's' || e.key === 'ArrowDown') keys.down = true;
+      if (key === 'a' || e.key === 'ArrowLeft') keys.left = true;
+      if (key === 'd' || e.key === 'ArrowRight') keys.right = true;
+      if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
+      if (e.key === ' ' && !e.repeat) triggerJump();
     });
 
-    window.addEventListener('keyup', e => {
-      if (e.key === 'ArrowUp' || e.key === 'w') keys.up = false;
-      if (e.key === 'ArrowDown' || e.key === 's') keys.down = false;
-      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
-      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'w' || e.key === 'ArrowUp') keys.up = false;
+      if (e.key === 's' || e.key === 'ArrowDown') keys.down = false;
+      if (e.key === 'a' || e.key === 'ArrowLeft') keys.left = false;
+      if (e.key === 'd' || e.key === 'ArrowRight') keys.right = false;
     });
 
-    // Mobile Joystick Logic
-    const jContainer = document.getElementById('joystick-container');
-    const jStick = document.getElementById('joystick-stick');
-    jContainer.addEventListener('touchstart', handleJoystickMove);
-    jContainer.addEventListener('touchmove', handleJoystickMove);
-    jContainer.addEventListener('touchend', () => {
-      joystick.active = false;
-      jStick.style.transform = `translate(0px, 0px)`;
+    // Pointer-based mobile joystick with smooth release.
+    const joyBase = document.getElementById('joystick-container');
+    const joyStick = document.getElementById('joystick-stick');
+    let joyPointerId = null;
+    joyBase.addEventListener('pointerdown', event => {
+      event.preventDefault();
+      joyPointerId = event.pointerId;
+      joyBase.setPointerCapture(event.pointerId);
+      handleJoyPointer(event);
     });
-
-    function handleJoystickMove(e) {
-      const rect = jContainer.getBoundingClientRect();
-      const touch = e.touches[0];
-      const x = touch.clientX - (rect.left + rect.width / 2);
-      const y = touch.clientY - (rect.top + rect.height / 2);
-      const dist = Math.min(30, Math.hypot(x, y));
-      const angle = Math.atan2(y, x);
-      
-      joystick.active = true;
-      joystick.dx = Math.cos(angle);
-      joystick.dy = Math.sin(angle);
-
-      jStick.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px)`;
+    joyBase.addEventListener('pointermove', event => {
+      if (event.pointerId === joyPointerId) handleJoyPointer(event);
+    });
+    function releaseJoystick(event) {
+      if (event.pointerId !== joyPointerId) return;
+      joyPointerId = null;
+      joystick.active = false; joystick.dx = 0; joystick.dy = 0;
+      joyStick.style.transform = 'translate(0px, 0px)';
+    }
+    joyBase.addEventListener('pointerup', releaseJoystick);
+    joyBase.addEventListener('pointercancel', releaseJoystick);
+    joyBase.addEventListener('lostpointercapture', releaseJoystick);
+    function handleJoyPointer(event) {
+      event.preventDefault();
+      const rect = joyBase.getBoundingClientRect();
+      let dx = event.clientX - (rect.left + rect.width / 2);
+      let dy = event.clientY - (rect.top + rect.height / 2);
+      const maxDist = 35;
+      const dist = Math.hypot(dx, dy);
+      if (dist > maxDist) { dx = dx / dist * maxDist; dy = dy / dist * maxDist; }
+      joyStick.style.transform = `translate(${dx}px, ${dy}px)`;
+      joystick.active = true; joystick.dx = dx / maxDist; joystick.dy = dy / maxDist;
     }
 
-    // Canvas Tap Add Friend / Select Slime
-    canvas.addEventListener('click', e => {
-      const rect = canvas.getBoundingClientRect();
-      const worldX = e.clientX - rect.left - canvas.width / 2 + camera.x;
-      const worldY = e.clientY - rect.top - canvas.height / 2 + camera.y;
-
-      Object.values(remotePlayers).forEach(p => {
-        if (Math.hypot(p.x - worldX, p.y - worldY) < 30) {
-          if (confirm(`Send friend request to ${p.name}?`)) {
-            sendFriendRequestTo(p);
-          }
-        }
+    // --- SLIME MEMORIES MATCH GAME ---
+    let memoryDeck = [];
+    let memoryRevealed = [];
+    let memoryMatched = new Set();
+    let memoryLocked = false;
+    let memoryFinished = false;
+    function openMemoriesModal() {
+      document.getElementById('memories-modal').classList.remove('hidden');
+      if (!memoryDeck.length || memoryFinished) startMemoriesGame();
+    }
+    function closeMemoriesModal() { document.getElementById('memories-modal').classList.add('hidden'); }
+    function startMemoriesGame() {
+      const symbols = ['🌸', '🐱', '🦊', '👑', '🐰', '⭐', '🐼', '🦄'];
+      memoryDeck = [...symbols, ...symbols].sort(() => Math.random() - .5);
+      memoryRevealed = [];
+      memoryMatched = new Set();
+      memoryLocked = false;
+      memoryFinished = false;
+      document.getElementById('memory-status').textContent = 'Find the matching stickers!';
+      renderMemoryCards();
+    }
+    function renderMemoryCards() {
+      const grid = document.getElementById('memory-grid');
+      grid.innerHTML = '';
+      memoryDeck.forEach((symbol, index) => {
+        const visible = memoryMatched.has(index) || memoryRevealed.includes(index);
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = `aspect-square rounded-2xl border-2 text-2xl sm:text-3xl shadow-sm transition active:scale-95 ${memoryMatched.has(index) ? 'bg-emerald-100 border-emerald-300' : visible ? 'bg-pink-100 border-pink-300' : 'bg-gradient-to-br from-emerald-400 to-teal-500 border-white text-white'}`;
+        card.textContent = visible ? symbol : '?';
+        card.setAttribute('aria-label', visible ? `Card ${index + 1}: ${symbol}` : `Hidden card ${index + 1}`);
+        card.onclick = () => flipMemoryCard(index);
+        grid.appendChild(card);
       });
-    });
+    }
+    function flipMemoryCard(index) {
+      if (memoryLocked || memoryFinished || memoryMatched.has(index) || memoryRevealed.includes(index)) return;
+      memoryRevealed.push(index);
+      renderMemoryCards();
+      if (memoryRevealed.length < 2) return;
+      const [first, second] = memoryRevealed;
+      if (memoryDeck[first] === memoryDeck[second]) {
+        memoryMatched.add(first); memoryMatched.add(second); memoryRevealed = [];
+        playSound('match');
+        renderMemoryCards();
+        if (memoryMatched.size === memoryDeck.length) {
+          memoryFinished = true;
+          localPlayer.points += 5;
+          savePlayerToStorage();
+          updateUIHeader();
+          document.getElementById('memory-status').textContent = 'You won! +5 points 🪙';
+        }
+      } else {
+        memoryLocked = true;
+        window.setTimeout(() => { memoryRevealed = []; memoryLocked = false; renderMemoryCards(); }, 700);
+      }
+    }
 
-    window.addEventListener('resize', resizeCanvas);
+    // --- AUTH MODAL HANDLERS ---
+    let authMode = 'signin';
+    function switchAuthTab(mode) {
+      authMode = mode;
+      document.getElementById('username-field').classList.toggle('hidden', mode === 'signin');
+    }
 
-    // INIT EXECUTION
-    window.onload = () => {
+    function loginAsGuest() {
+      document.getElementById('auth-modal').classList.add('hidden');
+      initSocialChannel();
+      initSupabaseChannel(currentChannel);
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const chosenName = document.getElementById('auth-username').value.trim();
+      if (authMode === 'signup' && chosenName) { localPlayer.name = chosenName.slice(0, 15); savePlayerToStorage(); }
+      document.getElementById('auth-modal').classList.add('hidden');
+      initSocialChannel();
+      initSupabaseChannel(currentChannel);
+    }
+
+    // INITIALIZATION ON LOAD
+    window.onload = function() {
       resizeCanvas();
+      updateUIHeader();
+      renderPfpPicker();
+      requestAnimationFrame(gameLoop);
       lucide.createIcons();
-      gameLoop();
     };
   </script>
 </body>
