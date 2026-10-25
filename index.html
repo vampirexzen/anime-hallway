@@ -675,6 +675,11 @@
       <button onclick="saveProfileSettings()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs">
         <i data-lucide="check" class="w-4 h-4"></i> Save & Refresh Everywhere
       </button>
+
+      <!-- Sign Out Button -->
+      <button onclick="handleSignOut()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-xs mt-2">
+        <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+      </button>
     </div>
   </div>
 
@@ -742,6 +747,7 @@
         { id: 'title_developer', name: 'DEV', type: 'titles', price: 0, text: 'DEV', color: '#7dd3fc', desc: 'Role title for developers' }
       ]
     };
+
 
     // --- PLAYER STATE ---
     function loadStoredJson(key, fallback) {
@@ -815,6 +821,7 @@
     // Keys & Joystick Input
     const keys = { up: false, down: false, left: false, right: false };
     const joystick = { active: false, dx: 0, dy: 0 };
+
     let camera = { x: 0, y: 0 };
 
     // --- AUDIO & AMBIENT MUSIC ---
@@ -879,7 +886,6 @@
       }
       lucide.createIcons();
     }
-
     function setLobbyMusicUrl(value) {
       const nextUrl = typeof value === 'string' && /^https:\/\//i.test(value) ? value : '';
       if (nextUrl === lobbyMusicUrl) return;
@@ -893,24 +899,21 @@
         playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420);
       }
     }
-
     async function loadLobbyMusic() {
       const { data, error } = await supabaseClient.rpc('get_lobby_music');
       if (!error) setLobbyMusicUrl(data || '');
       const field = document.getElementById('lobby-music-url');
       if (field && localPlayer.role !== 'player') field.value = lobbyMusicUrl;
     }
-
     async function saveLobbyMusic() {
       if (!['admin', 'developer'].includes(localPlayer.role)) return;
       const value = document.getElementById('lobby-music-url').value.trim();
-      if (!/^https:\/\//i.test(value) || value.length > 2048) { document.getElementById('lobby-music-status').textContent = 'Enter a direct HTTPS audio link.'; return; }
+      if (!/^https:\/\//i.test(value) || value.length > 2048) { document.getElementById('lobby-music-status').textContent = 'Enter a direct HTTPS audio URL.'; return; }
       const { data, error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: value });
       if (error) { document.getElementById('lobby-music-status').textContent = error.message; return; }
       setLobbyMusicUrl(data || value); sendSocialBroadcast('lobby_music_update', { url: lobbyMusicUrl });
       document.getElementById('lobby-music-status').textContent = 'Lobby music updated for everyone.';
     }
-
     async function clearLobbyMusic() {
       if (!['admin', 'developer'].includes(localPlayer.role)) return;
       const { error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: '' });
@@ -919,7 +922,7 @@
       sendSocialBroadcast('lobby_music_update', { url: '' }); document.getElementById('lobby-music-status').textContent = 'Lobby music cleared.';
     }
 
-    // --- CANVAS & RENDERING ---
+    // --- CAMERA & CANVAS RENDERING ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -966,6 +969,7 @@
       c.shadowBlur = 0;
     }
 
+    // Render Helper: Draw Slime model with soft idle wobble and squash on landing.
     function drawSlimeModel(c, x, y, skinId, accId, titleId, isJumping, jumpOff, activeEmoteAnim, isSelf, role = 'player', motionSpeed = 0, motionX = 0) {
       c.save();
       const phase = Date.now() * 0.008 + x * 0.015;
@@ -1177,6 +1181,7 @@
 
     function renderGameWorld() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       ctx.save();
       ctx.translate(-camera.x, -camera.y);
       drawZoneDecorations();
@@ -1209,7 +1214,7 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // --- INTERACTION & CLICK ON CANVAS ---
+    // --- INTERACTION & CLICK ON CANVAS TO ADD FRIEND ---
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
       const clickWorldX = e.clientX - rect.left + camera.x;
@@ -1290,7 +1295,6 @@
         if (selectedPlayerId === userId) { mute.textContent = 'Mute unavailable'; ban.textContent = error.message || 'Ban unavailable'; }
       }
     }
-
     async function moderateSelectedPlayer(kind, durationMinutes) {
       const target = selectedPlayerStaffUser;
       if (!target) return null;
@@ -1345,7 +1349,9 @@
       renderMarketGrid();
       startMarketPreviewLoop();
     }
-    function closeMarketModal() { document.getElementById('market-modal').classList.add('hidden'); }
+    function closeMarketModal() {
+      document.getElementById('market-modal').classList.add('hidden');
+    }
 
     function filterMarketCategory(cat) {
       activeMarketCategory = cat;
@@ -1415,7 +1421,7 @@
       if (!document.getElementById('inventory-modal').classList.contains('hidden')) renderInventoryGrid();
     }
 
-    // Market Preview Canvas with Fixed Message Card Text Bounding
+    // Market Preview Canvas
     let marketPreviewCanvas = document.getElementById('marketPreviewCanvas');
     let marketPreviewCtx = marketPreviewCanvas.getContext('2d');
 
@@ -1442,10 +1448,9 @@
         }
         if (marketTestingItem && marketTestingItem.type === 'message_cards') {
           const color = marketTestingItem.style === 'sakura' ? ['#fff1f2','#fb7185'] : marketTestingItem.style === 'moon' ? ['#e0f2fe','#38bdf8'] : ['#f3e8ff','#c084fc'];
-          marketPreviewCtx.fillStyle = color[0]; marketPreviewCtx.strokeStyle = color[1]; marketPreviewCtx.lineWidth = 2.5;
-          marketPreviewCtx.beginPath(); marketPreviewCtx.roundRect(15, 108, 150, 30, 10); marketPreviewCtx.fill(); marketPreviewCtx.stroke();
-          marketPreviewCtx.fillStyle = '#312e81'; marketPreviewCtx.font = 'bold 10px Plus Jakarta Sans, sans-serif'; marketPreviewCtx.textAlign = 'center';
-          marketPreviewCtx.fillText('A decorated message', 90, 127);
+          marketPreviewCtx.fillStyle = color[0]; marketPreviewCtx.strokeStyle = color[1]; marketPreviewCtx.lineWidth = 3;
+          marketPreviewCtx.beginPath(); marketPreviewCtx.roundRect(20, 112, 140, 28, 12); marketPreviewCtx.fill(); marketPreviewCtx.stroke();
+          marketPreviewCtx.fillStyle = '#312e81'; marketPreviewCtx.font = 'bold 9px sans-serif'; marketPreviewCtx.fillText('A decorated message', 90, 130);
         }
         if (marketTestingItem && marketTestingItem.type === 'frames') {
           const color = marketTestingItem.style === 'sakura' ? '#fb7185' : marketTestingItem.style === 'moon' ? '#38bdf8' : '#fbbf24';
@@ -1463,7 +1468,9 @@
       renderInventoryGrid();
       startInvPreviewLoop();
     }
-    function closeInventoryModal() { document.getElementById('inventory-modal').classList.add('hidden'); }
+    function closeInventoryModal() {
+      document.getElementById('inventory-modal').classList.add('hidden');
+    }
 
     function filterInventoryCategory(category) {
       activeInventoryCategory = category;
@@ -1521,8 +1528,10 @@
       const button = document.getElementById('special-emote-btn');
       if (!button) return;
       const item = MARKET_ITEMS.emotes.find(entry => entry.id === localPlayer.equippedEmote && localPlayer.inventory.includes(entry.id));
-      if (!item) { button.classList.add('hidden'); localPlayer.activeSpecialEmote = null; return; }
-      button.textContent = `${item.icon} ${item.name}${localPlayer.activeSpecialEmote === item.anim ? ' ✓' : ''}`;
+      const roleEmote = null;
+      if (!item && !roleEmote) { button.classList.add('hidden'); localPlayer.activeSpecialEmote = null; return; }
+      const selected = item || roleEmote;
+      button.textContent = `${selected.icon} ${selected.name}${localPlayer.activeSpecialEmote === selected.anim ? ' ✓' : ''}`;
       button.classList.remove('hidden');
     }
 
@@ -1613,7 +1622,10 @@
       if (!authUser || guestMode) { alert('Sign in to send friend requests.'); return; }
       if (!isValidUserId(id) || id === localPlayer.id) return;
       if (friendList.some(f => f.id === id)) return;
-      if (friendRequests.some(r => r.senderId === id)) { acceptFriendRequest(id); return; }
+      if (friendRequests.some(r => r.senderId === id)) {
+        acceptFriendRequest(id);
+        return;
+      }
       if (outgoingFriendRequests.some(r => r.targetId === id)) return;
       const request = { targetId: id, name: typeof name === 'string' && name.trim() ? name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(pfp) ? pfp : '🌸', avatarUrl: safeAvatarUrl(avatarUrl), time: Date.now() };
       outgoingFriendRequests.push(request);
@@ -1654,6 +1666,7 @@
     function removeFriend(id) {
       friendList = friendList.filter(f => f.id !== id);
       saveFriendData();
+      sendSocialBroadcast('unfriend', { targetId: id, userId: localPlayer.id });
       renderFriendsList();
       if (activeDMUserId === id) activeDMUserId = null;
       renderDMBox();
@@ -1976,6 +1989,17 @@
       else alert('Profile updated and saved to your account.');
     }
 
+    async function handleSignOut() {
+      if (realtimeChannel) { await realtimeChannel.unsubscribe(); realtimeChannel = null; }
+      if (socialChannel) { await socialChannel.unsubscribe(); socialChannel = null; }
+      await supabaseClient.auth.signOut();
+      authUser = null;
+      guestMode = false;
+      toggleSettingsModal();
+      document.getElementById('auth-modal').classList.remove('hidden');
+    }
+
+    // Storage & Header UI Update Helper
     function savePlayerToStorage() {
       localStorage.setItem('sakura_user_id', localPlayer.id);
       localStorage.setItem('sakura_name', localPlayer.name);
@@ -2040,7 +2064,6 @@
       searchWalletUsers();
     }
     function closeDeveloperWallet() { document.getElementById('developer-wallet-modal').classList.add('hidden'); }
-
     async function callStaffFunction(action, values = {}) {
       if (action === 'search_users') {
         const { data, error } = await supabaseClient.rpc('search_users', { p_query: String(values.query || '') });
@@ -2077,13 +2100,11 @@
       }
       throw new Error('Unknown staff action.');
     }
-
     function makeStaffButton(label, style, callback) {
       const button = document.createElement('button'); button.type = 'button';
       button.className = `rounded-lg px-2.5 py-1.5 text-[10px] font-bold text-white ${style}`;
       button.textContent = label; button.onclick = callback; return button;
     }
-
     function staffUserCard(user, mode) {
       const card = document.createElement('article');
       card.className = 'rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm';
@@ -2137,7 +2158,6 @@
       }
       return card;
     }
-
     async function runStaffAction(action, statusId, successText) {
       const status = document.getElementById(statusId); status.textContent = 'Working…';
       try {
@@ -2146,7 +2166,6 @@
         else await searchWalletUsers(true);
       } catch (error) { status.textContent = error.message || 'Could not complete this action.'; }
     }
-
     async function searchStaffUsers(immediate = false) {
       if (staffSearchTimer) clearTimeout(staffSearchTimer);
       const query = document.getElementById('staff-user-search').value.trim();
@@ -2163,7 +2182,6 @@
         } catch (error) { status.textContent = error.message || 'Search failed.'; }
       }, immediate ? 0 : 350);
     }
-
     async function searchWalletUsers(immediate = false) {
       if (walletSearchTimer) clearTimeout(walletSearchTimer);
       const query = document.getElementById('wallet-user-search').value.trim();
@@ -2193,7 +2211,6 @@
       if (data.is_banned) await leaveBannedGame();
       return Boolean(data.is_banned);
     }
-
     async function leaveBannedGame() {
       if (realtimeChannel) { await realtimeChannel.unsubscribe(); realtimeChannel = null; }
       if (socialChannel) { await socialChannel.unsubscribe(); socialChannel = null; }
@@ -2202,9 +2219,8 @@
       await supabaseClient.auth.signOut({ scope: 'local' });
       authUser = null;
       document.getElementById('auth-modal').classList.remove('hidden');
-      showAuthAlert('This account is currently banned from the game.');
+      showAuthAlert('This account is currently banned from the game. Contact an administrator to request an unban.');
     }
-
     function startModerationMonitor() {
       if (moderationPollTimer) clearInterval(moderationPollTimer);
       moderationPollTimer = setInterval(async () => {
@@ -2215,6 +2231,7 @@
         }
         await refreshOwnProfile();
         await refreshModerationState();
+        await Promise.allSettled(Object.keys(remotePlayers).map(resolveRemoteRole));
       }, 15000);
     }
 
@@ -2223,8 +2240,12 @@
       const { data, error } = await supabaseClient.rpc('get_user_role', { p_user_id: userId });
       return !error && ['admin', 'developer'].includes(data) ? data : 'player';
     }
+    async function resolveRemoteRole(userId) {
+      const role = await getTrustedUserRole(userId);
+      if (remotePlayers[userId]) { remotePlayers[userId].role = role; }
+    }
 
-    // --- SUPABASE REALTIME MULTIPLAYER (PRIVATE CONFIG REMOVED FOR CONNECTIVITY) ---
+    // --- SUPABASE REALTIME MULTIPLAYER (FIXED FOR PUBLIC BROADCAST & PRESENCE) ---
     let socialChannel = null;
     function initSocialChannel() {
       if (socialChannel || !authUser || guestMode) return;
@@ -2241,6 +2262,14 @@
           localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
           handleFriendUserSearch();
         })
+        .on('broadcast', { event: 'unfriend' }, ({ payload }) => {
+          if (!payload || payload.targetId !== localPlayer.id) return;
+          friendList = friendList.filter(f => f.id !== payload.userId);
+          saveFriendData();
+          renderFriendsList();
+          if (activeDMUserId === payload.userId) activeDMUserId = null;
+          renderDMBox();
+        })
         .on('broadcast', { event: 'profile_update' }, ({ payload }) => {
           if (!payload || !payload.id) return;
           if (payload.id === localPlayer.id) refreshOwnProfile();
@@ -2251,6 +2280,11 @@
           const isFriend = friendList.some(f => f.id === payload.senderId && f.accepted);
           const senderRole = await getTrustedUserRole(payload.senderId);
           if (!isFriend && senderRole !== 'developer' && localPlayer.role !== 'developer') return;
+          if (senderRole === 'developer' || localPlayer.role === 'developer') {
+            staffDMUserId = payload.senderId;
+            staffDMProfile = { id: payload.senderId, name: payload.sender || (senderRole === 'developer' ? 'Developer' : 'Player'), pfp: payload.pfp, avatarUrl: payload.avatarUrl, equippedFrame: payload.equippedFrame, role: senderRole };
+            activeDMUserId = payload.senderId;
+          }
           if (!dmMessages[payload.senderId]) dmMessages[payload.senderId] = [];
           dmMessages[payload.senderId].push({ senderId: payload.senderId, text: payload.text, time: Date.now(), pfp: payload.pfp, avatarUrl: payload.avatarUrl, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard });
           localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
@@ -2266,7 +2300,7 @@
       initSocialChannel();
       if (realtimeChannel) realtimeChannel.unsubscribe();
 
-      realtimeChannel = supabaseClient.channel(`room:${channelName}`, {
+      realtimeChannel = supabaseClient.channel(`sakura_room_${channelName}`, {
         config: { presence: { key: localPlayer.id } }
       });
 
@@ -2278,6 +2312,7 @@
             if (key !== localPlayer.id) {
               const player = state[key][0];
               remotePlayers[key] = { ...player, role: 'player', displayX: player.x, displayY: player.y, displayJumpOffset: player.jumpOffset || 0 };
+              resolveRemoteRole(key);
             }
           });
           Object.values(remotePlayers).forEach(syncFriendProfile);
@@ -2292,6 +2327,7 @@
               displayJumpOffset: previous && Number.isFinite(previous.displayJumpOffset) ? previous.displayJumpOffset : (payload.jumpOffset || 0)
             };
             syncFriendProfile(payload);
+            if (!previous) resolveRemoteRole(payload.id);
           }
         })
         .on('broadcast', { event: 'global_chat' }, async ({ payload }) => {
@@ -2309,7 +2345,11 @@
 
     function broadcastPlayerState() {
       if (realtimeChannel) {
-        realtimeChannel.send({ type: 'broadcast', event: 'player_update', payload: localPlayer });
+        realtimeChannel.send({
+          type: 'broadcast',
+          event: 'player_update',
+          payload: localPlayer
+        });
       }
     }
 
@@ -2361,6 +2401,14 @@
         nameButton.onclick = () => openChatPlayerCard(playerProfile);
       }
       header.append(avatar, nameButton);
+      if (profile.equippedTitle && !['title_admin','title_developer'].includes(profile.equippedTitle)) {
+        const title = [].concat(...Object.values(MARKET_ITEMS)).find(item => item.id === profile.equippedTitle);
+        if (title) { const tag = document.createElement('span'); tag.className = 'ml-auto rounded-full bg-white/15 px-2 py-0.5 text-[8px] font-black text-amber-200'; tag.textContent = title.text || title.name; header.appendChild(tag); }
+      }
+      if (roleTitle) {
+        const badge = document.createElement('span'); badge.className = `ml-auto rounded-full px-2 py-0.5 text-[8px] font-black tracking-wider ${role === 'developer' ? 'bg-cyan-300 text-cyan-950' : 'bg-rose-500 text-white'}`;
+        badge.textContent = roleTitle; header.appendChild(badge);
+      }
       const message = document.createElement('p'); message.className = 'break-words pl-9 text-[11px] leading-relaxed text-white/95'; message.textContent = text;
       card.append(header, message); chatBox.appendChild(card); chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -2384,8 +2432,12 @@
 
     function triggerEmote(emoji) {
       localPlayer.emoteEmoji = emoji;
+      localPlayer.emoteUntil = Date.now() + 900;
       localPlayer.speechBubble = { text: String(emoji).slice(0, 24), until: Date.now() + 2400 };
       playSound('jump'); broadcastPlayerState();
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        canvas.classList.remove('mobile-jiggle'); void canvas.offsetWidth; canvas.classList.add('mobile-jiggle');
+      }
     }
 
     function toggleActiveSpecialEmote() {
@@ -2400,6 +2452,7 @@
       document.getElementById('chat-sidebar').classList.toggle('translate-x-full');
     }
 
+    // Keyboard Listeners (Movement preserved)
     window.addEventListener('keydown', (e) => {
       if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
       const key = e.key.toLowerCase();
@@ -2460,7 +2513,7 @@
       savePlayerToStorage(); updateUIHeader(); return true;
     }
 
-    // --- SLIME MEMORIES MATCH GAME ---
+    // --- GAMES ---
     let memoryDeck = [];
     let memoryRevealed = [];
     let memoryMatched = new Set();
@@ -2493,6 +2546,7 @@
         card.type = 'button';
         card.className = `aspect-square rounded-2xl border-2 text-2xl sm:text-3xl shadow-sm transition active:scale-95 ${memoryMatched.has(index) ? 'bg-emerald-100 border-emerald-300' : visible ? 'bg-pink-100 border-pink-300' : 'bg-gradient-to-br from-emerald-400 to-teal-500 border-white text-white'}`;
         card.textContent = visible ? symbol : '?';
+        card.setAttribute('aria-label', visible ? `Card ${index + 1}: ${symbol}` : `Hidden card ${index + 1}`);
         card.onclick = () => flipMemoryCard(index);
         grid.appendChild(card);
       });
@@ -2518,119 +2572,78 @@
       }
     }
 
-    // --- SLIME SEQUENCE GAME (FULLY FIXED) ---
     const sequenceStickers = ['🌸', '🐸', '🍡', '⭐'];
     let slimeSequence = [];
     let sequenceInput = [];
     let sequenceLevel = 0;
     let sequenceLocked = true;
-    let sequenceTimeouts = [];
-
-    function clearSequenceTimeouts() {
-      sequenceTimeouts.forEach(t => clearTimeout(t));
-      sequenceTimeouts = [];
-    }
-
+    let sequenceTimer = null;
     function openSequenceGame() {
       closeGamesModal();
       document.getElementById('sequence-modal').classList.remove('hidden');
       renderSequenceButtons();
     }
-
     function closeSequenceGame() {
       document.getElementById('sequence-modal').classList.add('hidden');
-      clearSequenceTimeouts();
+      window.clearTimeout(sequenceTimer);
       sequenceLocked = true;
     }
-
     function renderSequenceButtons() {
       const grid = document.getElementById('sequence-grid');
       grid.innerHTML = '';
       sequenceStickers.forEach((sticker, index) => {
         const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'aspect-square rounded-2xl border-2 border-white bg-gradient-to-br from-violet-400 to-indigo-500 text-4xl shadow-md transition active:scale-95 flex items-center justify-center';
-        button.textContent = sticker;
+        button.type = 'button'; button.className = 'aspect-square rounded-2xl border-2 border-white bg-gradient-to-br from-violet-400 to-indigo-500 text-4xl shadow-md transition active:scale-95';
+        button.textContent = sticker; button.setAttribute('aria-label', `Sticker ${index + 1}`);
         button.onclick = () => clickSequenceSticker(index);
         grid.appendChild(button);
       });
     }
-
     function startSequenceGame() {
-      clearSequenceTimeouts();
-      slimeSequence = [];
-      sequenceInput = [];
-      sequenceLevel = 0;
-      sequenceLocked = true;
+      window.clearTimeout(sequenceTimer);
+      slimeSequence = []; sequenceInput = []; sequenceLevel = 0; sequenceLocked = true;
       document.getElementById('sequence-status').textContent = 'Watch the pattern…';
       advanceSequence();
     }
-
     function advanceSequence() {
-      clearSequenceTimeouts();
       slimeSequence.push(Math.floor(Math.random() * sequenceStickers.length));
-      sequenceInput = [];
-      sequenceLevel++;
+      sequenceInput = []; sequenceLevel++;
       const status = document.getElementById('sequence-status');
       status.textContent = `Round ${sequenceLevel} of 8 — watch closely`;
       sequenceLocked = true;
-
       const grid = document.getElementById('sequence-grid');
       const buttons = Array.from(grid.children);
-
-      slimeSequence.forEach((stickerIndex, step) => {
-        const showDelay = 500 + step * 650;
-        const hideDelay = showDelay + 400;
-
-        sequenceTimeouts.push(setTimeout(() => {
-          buttons.forEach((btn, idx) => {
-            if (idx === stickerIndex) {
-              btn.classList.add('ring-4', 'ring-yellow-300', 'brightness-150', 'scale-105');
-            }
-          });
-        }, showDelay));
-
-        sequenceTimeouts.push(setTimeout(() => {
-          buttons.forEach(btn => {
-            btn.classList.remove('ring-4', 'ring-yellow-300', 'brightness-150', 'scale-105');
-          });
-        }, hideDelay));
-      });
-
-      const unlockDelay = 500 + slimeSequence.length * 650;
-      sequenceTimeouts.push(setTimeout(() => {
-        sequenceLocked = false;
-        status.textContent = `Round ${sequenceLevel} of 8 — repeat the pattern`;
-      }, unlockDelay));
+      let step = 0;
+      const showNext = () => {
+        buttons.forEach(button => button.classList.remove('ring-4', 'ring-yellow-300', 'brightness-150'));
+        if (step >= slimeSequence.length) {
+          sequenceLocked = false;
+          status.textContent = `Round ${sequenceLevel} of 8 — repeat the pattern`;
+          return;
+        }
+        const button = buttons[slimeSequence[step++]];
+        button.classList.add('ring-4', 'ring-yellow-300', 'brightness-150');
+        sequenceTimer = window.setTimeout(showNext, 430);
+      };
+      sequenceTimer = window.setTimeout(showNext, 350);
     }
-
     async function clickSequenceSticker(index) {
       if (sequenceLocked || !slimeSequence.length) return;
-
-      const grid = document.getElementById('sequence-grid');
-      const button = grid.children[index];
-      if (button) {
-        button.classList.add('ring-2', 'ring-pink-300', 'brightness-125');
-        setTimeout(() => button.classList.remove('ring-2', 'ring-pink-300', 'brightness-125'), 200);
-      }
-
       sequenceInput.push(index);
       const position = sequenceInput.length - 1;
-
       if (sequenceInput[position] !== slimeSequence[position]) {
         sequenceLocked = true;
-        document.getElementById('sequence-status').textContent = 'Not quite! Press Start game to try again.';
+        document.getElementById('sequence-status').textContent = 'Not quite. Press Start and try again.';
         return;
       }
-
       if (sequenceInput.length === slimeSequence.length) {
         sequenceLocked = true;
         if (sequenceLevel >= 8) {
           const awarded = await awardGameWin('sequence');
           document.getElementById('sequence-status').textContent = awarded ? 'You won! +5 points 🪙' : 'You won! Sign in to save your 5 points.';
         } else {
-          document.getElementById('sequence-status').textContent = 'Great job! Next round starting…';
-          sequenceTimeouts.push(setTimeout(advanceSequence, 900));
+          document.getElementById('sequence-status').textContent = 'Nice! Get ready for the next round…';
+          sequenceTimer = window.setTimeout(advanceSequence, 650);
         }
       }
     }
@@ -2667,7 +2680,6 @@
         list.appendChild(card);
       });
     }
-
     async function editNotice(notice) {
       if (!isNoticeWriter()) return;
       const title = prompt('Edit notice title:', notice.title); if (title === null) return;
@@ -2676,14 +2688,12 @@
       if (error) { document.getElementById('notice-board-status').textContent = error.message; return; }
       await loadNoticeBoard();
     }
-
     async function deleteNotice(id) {
       if (!isNoticeWriter() || !confirm('Delete this notice?')) return;
       const { error } = await supabaseClient.rpc('delete_notice', { p_notice_id: id });
       if (error) { document.getElementById('notice-board-status').textContent = error.message; return; }
       await loadNoticeBoard();
     }
-
     async function postNotice(event) {
       event.preventDefault();
       if (!isNoticeWriter() || !authUser) { alert('Only an admin or developer account can post notices.'); return; }
@@ -2699,7 +2709,7 @@
       await loadNoticeBoard();
     }
 
-    // --- AUTH MODAL HANDLERS ---
+    // --- AUTH ---
     let authMode = 'signin';
     function switchAuthTab(mode) {
       authMode = mode;
@@ -2772,7 +2782,7 @@
         const { data } = await supabaseClient.auth.getSession();
         if (data && data.session && data.session.user) {
           const error = await applyAuthProfile(data.session.user);
-          if (moderationState.is_banned) { showAuthAlert('This account is banned from the game.'); return; }
+          if (moderationState.is_banned) { showAuthAlert('This account is banned from the game. Contact an administrator to request an unban.'); return; }
           document.getElementById('auth-modal').classList.add('hidden');
           initSocialChannel(); initSupabaseChannel(currentChannel); broadcastProfileUpdate(); updateUIHeader();
           if (error) alert('Signed in, but this profile could not sync to the account yet. ' + error.message);
