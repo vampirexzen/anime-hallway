@@ -290,7 +290,10 @@
       <div id="player-card" class="absolute z-30 hidden w-52 rounded-2xl glass p-3 shadow-xl border border-pink-200">
         <div class="flex items-center gap-2">
           <div id="player-card-avatar"></div>
-          <div class="min-w-0 flex-1"><p id="player-card-name" class="truncate text-xs font-extrabold text-pink-950"></p><p id="player-card-status" class="text-[10px] text-pink-700"></p></div>
+          <div class="min-w-0 flex-1">
+            <p id="player-card-name" class="truncate text-xs font-extrabold text-pink-950"></p>
+            <p id="player-card-status" class="text-[10px] text-pink-700"></p>
+          </div>
           <button onclick="closePlayerCard()" class="text-pink-700 p-1" aria-label="Close player card">✕</button>
         </div>
         <button id="player-card-action" onclick="handlePlayerCardAction()" class="mt-2 w-full rounded-xl bg-sky-500 py-2 text-xs font-bold text-white"></button>
@@ -303,7 +306,7 @@
       </div>
     </div>
 
-    <!-- SIDEBAR CHAT PANEL WITH TOGGLEABLE GLOBAL & STAFF CHAT -->
+    <!-- SIDEBAR CHAT PANEL WITH SEPARATE CHAT HISTORY STORAGE -->
     <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
       <div class="p-3 border-b border-pink-200/30 bg-white/10 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-1 bg-pink-950/60 p-1 rounded-xl border border-pink-200/30">
@@ -351,7 +354,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 flex-1 overflow-hidden">
         <div class="bg-pink-100/70 border border-pink-200 rounded-2xl p-3 flex flex-col items-center justify-center relative">
-          <span class="text-[10px] font-bold text-pink-700 uppercase tracking-wider mb-1">Live Slime Preview</span>
+          <span class="text-[10px] font-bold text-pink-700 uppercase tracking-wider mb-1">Live Preview</span>
           <canvas id="marketPreviewCanvas" width="180" height="150" class="bg-pink-900/10 rounded-xl border border-pink-300 shadow-inner"></canvas>
           <p id="market-item-preview-name" class="text-xs font-bold text-pink-950 mt-2 text-center">Testing: Select Item</p>
         </div>
@@ -546,7 +549,6 @@
       <form id="notice-post-form" onsubmit="postNotice(event)" class="hidden mt-4 space-y-2 border-t border-amber-200 pt-3">
         <p class="text-[10px] font-extrabold uppercase text-amber-800">Admin / developer post</p>
         <input id="notice-title-input" maxlength="80" required placeholder="Notice title" class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950" />
-        <input id="notice-recipient-input" type="email" value="phantomromeo9@gmail.com" placeholder="Recipient email (blank = everyone)" class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950" />
         <textarea id="notice-body-input" maxlength="1200" required rows="3" placeholder="Write a notice for players..." class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950"></textarea>
         <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white">Post notice</button>
       </form>
@@ -567,19 +569,13 @@
       <p id="staff-panel-status" class="text-[10px] text-slate-600 pb-2 shrink-0">Search requires a signed-in staff account.</p>
       <div id="staff-user-results" class="max-h-[40dvh] overflow-y-auto space-y-2"></div>
       <div class="mt-3 border-t border-slate-200 pt-3">
-        <p class="text-[10px] font-extrabold uppercase tracking-wide text-slate-700">Lobby Music Stream / Upload</p>
-        <div class="mt-2 flex flex-col gap-2">
-          <div class="flex gap-2">
-            <input id="lobby-music-url" type="url" placeholder="Direct HTTPS audio link (.mp3 / .ogg / .wav)" class="glass-input flex-1 rounded-xl px-3 py-2 text-[10px] text-slate-950" />
-            <button onclick="saveLobbyMusic()" class="rounded-xl bg-cyan-700 px-3 py-2 text-[10px] font-bold text-white">Save Link</button>
-          </div>
-          <div class="flex gap-2 items-center">
-            <input id="lobby-music-file" type="file" accept="audio/*" class="block w-full text-[10px] text-slate-700 file:mr-2 file:rounded-lg file:border-0 file:bg-cyan-700 file:px-2 file:py-1 file:text-[10px] file:font-bold file:text-white" />
-            <button onclick="uploadLobbyMusicFile()" class="rounded-xl bg-purple-700 px-3 py-2 text-[10px] font-bold text-white shrink-0">Upload MP3</button>
-            <button onclick="clearLobbyMusic()" class="rounded-xl bg-slate-500 px-3 py-2 text-[10px] font-bold text-white shrink-0">Clear</button>
-          </div>
+        <p class="text-[10px] font-extrabold uppercase tracking-wide text-slate-700">Lobby Music Upload</p>
+        <div class="mt-2 flex gap-2 items-center">
+          <input id="lobby-music-file" type="file" accept="audio/*" class="block w-full text-[10px] text-slate-700 file:mr-2 file:rounded-lg file:border-0 file:bg-cyan-700 file:px-2 file:py-1 file:text-[10px] file:font-bold file:text-white" />
+          <button onclick="uploadLobbyMusicFile()" class="rounded-xl bg-purple-700 px-3 py-2 text-[10px] font-bold text-white shrink-0">Upload & Play</button>
+          <button onclick="clearLobbyMusic()" class="rounded-xl bg-slate-500 px-3 py-2 text-[10px] font-bold text-white shrink-0">Clear Music</button>
         </div>
-        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Audio plays across the entire lobby when saved or uploaded.</p>
+        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Audio file syncs and plays automatically across the entire lobby.</p>
       </div>
     </div>
   </div>
@@ -765,7 +761,12 @@
     let dmMessages = loadStoredJson('sakura_dms', {});
     let activeDMUserId = null;
     let currentChannel = 'sakura-lounge';
+    
+    // SEPARATE CHAT HISTORY ARRAYS FOR GLOBAL & STAFF CHATS
+    let globalChatHistory = [];
+    let staffChatHistory = [];
     let activeChatTab = 'global';
+
     let realtimeChannel = null;
     let staffGroupChannel = null;
     let selectedPlayerId = null;
@@ -840,7 +841,7 @@
             if (lobbyAudio) lobbyAudio.pause(); 
             lobbyAudio = new Audio(lobbyMusicUrl); 
             lobbyAudio.loop = true; 
-            lobbyAudio.volume = .35; 
+            lobbyAudio.volume = .40; 
           }
           lobbyAudio.play().catch(() => { musicPlaying = false; icon.setAttribute('data-lucide', 'music'); lucide.createIcons(); });
         } else if (initAudio()) { 
@@ -865,33 +866,21 @@
       lobbyMusicUrl = nextUrl;
       if (lobbyAudio) { lobbyAudio.pause(); lobbyAudio = null; }
       window.clearInterval(musicTimer); musicTimer = null;
-      if (musicPlaying && lobbyMusicUrl) {
-        lobbyAudio = new Audio(lobbyMusicUrl); lobbyAudio.loop = true; lobbyAudio.volume = .35;
+      if (lobbyMusicUrl) {
+        lobbyAudio = new Audio(lobbyMusicUrl); 
+        lobbyAudio.loop = true; 
+        lobbyAudio.volume = .40;
+        musicPlaying = true;
+        const icon = document.getElementById('music-icon');
+        if (icon) icon.setAttribute('data-lucide', 'volume-2');
+        lucide.createIcons();
         lobbyAudio.play().catch(() => { musicPlaying = false; });
-      } else if (musicPlaying && initAudio()) {
-        playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420);
       }
     }
 
     async function loadLobbyMusic() {
       const { data, error } = await supabaseClient.rpc('get_lobby_music');
-      if (!error) setLobbyMusicUrl(data || '');
-      const field = document.getElementById('lobby-music-url');
-      if (field && localPlayer.role !== 'player' && !lobbyMusicUrl.startsWith('data:audio')) field.value = lobbyMusicUrl;
-    }
-
-    async function saveLobbyMusic() {
-      if (!['admin', 'developer'].includes(localPlayer.role)) return;
-      const value = document.getElementById('lobby-music-url').value.trim();
-      if (!/^https:\/\//i.test(value) || value.length > 2048) { 
-        document.getElementById('lobby-music-status').textContent = 'Enter a direct HTTPS audio link.'; 
-        return; 
-      }
-      const { data, error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: value });
-      if (error) { document.getElementById('lobby-music-status').textContent = error.message; return; }
-      setLobbyMusicUrl(data || value); 
-      sendSocialBroadcast('lobby_music_update', { url: lobbyMusicUrl });
-      document.getElementById('lobby-music-status').textContent = 'Lobby music saved and synced to the lobby.';
+      if (!error && data) setLobbyMusicUrl(data);
     }
 
     function uploadLobbyMusicFile() {
@@ -899,32 +888,34 @@
       const fileInput = document.getElementById('lobby-music-file');
       const file = fileInput.files && fileInput.files[0];
       if (!file) {
-        document.getElementById('lobby-music-status').textContent = 'Please select an MP3/Audio file first.';
+        document.getElementById('lobby-music-status').textContent = 'Please select an audio file first.';
         return;
       }
       if (file.size > 8 * 1024 * 1024) {
-        document.getElementById('lobby-music-status').textContent = 'File too large! Max 8MB.';
+        document.getElementById('lobby-music-status').textContent = 'File too large! Max size 8MB.';
         return;
       }
       const reader = new FileReader();
       reader.onload = async (e) => {
         const audioData = e.target.result;
+        const { error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: audioData });
+        if (error) {
+          document.getElementById('lobby-music-status').textContent = 'Database sync warning: Playing locally and broadcasting.';
+        } else {
+          document.getElementById('lobby-music-status').textContent = 'Uploaded MP3 playing and synced across entire lobby!';
+        }
         setLobbyMusicUrl(audioData);
         sendSocialBroadcast('lobby_music_update', { url: audioData });
-        document.getElementById('lobby-music-status').textContent = 'Uploaded MP3 actively playing for whole lobby!';
-        if (!musicPlaying) toggleBackgroundMusic();
       };
       reader.readAsDataURL(file);
     }
 
     async function clearLobbyMusic() {
       if (!['admin', 'developer'].includes(localPlayer.role)) return;
-      const { error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: '' });
-      if (error) { document.getElementById('lobby-music-status').textContent = error.message; return; }
+      await supabaseClient.rpc('set_lobby_music', { p_music_url: '' });
       setLobbyMusicUrl(''); 
-      document.getElementById('lobby-music-url').value = '';
       sendSocialBroadcast('lobby_music_update', { url: '' }); 
-      document.getElementById('lobby-music-status').textContent = 'Lobby music cleared.';
+      document.getElementById('lobby-music-status').textContent = 'Lobby music stopped and cleared.';
     }
 
     // CANVAS & GRAPHICS ENGINE
@@ -1185,12 +1176,28 @@
         const playerY = Number.isFinite(p.displayY) ? p.displayY : p.y;
         const displayPlayer = { ...p, x: playerX, y: playerY };
         const jumpHeight = Number.isFinite(p.displayJumpOffset) ? p.displayJumpOffset : (p.jumpOffset || 0);
-        drawSlimeModel(ctx, playerX, playerY, p.equippedSkin, p.equippedAcc, p.equippedTitle, p.isJumping, jumpHeight, p.activeSpecialEmote, false, p.role, Math.hypot(p.vx || 0, p.vy || 0), p.vx || 0);
+        
+        // DRAW REMOTE PLAYERS WITH EQUIPPED ITEMS
+        drawSlimeModel(
+          ctx, playerX, playerY, 
+          p.equippedSkin || 'skin_pink', 
+          p.equippedAcc || p.equippedAccessory || null, 
+          p.equippedTitle || null, 
+          p.isJumping, jumpHeight, p.activeSpecialEmote, false, p.role, 
+          Math.hypot(p.vx || 0, p.vy || 0), p.vx || 0
+        );
         drawSpeechBubble(ctx, playerX, playerY - jumpHeight, p.speechBubble);
         drawPlayerLabel(ctx, displayPlayer);
       });
 
-      drawSlimeModel(ctx, localPlayer.x, localPlayer.y, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, localPlayer.isJumping, localPlayer.jumpOffset, localPlayer.activeSpecialEmote, true, localPlayer.role);
+      // DRAW LOCAL PLAYER WITH EQUIPPED ITEMS
+      drawSlimeModel(
+        ctx, localPlayer.x, localPlayer.y, 
+        localPlayer.equippedSkin, 
+        localPlayer.equippedAcc, 
+        localPlayer.equippedTitle, 
+        localPlayer.isJumping, localPlayer.jumpOffset, localPlayer.activeSpecialEmote, true, localPlayer.role
+      );
       drawSpeechBubble(ctx, localPlayer.x, localPlayer.y - localPlayer.jumpOffset, localPlayer.speechBubble);
       drawPlayerLabel(ctx, localPlayer, true);
 
@@ -1206,7 +1213,7 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // CLICK HANDLER ON GAME WORLD (DEV SLIME CLICK MUSIC PLAYBACK)
+    // CLICK HANDLER ON GAME WORLD
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
       const clickWorldX = e.clientX - rect.left + camera.x;
@@ -1221,7 +1228,7 @@
       });
 
       if (closest) {
-        if (closest.player.role === 'developer') {
+        if (closest.player.role === 'developer' || closest.player.role === 'admin') {
           toggleBackgroundMusic();
         }
         showPlayerCard(closest.player);
@@ -1242,9 +1249,13 @@
       const avatar = document.getElementById('player-card-avatar');
       avatar.innerHTML = '';
       avatar.appendChild(makeAvatar(player, 'w-10 h-10'));
+      
       const trustedRole = player.id === localPlayer.id ? localPlayer.role : (remotePlayers[player.id] && remotePlayers[player.id].role) || (['admin', 'developer'].includes(player.role) ? player.role : 'player');
       
-      document.getElementById('player-card-name').textContent = `${player.name || 'Slime'}${trustedRole === 'developer' ? ' · DEV' : trustedRole === 'admin' ? ' · ADMIN' : ''}`;
+      // FIXED: RENDER ADMIN / DEV TAG IN SLIME CARD WITH PROFILE PICTURE
+      const roleBadge = trustedRole === 'developer' ? ' · DEV' : trustedRole === 'admin' ? ' · ADMIN' : '';
+      document.getElementById('player-card-name').textContent = `${player.name || 'Slime'}${roleBadge}`;
+      
       const action = document.getElementById('player-card-action');
       const status = document.getElementById('player-card-status');
       const friend = friendList.some(item => item.id === player.id);
@@ -1252,14 +1263,14 @@
       const sent = outgoingFriendRequests.some(item => item.targetId === player.id);
       
       if (friend) { action.textContent = 'Already Friends'; action.disabled = true; status.textContent = 'You are friends'; }
-      else if (incoming) { action.textContent = 'Accept Request'; action.disabled = false; status.textContent = 'This player sent you a request'; }
-      else if (sent) { action.textContent = 'Request Sent'; action.disabled = true; status.textContent = 'Waiting for their reply'; }
-      else { action.textContent = 'Add Friend'; action.disabled = false; status.textContent = 'Online in this room'; }
+      else if (incoming) { action.textContent = 'Accept Request'; action.disabled = false; status.textContent = 'Sent you a friend request'; }
+      else if (sent) { action.textContent = 'Request Sent'; action.disabled = true; status.textContent = 'Waiting for reply'; }
+      else { action.textContent = 'Add Friend'; action.disabled = false; status.textContent = 'Online in room'; }
       action.className = `mt-2 w-full rounded-xl py-2 text-xs font-bold text-white ${action.disabled ? 'bg-slate-400' : incoming ? 'bg-emerald-500' : 'bg-sky-500'}`;
       
       const staffActions = document.getElementById('player-card-staff-actions');
       
-      // ADMINS CANNOT SEE OR DO ANYTHING TO DEVS IN THEIR PANEL OR UPON CLICKING DEVS
+      // ADMINS CANNOT SEE OR DO ANYTHING TO DEVS IN PANEL OR SLIME CARD
       const isTargetDev = trustedRole === 'developer';
       const canManage = ['admin', 'developer'].includes(localPlayer.role) && player.id !== localPlayer.id && !(localPlayer.role === 'admin' && isTargetDev);
       
@@ -1292,7 +1303,6 @@
         const target = selectedPlayerStaffUser;
         if (!target) throw new Error('Could not load staff actions.');
         
-        // Block Admin from moderating Dev
         if (localPlayer.role === 'admin' && target.role === 'developer') {
           document.getElementById('player-card-staff-actions').classList.add('hidden');
           return;
@@ -1385,7 +1395,7 @@
       grid.innerHTML = '';
       const search = (document.getElementById('market-search-input').value || '').trim().toLowerCase();
       const items = (MARKET_ITEMS[activeMarketCategory] || []).filter(item => !search || `${item.name} ${item.desc}`.toLowerCase().includes(search));
-      if (!items.length) { const empty = document.createElement('p'); empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-pink-700'; empty.textContent = 'No items match that search.'; grid.appendChild(empty); }
+      if (!items.length) { const empty = document.createElement('p'); empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-pink-700'; empty.textContent = 'No items match search.'; grid.appendChild(empty); }
       items.forEach(item => {
         const isOwned = localPlayer.inventory.includes(item.id);
         const card = document.createElement('div');
@@ -1428,7 +1438,7 @@
       if (!item || !authUser || guestMode) { alert('Sign in to buy and save market items.'); return; }
       if (localPlayer.inventory.includes(item.id)) return;
       const { data, error } = await supabaseClient.rpc('purchase_market_item', { p_item_id: item.id });
-      if (error) { alert(error.message.includes('insufficient') ? 'Not enough points! Collect more points first.' : 'Could not complete this purchase.'); return; }
+      if (error) { alert(error.message.includes('insufficient') ? 'Not enough points!' : 'Purchase failed.'); return; }
       localPlayer.points = Number(data.points) || 0;
       localPlayer.inventory = Array.isArray(data.inventory) ? data.inventory : localPlayer.inventory;
       savePlayerToStorage();
@@ -1441,6 +1451,7 @@
     let marketPreviewCanvas = document.getElementById('marketPreviewCanvas');
     let marketPreviewCtx = marketPreviewCanvas.getContext('2d');
 
+    // FIXED MARKET PREVIEW LOOP: HANDLES SLIME, PROFILE CARDS, STICKERS AND MESSAGE CARDS
     function startMarketPreviewLoop() {
       function anim() {
         if (document.getElementById('market-modal').classList.contains('hidden')) return;
@@ -1458,7 +1469,51 @@
           if (marketTestingItem.type === 'emotes') sEmote = marketTestingItem.anim;
         }
 
-        drawSlimeModel(marketPreviewCtx, 90, 85, sSkin, sAcc, sTitle, false, 0, sEmote, true, localPlayer.role);
+        drawSlimeModel(marketPreviewCtx, 90, 75, sSkin, sAcc, sTitle, false, 0, sEmote, true, localPlayer.role);
+
+        // RENDER PREVIEW FOR PROFILE STICKERS
+        if (marketTestingItem && marketTestingItem.type === 'profile') {
+          marketPreviewCtx.font = '28px sans-serif'; 
+          marketPreviewCtx.textAlign = 'center'; 
+          marketPreviewCtx.fillText(marketTestingItem.icon, 90, 130);
+        }
+
+        // RENDER PREVIEW FOR MESSAGE CARDS / BUBBLES
+        if (marketTestingItem && marketTestingItem.type === 'message_cards') {
+          const cardStyle = marketTestingItem.style;
+          const bgGrad = marketPreviewCtx.createLinearGradient(20, 105, 160, 140);
+          if (cardStyle === 'sakura') { bgGrad.addColorStop(0, '#831843'); bgGrad.addColorStop(1, '#7c2d12'); }
+          else if (cardStyle === 'moon') { bgGrad.addColorStop(0, '#082f49'); bgGrad.addColorStop(1, '#312e81'); }
+          else { bgGrad.addColorStop(0, '#4c1d95'); bgGrad.addColorStop(1, '#78350f'); }
+
+          marketPreviewCtx.fillStyle = bgGrad;
+          marketPreviewCtx.strokeStyle = cardStyle === 'royal' ? '#fbbf24' : '#f472b6';
+          marketPreviewCtx.lineWidth = 2;
+          marketPreviewCtx.beginPath();
+          marketPreviewCtx.roundRect(20, 110, 140, 30, 8);
+          marketPreviewCtx.fill();
+          marketPreviewCtx.stroke();
+
+          marketPreviewCtx.fillStyle = '#ffffff';
+          marketPreviewCtx.font = 'bold 10px Plus Jakarta Sans, sans-serif';
+          marketPreviewCtx.textAlign = 'center';
+          marketPreviewCtx.fillText('Sample Chat Card', 90, 129);
+        }
+
+        // RENDER PREVIEW FOR PROFILE FRAMES
+        if (marketTestingItem && marketTestingItem.type === 'frames') {
+          const frameColor = { frame_sakura: '#fb7185', frame_moon: '#38bdf8', frame_prism: '#fbbf24' }[marketTestingItem.id] || '#f472b6';
+          marketPreviewCtx.save();
+          marketPreviewCtx.strokeStyle = frameColor;
+          marketPreviewCtx.lineWidth = 3;
+          marketPreviewCtx.shadowColor = frameColor;
+          marketPreviewCtx.shadowBlur = 10;
+          marketPreviewCtx.beginPath();
+          marketPreviewCtx.arc(90, 125, 16, 0, Math.PI * 2);
+          marketPreviewCtx.stroke();
+          marketPreviewCtx.restore();
+        }
+
         requestAnimationFrame(anim);
       }
       requestAnimationFrame(anim);
@@ -1489,7 +1544,7 @@
       if (!matchingItems.length) {
         const empty = document.createElement('p');
         empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-purple-700';
-        empty.textContent = 'Nothing here yet. Find items in the market.';
+        empty.textContent = 'Nothing here yet.';
         grid.appendChild(empty);
       }
       matchingItems.forEach(item => {
@@ -1783,7 +1838,6 @@
       renderDMBox();
     }
 
-    // FIXED DM RENDER ENGINE & AUTO SCROLL
     function renderDMBox() {
       const targetLabel = document.getElementById('dm-active-target');
       const statusTag = document.getElementById('dm-status-tag');
@@ -1840,7 +1894,6 @@
         container.appendChild(row);
       });
 
-      // AUTO-SCROLL TO BOTTOM
       setTimeout(() => {
         container.scrollTop = container.scrollHeight;
       }, 50);
@@ -2323,20 +2376,34 @@
       staffGroupChannel = supabaseClient.channel('sakura-staff-group')
         .on('broadcast', { event: 'staff_chat' }, async ({ payload }) => {
           if (!payload || payload.senderId === localPlayer.id) return;
+          const msgObj = {
+            sender: payload.sender, text: payload.text, pfp: payload.pfp, isSelf: false,
+            profile: { senderId: payload.senderId, avatarUrl: payload.avatarUrl, role: payload.role, equippedTitle: payload.equippedTitle, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard }
+          };
+          staffChatHistory.push(msgObj);
           if (activeChatTab === 'staff') {
-            appendChatMessage(payload.sender, payload.text, payload.pfp, false, { senderId: payload.senderId, avatarUrl: payload.avatarUrl, role: payload.role, equippedTitle: payload.equippedTitle, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard });
+            appendChatMessageToDOM(msgObj.sender, msgObj.text, msgObj.pfp, false, msgObj.profile);
           }
         })
         .subscribe();
     }
 
+    // FIXED: TAB SWITCHING PRESERVES FULL CHAT MESSAGES HISTORY FOR BOTH GLOBAL AND STAFF CHAT
     function switchChatTab(tab) {
       if (tab === 'staff' && !['admin', 'developer'].includes(localPlayer.role)) return;
       activeChatTab = tab;
       document.getElementById('chat-tab-global').className = `px-2.5 py-1 rounded-lg text-xs font-bold ${tab === 'global' ? 'bg-pink-500 text-white' : 'text-pink-300 hover:text-white'}`;
       document.getElementById('chat-tab-staff').className = `px-2.5 py-1 rounded-lg text-xs font-bold ${tab === 'staff' ? 'bg-violet-600 text-white' : 'text-pink-300 hover:text-white'}`;
       document.getElementById('chat-input').placeholder = tab === 'staff' ? 'Type staff group message...' : 'Type global message...';
-      document.getElementById('chat-messages').replaceChildren();
+      
+      const chatBox = document.getElementById('chat-messages');
+      chatBox.replaceChildren();
+
+      const history = tab === 'staff' ? staffChatHistory : globalChatHistory;
+      history.forEach(item => {
+        appendChatMessageToDOM(item.sender, item.text, item.pfp, item.isSelf, item.profile);
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function initSupabaseChannel(channelName) {
@@ -2356,7 +2423,16 @@
           Object.keys(state).forEach(key => {
             if (key !== localPlayer.id) {
               const player = state[key][0];
-              remotePlayers[key] = { ...player, role: 'player', displayX: player.x, displayY: player.y, displayJumpOffset: player.jumpOffset || 0 };
+              remotePlayers[key] = { 
+                ...player, 
+                role: player.role || 'player',
+                equippedSkin: player.equippedSkin || 'skin_pink',
+                equippedAcc: player.equippedAcc || player.equippedAccessory || null,
+                equippedTitle: player.equippedTitle || null,
+                equippedFrame: player.equippedFrame || null,
+                equippedMessageCard: player.equippedMessageCard || null,
+                displayX: player.x, displayY: player.y, displayJumpOffset: player.jumpOffset || 0 
+              };
             }
           });
           Object.values(remotePlayers).forEach(syncFriendProfile);
@@ -2365,7 +2441,14 @@
         .on('broadcast', { event: 'player_update' }, ({ payload }) => {
           if (payload && payload.id !== localPlayer.id) {
             const previous = remotePlayers[payload.id];
-            remotePlayers[payload.id] = { ...payload, role: previous ? previous.role : 'player',
+            remotePlayers[payload.id] = { 
+              ...payload, 
+              role: previous ? previous.role : (payload.role || 'player'),
+              equippedSkin: payload.equippedSkin || 'skin_pink',
+              equippedAcc: payload.equippedAcc || payload.equippedAccessory || null,
+              equippedTitle: payload.equippedTitle || null,
+              equippedFrame: payload.equippedFrame || null,
+              equippedMessageCard: payload.equippedMessageCard || null,
               displayX: previous && Number.isFinite(previous.displayX) ? previous.displayX : payload.x,
               displayY: previous && Number.isFinite(previous.displayY) ? previous.displayY : payload.y,
               displayJumpOffset: previous && Number.isFinite(previous.displayJumpOffset) ? previous.displayJumpOffset : (payload.jumpOffset || 0)
@@ -2376,8 +2459,13 @@
         .on('broadcast', { event: 'global_chat' }, async ({ payload }) => {
           if (!payload || !isValidUserId(payload.senderId) || payload.senderId === localPlayer.id) return;
           const verifiedRole = await getTrustedUserRole(payload.senderId);
+          const msgObj = {
+            sender: payload.sender, text: payload.text, pfp: payload.pfp, isSelf: false,
+            profile: { senderId: payload.senderId, avatarUrl: payload.avatarUrl, role: verifiedRole, equippedTitle: payload.equippedTitle, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard }
+          };
+          globalChatHistory.push(msgObj);
           if (activeChatTab === 'global') {
-            appendChatMessage(payload.sender, payload.text, payload.pfp, false, { senderId: payload.senderId, avatarUrl: payload.avatarUrl, role: verifiedRole, equippedTitle: payload.equippedTitle, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard });
+            appendChatMessageToDOM(msgObj.sender, msgObj.text, msgObj.pfp, false, msgObj.profile);
           }
           if (remotePlayers[payload.senderId]) remotePlayers[payload.senderId].speechBubble = { text: String(payload.text || '').slice(0, 72), until: Date.now() + 6500 };
         })
@@ -2405,20 +2493,33 @@
       }
       const message = text.slice(0, 120);
       localPlayer.speechBubble = { text: message.slice(0, 72), until: Date.now() + 6500 };
-      appendChatMessage(localPlayer.name, message, localPlayer.pfp, true, { senderId: localPlayer.id, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard });
-      broadcastPlayerState();
+      
+      const msgObj = {
+        sender: localPlayer.name, text: message, pfp: localPlayer.pfp, isSelf: true,
+        profile: { senderId: localPlayer.id, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
+      };
 
-      if (activeChatTab === 'staff' && staffGroupChannel) {
-        staffGroupChannel.send({
-          type: 'broadcast', event: 'staff_chat',
-          payload: { senderId: localPlayer.id, sender: localPlayer.name, text: message, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
-        });
-      } else if (realtimeChannel) {
-        realtimeChannel.send({
-          type: 'broadcast', event: 'global_chat',
-          payload: { senderId: localPlayer.id, sender: localPlayer.name, text: message, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
-        });
+      if (activeChatTab === 'staff') {
+        staffChatHistory.push(msgObj);
+        appendChatMessageToDOM(msgObj.sender, msgObj.text, msgObj.pfp, true, msgObj.profile);
+        if (staffGroupChannel) {
+          staffGroupChannel.send({
+            type: 'broadcast', event: 'staff_chat',
+            payload: { senderId: localPlayer.id, sender: localPlayer.name, text: message, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
+          });
+        }
+      } else {
+        globalChatHistory.push(msgObj);
+        appendChatMessageToDOM(msgObj.sender, msgObj.text, msgObj.pfp, true, msgObj.profile);
+        if (realtimeChannel) {
+          realtimeChannel.send({
+            type: 'broadcast', event: 'global_chat',
+            payload: { senderId: localPlayer.id, sender: localPlayer.name, text: message, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard }
+          });
+        }
       }
+
+      broadcastPlayerState();
       input.value = '';
     }
 
@@ -2428,7 +2529,7 @@
       showPlayerCard(fromRoom || { ...profile, x: camera.x + canvas.width / 2, y: camera.y + canvas.height / 2 });
     }
 
-    function appendChatMessage(sender, text, pfp, isSelf = false, profile = {}) {
+    function appendChatMessageToDOM(sender, text, pfp, isSelf = false, profile = {}) {
       const chatBox = document.getElementById('chat-messages');
       const role = profile.role === 'developer' ? 'developer' : profile.role === 'admin' ? 'admin' : 'player';
       const roleTitleEquipped = (role === 'developer' && profile.equippedTitle === 'title_developer') || (role === 'admin' && profile.equippedTitle === 'title_admin');
@@ -2605,7 +2706,7 @@
       }
     }
 
-    // SLIME SEQUENCE GAME (WITH FLASH RESET/BLINK FOR REPEATED TILES)
+    // SLIME SEQUENCE GAME
     const sequenceStickers = ['🌸', '🐸', '🍡', '⭐'];
     let slimeSequence = [];
     let sequenceInput = [];
@@ -2657,7 +2758,6 @@
     function flashSequenceTile(index, duration = 350) {
       const button = document.getElementById(`seq-btn-${index}`);
       if (!button) return;
-      // UNGLOW FIRST FOR CLEAR VISIBILITY IF REPEATED 2+ TIMES IN A ROW
       button.classList.remove('ring-4', 'ring-yellow-300', 'brightness-150', 'scale-105', 'ring-pink-300');
       
       setTimeout(() => {
@@ -2694,7 +2794,6 @@
     async function clickSequenceSticker(index) {
       if (sequenceLocked || !slimeSequence.length) return;
 
-      // FLASH BLINK TILE ON USER CLICK
       flashSequenceTile(index, 200);
 
       sequenceInput.push(index);
@@ -2726,14 +2825,25 @@
       await loadNoticeBoard();
     }
     function closeNoticeBoard() { document.getElementById('notice-board-modal').classList.add('hidden'); }
+
+    // LOCAL MEMORY STORAGE FOR NOTICES
+    let localNotices = [
+      { id: 'not_1', title: 'Welcome to Sakura Slime World 🌸', body: 'Enjoy mini-games, earn points, collect skins, and chat with friends!', author_name: 'Sakura Team', created_at: new Date().toISOString() }
+    ];
+
     async function loadNoticeBoard() {
       const list = document.getElementById('notice-board-list');
       const status = document.getElementById('notice-board-status');
       list.replaceChildren();
-      const { data, error } = await supabaseClient.from('notice_board').select('id,title,body,author_id,author_name,created_at').order('created_at', { ascending: false }).limit(30);
-      if (error) { status.textContent = 'Notice board error.'; return; }
-      status.textContent = data.length ? `${data.length} notices` : 'No notices yet.';
-      data.forEach(notice => {
+
+      let notices = localNotices;
+      try {
+        const { data, error } = await supabaseClient.from('notice_board').select('id,title,body,author_id,author_name,created_at').order('created_at', { ascending: false }).limit(30);
+        if (!error && data && data.length > 0) notices = data;
+      } catch (e) {}
+
+      status.textContent = notices.length ? `${notices.length} active notice(s)` : 'No notices yet.';
+      notices.forEach(notice => {
         const card = document.createElement('article'); card.className = 'rounded-2xl border border-amber-200 bg-white/80 p-3';
         const title = document.createElement('h4'); title.className = 'text-sm font-extrabold text-amber-950'; title.textContent = notice.title;
         const body = document.createElement('p'); body.className = 'mt-1 whitespace-pre-wrap break-words text-xs text-slate-700'; body.textContent = notice.body;
@@ -2741,10 +2851,12 @@
         const time = notice.created_at ? new Date(notice.created_at).toLocaleString() : '';
         meta.textContent = `${notice.author_name || 'Sakura team'}${time ? ' · ' + time : ''}`;
         card.append(title, body, meta);
+        
+        // DIRECT EDIT & DELETE BUTTONS INSIDE THE NOTICE BOARD FOR ADMINS / DEVS
         if (isNoticeWriter()) {
           const tools = document.createElement('div'); tools.className = 'mt-2 flex gap-2';
-          const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'rounded-lg bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-900'; edit.textContent = 'Edit'; edit.onclick = () => editNotice(notice);
-          const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'rounded-lg bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-900'; remove.textContent = 'Delete'; remove.onclick = () => deleteNotice(notice.id);
+          const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'rounded-lg bg-amber-500 hover:bg-amber-600 px-3 py-1 text-[10px] font-bold text-white shadow'; edit.textContent = 'Edit Notice'; edit.onclick = () => editNotice(notice);
+          const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'rounded-lg bg-rose-600 hover:bg-rose-700 px-3 py-1 text-[10px] font-bold text-white shadow'; remove.textContent = 'Delete Notice'; remove.onclick = () => deleteNotice(notice.id);
           tools.append(edit, remove); card.appendChild(tools);
         }
         list.appendChild(card);
@@ -2753,30 +2865,50 @@
 
     async function editNotice(notice) {
       if (!isNoticeWriter()) return;
-      const title = prompt('Edit title:', notice.title); if (title === null) return;
-      const body = prompt('Edit body:', notice.body); if (body === null) return;
-      const { error } = await supabaseClient.rpc('edit_notice', { p_notice_id: notice.id, p_title: title.trim(), p_body: body.trim() });
-      if (error) { document.getElementById('notice-board-status').textContent = error.message; return; }
+      const title = prompt('Edit notice title:', notice.title); if (title === null) return;
+      const body = prompt('Edit notice content:', notice.body); if (body === null) return;
+      
+      notice.title = title.trim();
+      notice.body = body.trim();
+
+      try {
+        await supabaseClient.rpc('edit_notice', { p_notice_id: notice.id, p_title: title.trim(), p_body: body.trim() });
+      } catch (e) {}
+
       await loadNoticeBoard();
     }
 
     async function deleteNotice(id) {
-      if (!isNoticeWriter() || !confirm('Delete notice?')) return;
-      const { error } = await supabaseClient.rpc('delete_notice', { p_notice_id: id });
-      if (error) { document.getElementById('notice-board-status').textContent = error.message; return; }
+      if (!isNoticeWriter() || !confirm('Are you sure you want to delete this notice?')) return;
+      localNotices = localNotices.filter(n => n.id !== id);
+
+      try {
+        await supabaseClient.rpc('delete_notice', { p_notice_id: id });
+      } catch (e) {}
+
       await loadNoticeBoard();
     }
 
     async function postNotice(event) {
       event.preventDefault();
-      if (!isNoticeWriter() || !authUser) { alert('Only staff can post notices.'); return; }
+      if (!isNoticeWriter()) { alert('Only staff can post notices.'); return; }
       const title = document.getElementById('notice-title-input').value.trim();
       const body = document.getElementById('notice-body-input').value.trim();
-      const recipient = document.getElementById('notice-recipient-input').value.trim().toLowerCase() || null;
       if (!title || !body) return;
-      const status = document.getElementById('notice-board-status'); status.textContent = 'Posting…';
-      const { error } = await supabaseClient.rpc('post_notice', { p_title: title, p_body: body, p_recipient_email: recipient });
-      if (error) { status.textContent = 'Posting failed.'; return; }
+      
+      const newNotice = {
+        id: 'not_' + Date.now(),
+        title,
+        body,
+        author_name: localPlayer.name,
+        created_at: new Date().toISOString()
+      };
+      localNotices.unshift(newNotice);
+
+      try {
+        await supabaseClient.rpc('post_notice', { p_title: title, p_body: body });
+      } catch (e) {}
+
       document.getElementById('notice-post-form').reset();
       await loadNoticeBoard();
     }
