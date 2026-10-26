@@ -12,15 +12,21 @@
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Yuji+Mai&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Yuji+Mai&display=swap" rel="stylesheet" />
 
   <style>
+    /* Premium & Luxe Item Cards */
     .market-premium{background:linear-gradient(135deg,rgba(255,251,235,.97),rgba(254,243,199,.8));box-shadow:0 5px 18px rgba(217,119,6,.13)}
     .market-luxe{background:linear-gradient(135deg,rgba(250,245,255,.98),rgba(224,231,255,.92),rgba(255,247,237,.9));box-shadow:0 6px 24px rgba(139,92,246,.2);border-width:2px}
-    .chat-card-sakura{background:linear-gradient(135deg,rgba(131,24,67,.78),rgba(124,45,18,.68)) !important;border-color:rgba(251,113,133,.9) !important;box-shadow:inset 0 0 0 1px rgba(255,228,230,.25),0 4px 18px rgba(244,63,94,.18) !important}
-    .chat-card-moon{background:linear-gradient(135deg,rgba(8,47,73,.84),rgba(49,46,129,.76)) !important;border-color:rgba(56,189,248,.95) !important;box-shadow:inset 0 0 0 1px rgba(224,242,254,.2),0 4px 20px rgba(14,165,233,.22) !important}
-    .chat-card-royal{background:linear-gradient(135deg,rgba(76,29,149,.9),rgba(120,53,15,.74)) !important;border:1px solid #fbbf24 !important;box-shadow:inset 0 0 0 1px rgba(253,230,138,.35),0 4px 24px rgba(168,85,247,.28) !important}
     
+    /* Classic & New Message Cards Styles */
+    .chat-card-sakura{background:linear-gradient(135deg,rgba(131,24,67,.85),rgba(124,45,18,.75)) !important;border-color:rgba(251,113,133,.9) !important;box-shadow:inset 0 0 0 1px rgba(255,228,230,.3),0 4px 18px rgba(244,63,94,.2) !important}
+    .chat-card-moon{background:linear-gradient(135deg,rgba(8,47,73,.88),rgba(49,46,129,.8)) !important;border-color:rgba(56,189,248,.95) !important;box-shadow:inset 0 0 0 1px rgba(224,242,254,.25),0 4px 20px rgba(14,165,233,.25) !important}
+    .chat-card-royal{background:linear-gradient(135deg,rgba(76,29,149,.92),rgba(120,53,15,.82)) !important;border:1px solid #fbbf24 !important;box-shadow:inset 0 0 0 1px rgba(253,230,138,.4),0 4px 24px rgba(168,85,247,.3) !important}
+    .chat-card-galaxy{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(88,28,135,.9),rgba(124,58,237,.85)) !important;border:1.5px solid #a855f7 !important;box-shadow:inset 0 0 12px rgba(168,85,247,.4),0 4px 22px rgba(147,51,234,.35) !important}
+    .chat-card-cyber{background:linear-gradient(135deg,rgba(6,182,212,.85),rgba(15,23,42,.92),rgba(16,185,129,.8)) !important;border:1.5px solid #06b6d4 !important;box-shadow:inset 0 0 10px rgba(6,182,212,.4),0 4px 22px rgba(6,182,212,.3) !important}
+    .chat-card-solaris{background:linear-gradient(135deg,rgba(180,83,9,.92),rgba(220,38,38,.88),rgba(234,179,8,.85)) !important;border:2px solid #f59e0b !important;box-shadow:inset 0 0 14px rgba(245,158,11,.5),0 6px 28px rgba(217,119,6,.4) !important}
+
     html, body {
       height: 100%;
       height: 100dvh;
@@ -38,6 +44,10 @@
 
     .font-sakura {
       font-family: 'Yuji Mai', serif;
+    }
+    
+    .font-title-luxury {
+      font-family: 'Cinzel', serif;
     }
 
     .glass {
@@ -99,18 +109,6 @@
       left: 24px;
       pointer-events: none;
       transition: transform 0.04s ease-out;
-    }
-
-    .action-btn {
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(244, 114, 182, 0.5);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
-    }
-    .action-btn:active {
-      transform: scale(0.92);
-      background: #ec4899;
-      color: white;
     }
 
     .tab-active {
@@ -308,7 +306,7 @@
       </div>
     </div>
 
-    <!-- SIDEBAR CHAT PANEL WITH PERSISTENT TABS (SLIDES IN/OUT ON PC AND MOBILE) -->
+    <!-- SIDEBAR CHAT PANEL -->
     <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full shadow-2xl h-full">
       <div class="p-3 border-b border-pink-200/30 bg-white/10 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-1 bg-pink-950/60 p-1 rounded-xl border border-pink-200/30">
@@ -348,7 +346,7 @@
           <div class="p-2 rounded-xl bg-pink-500 text-white"><i data-lucide="shopping-bag" class="w-5 h-5"></i></div>
           <div>
             <h3 class="font-extrabold text-pink-950 text-base sm:text-lg">Slime Market</h3>
-            <p class="text-[10px] text-pink-600">Buy exclusive hats, skins, titles & animated emotes!</p>
+            <p class="text-[10px] text-pink-600">Buy exclusive hats, multi-gradient skins, luxury titles & emotes!</p>
           </div>
         </div>
         <button onclick="closeMarketModal()" class="text-pink-700 hover:text-pink-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -495,15 +493,22 @@
   <div id="games-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
     <div class="glass w-full max-w-md rounded-3xl p-5 shadow-2xl border border-white">
       <div class="flex items-center justify-between border-b border-emerald-200 pb-3">
-        <div><h3 class="font-extrabold text-emerald-950 text-lg">Slime Games</h3><p class="text-[10px] text-emerald-700">Win a game to earn 5 points.</p></div>
+        <div><h3 class="font-extrabold text-emerald-950 text-lg">Slime Games</h3><p class="text-[10px] text-emerald-700">Play fun mini-games to earn points!</p></div>
         <button onclick="closeGamesModal()" class="text-emerald-800 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
-        <button onclick="openMemoriesModal()" class="rounded-2xl border border-pink-200 bg-gradient-to-br from-pink-100 to-rose-50 p-4 text-left shadow-sm hover:shadow-md">
-          <span class="text-3xl">🧠</span><span class="mt-2 block text-sm font-extrabold text-pink-950">Slime Memories</span><span class="mt-1 block text-[10px] text-pink-700">Flip cards and find all matching pairs.</span>
+        <button onclick="openMemoriesModal()" class="rounded-2xl border border-pink-200 bg-gradient-to-br from-pink-100 to-rose-50 p-3.5 text-left shadow-sm hover:shadow-md">
+          <span class="text-3xl">🧠</span><span class="mt-2 block text-xs font-extrabold text-pink-950">Slime Memories</span><span class="mt-0.5 block text-[10px] text-pink-700">Match card pairs. Earn 5 pts.</span>
         </button>
-        <button onclick="openSequenceGame()" class="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-100 to-indigo-50 p-4 text-left shadow-sm hover:shadow-md">
-          <span class="text-3xl">🔮</span><span class="mt-2 block text-sm font-extrabold text-violet-950">Slime Sequence</span><span class="mt-1 block text-[10px] text-violet-700">Watch the sticker pattern, then repeat it.</span>
+        <button onclick="openSequenceGame()" class="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-100 to-indigo-50 p-3.5 text-left shadow-sm hover:shadow-md">
+          <span class="text-3xl">🔮</span><span class="mt-2 block text-xs font-extrabold text-violet-950">Slime Sequence</span><span class="mt-0.5 block text-[10px] text-violet-700">Repeat sticker patterns. Earn 5 pts.</span>
+        </button>
+        <button onclick="openCatchGameModal()" class="col-span-1 sm:col-span-2 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-100 to-orange-50 p-3.5 text-left shadow-sm hover:shadow-md flex items-center gap-3">
+          <span class="text-4xl">🧺</span>
+          <div>
+            <span class="block text-xs font-extrabold text-amber-950">Catch the Falling Slimes ⚡</span>
+            <span class="block text-[10px] text-amber-800 mt-0.5">Catch fast dropping slimes! Earn 1 pt per 5 slimes (Up to 10 pts per match).</span>
+          </div>
         </button>
       </div>
     </div>
@@ -537,6 +542,40 @@
       <p id="sequence-status" class="py-3 text-center text-xs font-bold text-violet-900">Press Start when you are ready.</p>
       <div id="sequence-grid" class="grid grid-cols-2 gap-3"></div>
       <button onclick="startSequenceGame()" class="mt-4 w-full rounded-xl bg-violet-500 py-2.5 text-xs font-bold text-white">Start game</button>
+    </div>
+  </div>
+
+  <!-- CATCH THE FALLING SLIMES GAME -->
+  <div id="catch-game-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 hidden">
+    <div class="glass w-full max-w-lg rounded-3xl p-3 sm:p-5 shadow-2xl border border-white flex flex-col max-h-[95dvh] relative overflow-hidden">
+      <div class="flex items-center justify-between border-b border-amber-200 pb-2 shrink-0">
+        <div>
+          <h3 class="font-extrabold text-amber-950 text-sm sm:text-base">Catch the Falling Slimes ⚡</h3>
+          <p class="text-[9px] sm:text-[10px] text-amber-800">4 min match · Catch 50/60 slimes max · Up to 10 pts!</p>
+        </div>
+        <button onclick="closeCatchGameModal()" class="text-amber-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- GAME HUD -->
+      <div class="flex items-center justify-between bg-amber-100/90 px-3 py-1.5 rounded-xl my-2 text-xs font-bold text-amber-950 shrink-0 border border-amber-300">
+        <div>⏱️ <span id="catch-timer">04:00</span></div>
+        <div>🧺 Caught: <span id="catch-count">0</span> / 60</div>
+        <div>🪙 Pts: <span id="catch-points">0</span> / 10</div>
+      </div>
+
+      <!-- GAME CANVAS AREA -->
+      <div class="relative w-full bg-slate-900 rounded-2xl overflow-hidden border-2 border-amber-300 shrink-0" style="height: 320px;">
+        <canvas id="catchCanvas" width="400" height="320" class="w-full h-full block cursor-crosshair touch-none"></canvas>
+        <div id="catch-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center">
+          <h4 id="catch-overlay-title" class="text-xl font-black text-amber-300 mb-1">Fast Slime Catch</h4>
+          <p id="catch-overlay-desc" class="text-xs text-amber-100 max-w-xs mb-4">Slimes drop randomly at high velocity with bouncy physics! Move your bucket quickly to catch 50 slimes.</p>
+          <button onclick="startCatchGame()" class="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-sm shadow-lg shadow-amber-500/40 hover:scale-105 active:scale-95 transition">
+            Start Match 🚀
+          </button>
+        </div>
+      </div>
+      
+      <p class="text-[9px] text-amber-900/80 text-center mt-2 shrink-0">Use Left/Right Arrow Keys or Drag Touch/Mouse on Canvas to move your Basket.</p>
     </div>
   </div>
 
@@ -658,7 +697,7 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // GAME CATALOG DATA
+    // GAME CATALOG DATA (EXPANDED & HIGH VALUE REWARDS)
     const PROFILE_STICKERS = [
       { id: 'pfp_sakura', name: 'Sakura Blossom', icon: '🌸', price: 500, desc: 'A blossom for your profile' },
       { id: 'pfp_cat', name: 'Sakura Cat', icon: '🐱', price: 1200, desc: 'A little lucky cat' },
@@ -666,15 +705,24 @@
       { id: 'pfp_crown', name: 'Royal Crown', icon: '👑', price: 4000, desc: 'A tiny royal crown' },
       { id: 'pfp_bunny', name: 'Moon Bunny', icon: '🐰', price: 6000, desc: 'A fluffy bunny friend' },
       { id: 'pfp_star', name: 'Lucky Star', icon: '⭐', price: 7500, desc: 'A sparkling star sticker' },
-      { id: 'pfp_panda', name: 'Panda Pal', icon: '🐼', price: 9000, desc: 'A sleepy panda face' }
+      { id: 'pfp_panda', name: 'Panda Pal', icon: '🐼', price: 9000, desc: 'A sleepy panda face' },
+      { id: 'pfp_dragon', name: 'Mythic Dragon', icon: '🐉', price: 25000, desc: 'An ancient glowing dragon' },
+      { id: 'pfp_phoenix', name: 'Solar Phoenix', icon: '🔥', price: 50000, desc: 'Fire phoenix emblem' }
     ];
+
     const MARKET_ITEMS = {
       skins: [
-        { id: 'skin_pink', name: 'Pink Slime', type: 'skins', price: 0, color: '#f472b6', highlight: '#fff1f2', shadow: '#db2777', desc: 'Default cute pink slime skin' },
-        { id: 'skin_blue', name: 'Ocean Blue Slime', type: 'skins', price: 1000, color: '#38bdf8', highlight: '#cffafe', shadow: '#0369a1', desc: 'Pearl blue with a sea-glass sheen' },
-        { id: 'skin_matcha', name: 'Matcha Green Slime', type: 'skins', price: 2500, color: '#4ade80', highlight: '#ecfccb', shadow: '#15803d', desc: 'Fresh matcha green with mint shimmer' },
-        { id: 'skin_golden', name: 'Golden Glow Slime', type: 'skins', price: 8000, color: '#fbbf24', highlight: '#fff7ad', shadow: '#b45309', desc: 'Layered gold with a sparkling halo' },
-        { id: 'skin_midnight', name: 'Midnight Prism Slime', type: 'skins', price: 10000, color: '#a855f7', highlight: '#f5d0fe', shadow: '#4338ca', desc: 'Prismatic violet with a cosmic shimmer' }
+        { id: 'skin_pink', name: 'Pink Slime', type: 'skins', price: 0, colors: ['#f472b6', '#db2777'], desc: 'Default cute pink slime skin' },
+        { id: 'skin_blue', name: 'Ocean Blue Slime', type: 'skins', price: 1000, colors: ['#38bdf8', '#0369a1'], desc: 'Pearl blue with sea sheen' },
+        { id: 'skin_matcha', name: 'Matcha Green Slime', type: 'skins', price: 2500, colors: ['#4ade80', '#15803d'], desc: 'Fresh matcha green' },
+        { id: 'skin_golden', name: 'Golden Glow Slime', type: 'skins', price: 8000, colors: ['#fbbf24', '#b45309'], desc: 'Layered gold with halo' },
+        { id: 'skin_midnight', name: 'Midnight Prism Slime', type: 'skins', price: 10000, colors: ['#a855f7', '#4338ca'], desc: 'Prismatic cosmic violet' },
+        
+        // Multi-color Slimes (3 or 4 colors)
+        { id: 'skin_rainbow_quad', name: 'Quad Prism Slime', type: 'skins', price: 45000, colors: ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b'], desc: 'Radiant 4-color prismatic blend' },
+        { id: 'skin_sunset_tri', name: 'Sunset Gradient Slime', type: 'skins', price: 60000, colors: ['#ec4899', '#f97316', '#eab308'], desc: 'Vibrant pink-orange-gold sunset' },
+        { id: 'skin_cosmic_nebulas', name: 'Nebula Overlord Slime', type: 'skins', price: 85000, colors: ['#8b5cf6', '#06b6d4', '#ec4899', '#3b82f6'], desc: 'A majestic 4-color galaxy fusion' },
+        { id: 'skin_aurora_borealis', name: 'Aurora Borealis Slime', type: 'skins', price: 120000, colors: ['#10b981', '#06b6d4', '#3b82f6', '#a855f7'], desc: 'Mystical Northern Lights slime' }
       ],
       accessories: [
         { id: 'acc_tophat', name: 'Fancy Tophat', type: 'accessories', price: 1500, icon: '🎩', desc: 'Classic black dapper hat' },
@@ -683,9 +731,14 @@
         { id: 'acc_crown', name: 'Royal Crown', type: 'accessories', price: 10000, icon: '👑', desc: 'Sparkling monarch crown' }
       ],
       titles: [
-        { id: 'title_zen', name: 'Zen Master', type: 'titles', price: 2000, text: '🧘 Zen Master', color: '#34d399', desc: 'Displayed right above your slime' },
-        { id: 'title_sakura', name: 'Sakura Blossom', type: 'titles', price: 4500, text: '🌸 Sakura Blossom', color: '#f472b6', desc: 'Blooming cherry title' },
-        { id: 'title_king', name: 'Slime King', type: 'titles', price: 10000, text: '👑 Slime King', color: '#fbbf24', desc: 'Royalty status tag' }
+        { id: 'title_zen', name: 'Zen Master', type: 'titles', price: 15000, text: '🧘 ZEN MASTER', color: '#10b981', glow: '#34d399', desc: 'Peaceful master tag' },
+        { id: 'title_sakura', name: 'Sakura Blossom', type: 'titles', price: 30000, text: '🌸 SAKURA BLOSSOM', color: '#f472b6', glow: '#fb7185', desc: 'Cherry blossom title' },
+        { id: 'title_king', name: 'Slime King', type: 'titles', price: 60000, text: '👑 SLIME KING', color: '#f59e0b', glow: '#fbbf24', desc: 'Royalty status tag' },
+        
+        // Improved & New Luxury Titles
+        { id: 'title_celestial', name: 'Celestial Overlord', type: 'titles', price: 100000, text: '🌌 CELESTIAL OVERLORD', color: '#c084fc', glow: '#e879f9', desc: 'Cosmic supreme ruler' },
+        { id: 'title_solaris', name: 'Solaris Emperor', type: 'titles', price: 150000, text: '☀️ SOLARIS EMPEROR', color: '#f97316', glow: '#fde047', desc: 'Blazing golden monarch' },
+        { id: 'title_immortal', name: 'Immortal Slime God', type: 'titles', price: 250000, text: '💎 IMMORTAL SLIME GOD', color: '#06b6d4', glow: '#67e8f9', desc: 'Ultimate legend badge' }
       ],
       emotes: [
         { id: 'emote_dance', name: 'Groovy Disco Dance', type: 'emotes', price: 5000, anim: 'dance', icon: '💃', desc: 'Groovy side-sway bounce with sparkles!' },
@@ -694,25 +747,35 @@
       ],
       profile: PROFILE_STICKERS.map(item => ({ ...item, type: 'profile' })),
       message_cards: [
-        { id: 'card_sakura', name: 'Sakura Velvet Card', type: 'message_cards', price: 20000, style: 'sakura', desc: 'A floral rose-gold frame around every message' },
-        { id: 'card_moon', name: 'Moonlit Glass Card', type: 'message_cards', price: 35000, style: 'moon', desc: 'A cool blue crystal chat card' },
-        { id: 'card_royal', name: 'Royal Prism Card', type: 'message_cards', price: 50000, style: 'royal', desc: 'A vivid violet and gold message frame' }
+        { id: 'card_sakura', name: 'Sakura Velvet Card', type: 'message_cards', price: 20000, style: 'sakura', desc: 'Soft rose velvet chat card' },
+        { id: 'card_moon', name: 'Moonlit Glass Card', type: 'message_cards', price: 35000, style: 'moon', desc: 'Cool icy glass frame' },
+        { id: 'card_royal', name: 'Royal Prism Card', type: 'message_cards', price: 50000, style: 'royal', desc: 'Royal violet & gold card' },
+        
+        // New Message Cards
+        { id: 'card_galaxy', name: 'Galaxy Nebula Card', type: 'message_cards', price: 80000, style: 'galaxy', desc: 'Deep cosmic starfield card' },
+        { id: 'card_cyber', name: 'Cyberpunk Neon Card', type: 'message_cards', price: 110000, style: 'cyber', desc: 'Cyan glowing futuristic card' },
+        { id: 'card_solaris', name: 'Solaris Flame Card', type: 'message_cards', price: 160000, style: 'solaris', desc: 'Fiery sun energy chat card' }
       ],
       frames: [
-        { id: 'frame_sakura', name: 'Sakura Profile Frame', type: 'frames', price: 8000, style: 'sakura', desc: 'Soft cherry blossom border around your portrait' },
-        { id: 'frame_moon', name: 'Moon Crystal Frame', type: 'frames', price: 18000, style: 'moon', desc: 'Icy blue glow around your portrait' },
-        { id: 'frame_prism', name: 'Prism Crown Frame', type: 'frames', price: 35000, style: 'prism', desc: 'A bright rainbow-gold portrait frame' }
+        { id: 'frame_sakura', name: 'Sakura Profile Frame', type: 'frames', price: 12000, style: 'sakura', desc: 'Soft cherry blossom portrait glow' },
+        { id: 'frame_moon', name: 'Moon Crystal Frame', type: 'frames', price: 25000, style: 'moon', desc: 'Icy blue glow portrait frame' },
+        { id: 'frame_prism', name: 'Prism Crown Frame', type: 'frames', price: 50000, style: 'prism', desc: 'Golden prism portrait border' },
+        
+        // New Luxury Profile Frames
+        { id: 'frame_nebulas', name: 'Nebula Starlight Frame', type: 'frames', price: 90000, style: 'nebulas', desc: 'Pulsing purple star aura' },
+        { id: 'frame_dragon', name: 'Dragon Spirit Frame', type: 'frames', price: 140000, style: 'dragon', desc: 'Blazing dragon energy ring' }
       ]
     };
+
     const PROFILE_PFP_OPTIONS = PROFILE_STICKERS.map(item => item.icon);
     const ROLE_ITEMS = {
       admin: [
-        { id: 'skin_admin', name: 'Obsidian Red Aura', type: 'skins', price: 0, color: '#111118', desc: 'Admin role skin with red glow' },
-        { id: 'title_admin', name: 'Admin', type: 'titles', price: 0, text: 'ADMIN', color: '#fb7185', desc: 'Role title for administrators' }
+        { id: 'skin_admin', name: 'Obsidian Red Aura', type: 'skins', price: 0, colors: ['#111118', '#ef4444'], desc: 'Admin role skin' },
+        { id: 'title_admin', name: 'Admin', type: 'titles', price: 0, text: 'ADMIN', color: '#fb7185', glow: '#f43f5e', desc: 'Role title for administrators' }
       ],
       developer: [
-        { id: 'skin_developer', name: 'Pure White Icy Aura', type: 'skins', price: 0, color: '#f8fafc', desc: 'Developer role skin with icy glow' },
-        { id: 'title_developer', name: 'DEV', type: 'titles', price: 0, text: 'DEV', color: '#7dd3fc', desc: 'Role title for developers' }
+        { id: 'skin_developer', name: 'Pure White Icy Aura', type: 'skins', price: 0, colors: ['#f8fafc', '#38bdf8'], desc: 'Developer role skin' },
+        { id: 'title_developer', name: 'DEV', type: 'titles', price: 0, text: 'DEV', color: '#7dd3fc', glow: '#0284c7', desc: 'Role title for developers' }
       ]
     };
 
@@ -774,7 +837,6 @@
     let currentChannel = 'sakura-lounge';
     let activeChatTab = 'global';
     
-    // Persistent Chat Message Arrays
     let globalChatMessages = [];
     let staffChatMessages = [];
 
@@ -796,24 +858,22 @@
     function changeZoom(delta) {
       zoomLevel = Math.max(0.5, Math.min(2.2, zoomLevel + delta));
     }
-    function resetZoom() {
-      zoomLevel = 1.0;
-    }
+    function resetZoom() { zoomLevel = 1.0; }
 
     // INPUT & CONTROLS
     const keys = { up: false, down: false, left: false, right: false };
     const joystick = { active: false, dx: 0, dy: 0 };
     let camera = { x: 0, y: 0 };
 
-    // AUDIO PLAYLIST SYSTEM (MULTI-FILE PLAYLIST & REPLAY)
+    // AUDIO PLAYLIST SYSTEM
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     let musicPlaying = false;
     let musicTimer = null;
     let musicNoteIndex = 0;
-    let musicPlaylist = []; // Array of audio DataURLs or URLs
+    let musicPlaylist = []; 
     let musicPlaylistIndex = 0;
-    let musicUploaderUserId = null; // ID of staff member who uploaded song
+    let musicUploaderUserId = null; 
     let lobbyAudio = null;
     const musicNotes = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46];
 
@@ -1016,42 +1076,31 @@
 
     const profileAvatarCache = new Map();
     function drawPlayerLabel(c, player, isSelf = false) {
-      const labelY = player.y + (isSelf ? 34 : 32);
+      const labelY = player.y + 34;
       const avatarUrl = safeAvatarUrl(player.avatarUrl);
-      const role = player.role === 'developer' ? 'developer' : player.role === 'admin' ? 'admin' : 'player';
       
-      // Admin tag fix: "when admin unequips the title of admin and write in global chat or staff chat dont Show the Admin tag"
-      const roleTitleEquipped = (role === 'developer' && player.equippedTitle === 'title_developer') || (role === 'admin' && player.equippedTitle === 'title_admin');
-      const roleTag = roleTitleEquipped ? (role === 'developer' ? ' · DEV' : ' · ADMIN') : '';
+      // Fix: Removed "(You)" and "-DEV / -Admin" appended labels under slime
+      const nameText = player.name || 'Slime';
       
-      c.font = isSelf ? 'bold 12px Plus Jakarta Sans' : 'bold 11px Plus Jakarta Sans';
+      c.font = 'bold 12px Plus Jakarta Sans';
       c.textAlign = 'center';
-      c.lineWidth = 3;
-      c.strokeStyle = 'rgba(38, 18, 35, .72)';
-      c.fillStyle = roleTitleEquipped && role === 'developer' ? '#a5f3fc' : roleTitleEquipped && role === 'admin' ? '#fda4af' : isSelf ? '#f472b6' : '#ffffff';
-      c.shadowColor = roleTitleEquipped && role === 'developer' ? '#67e8f9' : roleTitleEquipped && role === 'admin' ? '#ef4444' : 'transparent';
-      c.shadowBlur = roleTitleEquipped ? 12 : 0;
-      const text = `${player.name || 'Slime'}${isSelf ? ' (You)' : ''}${roleTag}`;
+      c.lineWidth = 3.5;
+      c.strokeStyle = 'rgba(24, 9, 20, 0.85)';
+      c.fillStyle = isSelf ? '#f472b6' : '#ffffff';
       
       if (avatarUrl) {
         let avatar = profileAvatarCache.get(avatarUrl);
         if (!avatar) { avatar = new Image(); avatar.src = avatarUrl; profileAvatarCache.set(avatarUrl, avatar); }
         if (avatar.complete && avatar.naturalWidth) {
-          const left = player.x - 48;
-          c.save(); c.beginPath(); c.arc(left, labelY - 4, 10, 0, Math.PI * 2); c.clip(); c.drawImage(avatar, left - 10, labelY - 14, 20, 20); c.restore();
-          const frameColor = { frame_sakura: '#fb7185', frame_moon: '#38bdf8', frame_prism: '#fbbf24' }[player.equippedFrame];
-          if (frameColor) { c.save(); c.strokeStyle = frameColor; c.lineWidth = 2; c.shadowColor = frameColor; c.shadowBlur = 7; c.beginPath(); c.arc(left, labelY - 4, 11.5, 0, Math.PI * 2); c.stroke(); c.restore(); }
-          c.textAlign = 'left';
-          c.strokeText(text, left + 15, labelY);
-          c.fillText(text, left + 15, labelY);
-          c.shadowBlur = 0;
+          c.strokeText(nameText, player.x, labelY);
+          c.fillText(nameText, player.x, labelY);
           return;
         }
       }
+      
       const fallback = PROFILE_PFP_OPTIONS.includes(player.pfp) ? player.pfp : '🌸';
-      c.strokeText(`${fallback} ${text}`, player.x, labelY);
-      c.fillText(`${fallback} ${text}`, player.x, labelY);
-      c.shadowBlur = 0;
+      c.strokeText(`${fallback} ${nameText}`, player.x, labelY);
+      c.fillText(`${fallback} ${nameText}`, player.x, labelY);
     }
 
     function drawSlimeModel(c, x, y, skinId, accId, titleId, isJumping, jumpOff, activeEmoteAnim, isSelf, role = 'player', motionSpeed = 0, motionX = 0) {
@@ -1065,7 +1114,6 @@
       let extraY = 0;
       let extraRotation = 0;
 
-      // Improved Dance Emote: Groovy side-sway bounce with rhythmic tilt and sparkles!
       if (activeEmoteAnim === 'dance') {
         const danceTime = Date.now() * 0.008;
         extraX = Math.sin(danceTime) * 12;
@@ -1083,13 +1131,11 @@
       else if (extraRotation !== 0) c.rotate(extraRotation);
 
       const skinObj = MARKET_ITEMS.skins.find(s => s.id === skinId) || MARKET_ITEMS.skins[0];
-      const specialRoleSkin = (role === 'developer' && skinId === 'skin_developer') || (role === 'admin' && skinId === 'skin_admin');
-      const roleColor = specialRoleSkin ? (role === 'developer' ? '#f8fafc' : '#111118') : skinObj.color;
+      const colorList = skinObj.colors || [skinObj.color || '#f472b6', '#db2777'];
       
-      // Spinning emote shadow requirement: "in the spining emote dont show the shadow at all"
       if (activeEmoteAnim !== 'spin') {
-        c.shadowColor = specialRoleSkin ? (role === 'developer' ? '#7dd3fc' : '#ef4444') : skinObj.shadow || 'transparent';
-        c.shadowBlur = specialRoleSkin ? 24 : skinId === 'skin_golden' || skinId === 'skin_midnight' ? 14 : skinId === 'skin_matcha' ? 8 : 3;
+        c.shadowColor = colorList[colorList.length - 1] || 'rgba(0,0,0,0.3)';
+        c.shadowBlur = colorList.length >= 3 ? 16 : 8;
         c.fillStyle = 'rgba(0,0,0,0.22)';
         c.beginPath();
         c.ellipse(0, 18 + jumpOff, 22, 8, 0, 0, Math.PI * 2);
@@ -1103,10 +1149,26 @@
       const scaleY = 1 - moving * .04 - squash * .25 + (isJumping ? .06 : 0) - (activeEmoteAnim === 'dance' ? Math.sin(Date.now() * 0.016) * 0.08 : 0);
       c.save();
       c.scale(scaleX, scaleY);
+
+      // Enhanced Slime Gradient Rendering (Supporting 3 and 4 color mixtures)
       const slimeGradient = c.createRadialGradient(-8, -10, 2, 0, 0, 29);
-      slimeGradient.addColorStop(0, skinObj.highlight || '#fff1f2');
-      slimeGradient.addColorStop(.45, roleColor);
-      slimeGradient.addColorStop(1, specialRoleSkin ? roleColor : (skinObj.shadow || roleColor));
+      if (colorList.length === 2) {
+        slimeGradient.addColorStop(0, '#ffffff');
+        slimeGradient.addColorStop(0.3, colorList[0]);
+        slimeGradient.addColorStop(1, colorList[1]);
+      } else if (colorList.length === 3) {
+        slimeGradient.addColorStop(0, '#ffffff');
+        slimeGradient.addColorStop(0.25, colorList[0]);
+        slimeGradient.addColorStop(0.65, colorList[1]);
+        slimeGradient.addColorStop(1, colorList[2]);
+      } else if (colorList.length >= 4) {
+        slimeGradient.addColorStop(0, '#ffffff');
+        slimeGradient.addColorStop(0.2, colorList[0]);
+        slimeGradient.addColorStop(0.5, colorList[1]);
+        slimeGradient.addColorStop(0.8, colorList[2]);
+        slimeGradient.addColorStop(1, colorList[3]);
+      }
+
       c.fillStyle = slimeGradient;
       c.beginPath();
       c.ellipse(0, 0, 24, 20, 0, 0, Math.PI * 2);
@@ -1128,53 +1190,50 @@
       c.arc(11, 3, 3, 0, Math.PI * 2);
       c.fill();
 
-      // Bunny ears custom rendering: "bunny ears are not bunnears in market its a bunny sticker only near the ears and a bit bigger ones on the slime"
       if (accId) {
         if (accId === 'acc_bunny') {
-          // Render fluffy, bigger bunny ears on top of slime
           c.fillStyle = '#ffffff';
           c.strokeStyle = '#f472b6';
           c.lineWidth = 2;
-          
-          // Left Ear
-          c.beginPath();
-          c.ellipse(-10, -26, 6, 16, -0.2, 0, Math.PI * 2);
-          c.fill(); c.stroke();
+          c.beginPath(); c.ellipse(-10, -26, 6, 16, -0.2, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = '#fbcfe8';
-          c.beginPath();
-          c.ellipse(-10, -26, 3, 10, -0.2, 0, Math.PI * 2);
-          c.fill();
-
-          // Right Ear
+          c.beginPath(); c.ellipse(-10, -26, 3, 10, -0.2, 0, Math.PI * 2); c.fill();
           c.fillStyle = '#ffffff';
-          c.beginPath();
-          c.ellipse(10, -26, 6, 16, 0.2, 0, Math.PI * 2);
-          c.fill(); c.stroke();
+          c.beginPath(); c.ellipse(10, -26, 6, 16, 0.2, 0, Math.PI * 2); c.fill(); c.stroke();
           c.fillStyle = '#fbcfe8';
-          c.beginPath();
-          c.ellipse(10, -26, 3, 10, 0.2, 0, Math.PI * 2);
-          c.fill();
+          c.beginPath(); c.ellipse(10, -26, 3, 10, 0.2, 0, Math.PI * 2); c.fill();
         } else {
           const accObj = MARKET_ITEMS.accessories.find(a => a.id === accId);
           if (accObj) { c.font = '20px sans-serif'; c.textAlign = 'center'; c.fillText(accObj.icon, 0, -18); }
         }
       }
 
+      // Enhanced Title Rendering with Exact Centering & Premium Font
       if (titleId) {
         let titleObj = MARKET_ITEMS.titles.find(t => t.id === titleId);
         if (!titleObj && role === 'admin') titleObj = ROLE_ITEMS.admin.find(t => t.id === titleId);
         if (!titleObj && role === 'developer') titleObj = ROLE_ITEMS.developer.find(t => t.id === titleId);
         if (titleObj) {
-          c.font = `bold ${titleObj.price >= 8000 ? 9 : 8}px Plus Jakarta Sans`; c.textAlign = 'center';
-          const titleText = titleObj.text; const titleWidth = c.measureText(titleText).width + (titleObj.price >= 8000 ? 16 : 12);
-          c.shadowColor = titleObj.color; c.shadowBlur = titleObj.price >= 8000 ? 10 : 5; c.fillStyle = titleObj.color;
-          c.beginPath(); c.roundRect(-titleWidth / 2, -49, titleWidth, 16, 8); c.fill(); c.shadowBlur = 0;
-          c.fillStyle = '#fff'; c.fillText(titleText, 0, -38);
+          c.font = 'bold 9px Cinzel, Plus Jakarta Sans, sans-serif';
+          c.textAlign = 'center';
+          c.textBaseline = 'middle';
+          const titleText = titleObj.text; 
+          const titleWidth = c.measureText(titleText).width + 16;
+          
+          c.shadowColor = titleObj.glow || titleObj.color; 
+          c.shadowBlur = 12; 
+          c.fillStyle = titleObj.color;
+          c.beginPath(); 
+          c.roundRect(-titleWidth / 2, -49, titleWidth, 18, 9); 
+          c.fill(); 
+          
+          c.shadowBlur = 0;
+          c.fillStyle = '#ffffff'; 
+          c.fillText(titleText, 0, -40);
         }
       }
       c.restore();
 
-      // Dance Emote sparkles
       if (activeEmoteAnim === 'dance') {
         c.font = '12px sans-serif';
         c.fillText('✨', -24, -20 + Math.sin(Date.now() * 0.01) * 4);
@@ -1230,13 +1289,11 @@
         // Stones in Zen Garden
         const gardenStones = [[350, 450, 22], [420, 480, 16], [1200, 750, 28], [1260, 720, 18], [750, 1400, 24], [820, 1450, 15], [1650, 1200, 30]];
         gardenStones.forEach(([sx, sy, sr]) => {
-          ctx.fillStyle = '#b0a8a0';
-          ctx.beginPath(); ctx.ellipse(sx, sy, sr, sr * 0.7, 0.3, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = '#c8c2bc';
-          ctx.beginPath(); ctx.ellipse(sx - 3, sy - 3, sr * 0.6, sr * 0.4, 0.3, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#b0a8a0'; ctx.beginPath(); ctx.ellipse(sx, sy, sr, sr * 0.7, 0.3, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#c8c2bc'; ctx.beginPath(); ctx.ellipse(sx - 3, sy - 3, sr * 0.6, sr * 0.4, 0.3, 0, Math.PI * 2); ctx.fill();
         });
 
-        // Pond with fishes
+        // Classic Pond with Animated Fish
         ctx.fillStyle = '#a9dce2'; ctx.beginPath(); ctx.ellipse(1470, 440, 205, 118, -.18, 0, Math.PI * 2); ctx.fill();
         ctx.strokeStyle = '#77b9c3'; ctx.lineWidth = 8; ctx.stroke();
         ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.beginPath(); ctx.ellipse(1415, 405, 52, 15, -.22, 0, Math.PI * 2); ctx.fill();
@@ -1262,7 +1319,7 @@
           ctx.fillStyle='#fff5c2';ctx.beginPath();ctx.arc(x,y-23,4,0,Math.PI*2);ctx.fill();
         });
 
-        // Leaf / Petal fall down in Zen Garden
+        // Falling Sakura Petals
         for(let i=0;i<64;i++){
           const y=(i*271+time*.045)%2100;
           const x=(i*173+Math.sin(time*.001+i)*34+2100)%2100;
@@ -1273,18 +1330,26 @@
         ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(131,24,67,.55)';ctx.fillText('🌸 SAKURA ZEN GARDEN',75,78);
 
       } else {
-        // Onsen Spring
+        // Onsen Spring with Restored Trees & Classic Pond
         ctx.fillStyle='#d4bd91';ctx.fillRect(120,520,1860,155);ctx.fillRect(930,120,155,1860);
+
+        // Onsen Spring Bamboo & Pine Trees Restored
+        const onsenTrees = [[200,300],[800,200],[1600,250],[300,900],[1750,950],[400,1700],[1200,1750],[1800,1650]];
+        onsenTrees.forEach(([x,y]) => {
+          ctx.fillStyle = 'rgba(30,50,20,0.2)'; ctx.beginPath(); ctx.ellipse(x, y + 25, 35, 12, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#5c4033'; ctx.fillRect(x - 5, y - 5, 10, 40);
+          ctx.fillStyle = '#2e7d32'; ctx.beginPath(); ctx.arc(x, y - 20, 25, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#4caf50'; ctx.beginPath(); ctx.arc(x - 10, y - 10, 18, 0, Math.PI * 2); ctx.fill();
+        });
 
         // Stones in Onsen Spring
         const onsenStones = [[500, 600, 26], [580, 620, 20], [1200, 1100, 32], [1280, 1050, 22], [800, 400, 25], [1500, 1400, 28]];
         onsenStones.forEach(([sx, sy, sr]) => {
-          ctx.fillStyle = '#8c8275';
-          ctx.beginPath(); ctx.ellipse(sx, sy, sr, sr * 0.7, 0.4, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = '#a89e90';
-          ctx.beginPath(); ctx.ellipse(sx - 4, sy - 4, sr * 0.6, sr * 0.4, 0.4, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#8c8275'; ctx.beginPath(); ctx.ellipse(sx, sy, sr, sr * 0.7, 0.4, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#a89e90'; ctx.beginPath(); ctx.ellipse(sx - 4, sy - 4, sr * 0.6, sr * 0.4, 0.4, 0, Math.PI * 2); ctx.fill();
         });
 
+        // Restored Classic Hot Spring Pond & Fish
         ctx.fillStyle='#93cfd0';ctx.beginPath();ctx.ellipse(1420,1260,280,190,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#799a69';ctx.lineWidth=20;ctx.stroke();
         
         ctx.fillStyle='rgba(255,255,255,0.4)';
@@ -1306,7 +1371,7 @@
           ctx.restore();
         }
 
-        // Green leaf falldown in Onsen Spring: "make the green leafs fall in the onseen spring like the patels fall in zen garden"
+        // Green Leaf Fall in Onsen Spring
         for(let i=0;i<64;i++){
           const y=(i*271+time*.045)%2100;
           const x=(i*173+Math.sin(time*.001+i)*34+2100)%2100;
@@ -1349,7 +1414,6 @@
         }
       }
 
-      // Camera offset takes Zoom level into account
       const viewW = canvas.width / zoomLevel;
       const viewH = canvas.height / zoomLevel;
       camera.x += (localPlayer.x - viewW / 2 - camera.x) * Math.min(1, dt * 8);
@@ -1382,7 +1446,6 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
       
-      // Apply Zoom Transformation
       ctx.scale(zoomLevel, zoomLevel);
       ctx.translate(-camera.x, -camera.y);
       drawZoneDecorations();
@@ -1414,22 +1477,13 @@
     }
 
     // Slime Click Event
+    // Fix: Clicking slimes NO LONGER stops/plays/restarts music. Music only toggled from header button!
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
       const clickWorldX = (e.clientX - rect.left) / zoomLevel + camera.x;
       const clickWorldY = (e.clientY - rect.top) / zoomLevel + camera.y;
 
       let closest = null;
-      
-      // Check local player click
-      const localDist = Math.hypot(localPlayer.x - clickWorldX, localPlayer.y - clickWorldY);
-      if (localDist < 38) {
-        if (musicUploaderUserId && localPlayer.id === musicUploaderUserId) {
-          toggleBackgroundMusic();
-          return;
-        }
-      }
-
       Object.values(remotePlayers).forEach(player => {
         const x = Number.isFinite(player.displayX) ? player.displayX : player.x;
         const y = Number.isFinite(player.displayY) ? player.displayY : player.y;
@@ -1438,12 +1492,6 @@
       });
 
       if (closest) {
-        // "when the user clicks on the slime that has uploaded the song in the song section either admin or dev the it works as a play and pause button"
-        if (musicUploaderUserId && closest.player.id === musicUploaderUserId) {
-          toggleBackgroundMusic();
-        } else if (closest.player.role === 'developer') {
-          toggleBackgroundMusic();
-        }
         showPlayerCard(closest.player);
       }
     });
@@ -1464,8 +1512,7 @@
       avatar.appendChild(makeAvatar(player, 'w-10 h-10'));
       const trustedRole = player.id === localPlayer.id ? localPlayer.role : (remotePlayers[player.id] && remotePlayers[player.id].role) || (['admin', 'developer'].includes(player.role) ? player.role : 'player');
       
-      const roleTitleEquipped = (trustedRole === 'developer' && player.equippedTitle === 'title_developer') || (trustedRole === 'admin' && player.equippedTitle === 'title_admin');
-      document.getElementById('player-card-name').textContent = `${player.name || 'Slime'}${roleTitleEquipped ? (trustedRole === 'developer' ? ' · DEV' : ' · ADMIN') : ''}`;
+      document.getElementById('player-card-name').textContent = player.name || 'Slime';
       
       const action = document.getElementById('player-card-action');
       const status = document.getElementById('player-card-status');
@@ -1606,7 +1653,6 @@
       grid.innerHTML = '';
       const search = (document.getElementById('market-search-input').value || '').trim().toLowerCase();
       
-      // All items search feature: "allow the user to search for all items at once not section item search"
       let sourceItems = [];
       if (activeMarketCategory === 'all') {
         sourceItems = [].concat(...Object.values(MARKET_ITEMS));
@@ -1619,13 +1665,13 @@
       items.forEach(item => {
         const isOwned = localPlayer.inventory.includes(item.id);
         const card = document.createElement('div');
-        const luxe = item.price >= 30000;
-        card.className = `p-2.5 rounded-2xl flex flex-col justify-between shadow-sm transition ${luxe ? 'market-luxe border-violet-300' : item.price >= 10000 ? 'market-premium border-amber-300' : 'bg-white/80 border-pink-200 hover:border-pink-400'}`;
+        const luxe = item.price >= 50000;
+        card.className = `p-2.5 rounded-2xl flex flex-col justify-between shadow-sm transition ${luxe ? 'market-luxe border-violet-300' : item.price >= 15000 ? 'market-premium border-amber-300' : 'bg-white/80 border-pink-200 hover:border-pink-400'}`;
         card.innerHTML = `
           <div>
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-pink-950">${item.icon ? item.icon + ' ' : ''}${item.name}</span>
-              <span class="text-xs font-extrabold text-amber-700">🪙 ${item.price}</span>
+              <span class="text-xs font-extrabold text-amber-700">🪙 ${item.price.toLocaleString()}</span>
             </div>
             <p class="text-[10px] text-pink-600 mt-0.5 line-clamp-1">${item.desc}</p>
           </div>
@@ -1658,7 +1704,7 @@
       if (!item || !authUser || guestMode) { alert('Sign in to buy and save market items.'); return; }
       if (localPlayer.inventory.includes(item.id)) return;
       const { data, error } = await supabaseClient.rpc('purchase_market_item', { p_item_id: item.id });
-      if (error) { alert(error.message.includes('insufficient') ? 'Not enough points! Collect more points first.' : 'Could not complete this purchase.'); return; }
+      if (error) { alert(error.message.includes('insufficient') ? 'Not enough points! Play games or collect points.' : 'Could not complete this purchase.'); return; }
       localPlayer.points = Number(data.points) || 0;
       localPlayer.inventory = Array.isArray(data.inventory) ? data.inventory : localPlayer.inventory;
       savePlayerToStorage();
@@ -1678,13 +1724,13 @@
 
         if (marketTestingItem) {
           if (marketTestingItem.type === 'message_cards') {
-            // Message Card preview only
             marketPreviewCtx.save();
             const cardX = 15, cardY = 35, cardW = 150, cardH = 80;
-            marketPreviewCtx.shadowColor = marketTestingItem.style === 'sakura' ? 'rgba(244,63,94,0.5)' : marketTestingItem.style === 'moon' ? 'rgba(14,165,233,0.6)' : 'rgba(168,85,247,0.7)';
+            const cardClass = { card_sakura: 'rgba(244,63,94,0.5)', card_moon: 'rgba(14,165,233,0.6)', card_royal: 'rgba(168,85,247,0.7)', card_galaxy: 'rgba(147,51,234,0.8)', card_cyber: 'rgba(6,182,212,0.8)', card_solaris: 'rgba(245,158,11,0.9)' }[marketTestingItem.style];
+            marketPreviewCtx.shadowColor = cardClass || 'rgba(236,72,153,0.5)';
             marketPreviewCtx.shadowBlur = 15;
-            marketPreviewCtx.fillStyle = marketTestingItem.style === 'sakura' ? 'rgba(131,24,67,0.85)' : marketTestingItem.style === 'moon' ? 'rgba(8,47,73,0.9)' : 'rgba(76,29,149,0.9)';
-            marketPreviewCtx.strokeStyle = marketTestingItem.style === 'sakura' ? 'rgba(251,113,133,0.9)' : marketTestingItem.style === 'moon' ? 'rgba(56,189,248,0.95)' : '#fbbf24';
+            marketPreviewCtx.fillStyle = 'rgba(30,15,28,0.9)';
+            marketPreviewCtx.strokeStyle = cardClass || '#ec4899';
             marketPreviewCtx.lineWidth = 2;
             marketPreviewCtx.beginPath();
             marketPreviewCtx.roundRect(cardX, cardY, cardW, cardH, 12);
@@ -1697,10 +1743,9 @@
             marketPreviewCtx.fillText('🌸 Sakura Slime', cardX + 12, cardY + 22);
             marketPreviewCtx.font = '10px Plus Jakarta Sans';
             marketPreviewCtx.fillStyle = 'rgba(255,255,255,0.9)';
-            marketPreviewCtx.fillText('Message Card Preview ✨', cardX + 12, cardY + 45);
+            marketPreviewCtx.fillText('Card Preview ✨', cardX + 12, cardY + 45);
             marketPreviewCtx.restore();
           } else if (marketTestingItem.type === 'profile') {
-            // Profile sticker preview only
             marketPreviewCtx.save();
             marketPreviewCtx.shadowColor = '#ec4899';
             marketPreviewCtx.shadowBlur = 20;
@@ -1718,9 +1763,8 @@
             marketPreviewCtx.fillText(marketTestingItem.name, 90, 125);
             marketPreviewCtx.restore();
           } else if (marketTestingItem.type === 'frames') {
-            // Profile frame preview
             marketPreviewCtx.save();
-            const frameColor = marketTestingItem.style === 'sakura' ? '#fb7185' : marketTestingItem.style === 'moon' ? '#38bdf8' : '#fbbf24';
+            const frameColor = { frame_sakura: '#fb7185', frame_moon: '#38bdf8', frame_prism: '#fbbf24', frame_nebulas: '#c084fc', frame_dragon: '#f97316' }[marketTestingItem.style] || '#ec4899';
             marketPreviewCtx.shadowColor = frameColor;
             marketPreviewCtx.shadowBlur = 25;
             marketPreviewCtx.strokeStyle = frameColor;
@@ -1862,9 +1906,15 @@
 
     function makeAvatar(profile, size = 'w-8 h-8') {
       const wrap = document.createElement('span');
-      wrap.className = `${size} rounded-full bg-pink-100 border border-pink-200 flex items-center justify-center overflow-hidden shrink-0 text-base`;
+      wrap.className = `${size} rounded-full bg-pink-100 border border-pink-200 flex items-center justify-center overflow-hidden shrink-0 text-base relative`;
       const frame = profile.equippedFrame || profile.frameId;
-      const frameStyle = { frame_sakura: ['#fb7185', '0 0 0 2px #fff1f2, 0 0 10px #fb7185'], frame_moon: ['#38bdf8', '0 0 0 2px #e0f2fe, 0 0 12px #38bdf8'], frame_prism: ['#fbbf24', '0 0 0 2px #fef3c7, 0 0 14px #c084fc'] }[frame];
+      const frameStyle = { 
+        frame_sakura: ['#fb7185', '0 0 0 2px #fff1f2, 0 0 10px #fb7185'], 
+        frame_moon: ['#38bdf8', '0 0 0 2px #e0f2fe, 0 0 12px #38bdf8'], 
+        frame_prism: ['#fbbf24', '0 0 0 2px #fef3c7, 0 0 14px #c084fc'],
+        frame_nebulas: ['#c084fc', '0 0 0 2px #f3e8ff, 0 0 16px #c084fc'],
+        frame_dragon: ['#f97316', '0 0 0 2px #ffedd5, 0 0 18px #f97316']
+      }[frame];
       if (frameStyle) { wrap.style.borderColor = frameStyle[0]; wrap.style.boxShadow = frameStyle[1]; }
       const imageUrl = safeAvatarUrl(profile.avatarUrl);
       if (imageUrl) {
@@ -2128,10 +2178,9 @@
         const messageAvatar = makeAvatar(avatarProfile, 'w-6 h-6');
         if (!isMe) row.appendChild(messageAvatar);
         
-        // Message card & stickers applied in DM chat: "message card and all the other profile frames and sticker should also apply on the friend chat"
         const bubble = document.createElement('div'); 
         bubble.className = `max-w-[82%] rounded-2xl border px-3 py-1.5 font-medium ${isMe ? 'bg-sky-500 text-white border-sky-300' : 'bg-pink-100 text-pink-950 border-pink-200'}`;
-        const cardType = { card_sakura: 'chat-card-sakura', card_moon: 'chat-card-moon', card_royal: 'chat-card-royal' }[message.equippedMessageCard];
+        const cardType = { card_sakura: 'chat-card-sakura', card_moon: 'chat-card-moon', card_royal: 'chat-card-royal', card_galaxy: 'chat-card-galaxy', card_cyber: 'chat-card-cyber', card_solaris: 'chat-card-solaris' }[message.equippedMessageCard];
         if (cardType) bubble.classList.add(cardType);
         
         bubble.textContent = message.text; 
@@ -2300,7 +2349,7 @@
           if (error) alert('Saved on browser, could not sync to account. ' + error.message);
         };
         image.onerror = () => alert('Image error.');
-        image.src = result.result;
+        image.src = reader.result;
       };
       reader.readAsDataURL(file);
     }
@@ -2761,19 +2810,27 @@
       const chatBox = document.getElementById('chat-messages');
       const role = profile.role === 'developer' ? 'developer' : profile.role === 'admin' ? 'admin' : 'player';
       
-      // Admin tag fix: "when admin unequips the title of admin and write in global chat or staff chat dont Show the Admin tag"
       const roleTitleEquipped = (role === 'developer' && profile.equippedTitle === 'title_developer') || (role === 'admin' && profile.equippedTitle === 'title_admin');
-      const roleTitle = roleTitleEquipped ? (role === 'developer' ? 'DEV' : 'ADMIN') : '';
       
       const card = document.createElement('article');
-      const cardStyle = { card_sakura: 'chat-card-sakura', card_moon: 'chat-card-moon', card_royal: 'chat-card-royal' }[profile.equippedMessageCard];
+      const cardStyle = { 
+        card_sakura: 'chat-card-sakura', 
+        card_moon: 'chat-card-moon', 
+        card_royal: 'chat-card-royal',
+        card_galaxy: 'chat-card-galaxy',
+        card_cyber: 'chat-card-cyber',
+        card_solaris: 'chat-card-solaris'
+      }[profile.equippedMessageCard];
+      
       card.className = `rounded-2xl border p-2.5 shadow-sm ${roleTitleEquipped && role === 'developer' ? 'border-cyan-300 bg-cyan-950/70 shadow-cyan-500/20' : roleTitleEquipped && role === 'admin' ? 'border-rose-400 bg-slate-950/80 shadow-rose-500/25' : isSelf ? 'border-pink-300/40 bg-pink-500/20' : 'border-white/10 bg-white/5'} ${cardStyle || ''}`;
       const header = document.createElement('div'); header.className = 'mb-1 flex items-center gap-2';
       const userId = profile.senderId || profile.id;
       const avatar = makeAvatar({ pfp, avatarUrl: profile.avatarUrl || '', equippedFrame: profile.equippedFrame }, 'w-7 h-7');
       const nameButton = document.createElement('button'); nameButton.type = 'button';
       nameButton.className = `min-w-0 truncate text-left text-[11px] font-extrabold ${roleTitleEquipped && role === 'developer' ? 'text-cyan-200' : roleTitleEquipped && role === 'admin' ? 'text-rose-300' : isSelf ? 'text-pink-200' : 'text-pink-300'}`;
-      nameButton.textContent = `${sender || 'Slime'}${roleTitle ? ` · ${roleTitle}` : ''}`;
+      
+      // Fix: Display Name only (No -DEV or -Dev Admin under chat)
+      nameButton.textContent = sender || 'Slime';
       if (userId && userId !== localPlayer.id) {
         const playerProfile = { id: userId, name: sender, pfp, avatarUrl: profile.avatarUrl || '', equippedFrame: profile.equippedFrame, equippedTitle: profile.equippedTitle, equippedMessageCard: profile.equippedMessageCard, role };
         avatar.classList.add('cursor-pointer'); avatar.title = 'View profile / add friend'; avatar.onclick = () => openChatPlayerCard(playerProfile);
@@ -2815,7 +2872,6 @@
       renderOwnedEmoteButton(); broadcastPlayerState();
     }
 
-    // Chat sidebar toggle for both PC & Mobile
     function toggleChatSidebar() {
       document.getElementById('chat-sidebar').classList.toggle('translate-x-full');
     }
@@ -2871,12 +2927,12 @@
       joystick.active = true; joystick.dx = dx / maxDist; joystick.dy = dy / maxDist;
     }
 
-    async function awardGameWin(gameName) {
+    async function awardGameWin(gameName, amount = 5) {
       if (!authUser || guestMode) { alert('Sign in to earn points.'); return false; }
       const randomId = window.crypto && typeof window.crypto.randomUUID === 'function' ? window.crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); });
       const { data, error } = await supabaseClient.rpc('award_game_win', { p_game_key: `${gameName}:${randomId}` });
       if (error) { alert(error.message || 'Could not save reward.'); return false; }
-      localPlayer.points = Number(data.points) || localPlayer.points;
+      localPlayer.points += amount;
       savePlayerToStorage(); updateUIHeader(); return true;
     }
 
@@ -2929,7 +2985,7 @@
         renderMemoryCards();
         if (memoryMatched.size === memoryDeck.length) {
           memoryFinished = true;
-          const awarded = await awardGameWin('memories');
+          const awarded = await awardGameWin('memories', 5);
           document.getElementById('memory-status').textContent = awarded ? 'You won! +5 points 🪙' : 'You won!';
         }
       } else {
@@ -2990,7 +3046,7 @@
     function flashSequenceTile(index, duration = 350) {
       const button = document.getElementById(`seq-btn-${index}`);
       if (!button) return;
-      button.classList.remove('ring-4', 'ring-yellow-300', 'brightness-150', 'scale-105', 'ring-pink-300');
+      button.classList.remove('ring-4', 'ring-yellow-300', 'brightness-150', 'scale-105');
       setTimeout(() => {
         button.classList.add('ring-4', 'ring-yellow-300', 'brightness-150', 'scale-105');
         setTimeout(() => {
@@ -3037,13 +3093,197 @@
       if (sequenceInput.length === slimeSequence.length) {
         sequenceLocked = true;
         if (sequenceLevel >= 8) {
-          const awarded = await awardGameWin('sequence');
+          const awarded = await awardGameWin('sequence', 5);
           document.getElementById('sequence-status').textContent = awarded ? 'You won! +5 points 🪙' : 'You won!';
         } else {
           document.getElementById('sequence-status').textContent = 'Correct! Next round...';
           sequenceTimeouts.push(setTimeout(advanceSequence, 900));
         }
       }
+    }
+
+    // NEW GAME: CATCH THE FALLING SLIMES ⚡
+    // Rules: 4-minute match, drops up to 60 slimes. Catch 5 slimes = 1 pt (up to 10 points max for 50 caught). Dex ball physics!
+    let catchGameActive = false;
+    let catchScore = 0;
+    let catchTotalSpawned = 0;
+    let catchTimerSeconds = 240; // 4 minutes
+    let catchTimerInterval = null;
+    let catchAnimFrame = null;
+    
+    let bucket = { x: 160, width: 70, height: 18, speed: 450 };
+    let fallingSlimes = [];
+    const catchCanvas = document.getElementById('catchCanvas');
+    const catchCtx = catchCanvas ? catchCanvas.getContext('2d') : null;
+
+    function openCatchGameModal() {
+      closeGamesModal();
+      document.getElementById('catch-game-modal').classList.remove('hidden');
+      document.getElementById('catch-overlay').classList.remove('hidden');
+    }
+
+    function closeCatchGameModal() {
+      document.getElementById('catch-game-modal').classList.add('hidden');
+      stopCatchGame();
+    }
+
+    function startCatchGame() {
+      document.getElementById('catch-overlay').classList.add('hidden');
+      catchScore = 0;
+      catchTotalSpawned = 0;
+      catchTimerSeconds = 240;
+      fallingSlimes = [];
+      catchGameActive = true;
+      
+      bucket.x = (catchCanvas.width - bucket.width) / 2;
+      
+      updateCatchHUD();
+      
+      clearInterval(catchTimerInterval);
+      catchTimerInterval = setInterval(() => {
+        if (!catchGameActive) return;
+        catchTimerSeconds--;
+        updateCatchHUD();
+        
+        if (catchTimerSeconds <= 0 || catchTotalSpawned >= 60) {
+          endCatchGame();
+        }
+      }, 1000);
+
+      let lastTime = performance.now();
+      let spawnTimer = 0;
+
+      function catchLoop(now) {
+        if (!catchGameActive) return;
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+
+        // Dex ball physics slime spawner
+        spawnTimer += dt;
+        if (spawnTimer >= 1.8 && catchTotalSpawned < 60) {
+          spawnTimer = 0;
+          catchTotalSpawned++;
+          fallingSlimes.push({
+            x: 20 + Math.random() * (catchCanvas.width - 40),
+            y: -20,
+            radius: 14 + Math.random() * 6,
+            vx: (Math.random() - 0.5) * 180, // High erratic velocity (Dex ball style)
+            vy: 120 + Math.random() * 160,
+            color: ['#f472b6', '#38bdf8', '#4ade80', '#fbbf24', '#a855f7'][Math.floor(Math.random() * 5)]
+          });
+        }
+
+        // Bucket Movement via keyboard
+        if (keys.left) bucket.x = Math.max(0, bucket.x - bucket.speed * dt);
+        if (keys.right) bucket.x = Math.min(catchCanvas.width - bucket.width, bucket.x + bucket.speed * dt);
+
+        // Clear and render background
+        catchCtx.clearRect(0, 0, catchCanvas.width, catchCanvas.height);
+        catchCtx.fillStyle = '#0f172a';
+        catchCtx.fillRect(0, 0, catchCanvas.width, catchCanvas.height);
+
+        // Draw Bucket
+        catchCtx.fillStyle = '#f59e0b';
+        catchCtx.strokeStyle = '#fef08a';
+        catchCtx.lineWidth = 2;
+        catchCtx.beginPath();
+        catchCtx.roundRect(bucket.x, catchCanvas.height - bucket.height - 10, bucket.width, bucket.height, 8);
+        catchCtx.fill();
+        catchCtx.stroke();
+
+        // Update and draw falling slimes
+        for (let i = fallingSlimes.length - 1; i >= 0; i--) {
+          const s = fallingSlimes[i];
+          s.x += s.vx * dt;
+          s.y += s.vy * dt;
+          
+          // Bounce off left/right walls (Dex ball physics)
+          if (s.x - s.radius < 0 || s.x + s.radius > catchCanvas.width) {
+            s.vx *= -1;
+          }
+
+          // Render Slime
+          catchCtx.fillStyle = s.color;
+          catchCtx.beginPath();
+          catchCtx.ellipse(s.x, s.y, s.radius, s.radius * 0.85, 0, 0, Math.PI * 2);
+          catchCtx.fill();
+          
+          // Face
+          catchCtx.fillStyle = '#000';
+          catchCtx.beginPath();
+          catchCtx.arc(s.x - 4, s.y - 2, 2, 0, Math.PI * 2);
+          catchCtx.arc(s.x + 4, s.y - 2, 2, 0, Math.PI * 2);
+          catchCtx.fill();
+
+          // Bucket Collision Check
+          const bY = catchCanvas.height - bucket.height - 10;
+          if (s.y + s.radius >= bY && s.y - s.radius <= bY + bucket.height && s.x >= bucket.x - 5 && s.x <= bucket.x + bucket.width + 5) {
+            catchScore++;
+            playSound('match');
+            fallingSlimes.splice(i, 1);
+            updateCatchHUD();
+            if (catchScore >= 50) {
+              endCatchGame();
+              break;
+            }
+            continue;
+          }
+
+          // Out of bounds
+          if (s.y - s.radius > catchCanvas.height) {
+            fallingSlimes.splice(i, 1);
+          }
+        }
+
+        catchAnimFrame = requestAnimationFrame(catchLoop);
+      }
+
+      catchAnimFrame = requestAnimationFrame(catchLoop);
+    }
+
+    function updateCatchHUD() {
+      const minutes = Math.floor(catchTimerSeconds / 60);
+      const seconds = catchTimerSeconds % 60;
+      document.getElementById('catch-timer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      document.getElementById('catch-count').textContent = catchScore;
+      
+      const pts = Math.min(10, Math.floor(catchScore / 5));
+      document.getElementById('catch-points').textContent = pts;
+    }
+
+    async function endCatchGame() {
+      stopCatchGame();
+      const earnedPts = Math.min(10, Math.floor(catchScore / 5));
+      if (earnedPts > 0) {
+        await awardGameWin('catch_slimes', earnedPts);
+      }
+      
+      const title = document.getElementById('catch-overlay-title');
+      const desc = document.getElementById('catch-overlay-desc');
+      title.textContent = `Match Ended!`;
+      desc.textContent = `You caught ${catchScore} slimes and earned +${earnedPts} Points! 🪙`;
+      document.getElementById('catch-overlay').classList.remove('hidden');
+    }
+
+    function stopCatchGame() {
+      catchGameActive = false;
+      clearInterval(catchTimerInterval);
+      if (catchAnimFrame) cancelAnimationFrame(catchAnimFrame);
+    }
+
+    // Touch/Mouse Basket Control for Catch Game
+    if (catchCanvas) {
+      const moveBasket = (clientX) => {
+        const rect = catchCanvas.getBoundingClientRect();
+        const touchX = (clientX - rect.left) * (catchCanvas.width / rect.width);
+        bucket.x = Math.max(0, Math.min(catchCanvas.width - bucket.width, touchX - bucket.width / 2));
+      };
+      catchCanvas.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) moveBasket(e.touches[0].clientX);
+      });
+      catchCanvas.addEventListener('mousemove', (e) => {
+        if (e.buttons === 1) moveBasket(e.clientX);
+      });
     }
 
     // Notice Board & In-board Editing
