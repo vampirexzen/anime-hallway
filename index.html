@@ -2,7 +2,7 @@
 <html lang="en" class="h-full w-full overflow-hidden">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
   <title>Sakura Slime World 🌸 - Virtual Social Lounge</title>
 
   <!-- Tailwind CSS CDN -->
@@ -17,18 +17,9 @@
   <style>
     .market-premium{background:linear-gradient(135deg,rgba(255,251,235,.97),rgba(254,243,199,.8));box-shadow:0 5px 18px rgba(217,119,6,.13)}
     .market-luxe{background:linear-gradient(135deg,rgba(250,245,255,.98),rgba(224,231,255,.92),rgba(255,247,237,.9));box-shadow:0 6px 24px rgba(139,92,246,.2);border-width:2px}
-    .chat-card-sakura{background:linear-gradient(135deg,rgba(131,24,67,.92),rgba(124,45,18,.86)) !important;border-color:rgba(251,113,133,.95) !important;box-shadow:inset 0 0 0 1px rgba(255,228,230,.3),0 4px 18px rgba(244,63,94,.25) !important;color:#fff !important}
-    .chat-card-moon{background:linear-gradient(135deg,rgba(8,47,73,.94),rgba(49,46,129,.9)) !important;border-color:rgba(56,189,248,.98) !important;box-shadow:inset 0 0 0 1px rgba(224,242,254,.24),0 4px 20px rgba(14,165,233,.28) !important;color:#fff !important}
-    .chat-card-royal{background:linear-gradient(135deg,rgba(76,29,149,.96),rgba(120,53,15,.9)) !important;border:1px solid #fbbf24 !important;box-shadow:inset 0 0 0 1px rgba(253,230,138,.4),0 4px 24px rgba(168,85,247,.34) !important;color:#fff !important}
-    .market-message-preview{width:100%;max-width:280px;border:1px solid rgba(236,72,153,.28);border-radius:18px;padding:14px;background:rgba(255,255,255,.94);box-shadow:0 12px 26px rgba(131,24,67,.12);color:#831843}
-    .market-frame-preview{width:92px;height:92px;border-radius:9999px;display:grid;place-items:center;padding:6px;position:relative;animation:frame-float 3s ease-in-out infinite}
-    .market-frame-center{width:100%;height:100%;border-radius:9999px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(145deg,#fff7fb,#fce7f3);font-size:44px;border:2px solid rgba(255,255,255,.9)}
-    .market-frame-center img{width:100%;height:100%;object-fit:cover}
-    .preview-frame-sakura{border:4px solid #fb7185;background:linear-gradient(135deg,#ffe4e6,#fda4af);box-shadow:0 0 0 3px #fff1f2,0 0 24px 5px rgba(251,113,133,.78),inset 0 0 12px rgba(255,255,255,.8)}
-    .preview-frame-moon{border:4px solid #38bdf8;background:linear-gradient(135deg,#e0f2fe,#818cf8);box-shadow:0 0 0 3px #e0f2fe,0 0 26px 6px rgba(56,189,248,.8),inset 0 0 14px rgba(255,255,255,.9)}
-    .preview-frame-prism{border:4px solid transparent;background:linear-gradient(135deg,#fef3c7,#c084fc,#38bdf8,#fb7185) border-box;box-shadow:0 0 0 3px #fef3c7,0 0 28px 7px rgba(192,132,252,.78),inset 0 0 14px rgba(255,255,255,.9)}
-    .market-sticker-preview{width:92px;height:92px;border-radius:9999px;display:grid;place-items:center;background:radial-gradient(circle at 35% 25%,#fff 0,#ffe4ef 43%,#f9a8d4 100%);border:3px solid #fff;box-shadow:0 8px 28px rgba(236,72,153,.3),0 0 0 2px #f9a8d4;font-size:54px;animation:frame-float 3s ease-in-out infinite}
-    @keyframes frame-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+    .chat-card-sakura{background:linear-gradient(135deg,rgba(131,24,67,.78),rgba(124,45,18,.68)) !important;border-color:rgba(251,113,133,.9) !important;box-shadow:inset 0 0 0 1px rgba(255,228,230,.25),0 4px 18px rgba(244,63,94,.18) !important}
+    .chat-card-moon{background:linear-gradient(135deg,rgba(8,47,73,.84),rgba(49,46,129,.76)) !important;border-color:rgba(56,189,248,.95) !important;box-shadow:inset 0 0 0 1px rgba(224,242,254,.2),0 4px 20px rgba(14,165,233,.22) !important}
+    .chat-card-royal{background:linear-gradient(135deg,rgba(76,29,149,.9),rgba(120,53,15,.74)) !important;border:1px solid #fbbf24 !important;box-shadow:inset 0 0 0 1px rgba(253,230,138,.35),0 4px 24px rgba(168,85,247,.28) !important}
     
     html, body {
       height: 100%;
@@ -270,12 +261,14 @@
         </button>
       </div>
 
+      <!-- ZOOM CONTROLS FOR PC & MOBILE -->
+      <div class="absolute top-14 left-3 z-20 flex flex-col gap-1.5 glass p-1 rounded-2xl border border-pink-200/80 shadow-lg">
+        <button onclick="changeZoom(0.15)" class="w-8 h-8 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-900 font-extrabold flex items-center justify-center text-base shadow active:scale-95" title="Zoom In">+</button>
+        <button onclick="changeZoom(-0.15)" class="w-8 h-8 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-900 font-extrabold flex items-center justify-center text-base shadow active:scale-95" title="Zoom Out">-</button>
+        <button onclick="resetZoom()" class="w-8 h-8 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-900 font-bold flex items-center justify-center text-[10px] shadow active:scale-95" title="Reset Zoom">100%</button>
+      </div>
+
       <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2">
-        <button onclick="triggerJump()" class="action-btn px-2 py-0.5 rounded-xl text-xs font-black text-pink-800 flex items-center gap-1">
-          <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5 text-pink-600"></i>
-          <span class="hidden sm:inline">Jump</span>
-        </button>
-        <span class="text-pink-300">|</span>
         <button onclick="triggerEmote('🌸')" class="hover:scale-125 transition text-lg">🌸</button>
         <button onclick="triggerEmote('❤️')" class="hover:scale-125 transition text-lg">❤️</button>
         <button onclick="triggerEmote('✨')" class="hover:scale-125 transition text-lg">✨</button>
@@ -294,7 +287,7 @@
       </div>
 
       <div class="absolute bottom-3 right-3 z-20 pointer-events-auto md:hidden">
-        <button onclick="triggerJump()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-xs font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white">
+        <button ontouchstart="triggerJump(); event.preventDefault();" onclick="triggerJump()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white text-xs font-black shadow-lg shadow-pink-300/60 active:scale-90 flex items-center justify-center border-2 border-white select-none">
           JUMP
         </button>
       </div>
@@ -315,14 +308,14 @@
       </div>
     </div>
 
-    <!-- SIDEBAR CHAT PANEL WITH PERSISTENT TABS -->
-    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute md:relative right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full md:translate-x-0 shadow-2xl md:shadow-none h-full">
+    <!-- SIDEBAR CHAT PANEL WITH PERSISTENT TABS (SLIDES IN/OUT ON PC AND MOBILE) -->
+    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full shadow-2xl h-full">
       <div class="p-3 border-b border-pink-200/30 bg-white/10 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-1 bg-pink-950/60 p-1 rounded-xl border border-pink-200/30">
           <button id="chat-tab-global" onclick="switchChatTab('global')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-pink-500 text-white transition">Global Lounge</button>
           <button id="chat-tab-staff" onclick="switchChatTab('staff')" class="hidden px-2.5 py-1 rounded-lg text-xs font-bold text-pink-300 hover:text-white transition">Staff Group</button>
         </div>
-        <button onclick="toggleChatSidebar()" class="md:hidden text-pink-300 hover:text-white p-1">
+        <button onclick="toggleChatSidebar()" class="text-pink-300 hover:text-white p-1">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -355,7 +348,7 @@
           <div class="p-2 rounded-xl bg-pink-500 text-white"><i data-lucide="shopping-bag" class="w-5 h-5"></i></div>
           <div>
             <h3 class="font-extrabold text-pink-950 text-base sm:text-lg">Slime Market</h3>
-            <p class="text-[10px] text-pink-600">Buy exclusive accessories, skins, titles & animated emotes!</p>
+            <p class="text-[10px] text-pink-600">Buy exclusive hats, skins, titles & animated emotes!</p>
           </div>
         </div>
         <button onclick="closeMarketModal()" class="text-pink-700 hover:text-pink-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -365,17 +358,17 @@
         <div class="bg-pink-100/70 border border-pink-200 rounded-2xl p-3 flex flex-col items-center justify-center relative">
           <span class="text-[10px] font-bold text-pink-700 uppercase tracking-wider mb-1">Live Test Preview</span>
           <canvas id="marketPreviewCanvas" width="180" height="150" class="bg-pink-900/10 rounded-xl border border-pink-300 shadow-inner"></canvas>
-          <div id="market-special-preview" class="hidden w-[180px] h-[150px] rounded-xl border border-pink-200 bg-gradient-to-br from-white via-pink-50 to-rose-100 shadow-inner flex-col items-center justify-center gap-2 p-3"></div>
-          <p id="market-item-preview-name" class="text-xs font-bold text-pink-950 mt-2 text-center">Preview: Select an item</p>
+          <p id="market-item-preview-name" class="text-xs font-bold text-pink-950 mt-2 text-center">Testing: Select Item</p>
         </div>
 
         <div class="md:col-span-2 flex flex-col overflow-hidden">
           <div class="mb-2 flex gap-2 shrink-0">
-            <input id="market-search-input" type="search" oninput="renderMarketGrid()" placeholder="Search market items..." class="glass-input flex-1 rounded-xl px-3 py-2 text-xs text-pink-950" />
+            <input id="market-search-input" type="search" oninput="renderMarketGrid()" placeholder="Search all market items..." class="glass-input flex-1 rounded-xl px-3 py-2 text-xs text-pink-950" />
             <button type="button" onclick="renderMarketGrid()" class="rounded-xl bg-pink-500 px-3 text-xs font-bold text-white"><i data-lucide="search" class="h-4 w-4"></i></button>
           </div>
           <div class="flex items-center gap-1 border-b border-pink-200 pb-2 overflow-x-auto shrink-0">
-            <button onclick="filterMarketCategory('accessories')" id="mcat-accessories" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-active">Hats</button>
+            <button onclick="filterMarketCategory('all')" id="mcat-all" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-active">All</button>
+            <button onclick="filterMarketCategory('accessories')" id="mcat-accessories" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Hats</button>
             <button onclick="filterMarketCategory('skins')" id="mcat-skins" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Skins</button>
             <button onclick="filterMarketCategory('titles')" id="mcat-titles" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Titles</button>
             <button onclick="filterMarketCategory('emotes')" id="mcat-emotes" class="px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive">Emotes</button>
@@ -427,7 +420,7 @@
 
           <div class="flex items-center gap-1 overflow-x-auto pb-2 shrink-0" id="inventory-category-tabs">
             <button onclick="filterInventoryCategory('skins')" id="icat-skins" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-active">Skins</button>
-            <button onclick="filterInventoryCategory('accessories')" id="icat-accessories" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-inactive">Accessories</button>
+            <button onclick="filterInventoryCategory('accessories')" id="icat-accessories" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-inactive">Hats</button>
             <button onclick="filterInventoryCategory('titles')" id="icat-titles" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-inactive">Titles</button>
             <button onclick="filterInventoryCategory('profile')" id="icat-profile" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-inactive">Profile</button>
             <button onclick="filterInventoryCategory('emotes')" id="icat-emotes" class="px-2.5 py-1 rounded-xl text-[10px] font-bold tab-inactive">Emotes</button>
@@ -557,11 +550,14 @@
       <p id="notice-board-status" class="py-2 text-xs text-amber-900"></p>
       <div id="notice-board-list" class="flex-1 overflow-y-auto space-y-2"></div>
       <form id="notice-post-form" onsubmit="postNotice(event)" class="hidden mt-4 space-y-2 border-t border-amber-200 pt-3">
-        <p class="text-[10px] font-extrabold uppercase text-amber-800">Admin / developer post</p>
+        <p class="text-[10px] font-extrabold uppercase text-amber-800" id="notice-form-header">Admin / developer post</p>
         <input id="notice-title-input" maxlength="80" required placeholder="Notice title" class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950" />
         <input id="notice-recipient-input" type="email" placeholder="Recipient email (blank = everyone)" class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950" />
         <textarea id="notice-body-input" maxlength="1200" required rows="3" placeholder="Write a notice for players..." class="glass-input w-full rounded-xl px-3 py-2 text-xs text-pink-950"></textarea>
-        <button type="submit" class="rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white">Post notice</button>
+        <div class="flex gap-2">
+          <button type="submit" id="notice-submit-btn" class="flex-1 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white">Post notice</button>
+          <button type="button" id="notice-cancel-btn" onclick="cancelNoticeEdit()" class="hidden rounded-xl bg-slate-300 px-3 py-2 text-xs font-bold text-slate-800">Cancel</button>
+        </div>
       </form>
     </div>
   </div>
@@ -579,16 +575,19 @@
       </div>
       <p id="staff-panel-status" class="text-[10px] text-slate-600 pb-2 shrink-0">Search requires a signed-in staff account.</p>
       <div id="staff-user-results" class="max-h-[30dvh] overflow-y-auto space-y-2"></div>
+      
+      <!-- MULTI-FILE LOBBY MUSIC PLAYLIST UPLOADER -->
       <div class="mt-3 border-t border-slate-200 pt-3 shrink-0">
-        <p class="text-[10px] font-extrabold uppercase tracking-wide text-slate-700">Lobby Music Stream (Synced File Upload)</p>
+        <p class="text-[10px] font-extrabold uppercase tracking-wide text-slate-700">Lobby Music Playlist (Add Multiple Tracks)</p>
         <div class="mt-2 flex flex-col gap-2">
           <div class="flex gap-2 items-center">
-            <input id="lobby-music-file" type="file" accept="audio/*" class="block w-full text-[10px] text-slate-700 file:mr-2 file:rounded-lg file:border-0 file:bg-cyan-700 file:px-3 file:py-1.5 file:text-[10px] file:font-bold file:text-white" />
-            <button onclick="uploadLobbyMusicFile()" class="rounded-xl bg-purple-700 px-3 py-2 text-[10px] font-bold text-white shrink-0">Upload & Sync</button>
-            <button onclick="clearLobbyMusic()" class="rounded-xl bg-slate-500 px-3 py-2 text-[10px] font-bold text-white shrink-0">Clear</button>
+            <input id="lobby-music-file" type="file" accept="audio/*" multiple class="block w-full text-[10px] text-slate-700 file:mr-2 file:rounded-lg file:border-0 file:bg-cyan-700 file:px-3 file:py-1.5 file:text-[10px] file:font-bold file:text-white" />
+            <button onclick="uploadLobbyMusicFile()" class="rounded-xl bg-purple-700 px-3 py-2 text-[10px] font-bold text-white shrink-0">Add to Playlist</button>
+            <button onclick="clearLobbyMusic()" class="rounded-xl bg-slate-500 px-3 py-2 text-[10px] font-bold text-white shrink-0">Clear All</button>
           </div>
         </div>
-        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Audio plays and syncs across the entire lobby for all users.</p>
+        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Audio plays sequentially and syncs across the lobby. Tracks replay automatically!</p>
+        <div id="playlist-preview-list" class="mt-2 max-h-20 overflow-y-auto space-y-1 text-[10px] font-semibold text-slate-700"></div>
       </div>
     </div>
   </div>
@@ -661,7 +660,7 @@
 
     // GAME CATALOG DATA
     const PROFILE_STICKERS = [
-      { id: 'pfp_sakura', name: 'Sakura Blossom', icon: '🌸', price: 0, desc: 'Your complimentary blossom profile sticker' },
+      { id: 'pfp_sakura', name: 'Sakura Blossom', icon: '🌸', price: 500, desc: 'A blossom for your profile' },
       { id: 'pfp_cat', name: 'Sakura Cat', icon: '🐱', price: 1200, desc: 'A little lucky cat' },
       { id: 'pfp_fox', name: 'Clever Fox', icon: '🦊', price: 2500, desc: 'A bright fox sticker' },
       { id: 'pfp_crown', name: 'Royal Crown', icon: '👑', price: 4000, desc: 'A tiny royal crown' },
@@ -680,7 +679,7 @@
       accessories: [
         { id: 'acc_tophat', name: 'Fancy Tophat', type: 'accessories', price: 1500, icon: '🎩', desc: 'Classic black dapper hat' },
         { id: 'acc_bowtie', name: 'Red Bowtie', type: 'accessories', price: 3000, icon: '🎀', desc: 'Cute red bowtie' },
-        { id: 'acc_bunny', name: 'Bunny Ears', type: 'accessories', price: 5000, icon: '🐰', desc: 'Fluffy bunny ears' },
+        { id: 'acc_bunny', name: 'Bunny Ears', type: 'accessories', price: 5000, icon: '🐰', desc: 'Fluffy bunny ears on your slime' },
         { id: 'acc_crown', name: 'Royal Crown', type: 'accessories', price: 10000, icon: '👑', desc: 'Sparkling monarch crown' }
       ],
       titles: [
@@ -689,7 +688,7 @@
         { id: 'title_king', name: 'Slime King', type: 'titles', price: 10000, text: '👑 Slime King', color: '#fbbf24', desc: 'Royalty status tag' }
       ],
       emotes: [
-        { id: 'emote_dance', name: 'Dance Emote', type: 'emotes', price: 5000, anim: 'dance', icon: '💃', desc: 'Looping dance bounce animation' },
+        { id: 'emote_dance', name: 'Groovy Disco Dance', type: 'emotes', price: 5000, anim: 'dance', icon: '💃', desc: 'Groovy side-sway bounce with sparkles!' },
         { id: 'emote_bounce', name: 'Non-Stop Jump', type: 'emotes', price: 7500, anim: 'jump_loop', icon: '🦘', desc: 'Endless bounce jump emote' },
         { id: 'emote_spin', name: 'Spinning Whirl', type: 'emotes', price: 10000, anim: 'spin', icon: '🌀', desc: 'Rapid slime rotation' }
       ],
@@ -706,13 +705,6 @@
       ]
     };
     const PROFILE_PFP_OPTIONS = PROFILE_STICKERS.map(item => item.icon);
-    function normalizeInventory(items) {
-      const validItems = new Set([].concat(...Object.values(MARKET_ITEMS)).map(item => item.id));
-      const inventory = Array.isArray(items) ? items.filter(id => validItems.has(id)) : [];
-      if (!inventory.includes('skin_pink')) inventory.push('skin_pink');
-      if (!inventory.includes('pfp_sakura')) inventory.push('pfp_sakura');
-      return Array.from(new Set(inventory));
-    }
     const ROLE_ITEMS = {
       admin: [
         { id: 'skin_admin', name: 'Obsidian Red Aura', type: 'skins', price: 0, color: '#111118', desc: 'Admin role skin with red glow' },
@@ -747,7 +739,7 @@
       equippedSkin: localStorage.getItem('sakura_eq_skin') || 'skin_pink',
       equippedAcc: localStorage.getItem('sakura_eq_acc') || null,
       equippedTitle: localStorage.getItem('sakura_eq_title') || null,
-      inventory: normalizeInventory(loadStoredJson('sakura_inv', ['skin_pink', 'pfp_sakura'])),
+      inventory: loadStoredJson('sakura_inv', ['skin_pink', 'pfp_sakura']),
       role: 'player',
       equippedEmote: localStorage.getItem('sakura_eq_emote') || null,
       equippedMessageCard: localStorage.getItem('sakura_eq_message_card') || null,
@@ -763,7 +755,8 @@
       direction: 'down'
     };
 
-    localPlayer.inventory = normalizeInventory(localPlayer.inventory);
+    if (!Array.isArray(localPlayer.inventory)) localPlayer.inventory = ['skin_pink', 'pfp_sakura'];
+    if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
     if (!PROFILE_PFP_OPTIONS.includes(localPlayer.pfp)) localPlayer.pfp = '🌸';
     localStorage.setItem('sakura_inv', JSON.stringify(localPlayer.inventory));
 
@@ -798,18 +791,29 @@
     let moderationPollTimer = null;
     let moderationState = { is_banned: false, mute_until: null, ban_until: null };
 
+    // ZOOM CONTROL STATE
+    let zoomLevel = 1.0;
+    function changeZoom(delta) {
+      zoomLevel = Math.max(0.5, Math.min(2.2, zoomLevel + delta));
+    }
+    function resetZoom() {
+      zoomLevel = 1.0;
+    }
+
     // INPUT & CONTROLS
     const keys = { up: false, down: false, left: false, right: false };
     const joystick = { active: false, dx: 0, dy: 0 };
     let camera = { x: 0, y: 0 };
 
-    // AUDIO SYSTEM
+    // AUDIO PLAYLIST SYSTEM (MULTI-FILE PLAYLIST & REPLAY)
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     let musicPlaying = false;
     let musicTimer = null;
     let musicNoteIndex = 0;
-    let lobbyMusicUrl = '';
+    let musicPlaylist = []; // Array of audio DataURLs or URLs
+    let musicPlaylistIndex = 0;
+    let musicUploaderUserId = null; // ID of staff member who uploaded song
     let lobbyAudio = null;
     const musicNotes = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46];
 
@@ -849,28 +853,43 @@
       playTone(frequency, .34, .018, 'triangle');
     }
 
+    function playPlaylistCurrentTrack() {
+      if (!musicPlaying || !musicPlaylist.length) return;
+      if (lobbyAudio) { lobbyAudio.pause(); lobbyAudio = null; }
+      
+      const trackUrl = musicPlaylist[musicPlaylistIndex % musicPlaylist.length];
+      lobbyAudio = new Audio(trackUrl);
+      lobbyAudio.volume = .4;
+      lobbyAudio.onended = () => {
+        if (musicPlaying && musicPlaylist.length > 0) {
+          musicPlaylistIndex = (musicPlaylistIndex + 1) % musicPlaylist.length;
+          playPlaylistCurrentTrack();
+        }
+      };
+      lobbyAudio.play().catch(() => {
+        musicPlaying = false;
+        const icon = document.getElementById('music-icon');
+        if (icon) icon.setAttribute('data-lucide', 'music');
+        lucide.createIcons();
+      });
+    }
+
     function toggleBackgroundMusic() {
       musicPlaying = !musicPlaying;
       const icon = document.getElementById('music-icon');
       if (musicPlaying) {
-        icon.setAttribute('data-lucide', 'volume-2');
-        if (lobbyMusicUrl) {
-          if (!lobbyAudio || lobbyAudio.src !== lobbyMusicUrl) { 
-            if (lobbyAudio) lobbyAudio.pause(); 
-            lobbyAudio = new Audio(lobbyMusicUrl); 
-            lobbyAudio.loop = true; 
-            lobbyAudio.volume = .4; 
-          }
-          lobbyAudio.play().catch(() => { musicPlaying = false; icon.setAttribute('data-lucide', 'music'); lucide.createIcons(); });
+        if (icon) icon.setAttribute('data-lucide', 'volume-2');
+        if (musicPlaylist.length > 0) {
+          playPlaylistCurrentTrack();
         } else if (initAudio()) { 
           playNextMusicNote(); 
           musicTimer = window.setInterval(playNextMusicNote, 420); 
         } else { 
           musicPlaying = false; 
-          icon.setAttribute('data-lucide', 'music'); 
+          if (icon) icon.setAttribute('data-lucide', 'music'); 
         }
       } else {
-        icon.setAttribute('data-lucide', 'music'); 
+        if (icon) icon.setAttribute('data-lucide', 'music'); 
         window.clearInterval(musicTimer); 
         musicTimer = null;
         if (lobbyAudio) lobbyAudio.pause();
@@ -878,55 +897,110 @@
       lucide.createIcons();
     }
 
-    function setLobbyMusicUrl(value) {
-      const nextUrl = typeof value === 'string' && (value.startsWith('data:audio') || /^https:\/\//i.test(value)) ? value : '';
-      if (nextUrl === lobbyMusicUrl) return;
-      lobbyMusicUrl = nextUrl;
+    function setLobbyMusicPlaylist(playlistData, uploaderId = null) {
+      if (Array.isArray(playlistData)) {
+        musicPlaylist = playlistData;
+      } else if (typeof playlistData === 'string' && playlistData.length > 0) {
+        musicPlaylist = [playlistData];
+      } else {
+        musicPlaylist = [];
+      }
+      musicPlaylistIndex = 0;
+      if (uploaderId) musicUploaderUserId = uploaderId;
+
       if (lobbyAudio) { lobbyAudio.pause(); lobbyAudio = null; }
       window.clearInterval(musicTimer); musicTimer = null;
-      if (musicPlaying && lobbyMusicUrl) {
-        lobbyAudio = new Audio(lobbyMusicUrl); lobbyAudio.loop = true; lobbyAudio.volume = .4;
-        lobbyAudio.play().catch(() => { musicPlaying = false; });
-      } else if (musicPlaying && initAudio()) {
-        playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420);
+
+      if (musicPlaying) {
+        if (musicPlaylist.length > 0) {
+          playPlaylistCurrentTrack();
+        } else if (initAudio()) {
+          playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420);
+        }
       }
+      renderPlaylistPreview();
     }
 
     async function loadLobbyMusic() {
       const { data, error } = await supabaseClient.rpc('get_lobby_music');
-      if (!error && data) setLobbyMusicUrl(data);
+      if (!error && data) {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed && Array.isArray(parsed.playlist)) {
+            setLobbyMusicPlaylist(parsed.playlist, parsed.uploaderId);
+          } else {
+            setLobbyMusicPlaylist(data);
+          }
+        } catch(e) {
+          setLobbyMusicPlaylist(data);
+        }
+      }
+    }
+
+    function renderPlaylistPreview() {
+      const list = document.getElementById('playlist-preview-list');
+      if (!list) return;
+      list.replaceChildren();
+      if (!musicPlaylist.length) {
+        list.textContent = 'Playlist empty.';
+        return;
+      }
+      musicPlaylist.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'flex items-center justify-between bg-slate-100 p-1.5 rounded-lg';
+        itemDiv.innerHTML = `<span>🎵 Track ${index + 1}</span> <span class="text-[9px] text-cyan-800">${index === musicPlaylistIndex && musicPlaying ? '▶ Playing' : ''}</span>`;
+        list.appendChild(itemDiv);
+      });
     }
 
     function uploadLobbyMusicFile() {
       if (!['admin', 'developer'].includes(localPlayer.role)) return;
       const fileInput = document.getElementById('lobby-music-file');
-      const file = fileInput.files && fileInput.files[0];
-      if (!file) {
-        document.getElementById('lobby-music-status').textContent = 'Please select an MP3/Audio file first.';
+      const files = fileInput.files;
+      if (!files || files.length === 0) {
+        document.getElementById('lobby-music-status').textContent = 'Please select audio file(s) first.';
         return;
       }
-      if (file.size > 8 * 1024 * 1024) {
-        document.getElementById('lobby-music-status').textContent = 'File too large! Max 8MB.';
-        return;
+
+      let loadedCount = 0;
+      const totalFiles = files.length;
+      const newTracks = [];
+
+      for (let i = 0; i < totalFiles; i++) {
+        const file = files[i];
+        if (file.size > 8 * 1024 * 1024) {
+          alert(`File ${file.name} is larger than 8MB and was skipped.`);
+          loadedCount++;
+          continue;
+        }
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          newTracks.push(e.target.result);
+          loadedCount++;
+          if (loadedCount === totalFiles) {
+            const updatedPlaylist = [...musicPlaylist, ...newTracks];
+            musicUploaderUserId = localPlayer.id;
+            setLobbyMusicPlaylist(updatedPlaylist, localPlayer.id);
+
+            const payloadStr = JSON.stringify({ playlist: updatedPlaylist, uploaderId: localPlayer.id });
+            await supabaseClient.rpc('set_lobby_music', { p_music_url: payloadStr });
+            sendSocialBroadcast('lobby_music_update', { payloadStr });
+
+            document.getElementById('lobby-music-status').textContent = `${newTracks.length} track(s) added to synced playlist!`;
+            if (!musicPlaying) toggleBackgroundMusic();
+          }
+        };
+        reader.readAsDataURL(file);
       }
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const audioData = e.target.result;
-        setLobbyMusicUrl(audioData);
-        await supabaseClient.rpc('set_lobby_music', { p_music_url: audioData });
-        sendSocialBroadcast('lobby_music_update', { url: audioData });
-        document.getElementById('lobby-music-status').textContent = 'Uploaded MP3 actively synced & playing for the lobby!';
-        if (!musicPlaying) toggleBackgroundMusic();
-      };
-      reader.readAsDataURL(file);
     }
 
     async function clearLobbyMusic() {
       if (!['admin', 'developer'].includes(localPlayer.role)) return;
       await supabaseClient.rpc('set_lobby_music', { p_music_url: '' });
-      setLobbyMusicUrl('');
-      sendSocialBroadcast('lobby_music_update', { url: '' });
-      document.getElementById('lobby-music-status').textContent = 'Lobby music cleared.';
+      musicUploaderUserId = null;
+      setLobbyMusicPlaylist([]);
+      sendSocialBroadcast('lobby_music_update', { payloadStr: '' });
+      document.getElementById('lobby-music-status').textContent = 'Lobby playlist cleared.';
     }
 
     // CANVAS & GRAPHICS ENGINE
@@ -945,16 +1019,19 @@
       const labelY = player.y + (isSelf ? 34 : 32);
       const avatarUrl = safeAvatarUrl(player.avatarUrl);
       const role = player.role === 'developer' ? 'developer' : player.role === 'admin' ? 'admin' : 'player';
-      const roleTag = role === 'developer' ? ' · DEV' : role === 'admin' ? ' · ADMIN' : '';
+      
+      // Admin tag fix: "when admin unequips the title of admin and write in global chat or staff chat dont Show the Admin tag"
+      const roleTitleEquipped = (role === 'developer' && player.equippedTitle === 'title_developer') || (role === 'admin' && player.equippedTitle === 'title_admin');
+      const roleTag = roleTitleEquipped ? (role === 'developer' ? ' · DEV' : ' · ADMIN') : '';
+      
       c.font = isSelf ? 'bold 12px Plus Jakarta Sans' : 'bold 11px Plus Jakarta Sans';
       c.textAlign = 'center';
       c.lineWidth = 3;
       c.strokeStyle = 'rgba(38, 18, 35, .72)';
-      const roleTitleEquipped = (role === 'developer' && player.equippedTitle === 'title_developer') || (role === 'admin' && player.equippedTitle === 'title_admin');
       c.fillStyle = roleTitleEquipped && role === 'developer' ? '#a5f3fc' : roleTitleEquipped && role === 'admin' ? '#fda4af' : isSelf ? '#f472b6' : '#ffffff';
       c.shadowColor = roleTitleEquipped && role === 'developer' ? '#67e8f9' : roleTitleEquipped && role === 'admin' ? '#ef4444' : 'transparent';
       c.shadowBlur = roleTitleEquipped ? 12 : 0;
-      const text = `${player.name || 'Slime'}${isSelf ? ' (You)' : ''}${roleTitleEquipped ? roleTag : (role === 'developer' ? ' · DEV' : role === 'admin' ? ' · ADMIN' : '')}`;
+      const text = `${player.name || 'Slime'}${isSelf ? ' (You)' : ''}${roleTag}`;
       
       if (avatarUrl) {
         let avatar = profileAvatarCache.get(avatarUrl);
@@ -983,33 +1060,47 @@
       const moving = isSelf ? Math.min(1, Math.hypot(localPlayer.vx, localPlayer.vy) / 190) : Math.min(1, motionSpeed / 190);
       const squash = isSelf ? localPlayer.landingSquash : 0;
       const walkHop = Math.abs(Math.sin(phase * 1.65)) * moving * 4.8;
-      c.translate(x + Math.sin(phase * .8) * moving * 1.5, y - jumpOff - walkHop + Math.sin(phase) * (moving ? 1.1 : 0.45));
-      const motionXValue = isSelf ? localPlayer.vx : motionX;
-      if (moving) c.rotate(Math.max(-.08, Math.min(.08, motionXValue / 2500)));
+      
+      let extraX = 0;
+      let extraY = 0;
+      let extraRotation = 0;
 
+      // Improved Dance Emote: Groovy side-sway bounce with rhythmic tilt and sparkles!
       if (activeEmoteAnim === 'dance') {
-        c.translate(0, Math.sin(Date.now() * 0.01) * 8);
+        const danceTime = Date.now() * 0.008;
+        extraX = Math.sin(danceTime) * 12;
+        extraY = -Math.abs(Math.cos(danceTime * 2)) * 10;
+        extraRotation = Math.sin(danceTime) * 0.22;
       } else if (activeEmoteAnim === 'spin') {
-        c.rotate((Date.now() * 0.008) % (Math.PI * 2));
+        extraRotation = (Date.now() * 0.008) % (Math.PI * 2);
       } else if (activeEmoteAnim === 'jump_loop') {
-        c.translate(0, -Math.abs(Math.sin(Date.now() * 0.008) * 20));
+        extraY = -Math.abs(Math.sin(Date.now() * 0.008) * 20);
       }
+
+      c.translate(x + Math.sin(phase * .8) * moving * 1.5 + extraX, y - jumpOff - walkHop + Math.sin(phase) * (moving ? 1.1 : 0.45) + extraY);
+      const motionXValue = isSelf ? localPlayer.vx : motionX;
+      if (moving) c.rotate(Math.max(-.08, Math.min(.08, motionXValue / 2500)) + extraRotation);
+      else if (extraRotation !== 0) c.rotate(extraRotation);
 
       const skinObj = MARKET_ITEMS.skins.find(s => s.id === skinId) || MARKET_ITEMS.skins[0];
       const specialRoleSkin = (role === 'developer' && skinId === 'skin_developer') || (role === 'admin' && skinId === 'skin_admin');
-      const isSpinning = activeEmoteAnim === 'spin';
       const roleColor = specialRoleSkin ? (role === 'developer' ? '#f8fafc' : '#111118') : skinObj.color;
-      c.shadowColor = isSpinning ? 'transparent' : specialRoleSkin ? (role === 'developer' ? '#7dd3fc' : '#ef4444') : skinObj.shadow || 'transparent';
-      c.shadowBlur = isSpinning ? 0 : specialRoleSkin ? 24 : skinId === 'skin_golden' || skinId === 'skin_midnight' ? 14 : skinId === 'skin_matcha' ? 8 : 3;
-      if (!isSpinning) {
+      
+      // Spinning emote shadow requirement: "in the spining emote dont show the shadow at all"
+      if (activeEmoteAnim !== 'spin') {
+        c.shadowColor = specialRoleSkin ? (role === 'developer' ? '#7dd3fc' : '#ef4444') : skinObj.shadow || 'transparent';
+        c.shadowBlur = specialRoleSkin ? 24 : skinId === 'skin_golden' || skinId === 'skin_midnight' ? 14 : skinId === 'skin_matcha' ? 8 : 3;
         c.fillStyle = 'rgba(0,0,0,0.22)';
         c.beginPath();
         c.ellipse(0, 18 + jumpOff, 22, 8, 0, 0, Math.PI * 2);
         c.fill();
+      } else {
+        c.shadowColor = 'transparent';
+        c.shadowBlur = 0;
       }
 
-      const scaleX = 1 + moving * .045 + squash * .24 - (isJumping ? .035 : 0);
-      const scaleY = 1 - moving * .04 - squash * .25 + (isJumping ? .06 : 0);
+      const scaleX = 1 + moving * .045 + squash * .24 - (isJumping ? .035 : 0) + (activeEmoteAnim === 'dance' ? Math.sin(Date.now() * 0.016) * 0.08 : 0);
+      const scaleY = 1 - moving * .04 - squash * .25 + (isJumping ? .06 : 0) - (activeEmoteAnim === 'dance' ? Math.sin(Date.now() * 0.016) * 0.08 : 0);
       c.save();
       c.scale(scaleX, scaleY);
       const slimeGradient = c.createRadialGradient(-8, -10, 2, 0, 0, 29);
@@ -1037,10 +1128,38 @@
       c.arc(11, 3, 3, 0, Math.PI * 2);
       c.fill();
 
+      // Bunny ears custom rendering: "bunny ears are not bunnears in market its a bunny sticker only near the ears and a bit bigger ones on the slime"
       if (accId) {
-        const accObj = MARKET_ITEMS.accessories.find(a => a.id === accId);
-        if (accObj) { c.font = '20px sans-serif'; c.textAlign = 'center'; c.fillText(accObj.icon, 0, -18); }
+        if (accId === 'acc_bunny') {
+          // Render fluffy, bigger bunny ears on top of slime
+          c.fillStyle = '#ffffff';
+          c.strokeStyle = '#f472b6';
+          c.lineWidth = 2;
+          
+          // Left Ear
+          c.beginPath();
+          c.ellipse(-10, -26, 6, 16, -0.2, 0, Math.PI * 2);
+          c.fill(); c.stroke();
+          c.fillStyle = '#fbcfe8';
+          c.beginPath();
+          c.ellipse(-10, -26, 3, 10, -0.2, 0, Math.PI * 2);
+          c.fill();
+
+          // Right Ear
+          c.fillStyle = '#ffffff';
+          c.beginPath();
+          c.ellipse(10, -26, 6, 16, 0.2, 0, Math.PI * 2);
+          c.fill(); c.stroke();
+          c.fillStyle = '#fbcfe8';
+          c.beginPath();
+          c.ellipse(10, -26, 3, 10, 0.2, 0, Math.PI * 2);
+          c.fill();
+        } else {
+          const accObj = MARKET_ITEMS.accessories.find(a => a.id === accId);
+          if (accObj) { c.font = '20px sans-serif'; c.textAlign = 'center'; c.fillText(accObj.icon, 0, -18); }
+        }
       }
+
       if (titleId) {
         let titleObj = MARKET_ITEMS.titles.find(t => t.id === titleId);
         if (!titleObj && role === 'admin') titleObj = ROLE_ITEMS.admin.find(t => t.id === titleId);
@@ -1054,6 +1173,14 @@
         }
       }
       c.restore();
+
+      // Dance Emote sparkles
+      if (activeEmoteAnim === 'dance') {
+        c.font = '12px sans-serif';
+        c.fillText('✨', -24, -20 + Math.sin(Date.now() * 0.01) * 4);
+        c.fillText('✨', 18, -22 + Math.cos(Date.now() * 0.01) * 4);
+      }
+
       c.restore();
     }
 
@@ -1086,53 +1213,109 @@
       c.restore();
     }
 
-    function drawStone(c, x, y, rx, ry, onsen = false) {
-      c.save(); c.fillStyle='rgba(47,37,43,.16)'; c.beginPath(); c.ellipse(x+4,y+ry*.72,rx*.92,ry*.36,-.08,0,Math.PI*2); c.fill();
-      const colors=onsen?['#aaa99d','#737a70','#47524c']:['#d0c4c0','#999190','#696968'];
-      const g=c.createLinearGradient(x-rx,y-ry,x+rx,y+ry);g.addColorStop(0,colors[0]);g.addColorStop(.55,colors[1]);g.addColorStop(1,colors[2]);c.fillStyle=g;
-      c.beginPath();c.moveTo(x-rx,y+ry*.25);c.quadraticCurveTo(x-rx*.92,y-ry*.62,x-rx*.22,y-ry*.88);c.quadraticCurveTo(x+rx*.72,y-ry*1.05,x+rx,y+ry*.12);c.quadraticCurveTo(x+rx*.72,y+ry*.88,x,y+ry);c.quadraticCurveTo(x-rx*.82,y+ry*.9,x-rx,y+ry*.25);c.closePath();c.fill();
-      c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=Math.max(1,rx*.07);c.beginPath();c.moveTo(x-rx*.55,y-ry*.15);c.quadraticCurveTo(x-rx*.12,y-ry*.7,x+rx*.4,y-ry*.48);c.stroke();c.restore();
-    }
-    function drawStoneCluster(c,x,y,s=1,onsen=false){drawStone(c,x,y,27*s,16*s,onsen);drawStone(c,x-27*s,y+10*s,18*s,12*s,onsen);drawStone(c,x+29*s,y+11*s,20*s,12*s,onsen);}
-    function drawKoi(c,x,y,s,angle,color){
-      c.save();c.translate(x,y);c.rotate(angle);c.scale(s,s);c.fillStyle=color;c.beginPath();c.moveTo(-11,0);c.lineTo(-23,-8);c.lineTo(-20,0);c.lineTo(-23,8);c.closePath();c.fill();c.beginPath();c.ellipse(0,0,14,7,0,0,Math.PI*2);c.fill();
-      c.fillStyle='#fff8eb';c.beginPath();c.ellipse(-2,0,8,6,0,0,Math.PI*2);c.fill();c.fillStyle=color;c.beginPath();c.ellipse(5,-1,4.5,5,-.2,0,Math.PI*2);c.fill();c.fillStyle='#263238';c.beginPath();c.arc(10,-2,1.3,0,Math.PI*2);c.fill();c.restore();
-    }
-    function drawKoiPond(c,x,y,rx,ry,now,count=3){for(let i=0;i<count;i++){const a=now*.00032+i*2.15,fx=x+Math.sin(a)*rx*(.38+(i%2)*.08),fy=y+Math.cos(a*.77)*ry*.34;drawKoi(c,fx,fy,.78+(i%2)*.18,Math.cos(a)*.45,['#f97316','#f8fafc','#fda4af'][i%3]);if(i===1){c.strokeStyle='rgba(255,255,255,.48)';c.lineWidth=2;c.beginPath();c.ellipse(fx,fy+11,15+Math.sin(now*.003)*2,4,0,0,Math.PI*2);c.stroke();}}}
-    function drawFallingLeaf(c,x,y,s,angle,color){
-      const pts=[[0,-1],[.2,-.48],[.82,-.74],[.62,-.1],[1,0],[.48,.22],[.56,.78],[0,.46],[-.56,.78],[-.48,.22],[-1,0],[-.62,-.1],[-.82,-.74],[-.2,-.48]];
-      c.save();c.translate(x,y);c.rotate(angle);c.scale(s,s);c.globalAlpha=.82;c.fillStyle=color;c.beginPath();c.moveTo(pts[0][0],pts[0][1]);pts.slice(1).forEach(q=>c.lineTo(q[0],q[1]));c.closePath();c.fill();c.strokeStyle='rgba(120,45,38,.46)';c.lineWidth=.09;c.beginPath();c.moveTo(0,-.68);c.lineTo(0,.72);c.stroke();c.restore();
-    }
-    function drawBamboo(c,x,y,s=1){
-      c.save();c.lineCap='round';for(let i=0;i<4;i++){const bx=x+(i-1.5)*12*s;c.strokeStyle='#56785b';c.lineWidth=7*s;c.beginPath();c.moveTo(bx,y);c.quadraticCurveTo(bx+(i%2?5:-5)*s,y-74*s,bx,y-138*s);c.stroke();
-      c.strokeStyle='rgba(219,239,192,.55)';c.lineWidth=1.4*s;for(let n=1;n<=4;n++){const ny=y-n*28*s;c.beginPath();c.moveTo(bx-5*s,ny);c.lineTo(bx+5*s,ny);c.stroke();}
-      c.fillStyle=i%2?'#769b68':'#638b63';for(let n=0;n<3;n++){const ly=y-(75+n*19)*s,side=n%2?-1:1;c.beginPath();c.ellipse(bx+side*16*s,ly,21*s,5*s,side*-.35,0,Math.PI*2);c.fill();}}
-      c.restore();
-    }
-    function drawZoneDecorations(){
-      const garden=currentChannel==='sakura-lounge',now=Date.now();ctx.fillStyle=garden?'#f8e7ed':'#d8e2ca';ctx.fillRect(0,0,2100,2100);
-      if(garden){
-        ctx.fillStyle='rgba(255,255,255,.24)';ctx.fillRect(30,30,2040,2040);ctx.strokeStyle='rgba(214,169,184,.22)';ctx.lineWidth=2;
-        for(let n=0;n<=2100;n+=80){ctx.beginPath();ctx.moveTo(n,0);ctx.lineTo(n,2100);ctx.stroke();ctx.beginPath();ctx.moveTo(0,n);ctx.lineTo(2100,n);ctx.stroke();}
-        ctx.strokeStyle='#dfcba8';ctx.lineWidth=78;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(130,1120);ctx.bezierCurveTo(500,950,850,1060,1210,890);ctx.bezierCurveTo(1480,760,1720,520,1980,610);ctx.stroke();ctx.strokeStyle='rgba(255,255,255,.62)';ctx.lineWidth=5;ctx.setLineDash([4,24]);ctx.stroke();ctx.setLineDash([]);
-        const water=ctx.createRadialGradient(1410,385,25,1470,440,245);water.addColorStop(0,'#d7f5ef');water.addColorStop(.6,'#8dcdd0');water.addColorStop(1,'#5a9da7');ctx.fillStyle=water;ctx.beginPath();ctx.ellipse(1470,440,205,118,-.18,0,Math.PI*2);ctx.fill();
-        ctx.strokeStyle='#69979a';ctx.lineWidth=18;ctx.stroke();ctx.strokeStyle='rgba(250,255,249,.78)';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(1470,440,187,101,-.18,0,Math.PI*2);ctx.stroke();ctx.fillStyle='rgba(255,255,255,.62)';ctx.beginPath();ctx.ellipse(1415,405,52,15,-.22,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#6fa990';[[1532,398],[1382,475]].forEach(([x,y],i)=>{ctx.beginPath();ctx.ellipse(x,y,17,9,i*.6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff0a6';ctx.beginPath();ctx.arc(x+3,y-1,3,0,Math.PI*2);ctx.fill();ctx.fillStyle='#6fa990';});drawKoiPond(ctx,1470,440,205,118,now,3);
-        drawStoneCluster(ctx,1220,500,1.25);drawStoneCluster(ctx,1704,365,.95);drawStoneCluster(ctx,1555,586,.8);
-        const trees=[[240,250],[660,240],[1110,230],[1860,300],[270,740],[950,540],[1810,850],[380,1580],[880,1840],[1580,1660],[1880,1350]];
-        trees.forEach(([x,y],i)=>{ctx.fillStyle='rgba(69,49,48,.16)';ctx.beginPath();ctx.ellipse(x,y+20,42,14,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#815d52';ctx.fillRect(x-7,y-8,14,50);const cols=['#f7a9c4','#ffd0dc','#f58fb4','#e993b3'];[[-22,-25],[0,-39],[22,-25],[-12,-7],[14,-8],[2,-19]].forEach(([ox,oy],j)=>{ctx.fillStyle=cols[(i+j)%cols.length];ctx.beginPath();ctx.arc(x+ox,y+oy,16,0,Math.PI*2);ctx.fill();});ctx.fillStyle='#fff5c2';ctx.beginPath();ctx.arc(x,y-23,4,0,Math.PI*2);ctx.fill();});
-        [[510,510,1],[840,1390,.85],[1750,1150,1.1],[1250,1730,.9],[320,1780,.75]].forEach(([x,y,s])=>drawStoneCluster(ctx,x,y,s));
-        for(let i=0;i<38;i++){const y=(i*271+now*.045)%2100,x=(i*173+Math.sin(now*.001+i)*34+2100)%2100;ctx.save();ctx.translate(x,y);ctx.rotate((now*.001+i)%Math.PI);ctx.fillStyle=i%3===0?'rgba(255,208,220,.9)':'rgba(236,72,153,.55)';ctx.beginPath();ctx.ellipse(0,0,4,8,0,0,Math.PI*2);ctx.fill();ctx.restore();}
-        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(131,24,67,.64)';ctx.fillText('🌸 SAKURA ZEN GARDEN',75,78);ctx.font='13px Plus Jakarta Sans';ctx.fillStyle='rgba(131,24,67,.48)';ctx.fillText('Raked stone paths · koi pond · falling blossoms',77,101);
-      }else{
-        ctx.fillStyle='#c9ad7f';ctx.fillRect(120,520,1860,155);ctx.fillRect(930,120,155,1860);ctx.strokeStyle='rgba(255,244,210,.38)';ctx.lineWidth=3;
-        for(let x=140;x<1980;x+=80){ctx.beginPath();ctx.moveTo(x,525);ctx.lineTo(x,670);ctx.stroke();}for(let y=145;y<1980;y+=80){ctx.beginPath();ctx.moveTo(935,y);ctx.lineTo(1080,y);ctx.stroke();}
-        const water=ctx.createRadialGradient(1340,1160,25,1420,1260,340);water.addColorStop(0,'#c5eff0');water.addColorStop(.56,'#78bfc4');water.addColorStop(1,'#3e848f');ctx.fillStyle=water;ctx.beginPath();ctx.ellipse(1420,1260,280,190,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#667b63';ctx.lineWidth=30;ctx.stroke();ctx.strokeStyle='rgba(224,238,204,.76)';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(1420,1260,253,165,0,0,Math.PI*2);ctx.stroke();
-        ctx.strokeStyle='rgba(255,255,255,.42)';ctx.lineWidth=3;for(let i=0;i<4;i++){const r=28+i*17+Math.sin(now*.002+i)*3;ctx.beginPath();ctx.ellipse(1420,1255,r*1.6,r*.72,0,0,Math.PI*2);ctx.stroke();}ctx.fillStyle='rgba(255,255,255,.46)';ctx.beginPath();ctx.ellipse(1340,1196,70,18,-.18,0,Math.PI*2);ctx.fill();drawKoiPond(ctx,1420,1260,280,190,now,4);
-        [[1170,1090,1.3],[1665,1110,1.05],[1680,1390,1.3],[1210,1435,1.1],[1450,1018,.9],[1380,1480,.85],[1740,1235,.9]].forEach(([x,y,s])=>drawStoneCluster(ctx,x,y,s,true));drawBamboo(ctx,350,545,1.25);drawBamboo(ctx,1765,548,1.1);drawBamboo(ctx,420,1660,.85);drawBamboo(ctx,1900,1560,.9);
-        ctx.fillStyle='rgba(76,111,71,.72)';[[620,615],[740,605],[1180,520],[1500,570],[1820,680],[630,1640],[1115,1680],[1580,1720],[1860,1420]].forEach(([x,y],i)=>{ctx.save();ctx.translate(x,y);ctx.rotate(i*.7);ctx.beginPath();ctx.ellipse(0,0,25,7,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(10,-13,20,6,-.45,0,Math.PI*2);ctx.fill();ctx.restore();});
-        for(let i=0;i<34;i++){const y=(i*257+now*.052)%2100,x=(i*149+Math.sin(now*.0009+i*1.7)*44+2100)%2100;drawFallingLeaf(ctx,x,y,4+(i%4),Math.sin(now*.001+i)*.8,['#e68a64','#f2bf71','#cf6870','#e8a0a4'][i%4]);}
-        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(52,83,43,.72)';ctx.fillText('🎋 ONSEN SPRING',75,78);ctx.font='13px Plus Jakarta Sans';ctx.fillStyle='rgba(52,83,43,.55)';ctx.fillText('Warm mineral waters · koi · maple leaves',77,101);
+    function drawZoneDecorations() {
+      const garden = currentChannel === 'sakura-lounge';
+      ctx.fillStyle = garden ? '#f8e7ed' : '#c3d8a9';
+      ctx.fillRect(0, 0, 2100, 2100);
+
+      const time = Date.now();
+
+      if (garden) {
+        ctx.strokeStyle = 'rgba(214, 169, 184, .22)'; ctx.lineWidth = 2;
+        for (let n = 0; n <= 2100; n += 80) { ctx.beginPath(); ctx.moveTo(n, 0); ctx.lineTo(n, 2100); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, n); ctx.lineTo(2100, n); ctx.stroke(); }
+        ctx.strokeStyle = '#dfcba8'; ctx.lineWidth = 68; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(130, 1120); ctx.bezierCurveTo(500, 950, 850, 1060, 1210, 890); ctx.bezierCurveTo(1480, 760, 1720, 520, 1980, 610); ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,255,255,.58)'; ctx.lineWidth = 5; ctx.setLineDash([4, 24]); ctx.stroke(); ctx.setLineDash([]);
+
+        // Stones in Zen Garden
+        const gardenStones = [[350, 450, 22], [420, 480, 16], [1200, 750, 28], [1260, 720, 18], [750, 1400, 24], [820, 1450, 15], [1650, 1200, 30]];
+        gardenStones.forEach(([sx, sy, sr]) => {
+          ctx.fillStyle = '#b0a8a0';
+          ctx.beginPath(); ctx.ellipse(sx, sy, sr, sr * 0.7, 0.3, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#c8c2bc';
+          ctx.beginPath(); ctx.ellipse(sx - 3, sy - 3, sr * 0.6, sr * 0.4, 0.3, 0, Math.PI * 2); ctx.fill();
+        });
+
+        // Pond with fishes
+        ctx.fillStyle = '#a9dce2'; ctx.beginPath(); ctx.ellipse(1470, 440, 205, 118, -.18, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#77b9c3'; ctx.lineWidth = 8; ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.beginPath(); ctx.ellipse(1415, 405, 52, 15, -.22, 0, Math.PI * 2); ctx.fill();
+
+        for (let f = 0; f < 5; f++) {
+          const fx = 1470 + Math.sin(time * 0.001 + f * 1.5) * 120;
+          const fy = 440 + Math.cos(time * 0.0008 + f * 2) * 60;
+          ctx.save();
+          ctx.translate(fx, fy);
+          ctx.rotate(Math.sin(time * 0.001 + f) * 0.5);
+          ctx.fillStyle = f % 2 === 0 ? '#ff7043' : '#ffa726';
+          ctx.beginPath(); ctx.ellipse(0, 0, 12, 6, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(-12, 0); ctx.lineTo(-18, -6); ctx.lineTo(-18, 6); ctx.closePath(); ctx.fill();
+          ctx.restore();
+        }
+
+        const trees = [[240,250],[660,240],[1110,230],[1860,300],[270,740],[950,540],[1810,850],[380,1580],[880,1840],[1580,1660],[1880,1350]];
+        trees.forEach(([x,y],i) => {
+          ctx.fillStyle = 'rgba(69, 49, 48, .18)'; ctx.beginPath(); ctx.ellipse(x,y+20,39,12,0,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle = '#815d52'; ctx.fillRect(x-6,y-8,12,48);
+          const colors=['#f7a9c4','#ffd0dc','#f58fb4'];
+          [[-18,-24],[0,-37],[18,-23],[-9,-8],[12,-7]].forEach(([ox,oy],j)=>{ctx.fillStyle=colors[(i+j)%colors.length];ctx.beginPath();ctx.arc(x+ox,y+oy,15,0,Math.PI*2);ctx.fill();});
+          ctx.fillStyle='#fff5c2';ctx.beginPath();ctx.arc(x,y-23,4,0,Math.PI*2);ctx.fill();
+        });
+
+        // Leaf / Petal fall down in Zen Garden
+        for(let i=0;i<64;i++){
+          const y=(i*271+time*.045)%2100;
+          const x=(i*173+Math.sin(time*.001+i)*34+2100)%2100;
+          ctx.save();ctx.translate(x,y);ctx.rotate((time*.001+i)%Math.PI);
+          ctx.fillStyle=i%3===0?'rgba(255,208,220,.88)':'rgba(236,72,153,.55)';
+          ctx.beginPath();ctx.ellipse(0,0,4,8,0,0,Math.PI*2);ctx.fill();ctx.restore();
+        }
+        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(131,24,67,.55)';ctx.fillText('🌸 SAKURA ZEN GARDEN',75,78);
+
+      } else {
+        // Onsen Spring
+        ctx.fillStyle='#d4bd91';ctx.fillRect(120,520,1860,155);ctx.fillRect(930,120,155,1860);
+
+        // Stones in Onsen Spring
+        const onsenStones = [[500, 600, 26], [580, 620, 20], [1200, 1100, 32], [1280, 1050, 22], [800, 400, 25], [1500, 1400, 28]];
+        onsenStones.forEach(([sx, sy, sr]) => {
+          ctx.fillStyle = '#8c8275';
+          ctx.beginPath(); ctx.ellipse(sx, sy, sr, sr * 0.7, 0.4, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#a89e90';
+          ctx.beginPath(); ctx.ellipse(sx - 4, sy - 4, sr * 0.6, sr * 0.4, 0.4, 0, Math.PI * 2); ctx.fill();
+        });
+
+        ctx.fillStyle='#93cfd0';ctx.beginPath();ctx.ellipse(1420,1260,280,190,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#799a69';ctx.lineWidth=20;ctx.stroke();
+        
+        ctx.fillStyle='rgba(255,255,255,0.4)';
+        for (let s = 0; s < 4; s++) {
+          const sx = 1350 + (s * 40) + Math.sin(time * 0.002 + s) * 20;
+          const sy = 1260 - ((time * 0.03 + s * 50) % 80);
+          ctx.beginPath(); ctx.arc(sx, sy, 15 + (s % 3) * 5, 0, Math.PI * 2); ctx.fill();
+        }
+
+        for (let f = 0; f < 5; f++) {
+          const fx = 1420 + Math.sin(time * 0.0009 + f * 1.8) * 160;
+          const fy = 1260 + Math.cos(time * 0.0007 + f * 1.5) * 100;
+          ctx.save();
+          ctx.translate(fx, fy);
+          ctx.rotate(Math.cos(time * 0.001 + f) * 0.5);
+          ctx.fillStyle = f % 2 === 0 ? '#e91e63' : '#ffeb3b';
+          ctx.beginPath(); ctx.ellipse(0, 0, 14, 7, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(-20, -7); ctx.lineTo(-20, 7); ctx.closePath(); ctx.fill();
+          ctx.restore();
+        }
+
+        // Green leaf falldown in Onsen Spring: "make the green leafs fall in the onseen spring like the patels fall in zen garden"
+        for(let i=0;i<64;i++){
+          const y=(i*271+time*.045)%2100;
+          const x=(i*173+Math.sin(time*.001+i)*34+2100)%2100;
+          ctx.save();ctx.translate(x,y);ctx.rotate((time*.001+i)%Math.PI);
+          ctx.fillStyle=i%2===0?'rgba(74, 222, 128, 0.82)':'rgba(34, 197, 94, 0.65)';
+          ctx.beginPath();ctx.ellipse(0,0,4,8,0,0,Math.PI*2);ctx.fill();ctx.restore();
+        }
+
+        ctx.font='bold 23px Plus Jakarta Sans';ctx.textAlign='left';ctx.fillStyle='rgba(52,83,43,.65)';ctx.fillText('🎋 ONSEN SPRING',75,78);
       }
     }
 
@@ -1165,8 +1348,12 @@
           }
         }
       }
-      camera.x += (localPlayer.x - canvas.width / 2 - camera.x) * Math.min(1, dt * 8);
-      camera.y += (localPlayer.y - canvas.height / 2 - camera.y) * Math.min(1, dt * 8);
+
+      // Camera offset takes Zoom level into account
+      const viewW = canvas.width / zoomLevel;
+      const viewH = canvas.height / zoomLevel;
+      camera.x += (localPlayer.x - viewW / 2 - camera.x) * Math.min(1, dt * 8);
+      camera.y += (localPlayer.y - viewH / 2 - camera.y) * Math.min(1, dt * 8);
 
       const now = performance.now();
       if (now - lastStateBroadcastAt > 33 && (Math.hypot(localPlayer.vx, localPlayer.vy) > 1 || localPlayer.isJumping || (localPlayer.speechBubble && localPlayer.speechBubble.until > Date.now()) || now - lastStateBroadcastAt > 1000)) {
@@ -1194,6 +1381,9 @@
     function renderGameWorld() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
+      
+      // Apply Zoom Transformation
+      ctx.scale(zoomLevel, zoomLevel);
       ctx.translate(-camera.x, -camera.y);
       drawZoneDecorations();
 
@@ -1223,13 +1413,23 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // CLICK HANDLER ON GAME WORLD (DEV SLIME CLICK MUSIC PLAYBACK)
+    // Slime Click Event
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
-      const clickWorldX = e.clientX - rect.left + camera.x;
-      const clickWorldY = e.clientY - rect.top + camera.y;
+      const clickWorldX = (e.clientX - rect.left) / zoomLevel + camera.x;
+      const clickWorldY = (e.clientY - rect.top) / zoomLevel + camera.y;
 
       let closest = null;
+      
+      // Check local player click
+      const localDist = Math.hypot(localPlayer.x - clickWorldX, localPlayer.y - clickWorldY);
+      if (localDist < 38) {
+        if (musicUploaderUserId && localPlayer.id === musicUploaderUserId) {
+          toggleBackgroundMusic();
+          return;
+        }
+      }
+
       Object.values(remotePlayers).forEach(player => {
         const x = Number.isFinite(player.displayX) ? player.displayX : player.x;
         const y = Number.isFinite(player.displayY) ? player.displayY : player.y;
@@ -1238,7 +1438,10 @@
       });
 
       if (closest) {
-        if (closest.player.role === 'developer') {
+        // "when the user clicks on the slime that has uploaded the song in the song section either admin or dev the it works as a play and pause button"
+        if (musicUploaderUserId && closest.player.id === musicUploaderUserId) {
+          toggleBackgroundMusic();
+        } else if (closest.player.role === 'developer') {
           toggleBackgroundMusic();
         }
         showPlayerCard(closest.player);
@@ -1261,7 +1464,9 @@
       avatar.appendChild(makeAvatar(player, 'w-10 h-10'));
       const trustedRole = player.id === localPlayer.id ? localPlayer.role : (remotePlayers[player.id] && remotePlayers[player.id].role) || (['admin', 'developer'].includes(player.role) ? player.role : 'player');
       
-      document.getElementById('player-card-name').textContent = `${player.name || 'Slime'}${trustedRole === 'developer' ? ' · DEV' : trustedRole === 'admin' ? ' · ADMIN' : ''}`;
+      const roleTitleEquipped = (trustedRole === 'developer' && player.equippedTitle === 'title_developer') || (trustedRole === 'admin' && player.equippedTitle === 'title_admin');
+      document.getElementById('player-card-name').textContent = `${player.name || 'Slime'}${roleTitleEquipped ? (trustedRole === 'developer' ? ' · DEV' : ' · ADMIN') : ''}`;
+      
       const action = document.getElementById('player-card-action');
       const status = document.getElementById('player-card-status');
       const friend = friendList.some(item => item.id === player.id);
@@ -1287,8 +1492,8 @@
       
       card.classList.remove('hidden');
       const container = document.getElementById('canvas-container');
-      const x = (Number.isFinite(player.displayX) ? player.displayX : Number.isFinite(player.x) ? player.x : camera.x + canvas.width / 2) - camera.x;
-      const y = (Number.isFinite(player.displayY) ? player.displayY : Number.isFinite(player.y) ? player.y : camera.y + canvas.height / 2) - camera.y;
+      const x = ((Number.isFinite(player.displayX) ? player.displayX : Number.isFinite(player.x) ? player.x : camera.x + canvas.width / 2) - camera.x) * zoomLevel;
+      const y = ((Number.isFinite(player.displayY) ? player.displayY : Number.isFinite(player.y) ? player.y : camera.y + canvas.height / 2) - camera.y) * zoomLevel;
       const left = Math.max(8, Math.min(container.clientWidth - card.offsetWidth - 8, x - card.offsetWidth / 2));
       const top = Math.max(8, Math.min(container.clientHeight - card.offsetHeight - 8, y - card.offsetHeight - 54));
       card.style.left = `${left}px`; card.style.top = `${top}px`;
@@ -1373,7 +1578,7 @@
     }
 
     // MARKET & INVENTORY
-    let activeMarketCategory = 'accessories';
+    let activeMarketCategory = 'all';
     let activeInventoryCategory = 'skins';
     let marketTestingItem = null;
 
@@ -1386,21 +1591,30 @@
 
     function filterMarketCategory(cat) {
       activeMarketCategory = cat;
-      marketTestingItem = null;
-      ['accessories', 'skins', 'titles', 'emotes', 'profile', 'message_cards', 'frames'].forEach(c => {
+      ['all', 'accessories', 'skins', 'titles', 'emotes', 'profile', 'message_cards', 'frames'].forEach(c => {
         const btn = document.getElementById('mcat-' + c);
-        if (c === cat) btn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-active';
-        else btn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive';
+        if (btn) {
+          if (c === cat) btn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-active';
+          else btn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold tab-inactive';
+        }
       });
       renderMarketGrid();
-      renderMarketPreview();
     }
 
     function renderMarketGrid() {
       const grid = document.getElementById('market-items-grid');
       grid.innerHTML = '';
       const search = (document.getElementById('market-search-input').value || '').trim().toLowerCase();
-      const items = (MARKET_ITEMS[activeMarketCategory] || []).filter(item => !search || `${item.name} ${item.desc}`.toLowerCase().includes(search));
+      
+      // All items search feature: "allow the user to search for all items at once not section item search"
+      let sourceItems = [];
+      if (activeMarketCategory === 'all') {
+        sourceItems = [].concat(...Object.values(MARKET_ITEMS));
+      } else {
+        sourceItems = MARKET_ITEMS[activeMarketCategory] || [];
+      }
+
+      const items = sourceItems.filter(item => !search || `${item.name} ${item.desc}`.toLowerCase().includes(search));
       if (!items.length) { const empty = document.createElement('p'); empty.className = 'col-span-2 rounded-2xl bg-white/70 p-4 text-center text-[10px] font-semibold text-pink-700'; empty.textContent = 'No items match that search.'; grid.appendChild(empty); }
       items.forEach(item => {
         const isOwned = localPlayer.inventory.includes(item.id);
@@ -1420,7 +1634,7 @@
               Test
             </button>
             ${isOwned ? 
-              `<span class="px-2 py-1 rounded-xl bg-emerald-100 text-emerald-800 text-[10px] font-bold">Owned</span>` : 
+              `<span class="px-2 py-1 rounded-xl bg-emerald-100 text-emerald-800 text-[10px] font-bold text-center">Owned</span>` : 
               `<button onclick="buyMarketItem('${item.id}')" class="flex-1 py-1 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-[10px] font-bold">
                 Buy
               </button>`
@@ -1435,7 +1649,7 @@
       const allItems = [].concat(...Object.values(MARKET_ITEMS));
       const item = allItems.find(i => i.id === itemId);
       marketTestingItem = item;
-      renderMarketPreview();
+      document.getElementById('market-item-preview-name').textContent = `Testing: ${item ? item.name : 'None'}`;
     }
 
     async function buyMarketItem(itemId) {
@@ -1446,7 +1660,7 @@
       const { data, error } = await supabaseClient.rpc('purchase_market_item', { p_item_id: item.id });
       if (error) { alert(error.message.includes('insufficient') ? 'Not enough points! Collect more points first.' : 'Could not complete this purchase.'); return; }
       localPlayer.points = Number(data.points) || 0;
-      localPlayer.inventory = normalizeInventory(Array.isArray(data.inventory) ? data.inventory : localPlayer.inventory);
+      localPlayer.inventory = Array.isArray(data.inventory) ? data.inventory : localPlayer.inventory;
       savePlayerToStorage();
       playSound('buy');
       updateUIHeader();
@@ -1456,77 +1670,98 @@
 
     let marketPreviewCanvas = document.getElementById('marketPreviewCanvas');
     let marketPreviewCtx = marketPreviewCanvas.getContext('2d');
-    let marketPreviewFrame = 0;
-
-    function getMarketPreviewItem() {
-      if (marketTestingItem && marketTestingItem.type === activeMarketCategory) return marketTestingItem;
-      if (['profile', 'message_cards', 'frames'].includes(activeMarketCategory)) return (MARKET_ITEMS[activeMarketCategory] || [])[0] || null;
-      return null;
-    }
-
-    function makeMarketFrameAvatar(emoji, style, usePlayerImage = false) {
-      const frame = document.createElement('span');
-      frame.className = `market-frame-preview preview-frame-${style || 'sakura'}`;
-      const center = document.createElement('span'); center.className = 'market-frame-center';
-      const avatarUrl = usePlayerImage ? safeAvatarUrl(localPlayer.avatarUrl) : '';
-      if (avatarUrl) {
-        const image = document.createElement('img'); image.src = avatarUrl; image.alt = 'Your profile avatar'; center.appendChild(image);
-      } else center.textContent = emoji || '🌸';
-      frame.appendChild(center);
-      return frame;
-    }
-
-    function renderMarketPreview() {
-      const special = document.getElementById('market-special-preview');
-      const label = document.getElementById('market-item-preview-name');
-      const item = getMarketPreviewItem();
-      const specialType = item && ['profile', 'message_cards', 'frames'].includes(item.type);
-      marketPreviewCanvas.classList.toggle('hidden', Boolean(specialType));
-      special.classList.toggle('hidden', !specialType);
-      special.classList.toggle('flex', Boolean(specialType));
-      if (specialType) {
-        special.replaceChildren();
-        if (item.type === 'message_cards') {
-          const styleClass = { sakura: 'chat-card-sakura', moon: 'chat-card-moon', royal: 'chat-card-royal' }[item.style] || '';
-          const card = document.createElement('article'); card.className = `market-message-preview ${styleClass}`;
-          const header = document.createElement('div'); header.className = 'mb-2 flex items-center gap-2';
-          const avatar = document.createElement('span'); avatar.className = 'grid h-7 w-7 place-items-center rounded-full border border-white/60 bg-white/20 text-base'; avatar.textContent = '🌸';
-          const author = document.createElement('span'); author.className = 'text-[11px] font-extrabold'; author.textContent = 'Sakura friend';
-          header.append(avatar, author);
-          const message = document.createElement('p'); message.className = 'pl-9 text-[11px] leading-relaxed'; message.textContent = 'Meet me by the koi pond 🌸';
-          card.append(header, message); special.appendChild(card);
-        } else if (item.type === 'profile') {
-          const sticker = document.createElement('div'); sticker.className = 'market-sticker-preview'; sticker.textContent = item.icon || '🌸'; special.appendChild(sticker);
-        } else special.appendChild(makeMarketFrameAvatar(localPlayer.pfp || '🌸', item.style, true));
-        const caption = document.createElement('p'); caption.className = 'text-center text-[10px] font-extrabold text-pink-900'; caption.textContent = item.name;
-        special.appendChild(caption); label.textContent = `Preview: ${item.name}`;
-        return;
-      }
-      label.textContent = marketTestingItem && marketTestingItem.type === activeMarketCategory ? `Testing: ${marketTestingItem.name}` : 'Live slime preview';
-    }
 
     function startMarketPreviewLoop() {
-      if (marketPreviewFrame) cancelAnimationFrame(marketPreviewFrame);
-      renderMarketPreview();
       function anim() {
-        if (document.getElementById('market-modal').classList.contains('hidden')) { marketPreviewFrame = 0; return; }
-        if (!marketPreviewCanvas.classList.contains('hidden')) {
-          marketPreviewCtx.clearRect(0, 0, marketPreviewCanvas.width, marketPreviewCanvas.height);
-          let sSkin = localPlayer.equippedSkin;
-          let sAcc = localPlayer.equippedAcc;
-          let sTitle = localPlayer.equippedTitle;
-          let sEmote = null;
-          if (marketTestingItem && marketTestingItem.type === activeMarketCategory) {
+        if (document.getElementById('market-modal').classList.contains('hidden')) return;
+        marketPreviewCtx.clearRect(0, 0, marketPreviewCanvas.width, marketPreviewCanvas.height);
+
+        if (marketTestingItem) {
+          if (marketTestingItem.type === 'message_cards') {
+            // Message Card preview only
+            marketPreviewCtx.save();
+            const cardX = 15, cardY = 35, cardW = 150, cardH = 80;
+            marketPreviewCtx.shadowColor = marketTestingItem.style === 'sakura' ? 'rgba(244,63,94,0.5)' : marketTestingItem.style === 'moon' ? 'rgba(14,165,233,0.6)' : 'rgba(168,85,247,0.7)';
+            marketPreviewCtx.shadowBlur = 15;
+            marketPreviewCtx.fillStyle = marketTestingItem.style === 'sakura' ? 'rgba(131,24,67,0.85)' : marketTestingItem.style === 'moon' ? 'rgba(8,47,73,0.9)' : 'rgba(76,29,149,0.9)';
+            marketPreviewCtx.strokeStyle = marketTestingItem.style === 'sakura' ? 'rgba(251,113,133,0.9)' : marketTestingItem.style === 'moon' ? 'rgba(56,189,248,0.95)' : '#fbbf24';
+            marketPreviewCtx.lineWidth = 2;
+            marketPreviewCtx.beginPath();
+            marketPreviewCtx.roundRect(cardX, cardY, cardW, cardH, 12);
+            marketPreviewCtx.fill();
+            marketPreviewCtx.stroke();
+            marketPreviewCtx.shadowBlur = 0;
+
+            marketPreviewCtx.font = 'bold 11px Plus Jakarta Sans';
+            marketPreviewCtx.fillStyle = '#ffffff';
+            marketPreviewCtx.fillText('🌸 Sakura Slime', cardX + 12, cardY + 22);
+            marketPreviewCtx.font = '10px Plus Jakarta Sans';
+            marketPreviewCtx.fillStyle = 'rgba(255,255,255,0.9)';
+            marketPreviewCtx.fillText('Message Card Preview ✨', cardX + 12, cardY + 45);
+            marketPreviewCtx.restore();
+          } else if (marketTestingItem.type === 'profile') {
+            // Profile sticker preview only
+            marketPreviewCtx.save();
+            marketPreviewCtx.shadowColor = '#ec4899';
+            marketPreviewCtx.shadowBlur = 20;
+            marketPreviewCtx.fillStyle = 'rgba(255,255,255,0.9)';
+            marketPreviewCtx.beginPath();
+            marketPreviewCtx.arc(90, 75, 36, 0, Math.PI * 2);
+            marketPreviewCtx.fill();
+            marketPreviewCtx.shadowBlur = 0;
+            marketPreviewCtx.font = '40px sans-serif';
+            marketPreviewCtx.textAlign = 'center';
+            marketPreviewCtx.textBaseline = 'middle';
+            marketPreviewCtx.fillText(marketTestingItem.icon, 90, 75);
+            marketPreviewCtx.font = 'bold 11px Plus Jakarta Sans';
+            marketPreviewCtx.fillStyle = '#831843';
+            marketPreviewCtx.fillText(marketTestingItem.name, 90, 125);
+            marketPreviewCtx.restore();
+          } else if (marketTestingItem.type === 'frames') {
+            // Profile frame preview
+            marketPreviewCtx.save();
+            const frameColor = marketTestingItem.style === 'sakura' ? '#fb7185' : marketTestingItem.style === 'moon' ? '#38bdf8' : '#fbbf24';
+            marketPreviewCtx.shadowColor = frameColor;
+            marketPreviewCtx.shadowBlur = 25;
+            marketPreviewCtx.strokeStyle = frameColor;
+            marketPreviewCtx.lineWidth = 4;
+            marketPreviewCtx.beginPath();
+            marketPreviewCtx.arc(90, 75, 38, 0, Math.PI * 2);
+            marketPreviewCtx.stroke();
+            
+            marketPreviewCtx.shadowBlur = 0;
+            marketPreviewCtx.fillStyle = '#fce7f3';
+            marketPreviewCtx.beginPath();
+            marketPreviewCtx.arc(90, 75, 34, 0, Math.PI * 2);
+            marketPreviewCtx.fill();
+            
+            marketPreviewCtx.font = '36px sans-serif';
+            marketPreviewCtx.textAlign = 'center';
+            marketPreviewCtx.textBaseline = 'middle';
+            marketPreviewCtx.fillText('🌸', 90, 75);
+            
+            marketPreviewCtx.font = 'bold 11px Plus Jakarta Sans';
+            marketPreviewCtx.fillStyle = '#831843';
+            marketPreviewCtx.fillText(marketTestingItem.name, 90, 125);
+            marketPreviewCtx.restore();
+          } else {
+            let sSkin = localPlayer.equippedSkin;
+            let sAcc = localPlayer.equippedAcc;
+            let sTitle = localPlayer.equippedTitle;
+            let sEmote = null;
             if (marketTestingItem.type === 'skins') sSkin = marketTestingItem.id;
             if (marketTestingItem.type === 'accessories') sAcc = marketTestingItem.id;
             if (marketTestingItem.type === 'titles') sTitle = marketTestingItem.id;
             if (marketTestingItem.type === 'emotes') sEmote = marketTestingItem.anim;
+            drawSlimeModel(marketPreviewCtx, 90, 75, sSkin, sAcc, sTitle, false, 0, sEmote, true, localPlayer.role);
           }
-          drawSlimeModel(marketPreviewCtx, 90, 75, sSkin, sAcc, sTitle, false, 0, sEmote, true, localPlayer.role);
+        } else {
+          drawSlimeModel(marketPreviewCtx, 90, 75, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, false, 0, null, true, localPlayer.role);
         }
-        marketPreviewFrame = requestAnimationFrame(anim);
+
+        requestAnimationFrame(anim);
       }
-      marketPreviewFrame = requestAnimationFrame(anim);
+      requestAnimationFrame(anim);
     }
 
     function openInventoryModal() {
@@ -1610,7 +1845,7 @@
       requestAnimationFrame(anim);
     }
 
-    // FRIENDS & DM CHAT MODULE
+    // FRIENDS & DIRECT MESSAGES MODULE
     function openFriendsModal() {
       friendsUnread = false;
       localStorage.setItem('sakura_friends_unread', '0');
@@ -1893,6 +2128,7 @@
         const messageAvatar = makeAvatar(avatarProfile, 'w-6 h-6');
         if (!isMe) row.appendChild(messageAvatar);
         
+        // Message card & stickers applied in DM chat: "message card and all the other profile frames and sticker should also apply on the friend chat"
         const bubble = document.createElement('div'); 
         bubble.className = `max-w-[82%] rounded-2xl border px-3 py-1.5 font-medium ${isMe ? 'bg-sky-500 text-white border-sky-300' : 'bg-pink-100 text-pink-950 border-pink-200'}`;
         const cardType = { card_sakura: 'chat-card-sakura', card_moon: 'chat-card-moon', card_royal: 'chat-card-royal' }[message.equippedMessageCard];
@@ -1991,7 +2227,7 @@
         localPlayer.avatarUrl = safeAvatarUrl(profile.avatar_url);
         localPlayer.points = Math.max(0, Number(profile.points) || 0);
         const validItems = new Set([].concat(...Object.values(MARKET_ITEMS)).map(item => item.id));
-        localPlayer.inventory = normalizeInventory(profile.inventory);
+        localPlayer.inventory = Array.isArray(profile.inventory) ? profile.inventory.filter(id => validItems.has(id)) : ['skin_pink', 'pfp_sakura'];
         if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
         localPlayer.equippedSkin = profile.equipped_skin || 'skin_pink';
         localPlayer.equippedAcc = profile.equipped_accessory || null;
@@ -2024,7 +2260,7 @@
       localPlayer.avatarUrl = safeAvatarUrl(profile.avatar_url);
       localPlayer.points = Math.max(0, Number(profile.points) || 0);
       const validItems = new Set([].concat(...Object.values(MARKET_ITEMS)).map(item => item.id));
-      localPlayer.inventory = normalizeInventory(profile.inventory);
+      localPlayer.inventory = (Array.isArray(profile.inventory) ? profile.inventory : ['skin_pink', 'pfp_sakura']).filter(id => validItems.has(id));
       if (!localPlayer.inventory.includes('skin_pink')) localPlayer.inventory.push('skin_pink');
       localPlayer.equippedSkin = profile.equipped_skin || 'skin_pink';
       localPlayer.equippedAcc = profile.equipped_accessory || null;
@@ -2064,7 +2300,7 @@
           if (error) alert('Saved on browser, could not sync to account. ' + error.message);
         };
         image.onerror = () => alert('Image error.');
-        image.src = reader.result;
+        image.src = result.result;
       };
       reader.readAsDataURL(file);
     }
@@ -2153,6 +2389,7 @@
       document.getElementById('role-panel-title').textContent = localPlayer.role === 'developer' ? 'Developer Control Panel' : 'Admin Control Panel';
       document.getElementById('role-panel-modal').classList.remove('hidden');
       searchStaffUsers();
+      renderPlaylistPreview();
     }
     function closeRolePanel() { document.getElementById('role-panel-modal').classList.add('hidden'); }
     function openDeveloperWallet() {
@@ -2371,7 +2608,18 @@
           markFriendsUnread();
           if (activeDMUserId === payload.senderId) renderDMBox();
         })
-        .on('broadcast', { event: 'lobby_music_update' }, ({ payload }) => { if (payload) setLobbyMusicUrl(payload.url || ''); })
+        .on('broadcast', { event: 'lobby_music_update' }, ({ payload }) => { 
+          if (payload && payload.payloadStr) {
+            try {
+              const parsed = JSON.parse(payload.payloadStr);
+              setLobbyMusicPlaylist(parsed.playlist, parsed.uploaderId);
+            } catch(e) {
+              setLobbyMusicPlaylist(payload.payloadStr);
+            }
+          } else {
+            setLobbyMusicPlaylist([]);
+          }
+        })
         .subscribe();
     }
 
@@ -2401,7 +2649,6 @@
       document.getElementById('chat-tab-staff').className = `px-2.5 py-1 rounded-lg text-xs font-bold ${tab === 'staff' ? 'bg-violet-600 text-white' : 'text-pink-300 hover:text-white'}`;
       document.getElementById('chat-input').placeholder = tab === 'staff' ? 'Type staff group message...' : 'Type global message...';
       
-      // Render persistent messages for selected tab
       const chatBox = document.getElementById('chat-messages');
       chatBox.replaceChildren();
       const messagesToRender = tab === 'staff' ? staffChatMessages : globalChatMessages;
@@ -2513,8 +2760,11 @@
     function appendChatMessage(sender, text, pfp, isSelf = false, profile = {}, pushToHistory = true) {
       const chatBox = document.getElementById('chat-messages');
       const role = profile.role === 'developer' ? 'developer' : profile.role === 'admin' ? 'admin' : 'player';
+      
+      // Admin tag fix: "when admin unequips the title of admin and write in global chat or staff chat dont Show the Admin tag"
       const roleTitleEquipped = (role === 'developer' && profile.equippedTitle === 'title_developer') || (role === 'admin' && profile.equippedTitle === 'title_admin');
-      const roleTitle = roleTitleEquipped ? (role === 'developer' ? 'DEV' : 'ADMIN') : (role === 'developer' ? 'DEV' : role === 'admin' ? 'ADMIN' : '');
+      const roleTitle = roleTitleEquipped ? (role === 'developer' ? 'DEV' : 'ADMIN') : '';
+      
       const card = document.createElement('article');
       const cardStyle = { card_sakura: 'chat-card-sakura', card_moon: 'chat-card-moon', card_royal: 'chat-card-royal' }[profile.equippedMessageCard];
       card.className = `rounded-2xl border p-2.5 shadow-sm ${roleTitleEquipped && role === 'developer' ? 'border-cyan-300 bg-cyan-950/70 shadow-cyan-500/20' : roleTitleEquipped && role === 'admin' ? 'border-rose-400 bg-slate-950/80 shadow-rose-500/25' : isSelf ? 'border-pink-300/40 bg-pink-500/20' : 'border-white/10 bg-white/5'} ${cardStyle || ''}`;
@@ -2565,6 +2815,7 @@
       renderOwnedEmoteButton(); broadcastPlayerState();
     }
 
+    // Chat sidebar toggle for both PC & Mobile
     function toggleChatSidebar() {
       document.getElementById('chat-sidebar').classList.toggle('translate-x-full');
     }
@@ -2644,7 +2895,7 @@
     }
     function closeMemoriesModal() { document.getElementById('memories-modal').classList.add('hidden'); }
     function startMemoriesGame() {
-      const symbols = ['🌸', '🐱', '🦊', '👑', '🐰', '⭐', '🐼', '🦄'];
+      const symbols = ['🌸', '🐱', '🦊', '👑', '🐰', '⭐', '🐼', '🍡'];
       memoryDeck = [...symbols, ...symbols].sort(() => Math.random() - .5);
       memoryRevealed = [];
       memoryMatched = new Set();
@@ -2795,83 +3046,68 @@
       }
     }
 
-    function isNoticeWriter() { return ['admin', 'developer'].includes(localPlayer.role); }
+    // Notice Board & In-board Editing
     let editingNoticeId = null;
-    let confirmingNoticeDeleteId = null;
-
+    function isNoticeWriter() { return ['admin', 'developer'].includes(localPlayer.role); }
+    
     async function openNoticeBoard() {
       document.getElementById('notice-board-modal').classList.remove('hidden');
       document.getElementById('notice-post-form').classList.toggle('hidden', !isNoticeWriter());
       document.getElementById('notice-board-status').textContent = 'Loading notices…';
+      cancelNoticeEdit();
       await loadNoticeBoard();
     }
-    function closeNoticeBoard() {
-      editingNoticeId = null; confirmingNoticeDeleteId = null;
-      document.getElementById('notice-board-modal').classList.add('hidden');
-    }
-
+    function closeNoticeBoard() { document.getElementById('notice-board-modal').classList.add('hidden'); }
+    
     async function loadNoticeBoard() {
       const list = document.getElementById('notice-board-list');
       const status = document.getElementById('notice-board-status');
       list.replaceChildren();
       const { data, error } = await supabaseClient.from('notice_board').select('id,title,body,author_id,author_name,created_at').order('created_at', { ascending: false }).limit(30);
       if (error) { status.textContent = 'Notice board error.'; return; }
-      const notices = Array.isArray(data) ? data : [];
-      status.textContent = notices.length ? `${notices.length} notices` : 'No notices yet.';
-      notices.forEach(notice => {
-        const id = String(notice.id);
-        const card = document.createElement('article'); card.className = 'rounded-2xl border border-amber-200 bg-white/85 p-3 shadow-sm'; card.dataset.noticeId = id;
-        if (isNoticeWriter() && editingNoticeId === id) {
-          const form = document.createElement('form'); form.className = 'space-y-2'; form.onsubmit = event => { event.preventDefault(); saveNoticeEdits(id, form); };
-          const titleInput = document.createElement('input'); titleInput.type = 'text'; titleInput.maxLength = 80; titleInput.required = true; titleInput.value = notice.title || ''; titleInput.setAttribute('aria-label', 'Notice title'); titleInput.className = 'glass-input w-full rounded-xl px-3 py-2 text-xs font-bold text-amber-950';
-          const bodyInput = document.createElement('textarea'); bodyInput.maxLength = 1200; bodyInput.required = true; bodyInput.rows = 4; bodyInput.value = notice.body || ''; bodyInput.setAttribute('aria-label', 'Notice body'); bodyInput.className = 'glass-input w-full rounded-xl px-3 py-2 text-xs text-slate-800';
-          const actions = document.createElement('div'); actions.className = 'flex gap-2';
-          const save = document.createElement('button'); save.type = 'submit'; save.className = 'rounded-lg bg-emerald-500 px-3 py-1.5 text-[10px] font-bold text-white'; save.textContent = 'Save changes';
-          const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'rounded-lg bg-slate-100 px-3 py-1.5 text-[10px] font-bold text-slate-700'; cancel.textContent = 'Cancel'; cancel.onclick = () => { editingNoticeId = null; loadNoticeBoard(); };
-          actions.append(save, cancel); form.append(titleInput, bodyInput, actions); card.appendChild(form); list.appendChild(card); return;
-        }
-        const title = document.createElement('h4'); title.className = 'text-sm font-extrabold text-amber-950'; title.textContent = notice.title || '';
-        const body = document.createElement('p'); body.className = 'mt-1 whitespace-pre-wrap break-words text-xs text-slate-700'; body.textContent = notice.body || '';
+      status.textContent = data.length ? `${data.length} notices` : 'No notices yet.';
+      data.forEach(notice => {
+        const card = document.createElement('article'); card.className = 'rounded-2xl border border-amber-200 bg-white/80 p-3';
+        const title = document.createElement('h4'); title.className = 'text-sm font-extrabold text-amber-950'; title.textContent = notice.title;
+        const body = document.createElement('p'); body.className = 'mt-1 whitespace-pre-wrap break-words text-xs text-slate-700'; body.textContent = notice.body;
         const meta = document.createElement('p'); meta.className = 'mt-2 text-[9px] font-semibold text-amber-700';
         const time = notice.created_at ? new Date(notice.created_at).toLocaleString() : '';
         meta.textContent = `${notice.author_name || 'Sakura team'}${time ? ' · ' + time : ''}`;
         card.append(title, body, meta);
         if (isNoticeWriter()) {
-          const tools = document.createElement('div'); tools.className = 'mt-2 flex flex-wrap items-center gap-2';
-          if (confirmingNoticeDeleteId === id) {
-            const prompt = document.createElement('span'); prompt.className = 'text-[10px] font-semibold text-rose-800'; prompt.textContent = 'Delete this notice?';
-            const confirm = document.createElement('button'); confirm.type = 'button'; confirm.className = 'rounded-lg bg-rose-600 px-2.5 py-1 text-[10px] font-bold text-white'; confirm.textContent = 'Delete'; confirm.onclick = () => deleteNotice(id);
-            const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-700'; cancel.textContent = 'Keep notice'; cancel.onclick = () => { confirmingNoticeDeleteId = null; loadNoticeBoard(); };
-            tools.append(prompt, confirm, cancel);
-          } else {
-            const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'rounded-lg bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-900'; edit.textContent = 'Edit'; edit.onclick = () => { editingNoticeId = id; confirmingNoticeDeleteId = null; loadNoticeBoard(); };
-            const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'rounded-lg bg-rose-100 px-2.5 py-1 text-[10px] font-bold text-rose-900'; remove.textContent = 'Delete'; remove.onclick = () => { confirmingNoticeDeleteId = id; loadNoticeBoard(); };
-            tools.append(edit, remove);
-          }
-          card.appendChild(tools);
+          const tools = document.createElement('div'); tools.className = 'mt-2 flex gap-2';
+          const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'rounded-lg bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-900'; edit.textContent = 'Edit Inside'; edit.onclick = () => editNoticeInside(notice);
+          const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'rounded-lg bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-900'; remove.textContent = 'Delete'; remove.onclick = () => deleteNotice(notice.id);
+          tools.append(edit, remove); card.appendChild(tools);
         }
         list.appendChild(card);
       });
     }
 
-    async function saveNoticeEdits(id, form) {
+    function editNoticeInside(notice) {
       if (!isNoticeWriter()) return;
-      const title = form.querySelector('input').value.trim();
-      const body = form.querySelector('textarea').value.trim();
-      if (!title || !body) return;
-      const status = document.getElementById('notice-board-status'); status.textContent = 'Saving notice…';
-      const { error } = await supabaseClient.rpc('edit_notice', { p_notice_id: id, p_title: title, p_body: body });
-      if (error) { status.textContent = error.message || 'Could not save notice.'; return; }
+      editingNoticeId = notice.id;
+      document.getElementById('notice-title-input').value = notice.title;
+      document.getElementById('notice-body-input').value = notice.body;
+      document.getElementById('notice-form-header').textContent = 'Edit Notice Inside Board';
+      document.getElementById('notice-submit-btn').textContent = 'Update Notice';
+      document.getElementById('notice-cancel-btn').classList.remove('hidden');
+      document.getElementById('notice-post-form').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelNoticeEdit() {
       editingNoticeId = null;
-      await loadNoticeBoard();
+      document.getElementById('notice-post-form').reset();
+      document.getElementById('notice-form-header').textContent = 'Admin / developer post';
+      document.getElementById('notice-submit-btn').textContent = 'Post notice';
+      document.getElementById('notice-cancel-btn').classList.add('hidden');
     }
 
     async function deleteNotice(id) {
-      if (!isNoticeWriter()) return;
-      const status = document.getElementById('notice-board-status'); status.textContent = 'Deleting notice…';
+      if (!isNoticeWriter() || !confirm('Are you sure you want to delete this notice?')) return;
       const { error } = await supabaseClient.rpc('delete_notice', { p_notice_id: id });
-      if (error) { status.textContent = error.message || 'Could not delete notice.'; return; }
-      confirmingNoticeDeleteId = null;
+      if (error) { document.getElementById('notice-board-status').textContent = error.message; return; }
+      if (editingNoticeId === id) cancelNoticeEdit();
       await loadNoticeBoard();
     }
 
@@ -2882,9 +3118,19 @@
       const body = document.getElementById('notice-body-input').value.trim();
       const recipient = document.getElementById('notice-recipient-input').value.trim().toLowerCase() || null;
       if (!title || !body) return;
-      const status = document.getElementById('notice-board-status'); status.textContent = 'Posting…';
-      const { error } = await supabaseClient.rpc('post_notice', { p_title: title, p_body: body, p_recipient_email: recipient });
-      if (error) { status.textContent = 'Posting failed.'; return; }
+      const status = document.getElementById('notice-board-status'); status.textContent = editingNoticeId ? 'Updating notice…' : 'Posting…';
+      
+      let error = null;
+      if (editingNoticeId) {
+        const res = await supabaseClient.rpc('edit_notice', { p_notice_id: editingNoticeId, p_title: title, p_body: body });
+        error = res.error;
+        cancelNoticeEdit();
+      } else {
+        const res = await supabaseClient.rpc('post_notice', { p_title: title, p_body: body, p_recipient_email: recipient });
+        error = res.error;
+      }
+
+      if (error) { status.textContent = error.message || 'Operation failed.'; return; }
       document.getElementById('notice-post-form').reset();
       await loadNoticeBoard();
     }
