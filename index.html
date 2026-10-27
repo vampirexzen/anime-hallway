@@ -205,6 +205,106 @@
     #mobile-jump-button{touch-action:none}
     .avatar-frame-shell:after,.avatar-face:after{content:none!important;display:none!important}
     @media (max-width:520px){.auth-card{padding:1.25rem}.world-switch-btn{min-width:104px}}
+    /* Dreamy, slow-moving entry screen */
+    .auth-backdrop{isolation:isolate;overflow:hidden;background-color:rgba(35,7,25,.84)}
+    .auth-backdrop::before,.auth-backdrop::after{content:"";position:absolute;inset:-12%;z-index:0;pointer-events:none}
+    .auth-backdrop::before{background:radial-gradient(ellipse at 18% 22%,rgba(244,114,182,.36),transparent 32%),radial-gradient(ellipse at 84% 78%,rgba(129,140,248,.28),transparent 34%),radial-gradient(ellipse at 55% 5%,rgba(251,191,36,.18),transparent 28%);background-size:140% 140%;animation:auth-aurora 19s ease-in-out infinite alternate}
+    .auth-backdrop::after{background-image:radial-gradient(circle,rgba(255,255,255,.82) 1px,transparent 1.8px),radial-gradient(circle,rgba(251,207,232,.76) 1.5px,transparent 2px),radial-gradient(circle,rgba(253,230,138,.72) 1px,transparent 1.8px);background-size:91px 113px,147px 161px,197px 187px;background-position:0 0,37px 28px,72px 90px;opacity:.38;animation:auth-sparkle-drift 32s linear infinite}
+    .auth-card{position:relative;z-index:1;animation:auth-card-arrive .8s cubic-bezier(.18,.85,.3,1) both;box-shadow:0 30px 110px rgba(18,5,24,.46),0 8px 36px rgba(236,72,153,.24),inset 0 1px 0 #fff}
+    .auth-card::before{content:"";position:absolute;z-index:0;pointer-events:none;top:-45%;left:-72%;width:42%;height:190%;transform:rotate(24deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:auth-card-shine 9s ease-in-out infinite}
+    .auth-card>*{position:relative;z-index:1}
+    .auth-brand-mark{animation:auth-brand-float 3.6s ease-in-out infinite;transform-origin:center}
+    .auth-brand-mark i{animation:auth-sparkle-turn 10s linear infinite}
+    .auth-tab-active,.auth-tab-idle{transition:background .25s ease,color .25s ease,transform .2s ease,box-shadow .25s ease}
+    .auth-tab-active{transform:translateY(-1px);box-shadow:0 5px 16px rgba(131,24,67,.16),inset 0 1px #fff}
+    .auth-tab-idle:hover{transform:translateY(-1px);background:rgba(255,255,255,.55)}
+    .auth-submit{background:linear-gradient(105deg,#ec4899,#fb7185 48%,#c084fc);background-size:180% 100%;box-shadow:0 10px 24px rgba(236,72,153,.27);transition:background-position .5s ease,transform .2s ease,box-shadow .2s ease}
+    .auth-submit:hover{background-position:100% 0;transform:translateY(-2px);box-shadow:0 14px 28px rgba(236,72,153,.35)}
+    .auth-card input{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+    .auth-card input:focus{transform:translateY(-1px)}
+    #username-field:not(.hidden),#auth-alert:not(.hidden){animation:auth-field-arrive .28s ease-out both}
+    @keyframes auth-aurora{0%{transform:translate3d(-2%,-1%,0) rotate(-2deg);background-position:0 0}100%{transform:translate3d(2%,1%,0) rotate(2deg);background-position:100% 100%}}
+    @keyframes auth-sparkle-drift{from{transform:translate3d(-1%,0,0)}to{transform:translate3d(1%,-2%,0)}}
+    @keyframes auth-card-arrive{from{opacity:0;transform:translateY(22px) scale(.975);filter:blur(6px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+    @keyframes auth-card-shine{0%,35%{left:-72%;opacity:0}48%{opacity:.8}68%,100%{left:145%;opacity:0}}
+    @keyframes auth-brand-float{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+    @keyframes auth-sparkle-turn{to{transform:rotate(360deg)}}
+    @keyframes auth-field-arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    @media(prefers-reduced-motion:reduce){.auth-backdrop::before,.auth-backdrop::after,.auth-card,.auth-card::before,.auth-brand-mark,.auth-brand-mark i{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+    #chat-sidebar[data-zone="spring"] .chat-panel-header{background:linear-gradient(110deg,rgba(20,83,45,.86),rgba(6,78,59,.72));border-color:rgba(134,239,172,.4)}
+    #chat-sidebar[data-zone="spring"] .chat-tab-shell{background:rgba(5,46,32,.72);border-color:rgba(134,239,172,.38)}
+    #chat-sidebar[data-zone="spring"] .chat-tab[data-active="true"]{background:linear-gradient(120deg,#15803d,#22c55e)!important;color:#f0fdf4!important;box-shadow:0 3px 12px rgba(34,197,94,.28)}
+    #chat-sidebar[data-zone="spring"] .chat-tab[data-active="false"]{color:#bbf7d0}
+    #chat-sidebar[data-zone="spring"] .chat-tab[data-active="false"]:hover{color:#fff;background:rgba(34,197,94,.15)}
+    #chat-sidebar[data-zone="spring"] #chat-messages{background:radial-gradient(ellipse at 80% 10%,rgba(74,222,128,.12),transparent 38%),linear-gradient(160deg,rgba(9,49,37,.42),rgba(9,36,32,.3))}
+    #chat-sidebar[data-zone="spring"] .chat-composer{background:linear-gradient(110deg,rgba(6,46,34,.97),rgba(20,83,45,.92));border-color:rgba(134,239,172,.35)}
+    #chat-sidebar[data-zone="spring"] .chat-composer input:focus{border-color:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.24)}
+    #chat-sidebar[data-zone="spring"] .chat-panel-header>button{color:#bbf7d0}
+    #chat-sidebar[data-zone="spring"] .message-card-chat[data-role="player"]{border-color:rgba(134,239,172,.42)!important;background:linear-gradient(135deg,rgba(20,83,45,.38),rgba(6,78,59,.34))!important}
+    #chat-sidebar[data-zone="spring"] .message-card-chat[data-role="player"] button{color:#bbf7d0!important}
+    #chat-sidebar[data-zone="garden"] .chat-tab[data-active="true"]{background:linear-gradient(120deg,#db2777,#ec4899 55%,#fb7185)!important;color:#fff!important;box-shadow:0 3px 14px rgba(236,72,153,.34),inset 0 1px rgba(255,255,255,.35)}
+    #chat-sidebar[data-zone="garden"] .chat-tab[data-active="false"]{color:#fbcfe8}
+    #chat-sidebar[data-zone="garden"] .chat-tab[data-active="false"]:hover{color:#fff;background:rgba(236,72,153,.16)}
+    .chat-tab,#role-panel-modal button,#friends-modal button{transition:background-color .2s ease,color .2s ease,box-shadow .2s ease,transform .18s ease}
+    #role-panel-modal .role-panel-card{background:radial-gradient(ellipse at 100% 0,rgba(34,211,238,.13),transparent 34%),linear-gradient(145deg,rgba(255,255,255,.98),rgba(240,249,255,.97));border-color:rgba(255,255,255,.9);box-shadow:0 24px 70px rgba(8,30,48,.35),inset 0 1px #fff}
+    #role-panel-modal .staff-management-card{background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(240,249,255,.92));border-color:rgba(148,163,184,.42);box-shadow:0 5px 18px rgba(15,23,42,.08)}
+    #role-panel-modal .staff-management-card .staff-duration{min-height:36px}
+    #role-panel-modal .staff-management-card button{min-height:36px;box-shadow:0 2px 6px rgba(15,23,42,.12)}
+    #role-panel-modal .staff-management-card button:hover{transform:translateY(-1px);filter:brightness(1.05)}
+    #role-panel-modal .staff-search-row input,#developer-wallet-modal .staff-search-row input{min-width:0}
+    .mobile-top-action{min-height:34px;transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+    .mobile-top-action:active{transform:scale(.96)}
+    #role-panel-modal .staff-music-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
+    #role-panel-modal .staff-music-actions input[type=file]{flex:1 1 100%;min-width:0}
+    #friends-modal .friends-modal-card{background:radial-gradient(ellipse at 0 0,rgba(244,114,182,.16),transparent 35%),linear-gradient(145deg,rgba(255,255,255,.97),rgba(255,247,251,.96));border-color:rgba(255,255,255,.95);box-shadow:0 26px 90px rgba(48,12,37,.42),inset 0 1px #fff}
+    #friends-modal .friends-modal-grid{min-height:0}
+    #friends-modal .friends-list-pane{min-width:0;min-height:0}
+    #friends-modal .friends-dm-pane{min-width:0;min-height:0;box-shadow:inset 0 1px rgba(255,255,255,.8)}
+    #friends-modal input{min-width:0}
+    @media(max-width:700px){
+      #friends-modal{align-items:stretch;padding:.5rem}
+      #friends-modal .friends-modal-card{width:100%;height:calc(100dvh - 1rem);max-height:calc(100dvh - 1rem);padding:1rem;border-radius:1.35rem}
+      #friends-modal .friends-modal-grid{display:flex;flex-direction:column;gap:.55rem;overflow:hidden}
+      #friends-modal .friends-list-pane{flex:0 0 34%;max-height:34%;padding:0 0 .55rem;border-right:0;border-bottom:1px solid rgba(244,114,182,.35)}
+      #friends-modal .friends-list-pane #friend-requests-container{max-height:5rem}
+      #friends-modal .friends-dm-pane{flex:1 1 0;height:auto;padding:.65rem}
+      #friends-modal #dm-header{align-items:flex-start;gap:.4rem;flex-wrap:wrap}
+      #friends-modal #dm-active-target{max-width:65%;overflow-wrap:anywhere}
+      #friends-modal #dm-input-form{gap:.4rem}
+      #friends-modal #dm-text-input{font-size:16px}
+      #friends-modal #dm-send-btn{min-width:42px;min-height:42px}
+      #role-panel-modal{align-items:flex-start;padding:.5rem}
+      #role-panel-modal .role-panel-card{width:100%;max-height:calc(100dvh - 1rem);overflow-y:auto;padding:1rem;border-radius:1.35rem}
+      #role-panel-modal .staff-search-row,#developer-wallet-modal .staff-search-row{flex-wrap:wrap}
+      #developer-wallet-modal .staff-search-row input{flex:1 1 100%;width:100%;font-size:16px}
+      #developer-wallet-modal .staff-search-row button{min-height:42px;flex:1}
+      #emote-toolbar{bottom:max(.5rem,env(safe-area-inset-bottom));max-width:calc(100vw - 174px);overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+      #emote-toolbar::-webkit-scrollbar{display:none}
+      #emote-toolbar button{flex:0 0 auto}
+      #canvas-container>.pointer-events-none.absolute.top-12.right-3{top:4.35rem;max-width:45vw;text-align:right;line-height:1.25}
+      #role-panel-modal .staff-search-row input{flex:1 1 100%;width:100%;font-size:16px}
+      #role-panel-modal .staff-search-row button{min-height:42px;flex:1}
+      #role-panel-modal .staff-music-actions button{flex:1}
+      #role-panel-modal .staff-management-card{padding:.7rem}
+      #role-panel-modal .staff-management-card .staff-duration{width:100%;font-size:16px}
+      #role-panel-modal .staff-management-card button{flex:1 1 42%;min-height:40px}
+    }
+    button:not(:disabled){-webkit-tap-highlight-color:transparent;transition:transform .16s ease,box-shadow .2s ease,filter .2s ease,border-color .2s ease}
+    button:not(:disabled):hover{filter:brightness(1.045);box-shadow:0 5px 15px rgba(48,24,44,.15)}
+    button:not(:disabled):active{transform:scale(.975)}
+    button:focus-visible{outline:3px solid rgba(236,72,153,.54);outline-offset:2px}
+    #notice-board-modal .notice-board-card{background:radial-gradient(ellipse at 92% 0,rgba(251,191,36,.2),transparent 34%),radial-gradient(ellipse at 0 100%,rgba(244,114,182,.12),transparent 42%),linear-gradient(145deg,rgba(255,255,255,.98),rgba(255,250,235,.98));box-shadow:0 28px 90px rgba(42,26,12,.4),inset 0 1px #fff}
+    #notice-board-modal .notice-board-header{border-color:rgba(217,119,6,.22)}
+    #notice-board-modal .notice-board-mark{display:grid;place-items:center;width:2.6rem;height:2.6rem;border:1px solid rgba(245,158,11,.25);border-radius:1rem;background:linear-gradient(145deg,#fff7d6,#ffedd5);color:#b45309;box-shadow:0 5px 16px rgba(217,119,6,.15)}
+    #notice-board-modal .notice-board-mark i{width:1.25rem;height:1.25rem}
+    #notice-board-modal .notice-card{position:relative;overflow:hidden;border:1px solid rgba(217,119,6,.22);border-radius:1.25rem;background:linear-gradient(125deg,rgba(255,255,255,.98),rgba(255,250,235,.94) 70%,rgba(255,237,213,.92));padding:1rem;box-shadow:0 6px 20px rgba(120,74,17,.08),inset 0 1px rgba(255,255,255,.9);transition:transform .2s ease,box-shadow .2s ease}
+    #notice-board-modal .notice-card::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:linear-gradient(180deg,#fbbf24,#fb923c 55%,#f9a8d4)}
+    #notice-board-modal .notice-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(120,74,17,.13),inset 0 1px #fff}
+    #notice-board-modal .notice-title{font-size:.92rem;line-height:1.35;letter-spacing:.01em;color:#713f12}
+    #notice-board-modal .notice-body{color:#475569;line-height:1.65;font-size:.78rem}
+    #notice-board-modal .notice-meta{display:inline-flex;margin-top:.65rem;padding:.25rem .55rem;border:1px solid rgba(217,119,6,.15);border-radius:999px;background:rgba(255,247,214,.82);color:#92400e;font-size:.62rem}
+    #notice-board-modal .notice-actions{display:flex;flex-wrap:wrap;gap:.5rem;padding-top:.65rem;border-top:1px solid rgba(217,119,6,.12)}
+    #notice-board-modal #notice-board-status{color:#92400e;font-weight:700}
   </style>
 </head>
 <body class="flex flex-col h-full w-full overflow-hidden select-none bg-pink-950">
@@ -241,7 +341,7 @@
           <input type="text" id="auth-username" maxlength="15" autocomplete="nickname" placeholder="BouncySlime" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-pink-950" />
         </div>
 
-        <button type="submit" id="auth-submit-btn" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs mt-2">
+        <button type="submit" id="auth-submit-btn" class="auth-submit w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 rounded-2xl shadow-lg shadow-pink-300 transition active:scale-95 flex items-center justify-center gap-2 text-xs mt-2">
           <span>Sign In</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </button>
@@ -356,7 +456,7 @@
         <button type="button" onclick="resetZoom()" id="zoom-reset" class="w-8 h-8 rounded-xl bg-white/90 hover:bg-pink-100 text-pink-900 font-bold flex items-center justify-center text-sm shadow active:scale-95" title="Reset zoom to 100%" aria-label="Reset zoom">↺</button>
       </div>
 
-      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2">
+      <div id="emote-toolbar" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 glass px-2 py-1 rounded-2xl border border-pink-200/80 shadow-xl flex items-center gap-1 sm:gap-2">
         <button onclick="triggerEmote('🌸')" class="hover:scale-125 transition text-lg">🌸</button>
         <button onclick="triggerEmote('❤️')" class="hover:scale-125 transition text-lg">❤️</button>
         <button onclick="triggerEmote('✨')" class="hover:scale-125 transition text-lg">✨</button>
@@ -397,20 +497,20 @@
     </div>
 
     <!-- SIDEBAR CHAT PANEL WITH PERSISTENT TABS (SLIDES IN/OUT ON PC AND MOBILE) -->
-    <aside id="chat-sidebar" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full shadow-2xl h-full">
-      <div class="p-3 border-b border-pink-200/30 bg-white/10 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-1 bg-pink-950/60 p-1 rounded-xl border border-pink-200/30">
-          <button id="chat-tab-global" onclick="switchChatTab('global')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-pink-500 text-white transition">Global Lounge</button>
-          <button id="chat-tab-staff" onclick="switchChatTab('staff')" class="hidden px-2.5 py-1 rounded-lg text-xs font-bold text-pink-300 hover:text-white transition">Staff Group</button>
+    <aside id="chat-sidebar" data-zone="garden" class="w-full md:w-80 lg:w-96 glass-dark border-l border-pink-200/80 flex flex-col justify-between absolute right-0 top-0 bottom-0 z-40 transition-transform duration-300 transform translate-x-full shadow-2xl h-full">
+      <div class="chat-panel-header p-3 border-b border-pink-200/30 bg-white/10 flex items-center justify-between shrink-0">
+        <div class="chat-tab-shell flex items-center gap-1 bg-pink-950/60 p-1 rounded-xl border border-pink-200/30">
+          <button id="chat-tab-global" data-active="true" class="chat-tab px-2.5 py-1 rounded-lg text-xs font-bold bg-pink-500 text-white transition" onclick="switchChatTab('global')">Global Lounge</button>
+          <button id="chat-tab-staff" data-active="false" class="chat-tab hidden px-2.5 py-1 rounded-lg text-xs font-bold text-pink-300 hover:text-white transition" onclick="switchChatTab('staff')">Staff Group</button>
         </div>
         <button onclick="toggleChatSidebar()" class="text-pink-300 hover:text-white p-1">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2.5 text-xs"></div>
+      <div id="chat-messages" class="chat-panel-messages flex-1 overflow-y-auto p-3 space-y-2.5 text-xs"></div>
 
-      <div class="p-2.5 bg-pink-950/80 border-t border-pink-200/30 shrink-0">
+      <div class="chat-composer p-2.5 bg-pink-950/80 border-t border-pink-200/30 shrink-0">
         <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex items-center gap-2">
           <input 
             type="text" 
@@ -523,7 +623,7 @@
 
   <!-- FRIENDS & DIRECT MESSAGES MODAL -->
   <div id="friends-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
-    <div class="glass w-full max-w-2xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
+    <div class="friends-modal-card glass w-full max-w-2xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
       <div class="flex items-center justify-between border-b border-pink-200 pb-3 shrink-0">
         <div class="flex items-center gap-2">
           <div class="p-2 rounded-xl bg-sky-500 text-white"><i data-lucide="users" class="w-5 h-5"></i></div>
@@ -535,8 +635,8 @@
         <button onclick="closeFriendsModal()" class="text-pink-700 hover:text-pink-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 flex-1 overflow-hidden">
-        <div class="flex flex-col border-r border-pink-200/60 pr-2">
+      <div class="friends-modal-grid grid grid-cols-1 md:grid-cols-3 gap-4 mt-3 flex-1 overflow-hidden">
+        <div class="friends-list-pane flex flex-col border-r border-pink-200/60 pr-2">
           <div class="space-y-1.5 mb-2 shrink-0">
             <input 
               type="text" 
@@ -552,7 +652,7 @@
         </div>
 
         <!-- DM Chat Area -->
-        <div class="md:col-span-2 flex flex-col bg-white/40 rounded-2xl p-3 border border-pink-200 h-full overflow-hidden">
+        <div class="friends-dm-pane md:col-span-2 flex flex-col bg-white/40 rounded-2xl p-3 border border-pink-200 h-full overflow-hidden">
           <div id="dm-header" class="border-b border-pink-200 pb-2 mb-2 flex items-center justify-between shrink-0">
             <p class="text-xs font-extrabold text-pink-950" id="dm-active-target">Select a friend to message</p>
             <span class="text-[10px] bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full font-bold" id="dm-status-tag">Friend Required</span>
@@ -638,20 +738,20 @@
         <div><h3 class="font-extrabold text-amber-950 text-base sm:text-lg">Lantern Petal Catch</h3><p class="text-[10px] text-amber-800">Catch 10 blossoms in 15 seconds to win 5 points.</p></div>
         <button onclick="closePetalCatchGame()" class="text-amber-900 p-1" aria-label="Close game">✕</button>
       </div>
-      <div class="flex items-center justify-between py-2 text-xs font-extrabold text-amber-950"><span id="petal-catch-score">Blossoms: 0 / 10</span><span id="petal-catch-time">Time: 12s</span></div>
+      <div class="flex items-center justify-between py-2 text-xs font-extrabold text-amber-950"><span id="petal-catch-score">Blossoms: 0 / 10</span><span id="petal-catch-time">Time: 14s</span></div>
       <p id="petal-catch-status" class="pb-2 text-center text-[10px] font-bold text-amber-900">Press Start, then tap the floating blossom.</p>
       <div id="petal-catch-stage" class="relative h-56 overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-indigo-950 via-violet-900 to-rose-950 shadow-inner">
         <span class="pointer-events-none absolute left-5 top-5 text-xl opacity-50">✨</span><span class="pointer-events-none absolute right-8 top-10 text-lg opacity-60">🌙</span><span class="pointer-events-none absolute bottom-5 left-12 text-lg opacity-50">🌸</span>
-        <button id="petal-catch-target" type="button" onclick="catchPetal()" disabled class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl opacity-40 transition-transform duration-150 drop-shadow-lg" aria-label="Catch blossom">🌸</button>
+        <button id="petal-catch-target" type="button" onclick="catchPetal()" disabled class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl opacity-40 transition-transform duration-150 drop-shadow-lg" aria-label="Catch blossom">🌸</button>
       </div>
       <button onclick="startPetalCatchGame()" id="petal-catch-start" class="mt-3 w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 py-2.5 text-xs font-extrabold text-white shadow-md">Start game</button>
     </div>
   </div>
   <!-- NOTICE BOARD -->
   <div id="notice-board-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
-    <div class="glass w-full max-w-xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
-      <div class="flex items-center justify-between border-b border-amber-200 pb-3">
-        <div><h3 class="font-extrabold text-amber-950 text-base sm:text-lg">Notice Board</h3><p class="text-[10px] text-amber-700">News from the Sakura Slime team</p></div>
+    <div class="notice-board-card glass w-full max-w-xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
+      <div class="notice-board-header flex items-center justify-between border-b border-amber-200 pb-3">
+        <div class="flex items-center gap-3"><div class="notice-board-mark"><i data-lucide="scroll-text"></i></div><div><h3 class="font-extrabold text-amber-950 text-base sm:text-lg">Notice Board</h3><p class="text-[10px] text-amber-700">News from the Sakura Slime team</p></div></div>
         <button onclick="closeNoticeBoard()" class="text-amber-800 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <p id="notice-board-status" class="py-2 text-xs text-amber-900"></p>
@@ -671,12 +771,12 @@
 
   <!-- STAFF PANEL MODAL -->
   <div id="role-panel-modal" class="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
-    <div class="glass w-full max-w-2xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh]">
+    <div class="role-panel-card glass w-full max-w-2xl rounded-3xl p-4 sm:p-6 shadow-2xl border border-white flex flex-col max-h-[90dvh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-200 pb-3 shrink-0">
         <div><h3 id="role-panel-title" class="font-extrabold text-slate-950 text-base sm:text-lg">Staff tools</h3><p class="text-[10px] text-slate-600">Search players and manage chat or game access.</p></div>
         <button onclick="closeRolePanel()" class="text-slate-700 p-1" aria-label="Close staff panel">✕</button>
       </div>
-      <div class="flex gap-2 py-3 shrink-0">
+      <div class="staff-search-row flex gap-2 py-3 shrink-0">
         <input id="staff-user-search" type="search" oninput="searchStaffUsers()" placeholder="Search by username or email..." class="glass-input flex-1 rounded-xl px-3 py-2 text-xs text-slate-950" />
         <button onclick="searchStaffUsers()" class="rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white">Search</button>
       </div>
@@ -687,7 +787,7 @@
       <div class="mt-3 border-t border-slate-200 pt-3 shrink-0">
         <p class="text-[10px] font-extrabold uppercase tracking-wide text-slate-700">Lobby Music Playlist (Add Multiple Tracks)</p>
         <div class="mt-2 flex flex-col gap-2">
-          <div class="flex gap-2 items-center">
+          <div class="staff-music-actions flex gap-2 items-center">
             <input id="lobby-music-file" type="file" accept="audio/*" multiple class="block w-full text-[10px] text-slate-700 file:mr-2 file:rounded-lg file:border-0 file:bg-cyan-700 file:px-3 file:py-1.5 file:text-[10px] file:font-bold file:text-white" />
             <button onclick="uploadLobbyMusicFile()" class="rounded-xl bg-purple-700 px-3 py-2 text-[10px] font-bold text-white shrink-0">Add to Playlist</button>
             <button onclick="clearLobbyMusic()" class="rounded-xl bg-slate-500 px-3 py-2 text-[10px] font-bold text-white shrink-0">Clear All</button>
@@ -706,7 +806,7 @@
         <div><h3 class="font-extrabold text-cyan-950 text-base sm:text-lg">Developer Wallet</h3><p class="text-[10px] text-cyan-800">Adjust a player's points balance.</p></div>
         <button onclick="closeDeveloperWallet()" class="text-cyan-800 p-1" aria-label="Close wallet panel">✕</button>
       </div>
-      <div class="flex gap-2 py-3 shrink-0">
+      <div class="staff-search-row flex gap-2 py-3 shrink-0">
         <input id="wallet-user-search" type="search" oninput="searchWalletUsers()" placeholder="Search username or email..." class="glass-input flex-1 rounded-xl px-3 py-2 text-xs text-slate-950" />
         <button onclick="searchWalletUsers()" class="rounded-xl bg-cyan-700 px-3 py-2 text-xs font-bold text-white">Search</button>
       </div>
@@ -945,6 +1045,8 @@
     // INPUT & CONTROLS
     const keys = { up: false, down: false, left: false, right: false };
     const joystick = { active: false, dx: 0, dy: 0 };
+    const WORLD_SIZE = 2800;
+    const WORLD_EDGE = 112;
     let camera = { x: 0, y: 0 };
 
     // AUDIO PLAYLIST SYSTEM (MULTI-FILE PLAYLIST & REPLAY)
@@ -1172,12 +1274,34 @@
       c.restore();
     }
 
+    function drawGrassContact(c, x, y, jumpOff, moving, phase) {
+      if (c !== ctx) return;
+      const garden = currentChannel === 'sakura-lounge';
+      const lift = Math.max(0, Math.min(1, jumpOff / 42));
+      const breeze = Math.sin(Date.now() * .0018 + x * .012 + y * .008);
+      c.save();
+      const shadow = c.createRadialGradient(x, y + 15, 2, x, y + 15, 34 + lift * 8);
+      shadow.addColorStop(0, garden ? 'rgba(90,35,59,.2)' : 'rgba(28,63,31,.2)');
+      shadow.addColorStop(.56, garden ? 'rgba(104,46,68,.12)' : 'rgba(35,76,37,.12)');
+      shadow.addColorStop(1, 'rgba(30,45,30,0)');
+      c.fillStyle = shadow; c.beginPath(); c.ellipse(x, y + 15 + lift * 2, 32 + lift * 7, 11 + lift * 3, 0, 0, Math.PI * 2); c.fill();
+      c.lineCap = 'round'; const color = garden ? 'rgba(125,49,83,.72)' : 'rgba(43,94,42,.78)';
+      for (const side of [-1, 1]) for (let blade = 0; blade < 4; blade++) {
+        const offset = blade * 4.5 + 11, bx = x + side * offset, by = y + 15 + (blade % 2) * 2;
+        const bend = side * (5 + moving * 5) + breeze * 5, height = 10 + (blade % 3) * 3;
+        c.strokeStyle = blade === 0 ? (garden ? 'rgba(255,230,239,.86)' : 'rgba(221,246,187,.88)') : color; c.lineWidth = blade === 0 ? 1.7 : 1.2;
+        c.beginPath(); c.moveTo(bx, by); c.quadraticCurveTo(bx + bend * .35, by - height * .5, bx + bend, by - height + Math.sin(phase + blade) * 1.5); c.stroke();
+      }
+      c.restore();
+    }
+
     function drawSlimeModel(c, x, y, skinId, accId, titleId, isJumping, jumpOff, activeEmoteAnim, isSelf, role = 'player', motionSpeed = 0, motionX = 0) {
       c.save();
       const phase = Date.now() * 0.008 + x * 0.015;
       const moving = isSelf ? Math.min(1, Math.hypot(localPlayer.vx, localPlayer.vy) / 190) : Math.min(1, motionSpeed / 190);
       const squash = isSelf ? localPlayer.landingSquash : 0;
       const walkHop = Math.abs(Math.sin(phase * 1.65)) * moving * 4.8;
+      drawGrassContact(c, x, y, jumpOff, moving, phase);
       
       let extraX = 0;
       let extraY = 0;
@@ -1221,6 +1345,20 @@
       const scaleY = 1 - moving * .04 - squash * .25 + (isJumping ? .06 : 0) - (activeEmoteAnim === 'dance' ? Math.sin(Date.now() * 0.016) * 0.08 : 0);
       c.save();
       c.scale(scaleX, scaleY);
+      if (role === 'developer' && activeEmoteAnim !== 'spin') {
+        const devPulse = Date.now() * .0024;
+        const devGlow = c.createRadialGradient(0, 1, 4, 0, 1, 55 + Math.sin(devPulse) * 4);
+        devGlow.addColorStop(0, 'rgba(165,243,252,.3)'); devGlow.addColorStop(.58, 'rgba(34,211,238,.2)'); devGlow.addColorStop(1, 'rgba(34,211,238,0)');
+        c.fillStyle = devGlow; c.beginPath(); c.ellipse(0, 1, 53 + Math.sin(devPulse) * 4, 40 + Math.cos(devPulse) * 3, 0, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = 'rgba(103,232,249,.68)'; c.lineWidth = 1.35; c.setLineDash([3, 5]); c.beginPath(); c.ellipse(0, 1, 36, 27, devPulse * .18, 0, Math.PI * 2); c.stroke(); c.setLineDash([]);
+        for (let spark = 0; spark < 6; spark++) {
+          const angle = devPulse + spark * Math.PI / 2;
+          c.globalAlpha = .55 + .4 * Math.sin(devPulse * 1.4 + spark);
+          c.fillStyle = '#cffafe'; c.shadowColor = '#22d3ee'; c.shadowBlur = 9;
+          c.beginPath(); c.arc(Math.cos(angle) * 31, Math.sin(angle) * 23, spark % 2 ? 1.6 : 2.2, 0, Math.PI * 2); c.fill();
+        }
+        c.globalAlpha = 1; c.shadowBlur = 0;
+      }
       const slimeGradient = c.createRadialGradient(-9, -11, 2, 0, 0, 31);
       const skinColors = specialRoleSkin ? [roleColor, roleColor, roleColor, roleColor] : (skinObj.colors || [roleColor, roleColor, skinObj.shadow || roleColor, skinObj.shadow || roleColor]);
       slimeGradient.addColorStop(0, skinObj.highlight || '#fff1f2');
@@ -1392,8 +1530,9 @@
       c.restore();
     }
 
-    function drawSpeechBubble(c, x, y, bubble) {
+    function drawSpeechBubble(c, x, y, bubble, role = 'player') {
       if (!bubble || !bubble.text || (bubble.until && bubble.until < Date.now())) return;
+      const developer = role === 'developer';
       const text = String(bubble.text).slice(0, 72);
       c.save();
       c.font = 'bold 12px Manrope, sans-serif';
@@ -1407,85 +1546,196 @@
       });
       if (line) lines.push(line);
       if (lines.length > 3) lines.length = 3;
-      const width = Math.min(190, Math.max(44, ...lines.map(value => c.measureText(value).width + 22)));
-      const height = lines.length * 16 + 16;
+      const width = Math.min(developer ? 240 : 190, Math.max(developer ? 174 : 44, ...lines.map(value => c.measureText(value).width + 22)));
+      const height = lines.length * 16 + 16 + (developer ? 14 : 0);
       const left = x - width / 2;
       const top = y - 58 - height;
-      c.shadowColor = 'rgba(45, 20, 38, .28)'; c.shadowBlur = 10; c.shadowOffsetY = 3;
-      c.fillStyle = 'rgba(255,255,255,.96)'; c.strokeStyle = 'rgba(236,72,153,.7)'; c.lineWidth = 1.5;
+      c.shadowColor = developer ? 'rgba(34,211,238,.72)' : 'rgba(45, 20, 38, .28)';
+      c.shadowBlur = developer ? 17 : 10; c.shadowOffsetY = 3;
+      const fill = c.createLinearGradient(left, top, left + width, top + height);
+      if (developer) { fill.addColorStop(0, 'rgba(240,253,255,.99)'); fill.addColorStop(1, 'rgba(207,250,254,.97)'); }
+      else { fill.addColorStop(0, 'rgba(255,255,255,.98)'); fill.addColorStop(1, 'rgba(255,247,251,.97)'); }
+      c.fillStyle = fill; c.strokeStyle = developer ? 'rgba(8,145,178,.94)' : 'rgba(236,72,153,.7)'; c.lineWidth = developer ? 2 : 1.5;
       c.beginPath(); c.roundRect(left, top, width, height, 12); c.fill(); c.stroke();
       c.shadowColor = 'transparent'; c.shadowBlur = 0; c.shadowOffsetY = 0;
-      c.fillStyle = '#ec4899'; c.beginPath(); c.moveTo(x - 6, top + height - 1); c.lineTo(x + 5, top + height - 1); c.lineTo(x, top + height + 7); c.closePath(); c.fill();
-      c.fillStyle = '#3b1732'; c.textAlign = 'center';
-      lines.forEach((value, index) => c.fillText(value, x, top + 19 + index * 16));
+      c.fillStyle = developer ? '#0891b2' : '#ec4899';
+      c.beginPath(); c.moveTo(x - 6, top + height - 1); c.lineTo(x + 5, top + height - 1); c.lineTo(x, top + height + 7); c.closePath(); c.fill();
+      c.fillStyle = developer ? '#0e7490' : '#3b1732'; c.textAlign = 'center';
+      if (developer) { c.font = '900 8px Manrope, sans-serif'; c.fillText('✦  DEVELOPER  ✦', x, top + 12); c.font = 'bold 12px Manrope, sans-serif'; }
+      lines.forEach((value, index) => c.fillText(value, x, top + 19 + (developer ? 14 : 0) + index * 16));
       c.restore();
     }
-
     function drawDecorativePond(cx, cy, rx, ry, time, phase = 0, fishCount = 6, hotSpring = false) {
       ctx.save();
-      ctx.fillStyle = 'rgba(46,64,56,.18)'; ctx.beginPath(); ctx.ellipse(cx, cy + 8, rx + 15, ry + 12, -.08, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(34,53,49,.22)'; ctx.beginPath(); ctx.ellipse(cx + 2, cy + 10, rx + 17, ry + 15, -.08, 0, Math.PI * 2); ctx.fill();
       const bank = ctx.createLinearGradient(cx - rx, cy - ry, cx + rx, cy + ry);
-      bank.addColorStop(0, hotSpring ? '#8ca37c' : '#9ab486'); bank.addColorStop(1, hotSpring ? '#b5a783' : '#b7a98a');
-      ctx.fillStyle = bank; ctx.beginPath(); ctx.ellipse(cx, cy, rx + 10, ry + 10, -.08, 0, Math.PI * 2); ctx.fill();
+      bank.addColorStop(0, hotSpring ? '#9dad86' : '#a9c294'); bank.addColorStop(.48, hotSpring ? '#c6bb96' : '#c5b995'); bank.addColorStop(1, hotSpring ? '#829b80' : '#8faa83');
+      ctx.fillStyle = bank; ctx.beginPath(); ctx.ellipse(cx, cy, rx + 12, ry + 12, -.08, 0, Math.PI * 2); ctx.fill();
+      for (let i = 0; i < 44; i++) {
+        const angle = i * Math.PI * 2 / 44;
+        const pebbleX = cx + Math.cos(angle) * (rx + 7);
+        const pebbleY = cy + Math.sin(angle) * (ry + 7);
+        ctx.fillStyle = ['#a8a28a', '#d7cdb0', '#8f9d84', '#c0b18f'][i % 4];
+        ctx.beginPath(); ctx.ellipse(pebbleX, pebbleY, 5 + (i % 3), 3.2 + (i % 2), angle, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.2)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(pebbleX - 1, pebbleY - 1, 2.5, angle + .4, angle + 2.1); ctx.stroke();
+      }
       const water = ctx.createLinearGradient(cx - rx, cy - ry, cx + rx, cy + ry);
-      water.addColorStop(0, hotSpring ? '#b4e6df' : '#bce9ee'); water.addColorStop(.52, hotSpring ? '#72c7c8' : '#74c6d4'); water.addColorStop(1, hotSpring ? '#4e9fa9' : '#579daf');
+      water.addColorStop(0, hotSpring ? '#c5f1e5' : '#c9f1ec'); water.addColorStop(.38, hotSpring ? '#82d6d0' : '#8bd7df'); water.addColorStop(.72, hotSpring ? '#5fb4bb' : '#69b9cb'); water.addColorStop(1, hotSpring ? '#488e9c' : '#4e8fa8');
       ctx.fillStyle = water; ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, -.08, 0, Math.PI * 2); ctx.fill();
       ctx.save(); ctx.beginPath(); ctx.ellipse(cx, cy, rx - 2, ry - 2, -.08, 0, Math.PI * 2); ctx.clip();
-      for (let r = 0; r < 4; r++) {
-        const rippleX = cx - rx * .55 + ((r * 63 + time * .015) % (rx * 1.1));
-        const rippleY = cy - ry * .58 + (r % 2) * 25 + Math.sin(time * .001 + r + phase) * 4;
-        ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.ellipse(rippleX, rippleY, 17 + (r % 3) * 5, 4, -.12, 0, Math.PI * 2); ctx.stroke();
+      for (let r = 0; r < 8; r++) {
+        const rippleX = cx - rx * .68 + ((r * 57 + time * (.012 + (r % 3) * .002)) % (rx * 1.36));
+        const rippleY = cy - ry * .57 + (r % 4) * ry * .29 + Math.sin(time * .0011 + r + phase) * 4;
+        const shimmer = .17 + .14 * (Math.sin(time * .002 + r) + 1) / 2;
+        ctx.strokeStyle = `rgba(255,255,255,${shimmer})`; ctx.lineWidth = 1.3 + (r % 2) * .7;
+        ctx.beginPath(); ctx.ellipse(rippleX, rippleY, 13 + (r % 3) * 5, 3 + (r % 2), -.12, 0, Math.PI * 2); ctx.stroke();
       }
       for (let f = 0; f < fishCount; f++) {
-        const angle = time * (.00045 + (f % 3) * .00008) + f * (Math.PI * 2 / fishCount) + phase;
-        const fx = cx + Math.sin(angle) * rx * .64;
-        const fy = cy + Math.cos(angle * .83 + f) * ry * .58;
+        const angle = time * (.00039 + (f % 3) * .000055) + f * (Math.PI * 2 / fishCount) + phase;
+        const fx = cx + Math.sin(angle) * rx * (.32 + (f % 3) * .13);
+        const fy = cy + Math.cos(angle * .82 + f) * ry * (.3 + (f % 2) * .15);
         const direction = Math.cos(angle) >= 0 ? 1 : -1;
         const colors = hotSpring ? ['#f97373', '#ffd166', '#f9a8d4', '#fb923c'] : ['#f9735b', '#ffb347', '#f8fafc', '#e879f9'];
-        ctx.save(); ctx.translate(fx, fy); ctx.scale(direction, 1); ctx.rotate(Math.sin(angle) * .18);
+        const fin = Math.sin(time * .012 + f * 2) * 3;
+        ctx.save(); ctx.translate(fx, fy); ctx.scale(direction, 1); ctx.rotate(Math.sin(angle) * .13);
+        ctx.fillStyle = 'rgba(27,71,78,.16)'; ctx.beginPath(); ctx.ellipse(1, 4, 10, 3, 0, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = colors[f % colors.length];
-        ctx.beginPath(); ctx.ellipse(0, 0, 11, 5.5, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(-16, -5); ctx.lineTo(-15, 0); ctx.lineTo(-16, 5); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.beginPath(); ctx.arc(5, -1.5, 1.2, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-8, 0); ctx.lineTo(-17, -6 - fin * .35); ctx.lineTo(-15, 0); ctx.lineTo(-17, 6 + fin * .35); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(0, 0, 10 + (f % 3), 5.5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-1, -4); ctx.quadraticCurveTo(4, -9 - fin * .25, 7, -3); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-1, 4); ctx.quadraticCurveTo(4, 9 + fin * .25, 7, 3); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.48)'; ctx.lineWidth = .8; ctx.beginPath(); ctx.arc(-2, 0, 4, -.8, .8); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.beginPath(); ctx.arc(5, -1.5, 1.45, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#163b4b'; ctx.beginPath(); ctx.arc(5.4, -1.5, .62, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
+        if (f % 3 === 0) {
+          const bubbleX = fx + Math.sin(time * .002 + f) * 7;
+          const bubbleY = fy - 8 - ((time * .014 + f * 9) % 22);
+          ctx.strokeStyle = 'rgba(255,255,255,.52)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(bubbleX, bubbleY, 1.5 + (f % 2), 0, Math.PI * 2); ctx.stroke();
+        }
       }
       ctx.restore();
-      ctx.strokeStyle = 'rgba(255,255,255,.56)'; ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(255,255,255,.62)'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.ellipse(cx - rx * .34, cy - ry * .48, rx * .22, 7, -.2, 0, Math.PI * 2); ctx.stroke();
       if (hotSpring) {
-        ctx.strokeStyle = 'rgba(255,255,255,.38)'; ctx.lineWidth = 3;
-        for (let steam = 0; steam < 3; steam++) {
-          const sx = cx - 30 + steam * 30 + Math.sin(time * .0012 + steam) * 5;
-          const sy = cy - ry * .55 - ((time * .018 + steam * 17) % 42);
+        ctx.strokeStyle = 'rgba(255,255,255,.48)'; ctx.lineWidth = 3;
+        for (let steam = 0; steam < 4; steam++) {
+          const sx = cx - 42 + steam * 28 + Math.sin(time * .0012 + steam) * 5;
+          const sy = cy - ry * .55 - ((time * .016 + steam * 17) % 42);
           ctx.beginPath(); ctx.moveTo(sx, sy + 18); ctx.bezierCurveTo(sx - 8, sy + 7, sx + 8, sy - 3, sx, sy - 15); ctx.stroke();
         }
       }
       ctx.restore();
     }
-
     function drawGrassLawn(garden, time) {
-      const colors = garden ? ['#e7a2b8', '#f2bfd0', '#f8dce5'] : ['#80bf68', '#9bd17d', '#b9df95'];
-      const lawn = ctx.createLinearGradient(0, 0, 2100, 2100);
+      const colors = garden ? ['#d991ad', '#edb0c3', '#f6d1dd'] : ['#69a957', '#86c16b', '#a6d486'];
+      const lawn = ctx.createLinearGradient(0, 0, WORLD_SIZE, WORLD_SIZE);
       lawn.addColorStop(0, colors[0]); lawn.addColorStop(.52, colors[1]); lawn.addColorStop(1, colors[2]);
-      ctx.fillStyle = lawn; ctx.fillRect(0, 0, 2100, 2100);
-      const blades = garden ? ['rgba(177,65,111,.48)', 'rgba(211,104,145,.52)', 'rgba(255,227,236,.9)', 'rgba(238,155,183,.78)'] : ['rgba(48,119,54,.54)', 'rgba(70,145,61,.6)', 'rgba(214,241,176,.85)', 'rgba(128,179,84,.7)'];
+      ctx.fillStyle = lawn; ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+      const blades = garden ? ['rgba(151,48,95,.55)', 'rgba(199,82,127,.62)', 'rgba(255,235,242,.94)', 'rgba(231,136,168,.82)', 'rgba(255,190,207,.8)'] : ['rgba(37,100,43,.58)', 'rgba(51,131,54,.66)', 'rgba(226,246,190,.92)', 'rgba(111,165,70,.78)', 'rgba(166,211,112,.84)'];
+      const gust = time * .00175;
+      const visibleLeft = camera.x - 70, visibleTop = camera.y - 70;
+      const visibleRight = camera.x + canvas.width / zoomLevel + 70, visibleBottom = camera.y + canvas.height / zoomLevel + 70;
       ctx.save(); ctx.lineCap = 'round';
-      for (let i = 0; i < 720; i++) {
-        const x = 20 + ((i * 131.7) % 2060);
-        const y = 20 + ((i * 317.3) % 2060);
-        const height = 4 + (i % 6) * .85;
-        const sway = Math.sin(time * .00042 + i * .73) * 3.2;
-        ctx.strokeStyle = blades[i % blades.length]; ctx.lineWidth = i % 4 === 0 ? 1.4 : .9;
-        ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + sway * .35, y - height * .55, x + sway, y - height); ctx.stroke();
-        if (i % 3 === 0) {
-          const side = (i % 2 ? -1 : 1) * (2 + Math.sin(time * .00042 + i) * 1.5);
-          ctx.beginPath(); ctx.moveTo(x + 1, y); ctx.quadraticCurveTo(x + side * .4, y - height * .3, x + side, y - height * .62); ctx.stroke();
-        }
+      for (let i = 0; i < 1380; i++) {
+        const x = 12 + ((i * 131.7) % (WORLD_SIZE - 24));
+        const y = 12 + ((i * 317.3) % (WORLD_SIZE - 24));
+        if (x < visibleLeft || x > visibleRight || y < visibleTop || y > visibleBottom) continue;
+        const height = 7 + (i % 8) * 1.65;
+        const wave = gust - x * .006 - y * .002 + i * .09;
+        const sway = Math.sin(wave) * (4.5 + height * .44);
+        const bend = Math.sin(wave - .65) * 2.2;
+        ctx.strokeStyle = blades[i % blades.length]; ctx.lineWidth = i % 5 === 0 ? 2 : 1.25;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + bend, y - height * .55, x + sway, y - height); ctx.stroke();
+        ctx.globalAlpha = .72;
+        ctx.beginPath(); ctx.moveTo(x + 1, y); ctx.quadraticCurveTo(x + bend + sway * .42, y - height * .42, x + sway * .7 + (i % 2 ? -4 : 4), y - height * .7); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      // Long, bright streamers make the garden breeze visible across the lawn.
+      for (let i = 0; i < 42; i++) {
+        const x = ((i * 173 + time * (.034 + (i % 3) * .009)) % (WORLD_SIZE - 60)) - 70;
+        const y = (i * 97 + Math.sin(time * .0012 + i) * 34) % (WORLD_SIZE - 20);
+        const length = 32 + (i % 5) * 13;
+        if (x + length < visibleLeft || x > visibleRight || y < visibleTop || y > visibleBottom) continue;
+        const alpha = .18 + .14 * (Math.sin(time * .002 + i) + 1) / 2;
+        ctx.strokeStyle = garden ? `rgba(255,245,249,${alpha})` : `rgba(245,255,227,${alpha})`;
+        ctx.lineWidth = 1.5 + (i % 3) * .45;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + length * .48, y - 4 - Math.sin(time * .002 + i) * 5, x + length, y - 1); ctx.stroke();
+        ctx.fillStyle = garden ? `rgba(255,224,235,${alpha + .1})` : `rgba(216,248,185,${alpha + .1})`;
+        ctx.beginPath(); ctx.arc(x + length, y - 1, 1.5, 0, Math.PI * 2); ctx.fill();
       }
       ctx.restore();
     }
 
+    const meadowFlowerCache = Object.create(null);
+    function getMeadowFlowers(garden) {
+      const zone = garden ? 'garden' : 'spring';
+      if (meadowFlowerCache[zone]) return meadowFlowerCache[zone];
+      let seed = garden ? 739391 : 184127;
+      const random = () => { seed = seed * 16807 % 2147483647; return (seed - 1) / 2147483646; };
+      meadowFlowerCache[zone] = Array.from({ length: 276 }, () => ({
+        x: 78 + random() * (WORLD_SIZE - 156), y: 78 + random() * (WORLD_SIZE - 156),
+        size: .62 + random() * .82, phase: random() * Math.PI * 2, petals: random() > .55 ? 6 : 5, variety: Math.floor(random() * 5)
+      }));
+      return meadowFlowerCache[zone];
+    }
+    function drawMeadowFlowers(garden, time) {
+      const left = camera.x - 45, top = camera.y - 45;
+      const right = camera.x + canvas.width / zoomLevel + 45, bottom = camera.y + canvas.height / zoomLevel + 45;
+      const petals = garden ? ['#f472b6','#fff9fc','#f9a8d4','#ffe4ed','#ec78ab'] : ['#84cc16','#f7fee7','#fef08a','#fffef2','#b8dc70'];
+      const centers = garden ? ['#ffe7a6','#fffdf4','#f8d36d'] : ['#facc15','#fff7c2','#eab308'];
+      ctx.save(); ctx.lineCap = 'round';
+      for (const flower of getMeadowFlowers(garden)) {
+        if (flower.x < left || flower.x > right || flower.y < top || flower.y > bottom) continue;
+        const scale = flower.size, breeze = Math.sin(time * .00125 + flower.phase + flower.x * .002 + flower.y * .001) * (2.7 + scale * 2.2);
+        const stemHeight = 10 + scale * 5, headX = flower.x + breeze, headY = flower.y - stemHeight;
+        ctx.strokeStyle = garden ? 'rgba(86,117,57,.9)' : 'rgba(56,111,48,.9)'; ctx.lineWidth = 1.3 * scale;
+        ctx.beginPath(); ctx.moveTo(flower.x, flower.y); ctx.quadraticCurveTo(flower.x + breeze * .35, flower.y - stemHeight * .55, headX, headY); ctx.stroke();
+        ctx.fillStyle = garden ? '#82a75e' : '#609b4c';
+        ctx.beginPath(); ctx.ellipse(flower.x - 3 * scale, flower.y - 5 * scale, 4.2 * scale, 1.7 * scale, -.45 + breeze * .015, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(flower.x + 3 * scale, flower.y - 8 * scale, 3.8 * scale, 1.6 * scale, .4 + breeze * .015, 0, Math.PI * 2); ctx.fill();
+        ctx.save(); ctx.translate(headX, headY); ctx.rotate(breeze * .025);
+        const petalColor = petals[flower.variety]; ctx.fillStyle = petalColor; ctx.strokeStyle = garden ? 'rgba(190,78,125,.2)' : 'rgba(103,143,64,.18)'; ctx.lineWidth = .55;
+        for (let petal = 0; petal < flower.petals; petal++) {
+          const angle = petal * Math.PI * 2 / flower.petals + flower.phase * .1;
+          const px = Math.cos(angle) * 3.6 * scale, py = Math.sin(angle) * 3.2 * scale;
+          ctx.globalAlpha = .86 + .12 * Math.sin(time * .002 + flower.phase + petal);
+          ctx.beginPath(); ctx.ellipse(px, py, 3.05 * scale, 2.05 * scale, angle, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        }
+        ctx.globalAlpha = 1; ctx.fillStyle = centers[flower.variety % centers.length]; ctx.shadowColor = garden ? 'rgba(255,224,162,.56)' : 'rgba(253,224,71,.52)'; ctx.shadowBlur = 3 * scale;
+        ctx.beginPath(); ctx.arc(0, 0, 1.65 * scale, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    function drawFallingGardenParticles(garden, time) {
+      const wind = time * .006;
+      const visibleLeft = camera.x - 35, visibleTop = camera.y - 35;
+      const visibleRight = camera.x + canvas.width / zoomLevel + 35, visibleBottom = camera.y + canvas.height / zoomLevel + 35;
+      for (let i = 0; i < 84; i++) {
+        const fall = (i * 263 + time * (.012 + (i % 4) * .0015)) % WORLD_SIZE;
+        const drift = Math.sin(time * .00075 + i * .8) * 48 + wind;
+        const x = ((i * 177 + drift) % WORLD_SIZE + WORLD_SIZE) % WORLD_SIZE;
+        const y = fall - 28;
+        if (x < visibleLeft || x > visibleRight || y < visibleTop || y > visibleBottom) continue;
+        const size = 4.5 + (i % 5) * .9;
+        const flutter = Math.sin(time * .0017 + i * 1.8) * .34;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(time * .0008 + i) * .45 + flutter);
+        if (garden && i % 3 === 0) {
+          const pinks = ['rgba(255,223,234,.94)', 'rgba(245,153,188,.86)', 'rgba(255,191,211,.9)'];
+          ctx.fillStyle = pinks[i % pinks.length]; ctx.shadowColor = 'rgba(244,114,182,.3)'; ctx.shadowBlur = 5;
+          ctx.beginPath(); ctx.ellipse(-3, 0, size * .68, size * .35, -.45, 0, Math.PI * 2); ctx.ellipse(3, 0, size * .68, size * .35, .45, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = 'rgba(255,255,255,.72)'; ctx.beginPath(); ctx.arc(-2, -1, 1.4, 0, Math.PI * 2); ctx.fill();
+        } else {
+          const greens = garden ? ['rgba(197,111,143,.82)', 'rgba(231,159,180,.88)'] : ['rgba(49,140,68,.9)', 'rgba(111,190,96,.94)', 'rgba(175,222,132,.9)'];
+          ctx.fillStyle = greens[i % greens.length]; ctx.shadowColor = garden ? 'rgba(190,76,119,.2)' : 'rgba(31,109,56,.25)'; ctx.shadowBlur = 4;
+          ctx.beginPath(); ctx.moveTo(-size, 0); ctx.quadraticCurveTo(-size * .15, -size * .82, size, -size * .1); ctx.quadraticCurveTo(size * .2, size * .8, -size, 0); ctx.closePath(); ctx.fill();
+          ctx.shadowBlur = 0; ctx.strokeStyle = 'rgba(255,255,255,.42)'; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(-size * .75, 0); ctx.quadraticCurveTo(0, -size * .05, size * .65, -size * .12); ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
     function drawDecorativeRock(x, y, rx, ry, variation = 0, theme = 'spring') {
       const zen = theme === 'zen';
       const palettes = zen
@@ -1555,85 +1805,439 @@
         ctx.restore();
       }
     }
+    let worldCycleStart = Date.now();
+    const WORLD_DAY_MS = 5 * 60 * 1000;
+    const WORLD_NIGHT_MS = 5 * 60 * 1000;
+    let lastWorldClockText = '';
+    function getNightAmount(time = Date.now()) {
+      const cycle = WORLD_DAY_MS + WORLD_NIGHT_MS;
+      const phase = ((time - worldCycleStart) % cycle + cycle) % cycle;
+      const fade = 30000;
+      if (phase < WORLD_DAY_MS) return 0;
+      if (phase < WORLD_DAY_MS + fade) return (phase - WORLD_DAY_MS) / fade;
+      if (phase < cycle - fade) return 1;
+      return Math.max(0, (cycle - phase) / fade);
+    }
+    function updateWorldClockLabel(time = Date.now()) {
+      const label = document.getElementById('room-indicator');
+      if (!label) return;
+      const night = getNightAmount(time) >= .45;
+      const text = `#${currentChannel} · ${night ? '🌙 NIGHT' : '☀ DAY'}`;
+      if (text !== lastWorldClockText) { label.textContent = text; lastWorldClockText = text; }
+    }
+
+    function startWorldDayNightCycle() { worldCycleStart = Date.now(); lastWorldClockText = ''; updateWorldClockLabel(worldCycleStart); }
+
+    function drawOuterMeadow(garden, time) {
+      const left = camera.x - 90, top = camera.y - 90;
+      const width = canvas.width / zoomLevel + 180, height = canvas.height / zoomLevel + 180;
+      const backdrop = ctx.createLinearGradient(left, top, left + width * .86, top + height);
+      if (garden) { backdrop.addColorStop(0, '#7e5264'); backdrop.addColorStop(.38, '#bd718d'); backdrop.addColorStop(.72, '#e4a1b2'); backdrop.addColorStop(1, '#f1c3c4'); }
+      else { backdrop.addColorStop(0, '#244d40'); backdrop.addColorStop(.42, '#4d8058'); backdrop.addColorStop(.74, '#85ad66'); backdrop.addColorStop(1, '#d0d995'); }
+      ctx.fillStyle = backdrop; ctx.fillRect(left, top, width, height);
+      const glow = ctx.createRadialGradient(left + width * .52, top + height * .48, 10, left + width * .52, top + height * .48, Math.max(width, height) * .72);
+      if (garden) { glow.addColorStop(0, 'rgba(255,235,239,.14)'); glow.addColorStop(.6, 'rgba(255,190,211,.08)'); glow.addColorStop(1, 'rgba(255,223,222,0)'); }
+      else { glow.addColorStop(0, 'rgba(239,255,205,.16)'); glow.addColorStop(.58, 'rgba(197,239,157,.09)'); glow.addColorStop(1, 'rgba(221,248,177,0)'); }
+      ctx.fillStyle = glow; ctx.fillRect(left, top, width, height);
+      ctx.save(); ctx.lineCap = 'round';
+      const ribbons = garden ? ['rgba(255,225,236,.12)','rgba(125,58,84,.12)','rgba(255,247,238,.1)'] : ['rgba(228,255,195,.15)','rgba(35,82,53,.13)','rgba(255,250,190,.1)'];
+      for (let band = 0; band < 13; band++) {
+        const y = top + ((band * 137 + time * (.004 + (band % 3) * .0007)) % height);
+        ctx.strokeStyle = ribbons[band % ribbons.length]; ctx.lineWidth = 22 + (band % 4) * 15;
+        ctx.beginPath(); ctx.moveTo(left - 30, y);
+        ctx.bezierCurveTo(left + width * .22, y - 40 + Math.sin(time * .0007 + band) * 12, left + width * .58, y + 44 + Math.cos(time * .0006 + band) * 12, left + width + 30, y + Math.sin(time * .0008 + band) * 22); ctx.stroke();
+      }
+      const tufts = garden ? ['rgba(255,229,239,.8)','rgba(255,248,248,.86)','rgba(248,191,212,.78)'] : ['rgba(225,248,185,.86)','rgba(255,253,221,.84)','rgba(184,224,142,.8)'];
+      for (let tuft = 0; tuft < 112; tuft++) {
+        const x = left + ((tuft * 137 + Math.sin(time * .00065 + tuft) * 21) % width);
+        const y = top + ((tuft * 211 + Math.cos(time * .00072 + tuft) * 25) % height);
+        if (x >= 0 && x <= WORLD_SIZE && y >= 0 && y <= WORLD_SIZE) continue;
+        const sway = Math.sin(time * .00135 + tuft * .8) * (5 + (tuft % 4));
+        ctx.strokeStyle = garden ? 'rgba(113,61,81,.8)' : 'rgba(46,91,55,.84)'; ctx.lineWidth = 1.7;
+        for (let blade = 0; blade < 4; blade++) {
+          const offset = (blade - 1.5) * 4; ctx.beginPath(); ctx.moveTo(x + offset, y + 9);
+          ctx.quadraticCurveTo(x + offset + sway * .45, y - 3, x + offset + sway + (blade - 1.5) * 5, y - 16 - blade * 2); ctx.stroke();
+        }
+        if (tuft % 3 === 0) {
+          const bloom = tufts[tuft % tufts.length]; ctx.fillStyle = bloom; ctx.globalAlpha = .66 + .28 * (Math.sin(time * .002 + tuft) + 1) / 2;
+          for (let petal = 0; petal < 4; petal++) { const a = petal * Math.PI / 2; ctx.beginPath(); ctx.arc(x + sway + Math.cos(a) * 2.6, y - 18 + Math.sin(a) * 2.2, 1.8, 0, Math.PI * 2); ctx.fill(); }
+          ctx.globalAlpha = 1; ctx.fillStyle = garden ? '#ffe5a9' : '#fff3a6'; ctx.beginPath(); ctx.arc(x + sway, y - 18, 1.25, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      for (let seed = 0; seed < 34; seed++) {
+        const x = left + ((seed * 193 + time * (.009 + (seed % 4) * .002)) % width);
+        const y = top + ((seed * 281 + Math.sin(time * .0007 + seed) * 33) % height);
+        if ((x >= 0 && x <= WORLD_SIZE && y >= 0 && y <= WORLD_SIZE) || x < left || x > left + width || y < top || y > top + height) continue;
+        const drift = Math.sin(time * .001 + seed) * 7, twinkle = .45 + .45 * (Math.sin(time * .003 + seed * 2) + 1) / 2;
+        ctx.globalAlpha = twinkle; ctx.fillStyle = garden ? '#fff0f6' : '#f8ffd9'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 8;
+        ctx.beginPath(); ctx.arc(x + drift, y, seed % 3 ? 1.5 : 2.2, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0; ctx.strokeStyle = garden ? 'rgba(255,238,245,.36)' : 'rgba(242,255,213,.38)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x - 6, y + 5); ctx.quadraticCurveTo(x + drift, y - 1, x + 8 + drift, y + 2); ctx.stroke();
+      }
+      ctx.globalAlpha = 1; ctx.restore();
+    }
+
+    function drawCelestialEffects(garden, time) {
+      const night = getNightAmount(time);
+      const sizeScale = 1;
+      const sunX = WORLD_SIZE * .52;
+      const sunY = -142;
+      ctx.save();
+      if (night < .98) {
+        const day = 1 - night;
+        const halo = ctx.createRadialGradient(sunX, sunY, 5, sunX, sunY, 148 * sizeScale);
+        halo.addColorStop(0, garden ? 'rgba(255,221,156,.32)' : 'rgba(255,237,170,.34)');
+        halo.addColorStop(.45, garden ? 'rgba(255,218,169,.15)' : 'rgba(255,235,173,.14)'); halo.addColorStop(1, 'rgba(255,239,191,0)');
+        ctx.globalAlpha = day; ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(sunX, sunY, 148 * sizeScale, 0, Math.PI * 2); ctx.fill();
+        ctx.lineCap = 'round';
+        for (let ray = 0; ray < 9; ray++) {
+          const angle = .66 + ray * .145 + Math.sin(time * .00035 + ray) * .035;
+          const length = (900 + (ray % 4) * 260 + Math.sin(time * .00045 + ray * 2) * 46) * sizeScale;
+          const endX = sunX + Math.cos(angle) * length, endY = sunY + Math.sin(angle) * length;
+          const beam = ctx.createLinearGradient(sunX, sunY, endX, endY);
+          beam.addColorStop(0, garden ? 'rgba(255,226,165,.2)' : 'rgba(255,239,177,.2)'); beam.addColorStop(.35, garden ? 'rgba(255,229,181,.09)' : 'rgba(255,245,198,.09)'); beam.addColorStop(1, 'rgba(255,245,210,0)');
+          ctx.strokeStyle = beam; ctx.lineWidth = (28 + (ray % 3) * 17) * sizeScale; ctx.beginPath(); ctx.moveTo(sunX, sunY); ctx.lineTo(endX, endY); ctx.stroke();
+        }
+        ctx.globalAlpha = day;
+        ctx.fillStyle = ctx.createRadialGradient(sunX - 7, sunY - 8, 3, sunX, sunY, 33);
+        const sunFill = ctx.fillStyle; sunFill.addColorStop(0, '#fff9d6'); sunFill.addColorStop(.55, '#ffe58a'); sunFill.addColorStop(1, '#f8ae54');
+        ctx.shadowColor = '#ffd978'; ctx.shadowBlur = 28 * sizeScale; ctx.beginPath(); ctx.arc(sunX, sunY, 25 * sizeScale, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+        ctx.strokeStyle = 'rgba(255,244,195,.68)'; ctx.lineWidth = 2;
+        for (let ray = 0; ray < 12; ray++) {
+          const angle = time * .00012 + ray * Math.PI / 6;
+          const inner = (34 + Math.sin(time * .001 + ray) * 2) * sizeScale, outer = (43 + Math.sin(time * .001 + ray) * 4) * sizeScale;
+          ctx.beginPath(); ctx.moveTo(sunX + Math.cos(angle) * inner, sunY + Math.sin(angle) * inner); ctx.lineTo(sunX + Math.cos(angle) * outer, sunY + Math.sin(angle) * outer); ctx.stroke();
+        }
+      }
+      if (night > .02) {
+        const moonX = sunX, moonY = sunY;
+        ctx.globalAlpha = night;
+        const moonGlow = ctx.createRadialGradient(moonX, moonY, 4 * sizeScale, moonX, moonY, 250 * sizeScale);
+        moonGlow.addColorStop(0, 'rgba(219,234,254,.3)'); moonGlow.addColorStop(.52, 'rgba(147,197,253,.14)'); moonGlow.addColorStop(1, 'rgba(147,197,253,0)');
+        ctx.fillStyle = moonGlow; ctx.beginPath(); ctx.arc(moonX, moonY, 250 * sizeScale, 0, Math.PI * 2); ctx.fill();
+        ctx.lineCap = 'round';
+        for (let ray = 0; ray < 7; ray++) {
+          const angle = .76 + ray * .16 + Math.sin(time * .0003 + ray) * .025;
+          const endX = moonX + Math.cos(angle) * (780 + (ray % 3) * 230);
+          const endY = moonY + Math.sin(angle) * (780 + (ray % 3) * 230);
+          const beam = ctx.createLinearGradient(moonX, moonY, endX, endY);
+          beam.addColorStop(0, 'rgba(207,225,255,.12)'); beam.addColorStop(.38, 'rgba(207,225,255,.055)'); beam.addColorStop(1, 'rgba(207,225,255,0)');
+          ctx.strokeStyle = beam; ctx.lineWidth = (34 + (ray % 3) * 15) * sizeScale; ctx.beginPath(); ctx.moveTo(moonX, moonY); ctx.lineTo(endX, endY); ctx.stroke();
+        }
+        ctx.fillStyle = '#f1f5dc'; ctx.shadowColor = '#dbeafe'; ctx.shadowBlur = 18 * sizeScale; ctx.beginPath(); ctx.arc(moonX, moonY, 22 * sizeScale, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+        ctx.fillStyle = '#53617c'; ctx.beginPath(); ctx.arc(moonX + 10 * sizeScale, moonY - 8 * sizeScale, 20 * sizeScale, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.92)';
+        for (let star = 0; star < 5; star++) {
+          const angle = time * .00018 + star * Math.PI * .4;
+          const radius = (38 + (star % 3) * 10) * sizeScale;
+          ctx.globalAlpha = night * (.45 + .45 * (Math.sin(time * .002 + star) + 1) / 2);
+          ctx.beginPath(); ctx.arc(moonX + Math.cos(angle) * radius, moonY + Math.sin(angle) * radius, (star % 2 ? 1.4 : 2) * sizeScale, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawWorldInsects(time) {
+      const night = getNightAmount(time);
+      const left = camera.x - 30, top = camera.y - 30;
+      const right = camera.x + canvas.width / zoomLevel + 30, bottom = camera.y + canvas.height / zoomLevel + 30;
+      const garden = currentChannel === 'sakura-lounge';
+      if (night > .01) {
+        for (let i = 0; i < 30; i++) {
+          const x = ((i * 197 + time * (.008 + (i % 3) * .002) + Math.sin(time * .0007 + i) * 45) % WORLD_SIZE + WORLD_SIZE) % WORLD_SIZE - 20;
+          const y = ((i * 131 + Math.sin(time * .0009 + i * 1.4) * 80 + time * .0025) % WORLD_SIZE + WORLD_SIZE) % WORLD_SIZE - 20;
+          if (x < left || x > right || y < top || y > bottom) continue;
+          const pulse = .45 + .5 * (Math.sin(time * .004 + i * 2) + 1) / 2;
+          const color = garden ? '255,224,129' : '222,255,153';
+          const glow = ctx.createRadialGradient(x, y, 0, x, y, 19);
+          glow.addColorStop(0, `rgba(${color},${.58 * pulse})`); glow.addColorStop(.35, `rgba(${color},${.2 * pulse})`); glow.addColorStop(1, `rgba(${color},0)`);
+          ctx.save(); ctx.globalAlpha = night; ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 19, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#fff8c7'; ctx.shadowColor = `rgb(${color})`; ctx.shadowBlur = 10;
+          ctx.beginPath(); ctx.arc(x, y, 2 + pulse, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+          ctx.strokeStyle = `rgba(${color},${.3 * pulse})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x - 8, y + 5); ctx.quadraticCurveTo(x - 4, y + 1, x - 1, y + 2); ctx.stroke(); ctx.restore();
+        }
+      }
+      if (night < .92) {
+        for (let i = 0; i < 16; i++) {
+          const x = ((i * 169 + time * .012 + Math.sin(time * .0007 + i) * 74) % WORLD_SIZE + WORLD_SIZE) % WORLD_SIZE - 20;
+          const y = ((i * 223 + 250 + Math.sin(time * .00065 + i * 1.6) * 100) % WORLD_SIZE + WORLD_SIZE) % WORLD_SIZE - 20;
+          if (x < left || x > right || y < top || y > bottom) continue;
+          const flap = .25 + .75 * Math.abs(Math.sin(time * .011 + i * 1.4));
+          const colors = garden ? ['#f472b6', '#fda4af', '#fde68a'] : ['#facc15', '#67e8f9', '#f8fafc'];
+          ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(time * .001 + i) * .5); ctx.globalAlpha = 1 - night;
+          ctx.fillStyle = colors[i % colors.length]; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 4;
+          ctx.beginPath(); ctx.ellipse(-4, -2, 4.2, 5 * flap, -.55, 0, Math.PI * 2); ctx.ellipse(4, -2, 4.2, 5 * flap, .55, 0, Math.PI * 2); ctx.fill();
+          ctx.shadowBlur = 0; ctx.fillStyle = '#533a43'; ctx.beginPath(); ctx.ellipse(0, 1, 1.25, 4.5, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = 'rgba(65,50,55,.72)'; ctx.lineWidth = .7; ctx.beginPath(); ctx.moveTo(-.5, -3); ctx.quadraticCurveTo(-3, -7, -4, -6); ctx.moveTo(.5, -3); ctx.quadraticCurveTo(3, -7, 4, -6); ctx.stroke(); ctx.restore();
+        }
+      }
+    }
+    function drawAnimatedTree(x, y, index, garden, time) {
+      const breeze = Math.sin(time * .00135 + index * 1.7 + x * .002) * (garden ? 4.2 : 3.2);
+      ctx.save(); ctx.translate(x, y);
+      const treeScale = .9 + (index % 4) * .08; ctx.scale(treeScale, treeScale);
+      ctx.fillStyle = garden ? 'rgba(83,39,57,.18)' : 'rgba(35,65,44,.19)';
+      ctx.beginPath(); ctx.ellipse(0, 12, 42, 12, 0, 0, Math.PI * 2); ctx.fill();
+      const treeKind = garden ? 0 : [0, 1, 2, 3][index % 4];
+      if (treeKind === 1) {
+        for (let cane = 0; cane < 3; cane++) {
+          const bx = (cane - 1) * 13, height = 94 + (cane % 2) * 16;
+          const motion = Math.sin(time * .00125 + index * .8 + cane * 1.7) * 5.2;
+          const stalk = ctx.createLinearGradient(bx - 4, 0, bx + 5, -height);
+          stalk.addColorStop(0, '#486c43'); stalk.addColorStop(.45, '#8fb86d'); stalk.addColorStop(1, '#c6d895');
+          ctx.strokeStyle = stalk; ctx.lineWidth = 6.2; ctx.lineCap = 'round'; ctx.beginPath();
+          ctx.moveTo(bx, 7); ctx.bezierCurveTo(bx + motion * .25, -height * .28, bx + motion * .72, -height * .72, bx + motion, -height); ctx.stroke();
+          for (let node = 1; node <= 4; node++) {
+            const t = node / 4.6, ny = -height * t, nx = bx + motion * t;
+            ctx.strokeStyle = 'rgba(232,243,190,.82)'; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(nx - 4, ny); ctx.quadraticCurveTo(nx, ny + 1.5, nx + 4, ny - .5); ctx.stroke();
+            if (node === 1) continue;
+            const side = node % 2 ? -1 : 1, leafReach = 15 + (node % 2) * 4;
+            ctx.strokeStyle = '#668f55'; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(nx + side * 2, ny + 1);
+            ctx.quadraticCurveTo(nx + side * leafReach * .48 + motion * .12, ny - 5, nx + side * leafReach + motion * .22, ny - 9); ctx.stroke();
+            ctx.fillStyle = node % 2 ? '#9fc77a' : '#c4dc8c'; ctx.beginPath();
+            ctx.ellipse(nx + side * leafReach + motion * .22, ny - 9, 8, 2.4, side * -.38 + motion * .006, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+        ctx.restore(); return;
+      }
+      if (treeKind === 2) {
+        ctx.strokeStyle = garden ? '#785043' : '#684d37'; ctx.lineWidth = 13; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(0, 8); ctx.quadraticCurveTo(-5, -34, breeze * .3, -76); ctx.stroke();
+        for (let branch = 0; branch < 8; branch++) {
+          const side = branch % 2 ? 1 : -1, startY = -54 - (branch % 4) * 8, reach = 29 + (branch % 3) * 8;
+          const endX = side * reach + breeze * .8, endY = startY - 29 - (branch % 3) * 8;
+          ctx.strokeStyle = garden ? 'rgba(117,76,70,.78)' : 'rgba(88,103,62,.82)'; ctx.lineWidth = 2.1; ctx.beginPath(); ctx.moveTo(0, startY); ctx.quadraticCurveTo(endX * .45, startY + 10, endX, endY); ctx.stroke();
+          for (let leaf = 0; leaf < 5; leaf++) {
+            const t = (leaf + 1) / 6, lx = endX * t + Math.sin(time * .001 + branch + leaf) * 2, ly = startY + (endY - startY) * t + 8;
+            ctx.fillStyle = garden ? (leaf % 3 ? '#f3a9c4' : '#fff0f5') : (leaf % 3 ? '#79b868' : '#d8eca4');
+            ctx.globalAlpha = .82 + .15 * Math.sin(time * .002 + leaf + branch); ctx.beginPath(); ctx.ellipse(lx, ly, 3.2, 5.4, side * .35 + breeze * .012, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+        ctx.globalAlpha = 1; ctx.restore(); return;
+      }
+      if (treeKind === 3) {
+        ctx.fillStyle = garden ? '#5b4638' : '#584936'; ctx.fillRect(-4, -64, 8, 72);
+        if (garden) {
+          for (let tier = 0; tier < 4; tier++) {
+            const yy = -52 - tier * 13, width = 36 - tier * 5, drift = breeze * (tier + 1) * .12;
+            ctx.fillStyle = ['#355b43','#41694b','#527a51','#668957'][tier]; ctx.beginPath(); ctx.ellipse(drift, yy, width, 8, 0, Math.PI, Math.PI * 2); ctx.lineTo(drift + width, yy + 3); ctx.quadraticCurveTo(drift, yy + 13, drift - width, yy + 3); ctx.fill();
+            for (let bloom = 0; bloom < 4; bloom++) { ctx.fillStyle = bloom % 2 ? '#f8c4d5' : '#fff0f5'; ctx.beginPath(); ctx.arc(drift - width * .6 + bloom * width * .38, yy - 3, 2.2, 0, Math.PI * 2); ctx.fill(); }
+          }
+        } else {
+          for (let tier = 0; tier < 4; tier++) {
+            const yy = -28 - tier * 17, width = 35 - tier * 7, drift = breeze * (tier + 1) * .12;
+            ctx.fillStyle = ['#315c3d','#3c7045','#4a8050','#5a9258'][tier]; ctx.beginPath(); ctx.moveTo(drift, yy - 26); ctx.lineTo(drift + width, yy + 12); ctx.lineTo(drift - width, yy + 12); ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = 'rgba(202,232,164,.44)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(drift, yy - 22); ctx.lineTo(drift - width * .58, yy + 6); ctx.stroke();
+          }
+        }
+        ctx.restore(); return;
+      }
+      const bark = ctx.createLinearGradient(-12, 0, 12, -58);
+      if (garden) { bark.addColorStop(0, '#5e4037'); bark.addColorStop(.48, '#9a6954'); bark.addColorStop(1, '#c18b70'); }
+      else { bark.addColorStop(0, '#594337'); bark.addColorStop(.5, '#80624a'); bark.addColorStop(1, '#a7835d'); }
+      ctx.strokeStyle = bark; ctx.lineWidth = 15; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(0, 8); ctx.bezierCurveTo(-4, -16, breeze * .22, -39, breeze * .45, -76); ctx.stroke();
+      ctx.lineWidth = 5; ctx.strokeStyle = garden ? 'rgba(224,176,145,.76)' : 'rgba(201,164,119,.72)';
+      ctx.beginPath(); ctx.moveTo(-1, -20); ctx.quadraticCurveTo(-18, -42, -31 + breeze * .35, -58); ctx.moveTo(1, -37); ctx.quadraticCurveTo(20, -53, 31 + breeze * .4, -67); ctx.moveTo(1, -52); ctx.quadraticCurveTo(-5, -70, -9 + breeze * .4, -83); ctx.stroke();
+      const canopy = garden
+        ? [['#e875a5','#f7a7c4'],['#f08bb5','#ffd1df'],['#d95f94','#f6b5cc'],['#f39abd','#ffdae5'],['#dc7099','#f7aec5'],['#ef9cba','#ffe0e9']]
+        : [['#3f874f','#7ebd6d'],['#5a9d59','#a4d17d'],['#43864d','#8dc274'],['#71ae65','#b6d88b'],['#357a4a','#72ad67'],['#66a85e','#acd17e']];
+      const clusters = [[-30,-72,27,21],[-13,-92,29,23],[16,-91,31,24],[37,-73,26,21],[0,-66,34,23],[-42,-54,20,17],[43,-53,19,16]];
+      clusters.forEach(([cx,cy,rx,ry], ci) => {
+        const drift = breeze * ((cy + 100) / 65);
+        const gradient = ctx.createRadialGradient(cx - rx * .35 + drift, cy - ry * .42, 2, cx + drift, cy, rx * 1.25);
+        gradient.addColorStop(0, canopy[(index + ci) % canopy.length][1]); gradient.addColorStop(1, canopy[(index + ci) % canopy.length][0]);
+        ctx.fillStyle = gradient; ctx.beginPath(); ctx.ellipse(cx + drift, cy, rx, ry, Math.sin(time * .001 + ci + index) * .035, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = garden ? 'rgba(255,242,247,.24)' : 'rgba(231,255,213,.22)';
+        ctx.beginPath(); ctx.ellipse(cx + drift - rx * .2, cy - ry * .35, rx * .42, ry * .2, -.25, 0, Math.PI * 2); ctx.fill();
+      });
+      for (let leaf = 0; leaf < 18; leaf++) {
+        const clusterIndex = leaf % clusters.length; const cl = clusters[clusterIndex];
+        const angle = leaf * 2.399 + index;
+        const rx = cl[2] * (.35 + (leaf % 4) * .12); const ry = cl[3] * (.35 + (leaf % 3) * .13);
+        const lx = cl[0] + Math.cos(angle) * rx + breeze * ((cl[1] + 100) / 65);
+        const ly = cl[1] + Math.sin(angle) * ry;
+        const pulse = .78 + .22 * Math.sin(time * .0022 + leaf * 2 + index);
+        ctx.globalAlpha = pulse; ctx.fillStyle = garden ? (leaf % 4 === 0 ? '#fff0f5' : '#ffd3e1') : (leaf % 4 === 0 ? '#e0f2b5' : '#b9dc92');
+        ctx.beginPath(); ctx.ellipse(lx, ly, leaf % 3 === 0 ? 3.2 : 2.2, leaf % 3 === 0 ? 2.2 : 1.5, angle, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1; ctx.restore();
+    }
+    function drawWorldTrees(positions, garden, time) {
+      const left = camera.x - 125, top = camera.y - 140;
+      const right = camera.x + canvas.width / zoomLevel + 125, bottom = camera.y + canvas.height / zoomLevel + 140;
+      positions.forEach(([x, y], index) => { if (x >= left && x <= right && y >= top && y <= bottom) drawAnimatedTree(x, y, index, garden, time); });
+    }
+
+    function drawWorldBenches(garden, time) {
+      const benches = garden ? [[760, 1270, .12], [1770, 660, -.1], [1120, 1380, -.16]] : [[1800, 1550, .12], [830, 1580, .08]];
+      benches.forEach(([x, y, angle], index) => {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(angle);
+        ctx.fillStyle = 'rgba(37,40,34,.2)'; ctx.beginPath(); ctx.ellipse(0, 12, 38, 9, 0, 0, Math.PI * 2); ctx.fill();
+        const wood = ctx.createLinearGradient(0, -24, 0, 12);
+        wood.addColorStop(0, garden ? '#c58c62' : '#bd9263'); wood.addColorStop(.5, garden ? '#8c6047' : '#886448'); wood.addColorStop(1, '#543f35');
+        ctx.strokeStyle = '#4e4038'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(-25, -1); ctx.lineTo(-28, 12); ctx.moveTo(25, -1); ctx.lineTo(28, 12); ctx.moveTo(-22, -11); ctx.lineTo(-23, 7); ctx.moveTo(22, -11); ctx.lineTo(23, 7); ctx.stroke();
+        ctx.fillStyle = wood;
+        ctx.beginPath(); ctx.roundRect(-34, -24, 68, 5, 2); ctx.fill(); ctx.beginPath(); ctx.roundRect(-34, -16, 68, 5, 2); ctx.fill();
+        for (let slat = 0; slat < 3; slat++) { ctx.beginPath(); ctx.roundRect(-33, -7 + slat * 6, 66, 5, 2); ctx.fill(); }
+        ctx.strokeStyle = 'rgba(255,228,186,.52)'; ctx.lineWidth = 1;
+        for (let slat = 0; slat < 5; slat++) { const yy = -21 + slat * 6; ctx.beginPath(); ctx.moveTo(-29, yy); ctx.lineTo(29, yy); ctx.stroke(); }
+        ctx.fillStyle = garden ? '#e9aac0' : '#a6ca8c'; ctx.beginPath(); ctx.arc(-32, -5, 3, 0, Math.PI * 2); ctx.arc(32, -5, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    function drawNightAtmosphere(time) {
+      const night = getNightAmount(time);
+      if (night <= .01) return;
+      const left = camera.x - 60, top = camera.y - 60;
+      const width = canvas.width / zoomLevel + 120, height = canvas.height / zoomLevel + 120;
+      ctx.save(); ctx.globalAlpha = night;
+      const shade = ctx.createLinearGradient(left, top, left, top + height);
+      shade.addColorStop(0, 'rgba(18,30,73,.54)'); shade.addColorStop(.62, 'rgba(22,39,82,.43)'); shade.addColorStop(1, 'rgba(26,48,67,.38)');
+      ctx.fillStyle = shade; ctx.fillRect(left, top, width, height);
+      for (let star = 0; star < 46; star++) {
+        const sx = left + ((star * 421 + 173) % width); const sy = top + ((star * 277 + 94) % height);
+        const alpha = .3 + .55 * (Math.sin(time * .002 + star * 1.7) + 1) / 2;
+        ctx.globalAlpha = night * alpha; ctx.fillStyle = '#fff7d4'; ctx.beginPath(); ctx.arc(sx, sy, star % 7 === 0 ? 2 : 1.15, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawMapBoundary(garden, time) {
+      const visibleLeft = camera.x - 100, visibleTop = camera.y - 100;
+      const visibleRight = camera.x + canvas.width / zoomLevel + 100, visibleBottom = camera.y + canvas.height / zoomLevel + 100;
+      const inset = 38, extent = WORLD_SIZE - inset * 2;
+      ctx.save(); ctx.lineJoin = 'round'; ctx.shadowColor = garden ? 'rgba(112,35,74,.28)' : 'rgba(26,70,43,.3)'; ctx.shadowBlur = 24;
+      ctx.strokeStyle = garden ? 'rgba(120,53,83,.78)' : 'rgba(36,80,50,.8)'; ctx.lineWidth = 24; ctx.beginPath(); ctx.roundRect(inset, inset, extent, extent, 68); ctx.stroke();
+      ctx.shadowBlur = 0; ctx.strokeStyle = garden ? 'rgba(255,226,237,.96)' : 'rgba(225,248,199,.96)'; ctx.lineWidth = 5; ctx.beginPath(); ctx.roundRect(inset + 3, inset + 3, extent - 6, extent - 6, 65); ctx.stroke();
+      ctx.strokeStyle = garden ? 'rgba(226,148,174,.72)' : 'rgba(126,177,106,.78)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.roundRect(inset + 17, inset + 17, extent - 34, extent - 34, 54); ctx.stroke();
+      for (let i = 0; i < 20; i++) {
+        const along = 105 + i * 110, sway = Math.sin(time * .0012 + i * .8) * 3;
+        for (const [x, y] of [[along, inset + 6], [along, WORLD_SIZE - inset - 6], [inset + 6, along], [WORLD_SIZE - inset - 6, along]]) {
+          if (x < visibleLeft || x > visibleRight || y < visibleTop || y > visibleBottom) continue;
+          if (garden) {
+            ctx.strokeStyle = 'rgba(132,58,91,.72)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y + 4); ctx.quadraticCurveTo(x + sway, y - 3, x + sway, y - 11); ctx.stroke();
+            for (let petal = 0; petal < 5; petal++) { const a = petal * Math.PI * 2 / 5; ctx.fillStyle = petal % 2 ? '#f5b2c9' : '#ffe3ed'; ctx.beginPath(); ctx.ellipse(x + Math.cos(a) * 4 + sway, y - 12 + Math.sin(a) * 3, 2.8, 2.2, a, 0, Math.PI * 2); ctx.fill(); }
+            ctx.fillStyle = '#ffe58a'; ctx.beginPath(); ctx.arc(x + sway, y - 12, 1.8, 0, Math.PI * 2); ctx.fill();
+          } else {
+            ctx.fillStyle = i % 2 ? 'rgba(98,124,85,.92)' : 'rgba(128,144,103,.92)'; ctx.beginPath(); ctx.ellipse(x, y, 8, 5, (i % 3 - 1) * .22, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = 'rgba(235,249,203,.72)'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(x - 2, y + 1); ctx.lineTo(x + sway, y - 5); ctx.moveTo(x + 2, y + 1); ctx.lineTo(x + sway + 4, y - 3); ctx.stroke();
+          }
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawSideRiver(garden, time) {
+      const visibleLeft = camera.x - 100, visibleTop = camera.y - 100;
+      const visibleRight = camera.x + canvas.width / zoomLevel + 100, visibleBottom = camera.y + canvas.height / zoomLevel + 100;
+      const centerAt = y => WORLD_SIZE - 174 + Math.sin(y * .0027) * 30 + Math.sin(y * .006) * 13;
+      const banks = [], water = [];
+      for (let step = 0; step <= 80; step++) {
+        const y = 38 + step * ((WORLD_SIZE - 76) / 80);
+        const center = centerAt(y), width = 48 + Math.sin(y * .004) * 4;
+        banks.push({ left: center - width - 19, right: center + width + 19, y });
+        water.push({ left: center - width, right: center + width, y });
+      }
+      const fillRibbon = (edges, fill) => {
+        ctx.beginPath(); ctx.moveTo(edges[0].left, edges[0].y);
+        for (let i = 1; i < edges.length; i++) ctx.lineTo(edges[i].left, edges[i].y);
+        for (let i = edges.length - 1; i >= 0; i--) ctx.lineTo(edges[i].right, edges[i].y);
+        ctx.closePath(); ctx.fillStyle = fill; ctx.fill();
+      };
+      ctx.save();
+      const bankGradient = ctx.createLinearGradient(WORLD_SIZE - 280, 0, WORLD_SIZE, 0);
+      bankGradient.addColorStop(0, garden ? 'rgba(131,91,75,.9)' : 'rgba(77,93,62,.92)');
+      bankGradient.addColorStop(.5, garden ? 'rgba(183,145,111,.98)' : 'rgba(139,142,94,.98)');
+      bankGradient.addColorStop(1, garden ? 'rgba(131,91,75,.9)' : 'rgba(77,93,62,.92)');
+      fillRibbon(banks, bankGradient);
+      ctx.lineWidth = 3; ctx.strokeStyle = garden ? 'rgba(88,62,65,.6)' : 'rgba(51,77,59,.66)';
+      for (const edge of ['left','right']) { ctx.beginPath(); ctx.moveTo(banks[0][edge], banks[0].y); for (let i = 1; i < banks.length; i++) ctx.lineTo(banks[i][edge], banks[i].y); ctx.stroke(); }
+      const waterGradient = ctx.createLinearGradient(WORLD_SIZE - 250, 0, WORLD_SIZE - 70, 0);
+      if (garden) { waterGradient.addColorStop(0,'#bd6d98'); waterGradient.addColorStop(.24,'#df8fb2'); waterGradient.addColorStop(.58,'#f3bad0'); waterGradient.addColorStop(.82,'#e99fbd'); waterGradient.addColorStop(1,'#b96792'); }
+      else { waterGradient.addColorStop(0,'#408f88'); waterGradient.addColorStop(.3,'#65b9a2'); waterGradient.addColorStop(.68,'#a6d9b4'); waterGradient.addColorStop(1,'#438f86'); }
+      fillRibbon(water, waterGradient);
+      ctx.lineCap = 'round';
+      for (const edge of ['left','right']) { ctx.beginPath(); ctx.moveTo(water[0][edge], water[0].y); for (let i = 1; i < water.length; i++) ctx.lineTo(water[i][edge], water[i].y); ctx.strokeStyle = garden ? 'rgba(228,247,241,.7)' : 'rgba(226,251,210,.7)'; ctx.lineWidth = 2.5; ctx.stroke(); }
+      const glint = garden ? ['rgba(255,245,251,.8)','rgba(255,214,233,.72)','rgba(255,239,224,.58)'] : ['rgba(250,255,228,.62)','rgba(227,250,199,.54)','rgba(255,244,175,.5)'];
+      for (let i = 0; i < 46; i++) {
+        const riverLength = WORLD_SIZE - 76;
+        const y = 38 + ((i * 83 + time * .052) % riverLength + riverLength) % riverLength;
+        if (y < visibleTop || y > visibleBottom) continue;
+        const center = centerAt(y), spread = Math.sin(i * 12.3 + time * .001) * 19;
+        const x = center + spread; const len = 12 + (i % 5) * 5;
+        ctx.strokeStyle = glint[i % glint.length]; ctx.globalAlpha = .46 + .38 * (Math.sin(time * .002 + i) + 1) / 2; ctx.lineWidth = i % 4 === 0 ? 2.1 : 1.2;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + Math.sin(time * .001 + i) * 3, y + len * .5, x + Math.sin(time * .0014 + i * .5) * 5, y + len); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      if (garden) {
+        for (let i = 0; i < 15; i++) {
+          const span = WORLD_SIZE - 76, y = 38 + ((i * 181 + time * .031) % span + span) % span;
+          if (y < visibleTop - 30 || y > visibleBottom + 30) continue;
+          const x = centerAt(y) + Math.sin(time * .0008 + i * 2) * 13;
+          const progress = ((time * .022 + i * 7) % 34) / 34;
+          ctx.globalAlpha = (1 - progress) * .42; ctx.strokeStyle = i % 2 ? 'rgba(255,248,252,.9)' : 'rgba(255,210,232,.88)'; ctx.lineWidth = 1.4;
+          ctx.beginPath(); ctx.ellipse(x, y, 5 + progress * 15, 2 + progress * 5, Math.sin(i + time * .0003) * .12, 0, Math.PI * 2); ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+      for (let i = 0; i < 27; i++) {
+        const y = 78 + i * 101, center = centerAt(y);
+        if (y < visibleTop - 30 || y > visibleBottom + 30 || center < visibleLeft - 120 || center > visibleRight + 120) continue;
+        const side = i % 2 ? -1 : 1, x = center + side * (76 + Math.sin(i * 2.4) * 8), size = 4 + (i % 3) * 1.6;
+        ctx.fillStyle = i % 2 ? 'rgba(77,82,70,.88)' : 'rgba(157,148,117,.92)'; ctx.beginPath(); ctx.ellipse(x, y, size * 1.5, size, Math.sin(i) * .2, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.beginPath(); ctx.ellipse(x - 1, y - 1, size * .75, size * .28, -.2, 0, Math.PI * 2); ctx.fill();
+      }
+      if (!garden) {
+        for (let i = 0; i < 11; i++) {
+          const span = WORLD_SIZE - 100, baseY = 70 + i * (span / 11);
+          const cycle = (time * .035 + i * 31) % 155, y = baseY - cycle;
+          if (y < visibleTop - 40 || baseY > visibleBottom + 50) continue;
+          const center = centerAt(baseY) + Math.sin(time * .001 + i * 1.7) * 12, drift = Math.sin(time * .0011 + i) * 17;
+          const fade = Math.max(.04, 1 - cycle / 185); ctx.globalAlpha = fade * .48;
+          const vapor = ctx.createLinearGradient(center, y - 28, center + drift, y + 10); vapor.addColorStop(0,'rgba(255,255,241,0)'); vapor.addColorStop(.45,'rgba(255,255,245,.68)'); vapor.addColorStop(1,'rgba(255,255,241,0)');
+          ctx.strokeStyle = vapor; ctx.lineWidth = 5 + (i % 3) * 1.5; ctx.lineCap = 'round'; ctx.beginPath();
+          ctx.moveTo(center, y + 12); ctx.bezierCurveTo(center - 12 + drift * .2, y - 3, center + 14 + drift * .6, y - 12, center + drift, y - 34); ctx.stroke();
+          ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(center + 2, y + 5); ctx.quadraticCurveTo(center + drift * .5, y - 7, center + drift * .7, y - 20); ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+
     function drawZoneDecorations() {
       const garden = currentChannel === 'sakura-lounge';
       const time = Date.now();
+      drawOuterMeadow(garden, time);
       drawGrassLawn(garden, time);
-
+      drawMeadowFlowers(garden, time);
+      drawSideRiver(garden, time);
       if (garden) {
-        ctx.strokeStyle = 'rgba(214, 169, 184, .12)'; ctx.lineWidth = 2;
-        for (let n = 0; n <= 2100; n += 80) { ctx.beginPath(); ctx.moveTo(n, 0); ctx.lineTo(n, 2100); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, n); ctx.lineTo(2100, n); ctx.stroke(); }
-        ctx.strokeStyle = '#dfcba8'; ctx.lineWidth = 68; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(130, 1120); ctx.bezierCurveTo(500, 950, 850, 1060, 1210, 890); ctx.bezierCurveTo(1480, 760, 1720, 520, 1980, 610); ctx.stroke();
-        ctx.strokeStyle = 'rgba(255,255,255,.58)'; ctx.lineWidth = 5; ctx.setLineDash([4, 24]); ctx.stroke(); ctx.setLineDash([]);
-
-        // Smooth, layered stones sit in the pink lawn.
-        const gardenStones = [[350, 450, 22], [420, 480, 16], [1200, 750, 28], [1260, 720, 18], [750, 1400, 24], [820, 1450, 15], [1650, 1200, 30]];
+        const gardenStones = [[350, 450, 22], [420, 480, 16], [1200, 750, 28], [1260, 720, 18], [750, 1400, 24], [820, 1450, 15], [1650, 1200, 30], [2210, 930, 23]];
         gardenStones.forEach(([sx, sy, sr], index) => drawDecorativeRock(sx, sy, sr, sr * .72, index, 'zen'));
-
-        // The original koi pond is back, joined by a smaller garden pond.
         drawDecorativePond(1470, 440, 205, 118, time, 0, 7, false);
         drawDecorativePond(560, 1430, 132, 78, time, 2.4, 5, false);
-
-        const trees = [[240,250],[660,240],[1110,230],[1860,300],[270,740],[950,540],[1810,850],[380,1580],[880,1840],[1580,1660],[1880,1350]];
-        trees.forEach(([x,y],i) => {
-          ctx.fillStyle = 'rgba(69, 49, 48, .18)'; ctx.beginPath(); ctx.ellipse(x,y+20,39,12,0,0,Math.PI*2); ctx.fill();
-          ctx.fillStyle = '#815d52'; ctx.fillRect(x-6,y-8,12,48);
-          const colors=['#f7a9c4','#ffd0dc','#f58fb4'];
-          [[-18,-24],[0,-37],[18,-23],[-9,-8],[12,-7]].forEach(([ox,oy],j)=>{ctx.fillStyle=colors[(i+j)%colors.length];ctx.beginPath();ctx.arc(x+ox,y+oy,15,0,Math.PI*2);ctx.fill();});
-          ctx.fillStyle='#fff5c2';ctx.beginPath();ctx.arc(x,y-23,4,0,Math.PI*2);ctx.fill();
-        });
-
-        // Leaf / Petal fall down in Zen Garden
-        for(let i=0;i<64;i++){
-          const y=(i*271+time*.045)%2100;
-          const x=(i*173+Math.sin(time*.001+i)*34+2100)%2100;
-          ctx.save();ctx.translate(x,y);ctx.rotate((time*.001+i)%Math.PI);
-          ctx.fillStyle=i%3===0?'rgba(255,208,220,.88)':'rgba(236,72,153,.55)';
-          ctx.beginPath();ctx.ellipse(0,0,4,8,0,0,Math.PI*2);ctx.fill();ctx.restore();
-        }
-        ctx.font='bold 23px Manrope';ctx.textAlign='left';ctx.fillStyle='rgba(131,24,67,.55)';ctx.fillText('🌸 SAKURA ZEN GARDEN',75,78);
-
+        drawWorldTrees([[250,260],[650,240],[1100,255],[1840,300],[250,730],[860,520],[1850,860],[330,1560],[850,1840],[1570,1710],[1880,1360],[430,1320],[1810,1120],[1120,2300],[2180,2220]], true, time);
+        drawFallingGardenParticles(true, time);
+        ctx.font='bold 23px Manrope'; ctx.textAlign='left'; ctx.fillStyle='rgba(131,24,67,.62)'; ctx.fillText('🌸 SAKURA ZEN GARDEN',75,78);
       } else {
-        // Onsen Spring
-        ctx.fillStyle='#d4bd91';ctx.fillRect(120,520,1860,155);ctx.fillRect(930,120,155,1860);
-
-        // Faceted river stones with soft highlights and ground shadows.
-        const onsenStones = [[500, 600, 26], [580, 620, 20], [1200, 1100, 32], [1280, 1050, 22], [800, 400, 25], [1500, 1400, 28]];
+        const onsenStones = [[500, 600, 26], [580, 620, 20], [1200, 1100, 32], [1280, 1050, 22], [800, 400, 25], [1500, 1400, 28], [2140, 920, 24]];
         onsenStones.forEach(([sx, sy, sr], index) => drawDecorativeRock(sx, sy, sr, sr * .72, index, 'spring'));
-
-        // Bring back Spring greenery around the old hot-spring pools.
-        const springTrees = [[260,300],[560,315],[1780,320],[300,860],[735,1010],[1810,920],[330,1690],[900,1810],[1880,1720]];
-        springTrees.forEach(([x,y],i) => {
-          ctx.fillStyle = 'rgba(43,63,48,.17)'; ctx.beginPath(); ctx.ellipse(x,y+22,35,11,0,0,Math.PI*2); ctx.fill();
-          ctx.fillStyle = '#765c46'; ctx.fillRect(x-5,y-8,10,42);
-          const greens = ['#76a86e','#8fbd78','#a7c889'];
-          [[-17,-24],[0,-38],[18,-23],[-10,-8],[12,-8],[0,-19]].forEach(([ox,oy],j)=>{ ctx.fillStyle=greens[(i+j)%greens.length]; ctx.beginPath(); ctx.arc(x+ox,y+oy,14,0,Math.PI*2); ctx.fill(); });
-          ctx.fillStyle='rgba(255,248,214,.78)'; ctx.beginPath(); ctx.arc(x-5,y-24,3,0,Math.PI*2); ctx.fill();
-        });
-
-        // Restored twin Spring ponds, animated koi and gently rising steam.
+        drawWorldTrees([[255,285],[560,300],[1785,300],[270,850],[735,1000],[1815,920],[320,1680],[880,1810],[1880,1715],[500,1150],[1530,430],[140,1290],[2290,250],[2350,520],[2360,840],[2350,1170],[2290,1430],[2350,1680],[2400,2080],[2350,2410],[2040,2560],[1530,2670],[940,2500],[430,2380],[120,2060],[2050,520],[2040,1290],[2120,2260]], false, time);
         drawDecorativePond(1420, 1260, 280, 190, time, .6, 8, true);
         drawDecorativePond(560, 1370, 152, 92, time, 2.1, 6, true);
-
-        // Green leaf falldown in Onsen Spring: "make the green leafs fall in the onseen spring like the patels fall in zen garden"
-        for(let i=0;i<64;i++){
-          const y=(i*271+time*.045)%2100;
-          const x=(i*173+Math.sin(time*.001+i)*34+2100)%2100;
-          ctx.save();ctx.translate(x,y);ctx.rotate((time*.001+i)%Math.PI);
-          ctx.fillStyle=i%2===0?'rgba(74, 222, 128, 0.82)':'rgba(34, 197, 94, 0.65)';
-          ctx.beginPath();ctx.ellipse(0,0,4,8,0,0,Math.PI*2);ctx.fill();ctx.restore();
-        }
-
-        ctx.font='bold 23px Manrope';ctx.textAlign='left';ctx.fillStyle='rgba(52,83,43,.65)';ctx.fillText('🎋 ONSEN SPRING',75,78);
+        drawFallingGardenParticles(false, time);
+        ctx.font='bold 23px Manrope'; ctx.textAlign='left'; ctx.fillStyle='rgba(52,83,43,.7)'; ctx.fillText('🎋 ONSEN SPRING',75,78);
       }
+      drawMapBoundary(garden, time);
+      drawNightAtmosphere(time);
+      drawCelestialEffects(garden, time);
     }
-
     const WORLD_LAMPS = {
-      garden: [[480, 1010], [900, 970], [1370, 820], [1700, 640]],
-      spring: [[520, 660], [1040, 570], [1570, 1080], [1230, 1520]]
+      garden: [[260, 960], [790, 1095], [1330, 920], [1770, 700], [1460, 605], [480, 1275]],
+      spring: [[300, 490], [700, 690], [1300, 490], [1810, 690], [1110, 1265], [620, 1535]]
     };
-    const worldLampStates = { garden: [true, true, true, true], spring: [true, true, true, true] };
+    const worldLampStates = { garden: [true, true, true, true, true, true], spring: [true, true, true, true, true, true] };
     let worldActionToastTimer = null;
     function activeLampZone() { return currentChannel === 'sakura-lounge' ? 'garden' : 'spring'; }
     function drawGardenEnhancements(time) {
@@ -1648,26 +2252,11 @@
         }
         ctx.globalAlpha = 1; ctx.fillStyle = '#fff7ad'; ctx.beginPath(); ctx.arc(x, y, 2.4, 0, Math.PI * 2); ctx.fill();
       });
-      if (garden) {
-        [[1010, 1180], [1730, 1090]].forEach(([x, y]) => {
-          ctx.fillStyle = 'rgba(65,39,31,.22)'; ctx.beginPath(); ctx.ellipse(x, y + 16, 34, 8, 0, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = '#81513d'; ctx.fillRect(x - 25, y - 5, 50, 7); ctx.fillRect(x - 20, y - 15, 40, 6);
-          ctx.fillRect(x - 21, y + 1, 5, 17); ctx.fillRect(x + 16, y + 1, 5, 17);
-          ctx.strokeStyle = '#b7795e'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x - 20, y - 8); ctx.lineTo(x - 20, y - 17); ctx.moveTo(x + 20, y - 8); ctx.lineTo(x + 20, y - 17); ctx.stroke();
-        });
-      } else {
-        [[360, 1050], [690, 1480], [1750, 1490], [1860, 720]].forEach(([x, y], index) => {
-          ctx.strokeStyle = 'rgba(44,94,49,.78)'; ctx.lineWidth = 3;
-          for (let reed = 0; reed < 4; reed++) {
-            const rx = x + reed * 7;
-            ctx.beginPath(); ctx.moveTo(rx, y + 18); ctx.quadraticCurveTo(rx - 5, y - 4 - reed * 2, rx + (reed % 2 ? 9 : -7), y - 25); ctx.stroke();
-            ctx.fillStyle = index % 2 ? '#a3e635' : '#86efac'; ctx.beginPath(); ctx.ellipse(rx + (reed % 2 ? 8 : -7), y - 25, 4, 2, -.4, 0, Math.PI * 2); ctx.fill();
-          }
-        });
-      }
+      drawWorldBenches(garden, time);
+      drawWorldInsects(time);
       for (let i = 0; i < 10; i++) {
-        const x = (130 + i * 197 + Math.sin(time * .001 + i) * 18) % 2050;
-        const y = (280 + i * 173 + Math.cos(time * .0012 + i) * 15) % 1900;
+        const x = (130 + i * 197 + Math.sin(time * .001 + i) * 18) % (WORLD_SIZE - 24);
+        const y = (280 + i * 173 + Math.cos(time * .0012 + i) * 15) % (WORLD_SIZE - 24);
         ctx.globalAlpha = .25 + .5 * (Math.sin(time * .004 + i) + 1) / 2;
         ctx.fillStyle = garden ? '#fff7ad' : '#d9f99d'; ctx.beginPath(); ctx.arc(x, y, 2.2, 0, Math.PI * 2); ctx.fill();
       }
@@ -1675,24 +2264,37 @@
     }
     function drawInteractiveLamps(time) {
       const zone = activeLampZone();
+      const night = getNightAmount(time);
       WORLD_LAMPS[zone].forEach(([x, y], index) => {
         const isLit = worldLampStates[zone][index];
+        const flicker = .9 + .1 * Math.sin(time * .009 + index * 2.4);
         ctx.save();
         if (isLit) {
-          const glow = ctx.createRadialGradient(x, y - 42, 3, x, y - 42, 82);
-          glow.addColorStop(0, 'rgba(255,239,171,.38)'); glow.addColorStop(1, 'rgba(255,202,89,0)');
-          ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y - 42, 82, 0, Math.PI * 2); ctx.fill();
+          const radius = 76 + night * 90;
+          const glow = ctx.createRadialGradient(x, y - 41, 2, x, y - 41, radius);
+          glow.addColorStop(0, `rgba(255,239,169,${(.32 + night * .46) * flicker})`);
+          glow.addColorStop(.28, `rgba(255,190,88,${(.13 + night * .22) * flicker})`);
+          glow.addColorStop(1, 'rgba(255,174,62,0)');
+          ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y - 41, radius, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = `rgba(255,208,124,${.08 + night * .16})`; ctx.beginPath(); ctx.ellipse(x, y + 10, 32 + night * 14, 8 + night * 3, 0, 0, Math.PI * 2); ctx.fill();
         }
-        ctx.strokeStyle = '#59463a'; ctx.lineWidth = 5; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(x, y - 27); ctx.lineTo(x, y + 12); ctx.stroke();
-        ctx.fillStyle = '#5a4435'; ctx.beginPath(); ctx.ellipse(x, y + 14, 12, 4, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = isLit ? '#fff3bf' : '#64748b'; ctx.strokeStyle = '#6b5140'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.roundRect(x - 9, y - 52, 18, 24, 5); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = '#5a4435'; ctx.fillRect(x - 12, y - 56, 24, 4); ctx.fillRect(x - 12, y - 26, 24, 4);
+        ctx.strokeStyle = '#493b35'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(x, y - 28); ctx.quadraticCurveTo(x + 1, y - 7, x, y + 12); ctx.stroke();
+        ctx.strokeStyle = 'rgba(222,186,132,.72)'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(x - 1, y - 24); ctx.lineTo(x - 1, y + 8); ctx.stroke();
+        ctx.fillStyle = '#695747'; ctx.beginPath(); ctx.ellipse(x, y + 14, 15, 5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#9c8060'; ctx.beginPath(); ctx.ellipse(x, y + 12, 10, 3, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#5a493b'; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.moveTo(x - 9, y - 47); ctx.lineTo(x - 9, y - 56); ctx.quadraticCurveTo(x, y - 64, x + 9, y - 56); ctx.lineTo(x + 9, y - 47); ctx.stroke();
+        ctx.fillStyle = isLit ? '#fff0b5' : '#697783'; ctx.strokeStyle = '#624c3d'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.roundRect(x - 10, y - 50, 20, 24, 5); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = isLit ? `rgba(255,223,137,${.55 + night * .4})` : 'rgba(148,163,184,.35)';
+        ctx.beginPath(); ctx.roundRect(x - 6, y - 46, 12, 16, 3); ctx.fill();
+        ctx.fillStyle = '#5a4537'; ctx.beginPath(); ctx.roundRect(x - 14, y - 54, 28, 5, 2); ctx.fill(); ctx.beginPath(); ctx.roundRect(x - 13, y - 26, 26, 4, 2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x - 11, y - 54); ctx.lineTo(x, y - 61); ctx.lineTo(x + 11, y - 54); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#d5b57c'; ctx.beginPath(); ctx.arc(x, y - 63, 2, 0, Math.PI * 2); ctx.fill();
         if (isLit) {
-          ctx.globalAlpha = .65 + .25 * Math.sin(time * .004 + index);
-          ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y - 40, 3, 0, Math.PI * 2); ctx.fill();
-          ctx.font = '9px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('✦', x + 13, y - 47);
+          ctx.globalAlpha = .58 + .38 * flicker; ctx.fillStyle = '#fff'; ctx.shadowColor = '#ffd56d'; ctx.shadowBlur = 12 + night * 10;
+          ctx.beginPath(); ctx.arc(x, y - 38, 2.5 + night, 0, Math.PI * 2); ctx.fill();
+          ctx.shadowBlur = 0; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('✦', x + 16, y - 48);
         }
         ctx.restore();
       });
@@ -1721,8 +2323,8 @@
       const blend = 1 - Math.exp(-dt * 15);
       localPlayer.vx += (dx * 340 - localPlayer.vx) * blend;
       localPlayer.vy += (dy * 340 - localPlayer.vy) * blend;
-      localPlayer.x = Math.max(50, Math.min(2050, localPlayer.x + localPlayer.vx * dt));
-      localPlayer.y = Math.max(50, Math.min(2050, localPlayer.y + localPlayer.vy * dt));
+      localPlayer.x = Math.max(WORLD_EDGE, Math.min(WORLD_SIZE - WORLD_EDGE, localPlayer.x + localPlayer.vx * dt));
+      localPlayer.y = Math.max(WORLD_EDGE, Math.min(WORLD_SIZE - WORLD_EDGE, localPlayer.y + localPlayer.vy * dt));
       localPlayer.landingSquash = Math.max(0, localPlayer.landingSquash - dt * 4.5);
 
       if (localPlayer.isJumping) {
@@ -1789,12 +2391,12 @@
         const displayPlayer = { ...p, x: playerX, y: playerY };
         const jumpHeight = Number.isFinite(p.displayJumpOffset) ? p.displayJumpOffset : (p.jumpOffset || 0);
         drawSlimeModel(ctx, playerX, playerY, p.equippedSkin, p.equippedAcc, p.equippedTitle, p.isJumping, jumpHeight, p.activeSpecialEmote, false, p.role, Math.hypot(p.vx || 0, p.vy || 0), p.vx || 0);
-        drawSpeechBubble(ctx, playerX, playerY - jumpHeight, p.speechBubble);
+        drawSpeechBubble(ctx, playerX, playerY - jumpHeight, p.speechBubble, p.role);
         drawPlayerLabel(ctx, displayPlayer);
       });
 
       drawSlimeModel(ctx, localPlayer.x, localPlayer.y, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, localPlayer.isJumping, localPlayer.jumpOffset, localPlayer.activeSpecialEmote, true, localPlayer.role);
-      drawSpeechBubble(ctx, localPlayer.x, localPlayer.y - localPlayer.jumpOffset, localPlayer.speechBubble);
+      drawSpeechBubble(ctx, localPlayer.x, localPlayer.y - localPlayer.jumpOffset, localPlayer.speechBubble, localPlayer.role);
       drawPlayerLabel(ctx, localPlayer, true);
 
       ctx.restore();
@@ -1802,6 +2404,7 @@
 
     let previousFrameTime = 0;
     function gameLoop(timestamp) {
+      updateWorldClockLabel(Date.now());
       const dt = previousFrameTime ? Math.min(.05, (timestamp - previousFrameTime) / 1000) : 1 / 60;
       previousFrameTime = timestamp;
       updatePlayerMovement(dt);
@@ -2714,26 +3317,37 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
       if (!file.type.startsWith('image/')) { alert('Choose an image file.'); event.target.value = ''; return; }
+      if (file.size > 12 * 1024 * 1024) { alert('Choose an image smaller than 12 MB.'); event.target.value = ''; return; }
       const reader = new FileReader();
+      reader.onerror = () => { alert('Could not read that image. Please try another file.'); event.target.value = ''; };
       reader.onload = () => {
         const image = new Image();
+        image.onerror = () => { alert('Could not open that image. Please try another file.'); event.target.value = ''; };
         image.onload = async () => {
-          const scale = Math.min(1, 160 / Math.max(image.width, image.height));
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.max(1, Math.round(image.width * scale));
-          canvas.height = Math.max(1, Math.round(image.height * scale));
-          canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-          localPlayer.avatarUrl = canvas.toDataURL('image/jpeg', .76);
-          savePlayerToStorage(); renderAvatarPreview(); broadcastProfileUpdate();
-          const error = await persistProfileToAuth();
-          if (error) alert('Saved on browser, could not sync to account. ' + error.message);
+          try {
+            const scale = Math.min(1, 320 / Math.max(image.width, image.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(image.width * scale));
+            canvas.height = Math.max(1, Math.round(image.height * scale));
+            const imageContext = canvas.getContext('2d');
+            if (!imageContext) throw new Error('Image editing is unavailable in this browser.');
+            imageContext.fillStyle = '#fff'; imageContext.fillRect(0, 0, canvas.width, canvas.height);
+            imageContext.drawImage(image, 0, 0, canvas.width, canvas.height);
+            localPlayer.avatarUrl = canvas.toDataURL('image/jpeg', .84);
+            savePlayerToStorage(); renderAvatarPreview(); renderFriendsList();
+            syncFriendProfile(localPlayer); broadcastPlayerState(); broadcastProfileUpdate();
+            const error = await persistProfileToAuth();
+            if (error) alert('The photo is showing here, but could not sync to your account. ' + error.message);
+          } catch (error) {
+            alert(error && error.message ? error.message : 'Could not update that profile photo.');
+          } finally {
+            event.target.value = '';
+          }
         };
-        image.onerror = () => alert('Image error.');
-        image.src = result.result;
+        image.src = String(reader.result || '');
       };
       reader.readAsDataURL(file);
     }
-
     async function clearProfileImage() {
       localPlayer.avatarUrl = '';
       savePlayerToStorage(); renderAvatarPreview(); broadcastProfileUpdate(); renderFriendsList();
@@ -2753,6 +3367,7 @@
     }
 
     function savePlayerToStorage() {
+      if (guestMode) return;
       removeLegacyGuestId();
       localStorage.setItem('sakura_name', localPlayer.name);
       localStorage.setItem('sakura_pfp', localPlayer.pfp);
@@ -2766,7 +3381,6 @@
       localStorage.setItem('sakura_eq_frame', localPlayer.equippedFrame || '');
       localStorage.setItem('sakura_inv', JSON.stringify(localPlayer.inventory));
     }
-
     function updateUIHeader() {
       document.getElementById('player-points-display').textContent = localPlayer.points.toLocaleString();
       updateFriendRequestBadge();
@@ -2864,7 +3478,7 @@
 
     function staffUserCard(user, mode) {
       const card = document.createElement('article');
-      card.className = 'rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm';
+      card.className = 'staff-management-card rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm';
       const top = document.createElement('div'); top.className = 'flex items-center gap-2';
       top.appendChild(makeAvatar({ pfp: user.pfp, avatarUrl: user.avatar_url }, 'w-9 h-9'));
       const details = document.createElement('div'); details.className = 'min-w-0 flex-1';
@@ -3069,11 +3683,28 @@
         .subscribe();
     }
 
+    function updateChatZoneTheme() {
+      const sidebar = document.getElementById('chat-sidebar');
+      const globalTab = document.getElementById('chat-tab-global');
+      const staffTab = document.getElementById('chat-tab-staff');
+      const spring = currentChannel === 'onsen-hotspring';
+      const staffAllowed = ['admin', 'developer'].includes(localPlayer.role);
+      if (sidebar) sidebar.dataset.zone = spring ? 'spring' : 'garden';
+      if (globalTab) {
+        const active = activeChatTab === 'global';
+        globalTab.dataset.active = String(active);
+        globalTab.className = `chat-tab px-2.5 py-1 rounded-lg text-xs font-bold ${active ? 'bg-pink-500 text-white' : 'text-pink-300 hover:text-white'} transition`;
+      }
+      if (staffTab) {
+        const active = activeChatTab === 'staff';
+        staffTab.dataset.active = String(active);
+        staffTab.className = `chat-tab px-2.5 py-1 rounded-lg text-xs font-bold ${staffAllowed ? '' : 'hidden'} ${active ? 'bg-violet-600 text-white' : 'text-pink-300 hover:text-white'} transition`;
+      }
+    }
     function switchChatTab(tab) {
       if (tab === 'staff' && !['admin', 'developer'].includes(localPlayer.role)) return;
       activeChatTab = tab;
-      document.getElementById('chat-tab-global').className = `px-2.5 py-1 rounded-lg text-xs font-bold ${tab === 'global' ? 'bg-pink-500 text-white' : 'text-pink-300 hover:text-white'}`;
-      document.getElementById('chat-tab-staff').className = `px-2.5 py-1 rounded-lg text-xs font-bold ${tab === 'staff' ? 'bg-violet-600 text-white' : 'text-pink-300 hover:text-white'}`;
+      updateChatZoneTheme();
       document.getElementById('chat-input').placeholder = tab === 'staff' ? 'Type staff group message...' : 'Type global message...';
       
       const chatBox = document.getElementById('chat-messages');
@@ -3195,6 +3826,7 @@
       const roleTitle = roleTitleEquipped ? (role === 'developer' ? 'DEV' : 'ADMIN') : '';
       
       const card = document.createElement('article');
+      card.dataset.role = role;
       const cardStyle = '';
       card.className = `message-card-chat rounded-2xl border p-2.5 shadow-sm ${roleTitleEquipped && role === 'developer' ? 'border-cyan-300 bg-cyan-950/70 shadow-cyan-500/20' : roleTitleEquipped && role === 'admin' ? 'border-rose-400 bg-slate-950/80 shadow-rose-500/25' : isSelf ? 'border-pink-300/40 bg-pink-500/20' : 'border-white/10 bg-white/5'} ${cardStyle || ''}`;
       const header = document.createElement('div'); header.className = 'mb-1 flex items-center gap-2';
@@ -3228,6 +3860,7 @@
     function switchChannel(channelName) {
       if (!['sakura-lounge', 'onsen-hotspring'].includes(channelName)) return;
       currentChannel = channelName;
+      updateChatZoneTheme();
       remotePlayers = {};
       pondClickRipples.length = 0;
       syncWorldSelector(channelName);
@@ -3347,7 +3980,7 @@
     let petalCatchMoveTimer = null;
     let petalCatchActive = false;
     let petalCatchScore = 0;
-    let petalCatchRemaining = 12;
+    let petalCatchRemaining = 14;
     function openPetalCatchGame() {
       closeGamesModal();
       document.getElementById('petal-catch-modal').classList.remove('hidden');
@@ -3362,9 +3995,9 @@
     function resetPetalCatchGame() {
       window.clearInterval(petalCatchTimer); petalCatchTimer = null;
       window.clearInterval(petalCatchMoveTimer); petalCatchMoveTimer = null; petalCatchActive = false;
-      petalCatchScore = 0; petalCatchRemaining = 12;
+      petalCatchScore = 0; petalCatchRemaining = 14;
       document.getElementById('petal-catch-score').textContent = 'Blossoms: 0 / 10';
-      document.getElementById('petal-catch-time').textContent = 'Time: 12s';
+      document.getElementById('petal-catch-time').textContent = 'Time: 14s';
       document.getElementById('petal-catch-status').textContent = 'Press Start, then tap the floating blossom.';
       document.getElementById('petal-catch-target').disabled = true;
       document.getElementById('petal-catch-target').classList.add('opacity-40');
@@ -3386,7 +4019,7 @@
       document.getElementById('petal-catch-status').textContent = 'Go! Catch the blossom before it drifts away.';
       document.getElementById('petal-catch-start').textContent = 'Restart';
       movePetalCatchTarget();
-      petalCatchMoveTimer = window.setInterval(movePetalCatchTarget, 900);
+      petalCatchMoveTimer = window.setInterval(movePetalCatchTarget, 1050);
       petalCatchTimer = window.setInterval(() => {
         petalCatchRemaining--;
         document.getElementById('petal-catch-time').textContent = `Time: ${petalCatchRemaining}s`;
@@ -3598,15 +4231,16 @@
       if (error) { status.textContent = 'Notice board error.'; return; }
       status.textContent = data.length ? `${data.length} notices` : 'No notices yet.';
       data.forEach(notice => {
-        const card = document.createElement('article'); card.className = 'rounded-2xl border border-amber-200 bg-white/80 p-3';
-        const title = document.createElement('h4'); title.className = 'text-sm font-extrabold text-amber-950'; title.textContent = notice.title;
-        const body = document.createElement('p'); body.className = 'mt-1 whitespace-pre-wrap break-words text-xs text-slate-700'; body.textContent = notice.body;
-        const meta = document.createElement('p'); meta.className = 'mt-2 text-[9px] font-semibold text-amber-700';
+        const card = document.createElement('article');
+      card.className = 'notice-card rounded-2xl border border-amber-200 bg-white/80 p-3';
+        const title = document.createElement('h4'); title.className = 'notice-title text-sm font-extrabold text-amber-950'; title.textContent = notice.title;
+        const body = document.createElement('p'); body.className = 'notice-body mt-1 whitespace-pre-wrap break-words text-xs text-slate-700'; body.textContent = notice.body;
+        const meta = document.createElement('p'); meta.className = 'notice-meta mt-2 text-[9px] font-semibold text-amber-700';
         const time = notice.created_at ? new Date(notice.created_at).toLocaleString() : '';
         meta.textContent = `${notice.author_name || 'Sakura team'}${time ? ' · ' + time : ''}`;
         card.append(title, body, meta);
         if (isNoticeWriter()) {
-          const tools = document.createElement('div'); tools.className = 'mt-2 flex gap-2';
+          const tools = document.createElement('div'); tools.className = 'notice-actions mt-2 flex gap-2';
           const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'rounded-lg bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-900'; edit.textContent = 'Edit Inside'; edit.onclick = () => editNoticeInside(notice);
           const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'rounded-lg bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-900'; remove.textContent = 'Delete'; remove.onclick = () => deleteNotice(notice.id);
           tools.append(edit, remove); card.appendChild(tools);
@@ -3696,18 +4330,30 @@
       await Promise.allSettled([room, social, staff].filter(Boolean).map(channel => channel.unsubscribe()));
     }
 
+    function resetGuestProfile() {
+      localPlayer.id = createTemporaryGuestId();
+      localPlayer.name = 'Guest_' + Math.floor(100 + Math.random() * 900);
+      localPlayer.pfp = '🌸'; localPlayer.avatarUrl = ''; localPlayer.points = 0;
+      localPlayer.equippedSkin = 'skin_pink'; localPlayer.equippedAcc = null; localPlayer.equippedTitle = null;
+      localPlayer.equippedEmote = null; localPlayer.equippedMessageCard = null; localPlayer.equippedFrame = null;
+      localPlayer.inventory = ['skin_pink']; localPlayer.role = 'player'; localPlayer.speechBubble = null;
+      localPlayer.activeSpecialEmote = null; localPlayer.mutedUntil = null;
+      localPlayer.x = 600; localPlayer.y = 600; localPlayer.vx = 0; localPlayer.vy = 0;
+      localPlayer.isJumping = false; localPlayer.jumpOffset = 0; localPlayer.jumpVelocity = 0;
+      localPlayer.bounceCount = 0; localPlayer.landingSquash = 0; localPlayer.direction = 'down';
+    }
+
     async function loginAsGuest() {
       await stopRealtimeSession();
       removeLegacyGuestId();
-      authUser = null; guestMode = true; localPlayer.id = createTemporaryGuestId();
-      localPlayer.role = 'player'; updateRoleUi();
+      authUser = null; guestMode = true; resetGuestProfile(); startWorldDayNightCycle(); updateRoleUi();
       document.getElementById('auth-modal').classList.add('hidden');
       const input = document.getElementById('chat-input'); input.disabled = true; input.placeholder = 'Sign in for chat';
       syncWorldSelector(currentChannel);
-      updateUIHeader();
+      updateChatZoneTheme();
+      updateUIHeader(); renderAvatarPreview();
       initSupabaseChannel(currentChannel);
     }
-
     window.addEventListener('pagehide', () => {
       if (!guestMode) return;
       removeLegacyGuestId();
@@ -3745,6 +4391,7 @@
         const profileError = await applyAuthProfile(result.data.user);
         if (moderationState.is_banned) throw new Error('Account banned.');
         document.getElementById('auth-modal').classList.add('hidden');
+          startWorldDayNightCycle();
         initSocialChannel(); initSupabaseChannel(currentChannel); broadcastProfileUpdate(); updateUIHeader();
         if (profileError) alert('Signed in. ' + profileError.message);
       } catch (error) {
@@ -3759,6 +4406,7 @@
     window.onload = async function() {
       resizeCanvas();
       syncWorldSelector(currentChannel);
+      updateChatZoneTheme();
       updateUIHeader();
       requestAnimationFrame(gameLoop);
       lucide.createIcons();
@@ -3769,6 +4417,7 @@
           const error = await applyAuthProfile(data.session.user);
           if (moderationState.is_banned) { showAuthAlert('Account banned.'); return; }
           document.getElementById('auth-modal').classList.add('hidden');
+          startWorldDayNightCycle();
           initSocialChannel(); initSupabaseChannel(currentChannel); broadcastProfileUpdate(); updateUIHeader();
           if (error) alert('Session restored. ' + error.message);
         }
