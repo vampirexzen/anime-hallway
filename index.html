@@ -178,6 +178,25 @@
     .chat-card-autumn:after{content:"🍁";position:absolute;z-index:0;right:8%;top:14%;font-size:14px;animation:petal-drift 5s ease-in-out infinite}
     .chat-card-haunted:before{background:radial-gradient(circle at 80% 40%,rgba(196,181,253,.38),transparent 25%),radial-gradient(circle at 15% 90%,rgba(124,58,237,.32),transparent 24%);animation:ghost-glow 4s ease-in-out infinite}
     .chat-card-haunted:after{content:"🦇";position:absolute;z-index:0;right:10px;top:2px;font-size:16px;opacity:.4;animation:bat-drift 4.2s ease-in-out infinite}
+    .message-card-chat.chat-card-plasma{color:#ecfeff;background:linear-gradient(135deg,rgba(8,47,73,.97),rgba(14,116,144,.94),rgba(30,64,175,.92))!important;border-color:rgba(103,232,249,.9)!important;box-shadow:inset 0 1px rgba(255,255,255,.28),0 5px 22px rgba(6,182,212,.26)!important}
+    .message-card-chat.chat-card-plasma:before{opacity:.72;background:radial-gradient(circle at 82% 24%,rgba(165,243,252,.55),transparent 20%),linear-gradient(115deg,transparent 20%,rgba(103,232,249,.18) 48%,transparent 72%);background-size:auto,220% 100%;animation:plasma-flow 4.2s linear infinite}
+    .message-card-chat.chat-card-plasma:after{content:"⚡";position:absolute;z-index:0;right:12px;top:7px;font-size:15px;filter:drop-shadow(0 0 6px #67e8f9);animation:card-emblem-float 2.2s ease-in-out infinite}
+    .message-card-chat.chat-card-solar{color:#fff7ed;background:linear-gradient(135deg,rgba(124,45,18,.97),rgba(194,65,12,.94),rgba(120,53,15,.94))!important;border-color:rgba(253,186,116,.92)!important;box-shadow:inset 0 1px rgba(255,255,255,.25),0 5px 22px rgba(249,115,22,.26)!important}
+    .message-card-chat.chat-card-solar:before{opacity:.7;background:radial-gradient(circle at 82% 25%,rgba(254,240,138,.6),transparent 20%),repeating-conic-gradient(from 0deg at 85% 18%,rgba(251,191,36,.17) 0deg 3deg,transparent 3deg 18deg);animation:solar-radiance 12s linear infinite}
+    .message-card-chat.chat-card-solar:after{content:"🔥";position:absolute;z-index:0;right:12px;top:7px;font-size:15px;filter:drop-shadow(0 0 6px #fbbf24);animation:card-emblem-float 1.8s ease-in-out infinite}
+    .message-card-chat.chat-card-starlight{color:#f5f3ff;background:linear-gradient(135deg,rgba(49,46,129,.98),rgba(107,33,168,.94),rgba(30,41,96,.96))!important;border-color:rgba(196,181,253,.92)!important;box-shadow:inset 0 1px rgba(255,255,255,.28),0 5px 22px rgba(139,92,246,.3)!important}
+    .message-card-chat.chat-card-starlight:before{opacity:.76;background-image:radial-gradient(circle,rgba(255,255,255,.98) 1px,transparent 1.8px),radial-gradient(circle,rgba(196,181,253,.94) 1.4px,transparent 2px),linear-gradient(110deg,transparent 25%,rgba(255,255,255,.16) 48%,transparent 72%);background-size:27px 31px,43px 39px,220% 100%;animation:starfield-drift 7s linear infinite}
+    .message-card-chat.chat-card-starlight:after{content:"✦";position:absolute;z-index:0;right:12px;top:7px;font-size:17px;color:#fef3c7;text-shadow:0 0 9px #c4b5fd;animation:star-twinkle 2.4s ease-in-out infinite}
+    .message-card-chat.chat-card-sakura{color:#fff1f6;background:linear-gradient(135deg,rgba(131,24,67,.96),rgba(190,24,93,.92),rgba(124,45,18,.9))!important;border-color:rgba(251,182,206,.94)!important;box-shadow:inset 0 1px rgba(255,255,255,.3),0 5px 22px rgba(236,72,153,.28)!important}
+    .message-card-chat.chat-card-sakura:before{opacity:.78;background-image:radial-gradient(ellipse at center,rgba(255,255,255,.92) 0 34%,transparent 38%),radial-gradient(ellipse at center,rgba(251,207,232,.88) 0 34%,transparent 38%),linear-gradient(105deg,transparent 22%,rgba(255,255,255,.15) 48%,transparent 72%);background-size:14px 10px,18px 13px,220% 100%;background-position:0 0,9px 12px,0 0;animation:petal-field 8s linear infinite}
+    .message-card-chat.chat-card-sakura:after{content:"🌸";position:absolute;z-index:0;right:12px;top:7px;font-size:15px;filter:drop-shadow(0 0 5px #f9a8d4);animation:card-emblem-float 2.5s ease-in-out infinite}
+    @keyframes plasma-flow{from{background-position:0 0,-130% 0}to{background-position:0 0,130% 0}}
+    @keyframes solar-radiance{to{transform:rotate(360deg)}}
+    @keyframes starfield-drift{from{background-position:0 0,9px 11px,-130% 0}to{background-position:0 56px,9px 72px,130% 0}}
+    @keyframes petal-field{from{background-position:0 -20px,9px -12px,-130% 0}to{background-position:36px 50px,-25px 62px,130% 0}}
+    @keyframes card-emblem-float{0%,100%{transform:translateY(0) rotate(-8deg) scale(.95)}50%{transform:translateY(-3px) rotate(8deg) scale(1.08)}}
+    @keyframes star-twinkle{0%,100%{opacity:.65;transform:rotate(0) scale(.85)}50%{opacity:1;transform:rotate(45deg) scale(1.18)}}
+    @media (prefers-reduced-motion:reduce){.message-card-chat.chat-card-plasma:before,.message-card-chat.chat-card-plasma:after,.message-card-chat.chat-card-solar:before,.message-card-chat.chat-card-solar:after,.message-card-chat.chat-card-starlight:before,.message-card-chat.chat-card-starlight:after,.message-card-chat.chat-card-sakura:before,.message-card-chat.chat-card-sakura:after{animation:none}}
     .friend-message-bubble{font-size:12px;line-height:1.55;box-shadow:0 5px 15px rgba(15,23,42,.14),inset 0 1px rgba(255,255,255,.28)}
     @keyframes frame-glow{0%,100%{filter:brightness(1);box-shadow:0 0 0 2px var(--frame-b,#fbcfe8),0 0 9px var(--frame-c,rgba(236,72,153,.55))}50%{filter:brightness(1.18);box-shadow:0 0 0 2px var(--frame-b,#fbcfe8),0 0 16px var(--frame-c,rgba(236,72,153,.72))}}
     @keyframes frame-ornament{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-2px) rotate(5deg)}}
@@ -536,7 +555,7 @@
           <div class="p-2 rounded-xl bg-pink-500 text-white"><i data-lucide="shopping-bag" class="w-5 h-5"></i></div>
           <div>
             <h3 class="font-extrabold text-pink-950 text-base sm:text-lg">Slime Market</h3>
-            <p class="text-[10px] text-pink-600">Buy exclusive hats, skins, titles & animated emotes!</p>
+            <p class="text-[10px] text-pink-600">Buy hats, skins, titles, emotes & animated message cards!</p>
           </div>
         </div>
         <button onclick="closeMarketModal()" class="text-pink-700 hover:text-pink-900 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -587,7 +606,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 flex-1 overflow-hidden">
         <div class="bg-purple-100/70 border border-purple-200 rounded-2xl p-3 flex flex-col items-center justify-center relative">
-          <span class="text-[10px] font-bold text-purple-800 uppercase tracking-wider mb-1">Equipment Preview</span>
+          <span class="text-[10px] font-bold text-purple-800 uppercase tracking-wider mb-1">Equipment & Message Card Preview</span>
           <canvas id="invPreviewCanvas" width="180" height="150" class="bg-purple-900/10 rounded-xl border border-purple-300 shadow-inner"></canvas>
           <div id="inv-equipped-info" class="text-center mt-2 space-y-0.5">
             <p class="text-xs font-bold text-purple-950" id="inv-skin-label">Skin: Pink</p>
@@ -929,7 +948,12 @@
 
       ],
       profile: [],
-      message_cards: [],
+      message_cards: [
+        { id: 'card_plasma', name: 'Electric Blue Plasma', type: 'message_cards', theme: 'plasma', icon: '⚡', price: 42000, colors: ['#082f49', '#0e7490', '#1e40af'], desc: 'A live electric arc sweeps through every message.', preview: 'Plasma barrier online. Electrical arc frequency stabilized.', tier: 'Rare' },
+        { id: 'card_solar', name: 'Fiery Gold Orbit', type: 'message_cards', theme: 'solar', icon: '🔥', price: 68000, colors: ['#7c2d12', '#c2410c', '#78350f'], desc: 'Golden fire rings orbit a warm, glowing message.', preview: 'Orbital thermal ignition initiated. Fire rings active.', tier: 'Epic' },
+        { id: 'card_starlight', name: 'Cosmic Starlight', type: 'message_cards', theme: 'starlight', icon: '✨', price: 92000, colors: ['#312e81', '#6b21a8', '#1e293b'], desc: 'A shifting starfield twinkles behind your words.', preview: 'Deep space signal received. Constellations aligned.', tier: 'Epic' },
+        { id: 'card_sakura', name: 'Sakura Blossom', type: 'message_cards', theme: 'sakura', icon: '🌸', price: 36000, colors: ['#831843', '#be185d', '#7c2d12'], desc: 'A soft spring shimmer carries drifting sakura petals.', preview: 'A spring breeze carries petals through the garden.', tier: 'Rare' }
+      ],
       frames: []
     };
     const PROFILE_PFP_OPTIONS = PROFILE_STICKERS.map(item => item.icon);
@@ -975,7 +999,7 @@
       inventory: loadStoredJson('sakura_inv', ['skin_pink', 'pfp_sakura']),
       role: 'player',
       equippedEmote: localStorage.getItem('sakura_eq_emote') || null,
-      equippedMessageCard: null,
+      equippedMessageCard: localStorage.getItem('sakura_eq_message_card') || null,
       equippedFrame: null,
       speechBubble: null,
       mutedUntil: null,
@@ -1345,7 +1369,7 @@
       const scaleY = 1 - moving * .04 - squash * .25 + (isJumping ? .06 : 0) - (activeEmoteAnim === 'dance' ? Math.sin(Date.now() * 0.016) * 0.08 : 0);
       c.save();
       c.scale(scaleX, scaleY);
-      if (role === 'developer' && activeEmoteAnim !== 'spin') {
+      if (specialRoleSkin && role === 'developer' && activeEmoteAnim !== 'spin') {
         const devPulse = Date.now() * .0024;
         const devGlow = c.createRadialGradient(0, 1, 4, 0, 1, 55 + Math.sin(devPulse) * 4);
         devGlow.addColorStop(0, 'rgba(165,243,252,.3)'); devGlow.addColorStop(.58, 'rgba(34,211,238,.2)'); devGlow.addColorStop(1, 'rgba(34,211,238,0)');
@@ -1806,6 +1830,9 @@
       }
     }
     let worldCycleStart = Date.now();
+    let worldWeatherStart = worldCycleStart;
+    const WORLD_WEATHER_INTERVAL_MS = 20 * 60 * 1000;
+    const WORLD_RAIN_DURATION_MS = 3 * 60 * 1000;
     const WORLD_DAY_MS = 5 * 60 * 1000;
     const WORLD_NIGHT_MS = 5 * 60 * 1000;
     let lastWorldClockText = '';
@@ -1818,15 +1845,21 @@
       if (phase < cycle - fade) return 1;
       return Math.max(0, (cycle - phase) / fade);
     }
+    function getWorldWeather(time = Date.now()) {
+      const elapsed = Math.max(0, time - worldWeatherStart);
+      if (elapsed < WORLD_WEATHER_INTERVAL_MS) return 'clear';
+      return (elapsed - WORLD_WEATHER_INTERVAL_MS) % WORLD_WEATHER_INTERVAL_MS < WORLD_RAIN_DURATION_MS ? 'rain' : 'clear';
+    }
     function updateWorldClockLabel(time = Date.now()) {
       const label = document.getElementById('room-indicator');
       if (!label) return;
       const night = getNightAmount(time) >= .45;
-      const text = `#${currentChannel} · ${night ? '🌙 NIGHT' : '☀ DAY'}`;
+      const weather = getWorldWeather(time);
+      const text = `#${currentChannel} · ${night ? '🌙 NIGHT' : '☀ DAY'}${weather === 'rain' ? ' · 🌧 RAIN' : ''}`;
       if (text !== lastWorldClockText) { label.textContent = text; lastWorldClockText = text; }
     }
 
-    function startWorldDayNightCycle() { worldCycleStart = Date.now(); lastWorldClockText = ''; updateWorldClockLabel(worldCycleStart); }
+    function startWorldDayNightCycle() { worldCycleStart = Date.now(); worldWeatherStart = worldCycleStart; lastWorldClockText = ''; updateWorldClockLabel(worldCycleStart); }
 
     function drawOuterMeadow(garden, time) {
       const left = camera.x - 90, top = camera.y - 90;
@@ -1877,6 +1910,39 @@
       ctx.globalAlpha = 1; ctx.restore();
     }
 
+    function drawBorderClouds(garden, time) {
+      const inset = 38;
+      const cloudFill = garden ? 'rgba(255,202,221,.48)' : 'rgba(244,255,232,.33)';
+      const cloudHighlight = garden ? 'rgba(255,239,246,.42)' : 'rgba(255,255,245,.36)';
+      const visibleLeft = camera.x - 120, visibleTop = camera.y - 120;
+      const visibleRight = camera.x + canvas.width / zoomLevel + 120;
+      const visibleBottom = camera.y + canvas.height / zoomLevel + 120;
+      const puff = (x, y, scale, drift, seed) => {
+        if (x < visibleLeft || x > visibleRight || y < visibleTop || y > visibleBottom) return;
+        const breathe = 1 + Math.sin(time * .0007 + seed) * .035;
+        ctx.save(); ctx.translate(x + drift, y); ctx.scale(scale * breathe, scale);
+        ctx.globalAlpha = .88; ctx.shadowColor = cloudFill; ctx.shadowBlur = 13;
+        ctx.fillStyle = cloudFill; ctx.beginPath();
+        ctx.ellipse(-18, 3, 19, 9, 0, 0, Math.PI * 2);
+        ctx.ellipse(-7, -3, 14, 13, 0, 0, Math.PI * 2);
+        ctx.ellipse(8, -5, 17, 15, 0, 0, Math.PI * 2);
+        ctx.ellipse(21, 2, 17, 9, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0; ctx.globalAlpha = .68; ctx.fillStyle = cloudHighlight;
+        ctx.beginPath(); ctx.ellipse(1, -8, 9, 3, -.12, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      };
+      for (let i = 0; i < 11; i++) {
+        const offset = 105 + i * 255;
+        const sway = Math.sin(time * .00023 + i * 1.4) * 8;
+        const scale = .82 + (i % 3) * .12;
+        puff(offset, inset - 14, scale, sway, i);
+        puff(offset, WORLD_SIZE - inset + 14, scale, -sway, i + 15);
+        const sideY = offset;
+        puff(inset - 14, sideY, scale, sway * .45, i + 30);
+        puff(WORLD_SIZE - inset + 14, sideY, scale, -sway * .45, i + 45);
+      }
+    }
+
     function drawCelestialEffects(garden, time) {
       const night = getNightAmount(time);
       const sizeScale = 1;
@@ -1908,6 +1974,24 @@
           const inner = (34 + Math.sin(time * .001 + ray) * 2) * sizeScale, outer = (43 + Math.sin(time * .001 + ray) * 4) * sizeScale;
           ctx.beginPath(); ctx.moveTo(sunX + Math.cos(angle) * inner, sunY + Math.sin(angle) * inner); ctx.lineTo(sunX + Math.cos(angle) * outer, sunY + Math.sin(angle) * outer); ctx.stroke();
         }
+        for (let mote = 0; mote < 28; mote++) {
+          const ray = mote % 9;
+          const angle = .66 + ray * .145 + Math.sin(time * .00035 + ray) * .035;
+          const rayLength = 900 + (ray % 4) * 260;
+          const travel = .18 + ((time * .000025 + mote * .173) % .76);
+          const distance = 70 + rayLength * travel;
+          const mx = sunX + Math.cos(angle) * distance;
+          const my = sunY + Math.sin(angle) * distance;
+          const shimmer = .35 + .55 * (Math.sin(time * .003 + mote * 1.7) + 1) / 2;
+          ctx.globalAlpha = day * shimmer; ctx.fillStyle = garden ? '#fff2f7' : '#f7ffd9';
+          ctx.shadowColor = garden ? '#ffc4d8' : '#fff0a5'; ctx.shadowBlur = 7;
+          ctx.beginPath(); ctx.arc(mx, my, mote % 5 === 0 ? 2.1 : 1.25, 0, Math.PI * 2); ctx.fill();
+          if (mote % 7 === 0) {
+            ctx.strokeStyle = garden ? 'rgba(255,239,246,.8)' : 'rgba(255,250,214,.8)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(mx - 4, my); ctx.lineTo(mx + 4, my); ctx.moveTo(mx, my - 4); ctx.lineTo(mx, my + 4); ctx.stroke();
+          }
+        }
+        ctx.globalAlpha = day; ctx.shadowBlur = 0;
       }
       if (night > .02) {
         const moonX = sunX, moonY = sunY;
@@ -2209,6 +2293,7 @@
       const garden = currentChannel === 'sakura-lounge';
       const time = Date.now();
       drawOuterMeadow(garden, time);
+      drawBorderClouds(garden, time);
       drawGrassLawn(garden, time);
       drawMeadowFlowers(garden, time);
       drawSideRiver(garden, time);
@@ -2373,6 +2458,22 @@
       });
     }
 
+    function drawWeatherOverlay(time = Date.now()) {
+      if (getWorldWeather(time) !== 'rain') return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(42,67,96,.075)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const dropCount = Math.min(180, Math.max(55, Math.ceil(canvas.width * canvas.height / 5200)));
+      ctx.lineWidth = 1.25; ctx.lineCap = 'round';
+      for (let i = 0; i < dropCount; i++) {
+        const x = (i * 137 + time * .19) % canvas.width;
+        const y = (i * 83 + time * .48) % canvas.height;
+        ctx.globalAlpha = .24 + .28 * (Math.sin(time * .002 + i) + 1) / 2;
+        ctx.strokeStyle = i % 3 === 0 ? 'rgba(224,244,255,.82)' : 'rgba(187,221,245,.72)';
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 6, y + 13); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
     function renderGameWorld() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
@@ -2400,6 +2501,7 @@
       drawPlayerLabel(ctx, localPlayer, true);
 
       ctx.restore();
+      drawWeatherOverlay(Date.now());
     }
 
     let previousFrameTime = 0;
@@ -2656,6 +2758,68 @@
 
     let marketPreviewCanvas = document.getElementById('marketPreviewCanvas');
     let marketPreviewCtx = marketPreviewCanvas.getContext('2d');
+    function getMessageCardById(id) { return MARKET_ITEMS.message_cards.find(item => item.id === id) || null; }
+
+    function drawMessageCardPreview(context, item, time = Date.now()) {
+      const width = context.canvas.width, height = context.canvas.height;
+      const x = 10, y = 15, cardW = width - 20, cardH = height - 28;
+      const theme = item.theme || 'plasma';
+      const colors = item.colors || ['#312e81', '#7c3aed', '#0e7490'];
+      context.save();
+      context.clearRect(0, 0, width, height);
+      context.shadowColor = colors[1] || colors[0];
+      context.shadowBlur = 18 + Math.sin(time * .004) * 4;
+      const gradient = context.createLinearGradient(x, y, x + cardW, y + cardH);
+      colors.forEach((color, index) => gradient.addColorStop(index / Math.max(1, colors.length - 1), color));
+      context.fillStyle = gradient;
+      context.strokeStyle = colors[colors.length - 1] || colors[0];
+      context.lineWidth = 2;
+      context.beginPath(); context.roundRect(x, y, cardW, cardH, 13); context.fill(); context.stroke();
+      context.shadowBlur = 0;
+      context.save(); context.beginPath(); context.roundRect(x, y, cardW, cardH, 13); context.clip();
+
+      if (theme === 'solar') {
+        context.globalAlpha = .24; context.strokeStyle = '#fde68a'; context.lineWidth = 1;
+        context.beginPath(); context.ellipse(x + cardW * .82, y + 29, 27, 11, time * .00045, 0, Math.PI * 2); context.stroke();
+        context.beginPath(); context.ellipse(x + cardW * .82, y + 29, 18, 23, -time * .0004, 0, Math.PI * 2); context.stroke();
+      }
+      for (let i = 0; i < 15; i++) {
+        const travel = (time * (theme === 'plasma' ? .045 : .024) + i * 37) % (cardW + 22);
+        const px = x - 10 + travel;
+        const py = y + 7 + ((i * 29 + Math.sin(time * .0014 + i * 1.7) * 13) % (cardH - 12));
+        const pulse = .38 + .52 * (Math.sin(time * .004 + i * 1.9) + 1) / 2;
+        context.globalAlpha = pulse;
+        if (theme === 'sakura') {
+          context.save(); context.translate(px, py); context.rotate(time * .0008 + i);
+          context.fillStyle = i % 2 ? '#ffe4ef' : '#f9a8d4'; context.beginPath(); context.ellipse(0, 0, 3.6, 1.8, .4, 0, Math.PI * 2); context.fill(); context.restore();
+        } else if (theme === 'solar') {
+          context.fillStyle = i % 2 ? '#fff7ad' : '#fdba74'; context.shadowColor = '#fbbf24'; context.shadowBlur = 7;
+          context.beginPath(); context.arc(px, py, i % 4 === 0 ? 2.2 : 1.3, 0, Math.PI * 2); context.fill(); context.shadowBlur = 0;
+        } else if (theme === 'starlight') {
+          context.fillStyle = i % 2 ? '#fff' : '#ddd6fe'; context.shadowColor = '#c4b5fd'; context.shadowBlur = 7;
+          context.beginPath(); context.arc(px, py, i % 4 === 0 ? 2 : 1.15, 0, Math.PI * 2); context.fill(); context.shadowBlur = 0;
+        } else {
+          context.strokeStyle = i % 2 ? '#a5f3fc' : '#67e8f9'; context.lineWidth = i % 4 === 0 ? 2 : 1;
+          context.beginPath(); context.moveTo(px - 3, py + 5); context.lineTo(px + 2, py - 4); context.stroke();
+          context.fillStyle = '#cffafe'; context.shadowColor = '#22d3ee'; context.shadowBlur = 8;
+          context.beginPath(); context.arc(px, py, i % 5 === 0 ? 2 : 1, 0, Math.PI * 2); context.fill(); context.shadowBlur = 0;
+        }
+      }
+      const shineX = x - cardW * .45 + ((time * .065) % (cardW * 1.9));
+      const shine = context.createLinearGradient(shineX - 24, y, shineX + 24, y + cardH);
+      shine.addColorStop(0, 'rgba(255,255,255,0)'); shine.addColorStop(.5, 'rgba(255,255,255,.22)'); shine.addColorStop(1, 'rgba(255,255,255,0)');
+      context.globalAlpha = .7; context.fillStyle = shine; context.fillRect(x, y, cardW, cardH);
+      context.restore();
+
+      context.textAlign = 'left'; context.textBaseline = 'alphabetic'; context.shadowBlur = 0;
+      context.fillStyle = '#fff'; context.font = '800 11px Manrope, sans-serif';
+      context.fillText(`${item.icon || '✦'}  ${item.name}`, x + 10, y + 24, cardW - 20);
+      context.fillStyle = 'rgba(255,255,255,.94)'; context.font = '10px Manrope, sans-serif';
+      context.fillText(item.preview || item.desc || 'A little magic in every message.', x + 10, y + 47, cardW - 20);
+      context.fillStyle = 'rgba(255,255,255,.72)'; context.font = '700 7px Manrope, sans-serif';
+      context.fillText('LIVE MESSAGE EFFECT', x + 10, y + cardH - 8, cardW - 20);
+      context.restore();
+    }
 
     function startMarketPreviewLoop() {
       function anim() {
@@ -2664,30 +2828,7 @@
 
         if (marketTestingItem) {
           if (marketTestingItem.type === 'message_cards') {
-            // Message Card preview only
-            marketPreviewCtx.save();
-            const cardX = 15, cardY = 35, cardW = 150, cardH = 80;
-            const cardColors = marketTestingItem.colors || ['#831843', '#7c2d12'];
-            marketPreviewCtx.shadowColor = cardColors[0];
-            marketPreviewCtx.shadowBlur = 18;
-            const cardGradient = marketPreviewCtx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
-            cardColors.forEach((color, index) => cardGradient.addColorStop(index / Math.max(1, cardColors.length - 1), color));
-            marketPreviewCtx.fillStyle = cardGradient;
-            marketPreviewCtx.strokeStyle = cardColors[cardColors.length - 1] || cardColors[0];
-            marketPreviewCtx.lineWidth = 2;
-            marketPreviewCtx.beginPath();
-            marketPreviewCtx.roundRect(cardX, cardY, cardW, cardH, 12);
-            marketPreviewCtx.fill();
-            marketPreviewCtx.stroke();
-            marketPreviewCtx.shadowBlur = 0;
-
-            marketPreviewCtx.font = 'bold 11px Manrope';
-            marketPreviewCtx.fillStyle = '#ffffff';
-            marketPreviewCtx.fillText(marketTestingItem.name, cardX + 12, cardY + 22, cardW - 24);
-            marketPreviewCtx.font = '10px Manrope';
-            marketPreviewCtx.fillStyle = 'rgba(255,255,255,0.9)';
-            marketPreviewCtx.fillText('Sakura Slime · message preview ✨', cardX + 12, cardY + 45, cardW - 24);
-            marketPreviewCtx.restore();
+            drawMessageCardPreview(marketPreviewCtx, marketTestingItem, Date.now());
           } else if (marketTestingItem.type === 'profile') {
             // Profile sticker preview only
             marketPreviewCtx.save();
@@ -2761,6 +2902,12 @@
 
     function openInventoryModal() {
       document.getElementById('inventory-modal').classList.remove('hidden');
+      inventoryPreviewItem = getMessageCardById(localPlayer.equippedMessageCard);
+      if (inventoryPreviewItem) previewInventoryItem(inventoryPreviewItem.id);
+      else {
+        document.getElementById('inv-skin-label').textContent = `Skin: ${(MARKET_ITEMS.skins.find(skin => skin.id === localPlayer.equippedSkin) || MARKET_ITEMS.skins[0]).name}`;
+        document.getElementById('inv-title-label').textContent = `Title: ${(MARKET_ITEMS.titles.find(title => title.id === localPlayer.equippedTitle) || {}).text || 'None'}`;
+      }
       renderInventoryGrid();
       startInvPreviewLoop();
     }
@@ -2794,10 +2941,16 @@
         const visual = marketItemVisual(item);
         const details = document.createElement('div'); details.className = 'flex items-center gap-2';
         details.innerHTML = `${visual}<div class="min-w-0"><p class="text-[11px] font-extrabold leading-tight text-purple-950">${item.name}</p><p class="mt-1 text-[9px] font-bold uppercase tracking-wide text-purple-600">${item.type}</p></div>`;
+        const actions = document.createElement('div'); actions.className = 'mt-2 flex gap-1.5';
+        if (item.type === 'message_cards') {
+          const previewButton = document.createElement('button'); previewButton.type = 'button';
+          previewButton.className = 'flex-1 rounded-xl border border-purple-200 bg-white py-1.5 text-[10px] font-extrabold text-purple-800 hover:bg-purple-50';
+          previewButton.textContent = 'Preview'; previewButton.onclick = () => previewInventoryItem(item.id); actions.appendChild(previewButton);
+        }
         const button = document.createElement('button');
-        button.className = `mt-2 w-full rounded-xl py-1.5 text-[10px] font-extrabold ${isEquipped ? 'bg-emerald-500 text-white' : 'bg-purple-500 text-white hover:bg-purple-600'}`;
+        button.className = `flex-1 rounded-xl py-1.5 text-[10px] font-extrabold ${isEquipped ? 'bg-emerald-500 text-white' : 'bg-purple-500 text-white hover:bg-purple-600'}`;
         button.textContent = isEquipped ? 'Equipped' : 'Equip'; button.onclick = () => equipInventoryItem(item.id);
-        card.append(details, button); grid.appendChild(card);
+        actions.appendChild(button); card.append(details, actions); grid.appendChild(card);
       });
     }
 
@@ -2817,6 +2970,9 @@
       if (error) { alert('Could not save equipped item. ' + error.message); return; }
       savePlayerToStorage();
       broadcastPlayerState(); broadcastProfileUpdate();
+      inventoryPreviewItem = item.type === 'message_cards' && localPlayer.equippedMessageCard === item.id ? item : null;
+      if (inventoryPreviewItem) previewInventoryItem(item.id);
+      else { document.getElementById('inv-skin-label').textContent = `Skin: ${(MARKET_ITEMS.skins.find(skin => skin.id === localPlayer.equippedSkin) || MARKET_ITEMS.skins[0]).name}`; document.getElementById('inv-title-label').textContent = `Title: ${(MARKET_ITEMS.titles.find(title => title.id === localPlayer.equippedTitle) || {}).text || 'None'}`; }
       renderAvatarPreview(); renderInventoryGrid(); renderOwnedEmoteButton();
     }
 
@@ -2831,12 +2987,21 @@
 
     let invPreviewCanvas = document.getElementById('invPreviewCanvas');
     let invPreviewCtx = invPreviewCanvas.getContext('2d');
+    let inventoryPreviewItem = null;
+    function previewInventoryItem(itemId) {
+      const item = getMessageCardById(itemId);
+      if (!item || !localPlayer.inventory.includes(item.id)) return;
+      inventoryPreviewItem = item;
+      document.getElementById('inv-skin-label').textContent = `Card: ${item.name}`;
+      document.getElementById('inv-title-label').textContent = 'Animated chat preview';
+    }
 
     function startInvPreviewLoop() {
       function anim() {
         if (document.getElementById('inventory-modal').classList.contains('hidden')) return;
         invPreviewCtx.clearRect(0, 0, invPreviewCanvas.width, invPreviewCanvas.height);
-        drawSlimeModel(invPreviewCtx, 90, 85, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, false, 0, localPlayer.activeSpecialEmote, true, localPlayer.role);
+        if (inventoryPreviewItem) drawMessageCardPreview(invPreviewCtx, inventoryPreviewItem, Date.now());
+        else drawSlimeModel(invPreviewCtx, 90, 85, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, false, 0, localPlayer.activeSpecialEmote, true, localPlayer.role);
         requestAnimationFrame(anim);
       }
       requestAnimationFrame(anim);
@@ -3156,10 +3321,10 @@
         if (!isMe) row.appendChild(messageAvatar);
         
         // Message card & stickers applied in DM chat: "message card and all the other profile frames and sticker should also apply on the friend chat"
-        const bubble = document.createElement('div'); 
+        const bubble = document.createElement('div');
         bubble.className = `message-card-chat friend-message-bubble max-w-[82%] rounded-2xl border px-3 py-1.5 font-medium ${isMe ? 'bg-sky-500 text-white border-sky-300' : 'bg-pink-100 text-pink-950 border-pink-200'}`;
-        const cardType = null;
-        if (cardType) bubble.classList.add(cardType);
+        const messageCard = getMessageCardById(message.equippedMessageCard);
+        if (messageCard) { bubble.classList.add(`chat-card-${messageCard.theme}`); bubble.dataset.messageCard = messageCard.id; }
         
         const messageText = document.createElement('span'); messageText.className = 'relative z-[1]'; messageText.textContent = message.text;
         bubble.appendChild(messageText);
@@ -3265,7 +3430,7 @@
         localPlayer.equippedAcc = profile.equipped_accessory || null;
         localPlayer.equippedTitle = profile.equipped_title || null;
         localPlayer.equippedEmote = profile.equipped_emote || null;
-        localPlayer.equippedMessageCard = null;
+        localPlayer.equippedMessageCard = localPlayer.inventory.includes(profile.equipped_message_card) ? profile.equipped_message_card : null;
         localPlayer.equippedFrame = null;
       }
       const { data: role, error: roleError } = await supabaseClient.rpc('get_my_role');
@@ -3298,7 +3463,7 @@
       localPlayer.equippedAcc = profile.equipped_accessory || null;
       localPlayer.equippedTitle = profile.equipped_title || null;
       localPlayer.equippedEmote = profile.equipped_emote || null;
-      localPlayer.equippedMessageCard = null;
+      localPlayer.equippedMessageCard = localPlayer.inventory.includes(profile.equipped_message_card) ? profile.equipped_message_card : null;
       localPlayer.equippedFrame = null;
       const { data: role } = await supabaseClient.rpc('get_my_role');
       if (role && ['player', 'admin', 'developer'].includes(role)) localPlayer.role = role;
@@ -3827,8 +3992,10 @@
       
       const card = document.createElement('article');
       card.dataset.role = role;
-      const cardStyle = '';
+      const messageCard = getMessageCardById(profile.equippedMessageCard);
+      const cardStyle = messageCard ? `chat-card-${messageCard.theme}` : '';
       card.className = `message-card-chat rounded-2xl border p-2.5 shadow-sm ${roleTitleEquipped && role === 'developer' ? 'border-cyan-300 bg-cyan-950/70 shadow-cyan-500/20' : roleTitleEquipped && role === 'admin' ? 'border-rose-400 bg-slate-950/80 shadow-rose-500/25' : isSelf ? 'border-pink-300/40 bg-pink-500/20' : 'border-white/10 bg-white/5'} ${cardStyle || ''}`;
+      if (messageCard) card.dataset.messageCard = messageCard.id;
       const header = document.createElement('div'); header.className = 'mb-1 flex items-center gap-2';
       const userId = profile.senderId || profile.id;
       const avatar = makeAvatar({ pfp, avatarUrl: profile.avatarUrl || '', equippedFrame: profile.equippedFrame }, 'w-7 h-7');
@@ -3930,6 +4097,12 @@
     });
     const joyBase = document.getElementById('joystick-container');
     const joyStick = document.getElementById('joystick-stick');
+    const mobileJumpButton = document.getElementById('mobile-jump-button');
+    if (mobileJumpButton) mobileJumpButton.addEventListener('pointerdown', event => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      event.preventDefault();
+      triggerJump();
+    });
     let joyPointerId = null;
     joyBase.addEventListener('pointerdown', event => {
       event.preventDefault();
