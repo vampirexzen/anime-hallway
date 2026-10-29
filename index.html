@@ -938,6 +938,31 @@
       const SUPABASE_URL = 'https://brvyjdtnxzjlrhukngjn.supabase.co';
       const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydnlqZHRueHpqbHJodWtuZ2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTAwMjcsImV4cCI6MjEwODA4NjAyN30.2ib-m3ju3SEhJLaQHQdA8xinenbtN5MltOatIYZSZIE';
       const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      function isSupabaseFetchFailure(error) {
+        if (!error) return false;
+        const message = String(error.message || error);
+        return (error.name === 'TypeError' && /fetch|network/i.test(message)) || /failed to fetch|fetch failed|network request failed|networkerror|load failed/i.test(message) || Boolean(error.cause && error.cause.name === 'TypeError');
+      }
+      async function retrySupabaseFetch(operation, attempts = 2) {
+        let lastError;
+        for (let attempt = 0; attempt < attempts; attempt++) {
+          try {
+            const result = await operation();
+            if (!result || !isSupabaseFetchFailure(result.error)) return result;
+            lastError = result.error;
+            if (attempt + 1 >= attempts) throw lastError;
+          } catch (error) {
+            lastError = error;
+            if (!isSupabaseFetchFailure(error) || attempt + 1 >= attempts) throw error;
+          }
+          await new Promise(resolve => setTimeout(resolve, 600 * (attempt + 1)));
+        }
+        throw lastError;
+      }
+      function friendlySupabaseError(error) {
+        if (isSupabaseFetchFailure(error)) return 'Could not reach Supabase. Check your internet connection, confirm the project is active and the URL and anon key belong to it, and open this page from localhost or your hosted site instead of file:// (local files can be blocked by browser CORS).';
+        return error && error.message ? error.message : 'Supabase request failed.';
+      }
 
       // GAME CATALOG DATA
       const PROFILE_STICKERS = [
@@ -1038,6 +1063,11 @@
       function removeLegacyGuestId() { localStorage.removeItem('sakura_user_id'); }
       removeLegacyGuestId();
 
+      function setStoredValueSafely(key, value) {
+        try { localStorage.setItem(key, value); return true; }
+        catch (error) { try { localStorage.removeItem(key); localStorage.setItem(key, value); return true; } catch (retryError) { return false; } }
+      }
+      function removeStoredValueSafely(key) { try { localStorage.removeItem(key); } catch (error) {} }
       // LOCAL PLAYER STATE
       function loadStoredJson(key, fallback) {
         try { const value = JSON.parse(localStorage.getItem(key)); return value == null ? fallback : value; }
@@ -1090,10 +1120,14 @@
       function normalizeFriendList(records) {
         if (!Array.isArray(records)) return [];
         const valid = records.filter(friend => friend && isValidUserId(friend.id)).map(friend => ({
-          ...friend,
-          name: typeof friend.name === 'string' && friend.name.trim() && friend.name !== 'undefined' ? friend.name.trim() : 'Slime',
+          id: friend.id,
+          name: typeof friend.name === 'string' && friend.name.trim() && friend.name !== 'undefined' ? friend.name.trim().slice(0,24) : 'Slime',
           pfp: PROFILE_PFP_OPTIONS.includes(friend.pfp) ? friend.pfp : '🌸',
           avatarUrl: safeAvatarUrl(friend.avatarUrl || ''),
+          equippedFrame: typeof friend.equippedFrame === 'string' ? friend.equippedFrame : null,
+          role: ['admin','developer'].includes(friend.role) ? friend.role : 'player',
+          equippedTitle: typeof friend.equippedTitle === 'string' ? friend.equippedTitle : null,
+          equippedMessageCard: typeof friend.equippedMessageCard === 'string' ? friend.equippedMessageCard : null,
           friendSince: Number(friend.friendSince) || Number(friend.time) || 1,
           accepted: true
         }));
@@ -1103,22 +1137,44 @@
       function normalizeFriendRequests(records) {
         if (!Array.isArray(records)) return [];
         return records.filter(request => request && isValidUserId(request.senderId)).map(request => ({
-          ...request,
-          name: typeof request.name === 'string' && request.name.trim() ? request.name.trim() : 'Slime',
+          senderId: request.senderId,
+          name: typeof request.name === 'string' && request.name.trim() ? request.name.trim().slice(0,24) : 'Slime',
           pfp: PROFILE_PFP_OPTIONS.includes(request.pfp) ? request.pfp : '🌸',
           avatarUrl: safeAvatarUrl(request.avatarUrl || ''),
+          equippedFrame: typeof request.equippedFrame === 'string' ? request.equippedFrame : null,
+          role: ['admin','developer'].includes(request.role) ? request.role : 'player',
+          equippedTitle: typeof request.equippedTitle === 'string' ? request.equippedTitle : null,
+          equippedMessageCard: typeof request.equippedMessageCard === 'string' ? request.equippedMessageCard : null,
           time: Number(request.time) || Date.now()
         }));
       }
       function normalizeOutgoingFriendRequests(records) {
         if (!Array.isArray(records)) return [];
         return records.filter(request => request && isValidUserId(request.targetId)).map(request => ({
-          ...request,
-          name: typeof request.name === 'string' && request.name.trim() ? request.name.trim() : 'Slime',
+          targetId: request.targetId,
+          name: typeof request.name === 'string' && request.name.trim() ? request.name.trim().slice(0,24) : 'Slime',
           pfp: PROFILE_PFP_OPTIONS.includes(request.pfp) ? request.pfp : '🌸',
-          avatarUrl: safeAvatarUrl(request.avatarUrl || ''),
           time: Number(request.time) || Date.now()
         }));
+      }
+      function normalizeDirectMessages(records) {
+        if (!records || typeof records !== 'object' || Array.isArray(records)) return {};
+        const conversations = Object.entries(records).filter(([id,messages]) => isValidUserId(id) && Array.isArray(messages))
+          .map(([id,messages]) => [id,messages.slice(-60).map(message => ({
+            messageId: typeof message.messageId === 'string' ? message.messageId : `${id}:${Number(message.time)||Date.now()}`,
+            senderId: isValidUserId(message.senderId) ? message.senderId : id,
+            sender: String(message.sender || 'Slime').slice(0,24), text: String(message.text || '').slice(0,500),
+            time: Number(message.time) || Date.now(), pfp: PROFILE_PFP_OPTIONS.includes(message.pfp) ? message.pfp : '🌸',
+            equippedFrame: typeof message.equippedFrame === 'string' ? message.equippedFrame : null,
+            equippedMessageCard: typeof message.equippedMessageCard === 'string' ? message.equippedMessageCard : null,
+            equippedTitle: typeof message.equippedTitle === 'string' ? message.equippedTitle : null,
+            senderRole: ['admin','developer'].includes(message.senderRole) ? message.senderRole : 'player'
+          }))]).sort((a,b) => (Number(b[1].at(-1)?.time)||0) - (Number(a[1].at(-1)?.time)||0)).slice(0,24);
+        return Object.fromEntries(conversations);
+      }
+      function persistDirectMessages() {
+        dmMessages = normalizeDirectMessages(dmMessages);
+        return setStoredValueSafely('sakura_dms', JSON.stringify(dmMessages));
       }
       let friendList = normalizeFriendList(loadStoredJson('sakura_friends', []));
       let removedFriendIds = normalizeRemovedFriends(loadStoredJson('sakura_friend_removed', {}));
@@ -1129,9 +1185,8 @@
       let friendStateUpdatedAt = 0;
       let friendCloudSaveTimer = null;
       let friendCloudSaveQueue = Promise.resolve();
-      localStorage.setItem('sakura_friends', JSON.stringify(friendList));
-      localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
-      let dmMessages = loadStoredJson('sakura_dms', {});
+      let dmMessages = normalizeDirectMessages(loadStoredJson('sakura_dms', {}));
+      persistDirectMessages();
       let activeDMUserId = null;
       let currentChannel = 'sakura-lounge';
       let activeChatTab = 'global';
@@ -1336,22 +1391,21 @@
         renderPlaylistPreview();
       }
       async function loadLobbyMusic() {
-        const { data, error } = await supabaseClient.rpc('get_lobby_music');
-        if (!error && data) {
-          try {
-            const parsed = JSON.parse(data);
-            if (parsed && Array.isArray(parsed.playlist)) {
-              setLobbyMusicPlaylist(parsed.playlist, parsed.uploaderId, Number.isInteger(parsed.activeIndex) ? parsed.activeIndex : null, parsed.playNow === true, Number.isFinite(parsed.activeStartedAt) ? parsed.activeStartedAt : null);
-            } else {
-              setLobbyMusicPlaylist(data);
-            }
-          } catch(e) {
-            setLobbyMusicPlaylist(data);
+        try {
+          const { data, error } = await retrySupabaseFetch(() => supabaseClient.rpc('get_lobby_music'));
+          if (!error && data) {
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed && Array.isArray(parsed.playlist)) {
+                setLobbyMusicPlaylist(parsed.playlist, parsed.uploaderId, Number.isInteger(parsed.activeIndex) ? parsed.activeIndex : null, parsed.playNow === true, Number.isFinite(parsed.activeStartedAt) ? parsed.activeStartedAt : null);
+              } else setLobbyMusicPlaylist(data);
+            } catch(e) { setLobbyMusicPlaylist(data); }
           }
+        } catch (error) {
+          const status = document.getElementById('lobby-music-status');
+          if (status) status.textContent = friendlySupabaseError(error);
         }
-      }
-
-      function renderPlaylistPreview() {
+      }      function renderPlaylistPreview() {
         const list = document.getElementById('playlist-preview-list');
         if (!list) return;
         list.replaceChildren();
@@ -3307,14 +3361,14 @@
 
       function friendStateForCloud(state) {
         const compactProfile = profile => ({
-          id: profile.id, name: profile.name, pfp: profile.pfp, avatarUrl: safeAvatarUrl(profile.avatarUrl || ''),
+          id: profile.id, name: profile.name, pfp: profile.pfp,
           equippedFrame: profile.equippedFrame || null, role: profile.role || 'player',
           equippedTitle: profile.equippedTitle || null, equippedMessageCard: profile.equippedMessageCard || null, friendSince: Number(profile.friendSince) || 1
         });
         return {
           version: 1, updatedAt: state.updatedAt,
           friends: state.friends.map(compactProfile),
-          requests: state.requests.map(request => ({ senderId: request.senderId, name: request.name, pfp: request.pfp, avatarUrl: safeAvatarUrl(request.avatarUrl || ''), equippedFrame: request.equippedFrame || null, role: request.role || 'player', equippedTitle: request.equippedTitle || null, equippedMessageCard: request.equippedMessageCard || null, time: request.time })),
+          requests: state.requests.map(request => ({ senderId: request.senderId, name: request.name, pfp: request.pfp, equippedFrame: request.equippedFrame || null, role: request.role || 'player', equippedTitle: request.equippedTitle || null, equippedMessageCard: request.equippedMessageCard || null, time: request.time })),
           outgoing: state.outgoing.map(request => ({ targetId: request.targetId, name: request.name, pfp: request.pfp, time: request.time })),
           removed: { ...state.removed }, cancelled: { ...state.cancelled }
         };
@@ -3345,19 +3399,48 @@
         outgoingFriendRequests = normalizeOutgoingFriendRequests(outgoingFriendRequests);
         const state = { version: 1, updatedAt: Date.now(), friends: friendList, requests: friendRequests, outgoing: outgoingFriendRequests, removed: removedFriendIds, cancelled: cancelledFriendRequests };
         friendStateUpdatedAt = state.updatedAt;
-        const snapshot = JSON.stringify(state);
-        localStorage.setItem('sakura_friends', JSON.stringify(friendList));
-        localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
-        localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
-        localStorage.setItem('sakura_friend_removed', JSON.stringify(removedFriendIds));
-        localStorage.setItem('sakura_friend_cancelled', JSON.stringify(cancelledFriendRequests));
-        if (isValidUserId(localPlayer.id) && !String(localPlayer.id).startsWith('guest_')) {
-          localStorage.setItem(friendStorageKey(localPlayer.id), snapshot);
+        const compactState = friendStateForCloud(state);
+        const snapshot = JSON.stringify(compactState);
+        const accountId = isValidUserId(localPlayer.id) && !String(localPlayer.id).startsWith('guest_') ? localPlayer.id : null;
+        if (accountId) {
+          const accountKey = friendStorageKey(accountId);
+          let saved = setStoredValueSafely(accountKey, snapshot);
+          if (!saved) {
+            ['sakura_friends','sakura_friend_reqs','sakura_friend_outgoing','sakura_friend_removed','sakura_friend_cancelled'].forEach(removeStoredValueSafely);
+            saved = setStoredValueSafely(accountKey, snapshot);
+          }
+          setStoredValueSafely('sakura_social_owner', accountId);
+          if (saved) ['sakura_friends','sakura_friend_reqs','sakura_friend_outgoing','sakura_friend_removed','sakura_friend_cancelled'].forEach(removeStoredValueSafely);
+          else setFriendSyncStatus('Browser storage is full; syncing your friends to your account…', true);
+        } else {
+          setStoredValueSafely('sakura_friends', JSON.stringify(compactState.friends));
+          setStoredValueSafely('sakura_friend_reqs', JSON.stringify(compactState.requests));
+          setStoredValueSafely('sakura_friend_outgoing', JSON.stringify(compactState.outgoing));
+          setStoredValueSafely('sakura_friend_removed', JSON.stringify(compactState.removed));
+          setStoredValueSafely('sakura_friend_cancelled', JSON.stringify(compactState.cancelled));
         }
         if (syncAccount) queueFriendAccountSave(state);
         updateFriendRequestBadge();
       }
-
+      function compactLegacyFriendStorage() {
+        try {
+          const state = friendStateForCloud({
+            updatedAt: Date.now(), friends: normalizeFriendList(loadStoredJson('sakura_friends', [])),
+            requests: normalizeFriendRequests(loadStoredJson('sakura_friend_reqs', [])),
+            outgoing: normalizeOutgoingFriendRequests(loadStoredJson('sakura_friend_outgoing', [])),
+            removed: normalizeRemovedFriends(loadStoredJson('sakura_friend_removed', {})),
+            cancelled: normalizeRemovedFriends(loadStoredJson('sakura_friend_cancelled', {}))
+          });
+          setStoredValueSafely('sakura_friends', JSON.stringify(state.friends));
+          setStoredValueSafely('sakura_friend_reqs', JSON.stringify(state.requests));
+          setStoredValueSafely('sakura_friend_outgoing', JSON.stringify(state.outgoing));
+          setStoredValueSafely('sakura_friend_removed', JSON.stringify(state.removed));
+          setStoredValueSafely('sakura_friend_cancelled', JSON.stringify(state.cancelled));
+          persistDirectMessages();
+        } catch (error) {
+          ['sakura_friends','sakura_friend_reqs','sakura_friend_outgoing','sakura_friend_removed','sakura_friend_cancelled'].forEach(removeStoredValueSafely);
+        }
+      }
       function restoreFriendDataForAccount(user) {
         if (!user || !isValidUserId(user.id) || String(user.id).startsWith('guest_')) return;
         const legacyOwner = localStorage.getItem('sakura_social_owner');
@@ -3396,7 +3479,7 @@
           removedFriendIds = {};
           cancelledFriendRequests = {};
         }
-        localStorage.setItem('sakura_social_owner', user.id);
+        setStoredValueSafely('sakura_social_owner', user.id);
         saveFriendData(!remoteState || !newest || Number(newest.updatedAt) > (Number(remoteState.updatedAt) || 0));
       }
 
@@ -3498,7 +3581,7 @@
           equippedTitle: payload.equippedTitle || null, senderRole: 'player'
         };
         dmMessages[payload.senderId].push(incomingMessage);
-        localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
+        persistDirectMessages();
         markFriendsUnread();
         if (activeDMUserId === payload.senderId) {
           const target = friendList.find(friend => friend.id === payload.senderId) || remotePlayers[payload.senderId] || staffDMProfile;
@@ -3508,7 +3591,7 @@
           getTrustedUserRole(payload.senderId).then(role => {
             incomingMessage.senderRole = role;
             if (activeDMUserId === payload.senderId) renderDMBox();
-            localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
+            persistDirectMessages();
           }).catch(() => {});
         }
       }
@@ -3539,9 +3622,6 @@
         if (outgoingFriendRequests.some(r => r.targetId === id)) return;
         const request = { targetId: id, name: typeof name === 'string' && name.trim() ? name.trim() : 'Slime', pfp: PROFILE_PFP_OPTIONS.includes(pfp) ? pfp : '🌸', avatarUrl: safeAvatarUrl(avatarUrl), time: Date.now() };
         outgoingFriendRequests.push(request);
-        localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
-        localStorage.setItem('sakura_friend_removed', JSON.stringify(removedFriendIds));
-        localStorage.setItem('sakura_friend_cancelled', JSON.stringify(cancelledFriendRequests));
         saveFriendData();
         void sendFriendBroadcast('friend_request', { targetId: id, senderId: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame, role: localPlayer.role, equippedTitle: localPlayer.equippedTitle, equippedMessageCard: localPlayer.equippedMessageCard, time: request.time });
         const query = document.getElementById('friend-search-input').value.trim();
@@ -3887,7 +3967,7 @@
         const body = { messageId, senderId: localPlayer.id, sender: localPlayer.name, text: text.slice(0, 500), time: Date.now(), pfp: localPlayer.pfp, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard, equippedTitle: localPlayer.equippedTitle, senderRole: localPlayer.role };
         if (!dmMessages[targetId]) dmMessages[targetId] = [];
         dmMessages[targetId].push(body);
-        localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
+        persistDirectMessages();
         const currentTarget = developerDM ? (staffDMProfile || remotePlayers[targetId] || friendList.find(entry => entry.id === targetId)) : friendList.find(entry => entry.id === targetId);
         appendDMMessage(body, currentTarget);
         input.value = '';
@@ -3898,7 +3978,7 @@
           if (activeDMUserId === targetId) statusTag.textContent = developerDM ? 'Staff Direct' : 'Friends';
         } catch (error) {
           dmMessages[targetId] = (dmMessages[targetId] || []).filter(message => message.messageId !== messageId);
-          localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
+          persistDirectMessages();
           if (activeDMUserId === targetId) {
             renderDMBox(); input.value = text; statusTag.textContent = 'Not sent · try again';
           }
@@ -3962,11 +4042,11 @@
         guestMode = false;
         localPlayer.id = user.id;
         restoreFriendDataForAccount(user);
-        let { data: profile, error } = await supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote,equipped_message_card,equipped_frame').eq('user_id', user.id).maybeSingle();
+        let { data: profile, error } = await retrySupabaseFetch(() => supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote,equipped_message_card,equipped_frame').eq('user_id', user.id).maybeSingle());
         if (!profile && !error) {
-          const ensured = await supabaseClient.rpc('ensure_my_profile');
+          const ensured = await retrySupabaseFetch(() => supabaseClient.rpc('ensure_my_profile'));
           if (!ensured.error) {
-            const retry = await supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote,equipped_message_card,equipped_frame').eq('user_id', user.id).maybeSingle();
+            const retry = await retrySupabaseFetch(() => supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote,equipped_message_card,equipped_frame').eq('user_id', user.id).maybeSingle());
             profile = retry.data; error = retry.error;
           }
         }
@@ -3986,7 +4066,7 @@
           localPlayer.equippedMessageCard = localPlayer.inventory.includes(profile.equipped_message_card) ? profile.equipped_message_card : null;
           localPlayer.equippedFrame = localPlayer.inventory.includes(profile.equipped_frame) ? profile.equipped_frame : null;
         }
-        const { data: role, error: roleError } = await supabaseClient.rpc('get_my_role');
+        const { data: role, error: roleError } = await retrySupabaseFetch(() => supabaseClient.rpc('get_my_role'));
         localPlayer.role = roleError ? 'player' : (role || 'player');
         await loadLobbyMusic();
         if (!['admin', 'developer'].includes(localPlayer.role)) {
@@ -4301,8 +4381,19 @@
 
       async function refreshModerationState() {
         if (!authUser || guestMode) return false;
-        const { data, error } = await supabaseClient.rpc('get_my_moderation');
-        if (error || !data) return false;
+        let result;
+        try { result = await retrySupabaseFetch(() => supabaseClient.rpc('get_my_moderation')); }
+        catch (error) {
+          const input = document.getElementById('chat-input');
+          if (input) { input.disabled = true; input.placeholder = 'Cannot verify chat access · reconnecting'; }
+          return false;
+        }
+        const { data, error } = result || {};
+        if (error || !data) {
+          const input = document.getElementById('chat-input');
+          if (input) { input.disabled = true; input.placeholder = 'Cannot verify chat access · reconnecting'; }
+          return false;
+        }
         moderationState = data;
         const muted = data.mute_until && new Date(data.mute_until).getTime() > Date.now();
         localPlayer.mutedUntil = muted ? data.mute_until : null;
@@ -5152,21 +5243,21 @@
           if (authMode === 'signup') {
             const chosenName = document.getElementById('auth-username').value.trim().slice(0, 15) || localPlayer.name;
             localPlayer.name = chosenName;
-            result = await supabaseClient.auth.signUp({
+            result = await retrySupabaseFetch(() => supabaseClient.auth.signUp({
               email, password,
               options: { data: {
                 display_name: localPlayer.name, pfp: localPlayer.pfp, avatar_url: localPlayer.avatarUrl || '',
                 points: localPlayer.points, inventory: localPlayer.inventory,
                 equipped_skin: localPlayer.equippedSkin, equipped_accessory: localPlayer.equippedAcc || '', equipped_title: localPlayer.equippedTitle || ''
               }}
-            });
+            }));
             if (result.error) throw result.error;
             if (!result.data.session || !result.data.user) {
               showAuthAlert('Confirm account via email, then sign in.', false);
               return;
             }
           } else {
-            result = await supabaseClient.auth.signInWithPassword({ email, password });
+            result = await retrySupabaseFetch(() => supabaseClient.auth.signInWithPassword({ email, password }));
             if (result.error) throw result.error;
           }
           const profileError = await applyAuthProfile(result.data.user);
@@ -5176,7 +5267,7 @@
           initSocialChannel(); initSupabaseChannel(currentChannel); broadcastProfileUpdate(); updateUIHeader();
           if (profileError) alert('Signed in. ' + profileError.message);
         } catch (error) {
-          showAuthAlert(error && error.message ? error.message : 'Auth failed.');
+          showAuthAlert(friendlySupabaseError(error));
         } finally {
           button.disabled = false;
           button.querySelector('span').textContent = authMode === 'signup' ? 'Create Account' : 'Sign In';
@@ -5193,7 +5284,8 @@
         lucide.createIcons();
         updateZoomReadout(); updateAudioButton();
         try {
-          const { data } = await supabaseClient.auth.getSession();
+          compactLegacyFriendStorage();
+          const { data } = await retrySupabaseFetch(() => supabaseClient.auth.getSession());
           if (data && data.session && data.session.user) {
             const error = await applyAuthProfile(data.session.user);
             if (moderationState.is_banned) { showAuthAlert('Account banned.'); return; }
@@ -5203,7 +5295,7 @@
             if (error) alert('Session restored. ' + error.message);
           }
         } catch (error) {
-          showAuthAlert(error && error.message ? error.message : 'Could not restore session.');
+          showAuthAlert(friendlySupabaseError(error));
         }
       };
     </script>
