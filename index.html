@@ -1152,6 +1152,22 @@
       window.clearInterval(musicTimer); musicTimer = null;
     }
 
+    function handlePlaylistTrackEnded(trackStartedAt) {
+      if (!musicPlaying || !audioEnabled || !musicPlaylist.length || musicStartedAt !== trackStartedAt) return;
+      musicPlaylistIndex = (musicPlaylistIndex + 1) % musicPlaylist.length;
+      musicStartedAt = Date.now();
+      playPlaylistCurrentTrack(musicStartedAt);
+      const leaderId = getLobbyMusicLeaderId();
+      if (localPlayer.id === leaderId && ['admin', 'developer'].includes(localPlayer.role)) {
+        musicUploaderUserId = leaderId;
+        const activeStartedAt = musicStartedAt;
+        const payloadStr = JSON.stringify({ playlist: musicPlaylist, uploaderId: musicUploaderUserId, activeIndex: musicPlaylistIndex, playNow: true, activeStartedAt });
+        supabaseClient.rpc('set_lobby_music', { p_music_url: payloadStr }).then(({ error }) => {
+          if (!error && musicStartedAt === activeStartedAt) sendSocialBroadcast('lobby_music_update', { refresh: true });
+        }).catch(() => {});
+      }
+    }
+
     function playPlaylistCurrentTrack(startedAt = musicStartedAt) {
       if (!musicPlaying || !audioEnabled || !musicPlaylist.length) return;
       stopBasicMusic();
@@ -1170,6 +1186,8 @@
         showWorldActionToast('Tap the music button to start the lobby track on this device.');
       });
       if (lobbyAudio && lobbyAudio.src === resolvedUrl) {
+        const trackStartedAt = musicStartedAt;
+        lobbyAudio.onended = () => handlePlaylistTrackEnded(trackStartedAt);
         if (lobbyAudio.readyState >= 1) seekToLobbyPosition(lobbyAudio);
         else lobbyAudio.addEventListener('loadedmetadata', () => seekToLobbyPosition(lobbyAudio), { once: true });
         startAudio(lobbyAudio);
@@ -1180,13 +1198,8 @@
       lobbyAudio.volume = .4;
       const activeAudio = lobbyAudio;
       activeAudio.addEventListener('loadedmetadata', () => seekToLobbyPosition(activeAudio), { once: true });
-      activeAudio.onended = () => {
-        if (musicPlaying && audioEnabled && musicPlaylist.length > 0) {
-          musicPlaylistIndex = (musicPlaylistIndex + 1) % musicPlaylist.length;
-          musicStartedAt = Date.now();
-          playPlaylistCurrentTrack(musicStartedAt);
-        }
-      };
+      const trackStartedAt = musicStartedAt;
+      activeAudio.onended = () => handlePlaylistTrackEnded(trackStartedAt);
       startAudio(activeAudio);
     }
     function updateAudioButton() {
@@ -1285,7 +1298,7 @@
     async function staffPlayPlaylistTrack(index) {
       if (!['admin', 'developer'].includes(localPlayer.role) || !musicPlaylist.length) return;
       const activeIndex = ((Number(index) || 0) % musicPlaylist.length + musicPlaylist.length) % musicPlaylist.length;
-      const uploaderId = musicUploaderUserId || localPlayer.id;
+      const uploaderId = localPlayer.id;
       audioEnabled = true; musicPlaying = true;
       initAudio();
       const activeStartedAt = Date.now();
@@ -1293,8 +1306,8 @@
       setLobbyMusicPlaylist(musicPlaylist, uploaderId, activeIndex, true, activeStartedAt);
       updateAudioButton();
       const payloadStr = JSON.stringify({ playlist: musicPlaylist, uploaderId, activeIndex, playNow: true, activeStartedAt });
-      sendSocialBroadcast('lobby_music_update', { payloadStr });
       const { error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: payloadStr });
+      if (!error) sendSocialBroadcast('lobby_music_update', { refresh: true });
       const status = document.getElementById('lobby-music-status');
       if (status) status.textContent = error ? `Playing track ${activeIndex + 1}; lobby sync could not be saved.` : `Playing playlist track ${activeIndex + 1}.`;
     }
@@ -1339,10 +1352,13 @@
             setLobbyMusicPlaylist(updatedPlaylist, localPlayer.id);
 
             const payloadStr = JSON.stringify({ playlist: updatedPlaylist, uploaderId: localPlayer.id, activeIndex: musicPlaylistIndex });
-            await supabaseClient.rpc('set_lobby_music', { p_music_url: payloadStr });
-            sendSocialBroadcast('lobby_music_update', { payloadStr });
-
-            document.getElementById('lobby-music-status').textContent = `${newTracks.length} track(s) added. Use the top music button to start playback.`;
+            const { error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: payloadStr });
+            if (error) {
+              document.getElementById('lobby-music-status').textContent = `Added locally, but could not sync the playlist: ${error.message}`;
+            } else {
+              sendSocialBroadcast('lobby_music_update', { refresh: true });
+              document.getElementById('lobby-music-status').textContent = `${newTracks.length} track(s) added to the playlist rotation.`;
+            }
           }
         };
         reader.readAsDataURL(file);
@@ -1643,9 +1659,9 @@
       c.restore();
     }
 
-    function drawSpeechBubble(c, x, y, bubble, role = 'player') {
+    function drawSpeechBubble(c, x, y, bubble, role = 'player', equippedTitle = null) {
       if (!bubble || !bubble.text || (bubble.until && bubble.until < Date.now())) return;
-      const developer = role === 'developer';
+      const developer = role === 'developer' && equippedTitle === 'title_developer';
       const text = String(bubble.text).slice(0, 72);
       c.save();
       c.font = 'bold 12px Manrope, sans-serif';
@@ -2028,6 +2044,22 @@
       }
     }
 
+    function drawRainCloudOverSun(time) {
+      const sunX = WORLD_SIZE * .52, sunY = -142;
+      const breathe = 1 + Math.sin(time * .00055) * .018;
+      ctx.save(); ctx.translate(sunX, sunY); ctx.scale(1.48 * breathe, 1.48 * breathe);
+      ctx.globalAlpha = .97; ctx.shadowColor = 'rgba(26,42,64,.72)'; ctx.shadowBlur = 20;
+      const cloud = ctx.createLinearGradient(0, -32, 0, 24);
+      cloud.addColorStop(0, '#b4c0cf'); cloud.addColorStop(.42, '#718197'); cloud.addColorStop(1, '#3c4d63');
+      ctx.fillStyle = cloud; ctx.beginPath();
+      ctx.ellipse(-43, 4, 40, 20, 0, 0, Math.PI * 2);
+      ctx.ellipse(-20, -9, 33, 29, 0, 0, Math.PI * 2);
+      ctx.ellipse(13, -17, 39, 34, 0, 0, Math.PI * 2);
+      ctx.ellipse(45, 1, 38, 21, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0; ctx.globalAlpha = .34; ctx.fillStyle = '#eef5fc';
+      ctx.beginPath(); ctx.ellipse(-2, -28, 32, 6, -.05, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
     function drawCelestialEffects(garden, time) {
       const night = getNightAmount(time);
       const sizeScale = 1;
@@ -2104,6 +2136,7 @@
           ctx.beginPath(); ctx.arc(moonX + Math.cos(angle) * radius, moonY + Math.sin(angle) * radius, (star % 2 ? 1.4 : 2) * sizeScale, 0, Math.PI * 2); ctx.fill();
         }
       }
+      if (getWorldWeather(time) === 'rain') drawRainCloudOverSun(time);
       ctx.restore();
     }
 
@@ -2544,52 +2577,42 @@
       });
     }
 
+    const weatherAnimationStartedAt = Date.now();
     function drawWeatherOverlay(time = Date.now()) {
       if (getWorldWeather(time) !== 'rain') return;
       ctx.save();
-      ctx.fillStyle = 'rgba(32,51,76,.19)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      const sunX = (WORLD_SIZE * .52 - camera.x) * zoomLevel;
-      const sunY = (-142 - camera.y) * zoomLevel;
-      const paintStormCloud = (centerX, centerY, scale, phase) => {
-        ctx.save(); ctx.translate(centerX, centerY); ctx.scale(scale, scale);
-        ctx.globalAlpha = .78; ctx.shadowColor = 'rgba(35,52,76,.52)'; ctx.shadowBlur = 16;
-        const cloud = ctx.createLinearGradient(0, -32, 0, 20);
-        cloud.addColorStop(0, '#9aacc0'); cloud.addColorStop(.55, '#647991'); cloud.addColorStop(1, '#40556e');
-        ctx.fillStyle = cloud; ctx.beginPath();
-        ctx.ellipse(-38, 2, 42, 21, 0, 0, Math.PI * 2);
-        ctx.ellipse(-12, -12, 32, 31, 0, 0, Math.PI * 2);
-        ctx.ellipse(21, -16, 36, 35, 0, 0, Math.PI * 2);
-        ctx.ellipse(50, 1, 39, 22, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0; ctx.globalAlpha = .23; ctx.fillStyle = '#e2eaf2';
-        ctx.beginPath(); ctx.ellipse(5, -28, 27, 6, -.08, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
+      ctx.fillStyle = 'rgba(32,51,76,.17)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const randomFor = seed => {
+        const value = Math.sin(seed * 127.1 + 311.7) * 43758.5453123;
+        return value - Math.floor(value);
       };
-      const sunVisible = sunX > -150 && sunX < canvas.width + 150 && sunY > -130 && sunY < canvas.height * .68;
-      if (sunVisible) paintStormCloud(sunX, sunY, 1.75, time);
-      const cloudCount = Math.max(3, Math.ceil(canvas.width / 360));
-      for (let i = 0; i < cloudCount; i++) {
-        const travel = (time * (.018 + (i % 3) * .004) + i * 283) % (canvas.width + 260);
-        const x = travel - 130;
-        const y = 25 + (i % 3) * 38 + Math.sin(time * .0007 + i) * 7;
-        if (sunVisible && Math.abs(x - sunX) < 180 && Math.abs(y - sunY) < 85) continue;
-        paintStormCloud(x, y, .92 + (i % 2) * .18, time + i);
-      }
-
-      const dropCount = Math.min(360, Math.max(110, Math.ceil(canvas.width * canvas.height / 3000)));
+      const elapsed = Math.max(0, (time - weatherAnimationStartedAt) / 1000);
+      const dropCount = Math.min(34, Math.max(16, Math.ceil(canvas.width * canvas.height / 38000)));
+      const width = canvas.width, height = canvas.height;
       ctx.lineCap = 'round';
       for (let i = 0; i < dropCount; i++) {
-        const x = (i * 137 + time * .29) % canvas.width;
-        const y = (i * 83 + time * .72) % canvas.height;
-        const streak = 12 + (i % 4) * 3;
-        ctx.globalAlpha = .42 + .38 * (Math.sin(time * .002 + i) + 1) / 2;
-        ctx.strokeStyle = i % 3 === 0 ? 'rgba(235,248,255,.95)' : 'rgba(198,226,248,.88)';
-        ctx.lineWidth = i % 5 === 0 ? 2 : 1.35;
-        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 8, y + streak); ctx.stroke();
+        const seed = i * 5;
+        const speed = 28 + randomFor(seed + 3) * 42;
+        const length = 9 + randomFor(seed + 4) * 9;
+        const cycle = height + length + 38;
+        const startY = randomFor(seed + 1) * cycle;
+        const y = (startY + elapsed * speed) % cycle - length - 18;
+        const x = (randomFor(seed + 2) * (width + 28) + elapsed * (13 + randomFor(seed + 5) * 11) + Math.sin(elapsed * .8 + i) * 3) % (width + 28) - 14;
+        const slant = 2.5 + randomFor(seed + 6) * 5.5;
+        const alpha = .28 + randomFor(seed + 7) * .27;
+        const drop = ctx.createLinearGradient(x, y, x - slant, y + length);
+        drop.addColorStop(0, `rgba(238,248,255,${alpha * .35})`);
+        drop.addColorStop(.4, `rgba(203,228,247,${alpha})`);
+        drop.addColorStop(1, 'rgba(180,215,240,0)');
+        ctx.strokeStyle = drop; ctx.globalAlpha = 1; ctx.lineWidth = .75 + randomFor(seed + 8) * .7;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - slant, y + length); ctx.stroke();
+        if (i % 15 === 0) {
+          ctx.globalAlpha = alpha * .72; ctx.fillStyle = '#e7f4ff';
+          ctx.beginPath(); ctx.ellipse(x - slant, y + length + 2, 1.1, 2.1, -.2, 0, Math.PI * 2); ctx.fill();
+        }
       }
       ctx.restore();
     }
-
     function renderGameWorld() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
@@ -2608,12 +2631,12 @@
         const displayPlayer = { ...p, x: playerX, y: playerY };
         const jumpHeight = Number.isFinite(p.displayJumpOffset) ? p.displayJumpOffset : (p.jumpOffset || 0);
         drawSlimeModel(ctx, playerX, playerY, p.equippedSkin, p.equippedAcc, p.equippedTitle, p.isJumping, jumpHeight, p.activeSpecialEmote, false, p.role, Math.hypot(p.vx || 0, p.vy || 0), p.vx || 0);
-        drawSpeechBubble(ctx, playerX, playerY - jumpHeight, p.speechBubble, p.role);
+        drawSpeechBubble(ctx, playerX, playerY - jumpHeight, p.speechBubble, p.role, p.equippedTitle);
         drawPlayerLabel(ctx, displayPlayer);
       });
 
       drawSlimeModel(ctx, localPlayer.x, localPlayer.y, localPlayer.equippedSkin, localPlayer.equippedAcc, localPlayer.equippedTitle, localPlayer.isJumping, localPlayer.jumpOffset, localPlayer.activeSpecialEmote, true, localPlayer.role);
-      drawSpeechBubble(ctx, localPlayer.x, localPlayer.y - localPlayer.jumpOffset, localPlayer.speechBubble, localPlayer.role);
+      drawSpeechBubble(ctx, localPlayer.x, localPlayer.y - localPlayer.jumpOffset, localPlayer.speechBubble, localPlayer.role, localPlayer.equippedTitle);
       drawPlayerLabel(ctx, localPlayer, true);
 
       ctx.restore();
@@ -3070,7 +3093,11 @@
       if (!item || (!localPlayer.inventory.includes(item.id) && !roleOwned)) return;
       if (item.type === 'skins') localPlayer.equippedSkin = localPlayer.equippedSkin === item.id ? 'skin_pink' : item.id;
       if (item.type === 'accessories') localPlayer.equippedAcc = localPlayer.equippedAcc === item.id ? null : item.id;
-      if (item.type === 'titles') localPlayer.equippedTitle = localPlayer.equippedTitle === item.id ? null : item.id;
+      if (item.type === 'titles') {
+        const isUnequippingDeveloperTitle = item.id === 'title_developer' && localPlayer.equippedTitle === item.id;
+        localPlayer.equippedTitle = isUnequippingDeveloperTitle ? null : item.id;
+        if (isUnequippingDeveloperTitle) localPlayer.speechBubble = null;
+      }
       if (item.type === 'profile') { localPlayer.pfp = item.icon; localPlayer.avatarUrl = ''; }
       if (item.type === 'emotes') localPlayer.equippedEmote = localPlayer.equippedEmote === item.id ? null : item.id;
       if (item.type === 'message_cards') localPlayer.equippedMessageCard = localPlayer.equippedMessageCard === item.id ? null : item.id;
@@ -3207,9 +3234,63 @@
 
     function sendSocialBroadcast(event, payload) {
       const channel = socialChannel || realtimeChannel;
-      if (channel) channel.send({ type: 'broadcast', event, payload });
+      if (!channel) return;
+      try { Promise.resolve(channel.send({ type: 'broadcast', event, payload })).catch(() => {}); } catch (error) {}
     }
 
+    function notifySocialChannelWaiters(channel) {
+      const waiting = socialChannelWaiters.splice(0);
+      waiting.forEach(resolve => resolve(channel));
+    }
+
+    function waitForSocialChannel(timeoutMs = 7000) {
+      initSocialChannel();
+      if (socialChannelReady && socialChannel) return Promise.resolve(socialChannel);
+      return new Promise(resolve => {
+        let timer = null;
+        const finish = channel => { if (timer) clearTimeout(timer); resolve(channel); };
+        socialChannelWaiters.push(finish);
+        timer = setTimeout(() => {
+          socialChannelWaiters = socialChannelWaiters.filter(waiter => waiter !== finish);
+          finish(socialChannelReady ? socialChannel : null);
+        }, timeoutMs);
+      });
+    }
+
+    async function sendDirectMessagePayload(payload) {
+      const channel = await waitForSocialChannel();
+      const channels = [...new Set([channel, realtimeChannel].filter(Boolean))];
+      if (!channels.length) throw new Error('Chat connection is not ready.');
+      const results = await Promise.allSettled(channels.map(candidate => candidate.send({ type: 'broadcast', event: 'direct_msg', payload })));
+      if (results.some(result => result.status === 'fulfilled' && result.value === 'ok')) return true;
+      const failure = results.find(result => result.status === 'rejected');
+      throw (failure && failure.reason) || new Error('Chat channels did not accept the message.');
+    }
+
+    async function receiveDirectMessage(payload) {
+      if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.senderId) || payload.senderId === localPlayer.id) return;
+      const isFriend = friendList.some(friend => friend.id === payload.senderId && friend.accepted);
+      const isOpenConversation = activeDMUserId === payload.senderId;
+      if (!isFriend && !isOpenConversation && localPlayer.role !== 'developer') {
+        const senderRole = await getTrustedUserRole(payload.senderId);
+        if (senderRole !== 'developer') return;
+      }
+      if (!dmMessages[payload.senderId]) dmMessages[payload.senderId] = [];
+      const messageId = typeof payload.messageId === 'string' ? payload.messageId : `${payload.senderId}:${payload.time || Date.now()}:${String(payload.text || '').slice(0, 24)}`;
+      if (dmMessages[payload.senderId].some(message => message.messageId === messageId)) return;
+      const incomingMessage = {
+        messageId, senderId: payload.senderId, text: String(payload.text || '').slice(0, 500),
+        time: Number(payload.time) || Date.now(), pfp: payload.pfp, avatarUrl: payload.avatarUrl,
+        equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard
+      };
+      dmMessages[payload.senderId].push(incomingMessage);
+      localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
+      markFriendsUnread();
+      if (activeDMUserId === payload.senderId) {
+        const target = friendList.find(friend => friend.id === payload.senderId) || remotePlayers[payload.senderId] || staffDMProfile;
+        appendDMMessage(incomingMessage, target);
+      }
+    }
     function addFriend(id, name, pfp, avatarUrl = '', equippedFrame = null) {
       if (!isValidUserId(id) || id === localPlayer.id) return;
       const known = friendList.find(f => f.id === id);
@@ -3452,25 +3533,43 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    function handleDMSubmit(e) {
+    async function handleDMSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('dm-text-input');
+      const sendBtn = document.getElementById('dm-send-btn');
+      const statusTag = document.getElementById('dm-status-tag');
       const text = input.value.trim();
-      if (!authUser || guestMode || !text || !activeDMUserId) return;
-      const friend = friendList.some(f => f.id === activeDMUserId && f.accepted);
-      const developerDM = (staffDMUserId === activeDMUserId && staffDMProfile && (localPlayer.role === 'developer' || staffDMProfile.role === 'developer')) || localPlayer.role === 'developer';
+      const targetId = activeDMUserId;
+      if (!authUser || guestMode || !text || !targetId) return;
+      const friend = friendList.some(entry => entry.id === targetId && entry.accepted);
+      const developerDM = (staffDMUserId === targetId && staffDMProfile && (localPlayer.role === 'developer' || staffDMProfile.role === 'developer')) || localPlayer.role === 'developer';
       if (!friend && !developerDM) return;
-      
-      const body = { senderId: localPlayer.id, sender: localPlayer.name, text: text.slice(0, 500), time: Date.now(), pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard };
-      if (!dmMessages[activeDMUserId]) dmMessages[activeDMUserId] = [];
-      dmMessages[activeDMUserId].push(body);
+
+      const messageId = window.crypto && typeof window.crypto.randomUUID === 'function' ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const body = { messageId, senderId: localPlayer.id, sender: localPlayer.name, text: text.slice(0, 500), time: Date.now(), pfp: localPlayer.pfp, equippedFrame: localPlayer.equippedFrame, equippedMessageCard: localPlayer.equippedMessageCard };
+      if (!dmMessages[targetId]) dmMessages[targetId] = [];
+      dmMessages[targetId].push(body);
       localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
-      sendSocialBroadcast('direct_msg', { targetId: activeDMUserId, ...body });
-      const currentTarget = developerDM ? (staffDMProfile || remotePlayers[activeDMUserId] || friendList.find(entry => entry.id === activeDMUserId)) : friendList.find(entry => entry.id === activeDMUserId);
+      const currentTarget = developerDM ? (staffDMProfile || remotePlayers[targetId] || friendList.find(entry => entry.id === targetId)) : friendList.find(entry => entry.id === targetId);
       appendDMMessage(body, currentTarget);
       input.value = '';
-    }
+      input.disabled = true; sendBtn.disabled = true; statusTag.textContent = 'Sending…';
 
+      try {
+        await sendDirectMessagePayload({ targetId, ...body });
+        if (activeDMUserId === targetId) statusTag.textContent = developerDM ? 'Staff Direct' : 'Friends';
+      } catch (error) {
+        dmMessages[targetId] = (dmMessages[targetId] || []).filter(message => message.messageId !== messageId);
+        localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
+        if (activeDMUserId === targetId) {
+          renderDMBox(); input.value = text; statusTag.textContent = 'Not sent · try again';
+        }
+        showWorldActionToast('Message was not sent. Check the connection and try again.');
+      } finally {
+        if (activeDMUserId === targetId) { input.disabled = false; sendBtn.disabled = false; }
+        else renderDMBox();
+      }
+    }
     // PROFILE SETTINGS & SIGN OUT
     function toggleSettingsModal() {
       const modal = document.getElementById('settings-modal');
@@ -3553,7 +3652,10 @@
       await loadLobbyMusic();
       if (!['admin', 'developer'].includes(localPlayer.role)) {
         if (localPlayer.equippedSkin === 'skin_admin' || localPlayer.equippedSkin === 'skin_developer') localPlayer.equippedSkin = 'skin_pink';
-        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') localPlayer.equippedTitle = null;
+        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') {
+          if (localPlayer.equippedTitle === 'title_developer') localPlayer.speechBubble = null;
+          localPlayer.equippedTitle = null;
+        }
       }
       savePlayerToStorage();
       updateRoleUi(); renderOwnedEmoteButton();
@@ -3584,7 +3686,10 @@
       if (role && ['player', 'admin', 'developer'].includes(role)) localPlayer.role = role;
       if (!['admin', 'developer'].includes(localPlayer.role)) {
         if (localPlayer.equippedSkin === 'skin_admin' || localPlayer.equippedSkin === 'skin_developer') localPlayer.equippedSkin = 'skin_pink';
-        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') localPlayer.equippedTitle = null;
+        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') {
+          if (localPlayer.equippedTitle === 'title_developer') localPlayer.speechBubble = null;
+          localPlayer.equippedTitle = null;
+        }
       }
       savePlayerToStorage(); updateRoleUi(); updateUIHeader(); broadcastPlayerState();
       if (!document.getElementById('inventory-modal').classList.contains('hidden')) renderInventoryGrid();
@@ -3669,6 +3774,7 @@
 
     function broadcastProfileUpdate() {
       sendSocialBroadcast('profile_update', { id: localPlayer.id, name: localPlayer.name, pfp: localPlayer.pfp, avatarUrl: localPlayer.avatarUrl, equippedFrame: localPlayer.equippedFrame, equippedTitle: localPlayer.equippedTitle, role: localPlayer.role });
+      if (socialChannelReady && socialChannel) socialChannel.track({ id: localPlayer.id, role: localPlayer.role }).catch(() => {});
     }
 
     let staffSearchTimer = null;
@@ -3701,10 +3807,14 @@
 
       if (!['admin', 'developer'].includes(localPlayer.role)) {
         if (localPlayer.equippedSkin === 'skin_admin' || localPlayer.equippedSkin === 'skin_developer') localPlayer.equippedSkin = 'skin_pink';
-        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') localPlayer.equippedTitle = null;
+        if (localPlayer.equippedTitle === 'title_admin' || localPlayer.equippedTitle === 'title_developer') {
+          if (localPlayer.equippedTitle === 'title_developer') localPlayer.speechBubble = null;
+          localPlayer.equippedTitle = null;
+        }
       }
       renderOwnedEmoteButton();
       if (!document.getElementById('inventory-modal').classList.contains('hidden')) renderInventoryGrid();
+      if (socialChannelReady && socialChannel) socialChannel.track({ id: localPlayer.id, role: localPlayer.role }).catch(() => {});
     }
 
     function openRolePanel() {
@@ -3898,9 +4008,21 @@
 
     // REALTIME CHANNELS & STAFF GROUP CHAT
     let socialChannel = null;
+    let socialChannelReady = false;
+    let socialChannelWaiters = [];
+    let socialOnlinePlayers = [];
+    function getLobbyMusicLeaderId() {
+      const staffIds = socialOnlinePlayers.filter(player => isValidUserId(player.id) && ['admin', 'developer'].includes(player.role)).map(player => player.id).sort();
+      if (musicUploaderUserId && staffIds.includes(musicUploaderUserId)) return musicUploaderUserId;
+      return staffIds[0] || null;
+    }
     function initSocialChannel() {
       if (socialChannel || !authUser || guestMode) return;
-      socialChannel = supabaseClient.channel('sakura-social')
+      socialChannel = supabaseClient.channel('sakura-social', { config: { presence: { key: localPlayer.id }, broadcast: { ack: true, self: false } } })
+        .on('presence', { event: 'sync' }, () => {
+          const state = socialChannel.presenceState();
+          socialOnlinePlayers = Object.values(state).flatMap(entries => entries).filter(player => isValidUserId(player.id));
+        })
         .on('broadcast', { event: 'friend_request' }, ({ payload }) => receiveFriendRequest(payload))
         .on('broadcast', { event: 'friend_accept' }, ({ payload }) => {
           if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.friendId)) return;
@@ -3918,23 +4040,9 @@
           if (payload.id === localPlayer.id) refreshOwnProfile();
           else syncFriendProfile(payload);
         })
-        .on('broadcast', { event: 'direct_msg' }, async ({ payload }) => {
-          if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.senderId)) return;
-          const isFriend = friendList.some(f => f.id === payload.senderId && f.accepted);
-          let senderRole = 'player';
-          if (!isFriend && localPlayer.role !== 'developer') senderRole = await getTrustedUserRole(payload.senderId);
-          if (!isFriend && senderRole !== 'developer' && localPlayer.role !== 'developer') return;
-          if (!dmMessages[payload.senderId]) dmMessages[payload.senderId] = [];
-          const incomingMessage = { senderId: payload.senderId, text: payload.text, time: Date.now(), pfp: payload.pfp, avatarUrl: payload.avatarUrl, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard };
-          dmMessages[payload.senderId].push(incomingMessage);
-          localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
-          markFriendsUnread();
-          if (activeDMUserId === payload.senderId) {
-            const target = friendList.find(friend => friend.id === payload.senderId) || remotePlayers[payload.senderId] || staffDMProfile;
-            appendDMMessage(incomingMessage, target);
-          }
-        })
-        .on('broadcast', { event: 'lobby_music_update' }, ({ payload }) => { 
+        .on('broadcast', { event: 'direct_msg' }, ({ payload }) => receiveDirectMessage(payload))
+        .on('broadcast', { event: 'lobby_music_update' }, ({ payload }) => {
+          if (payload && payload.refresh) { loadLobbyMusic(); return; }
           if (payload && payload.payloadStr) {
             try {
               const parsed = JSON.parse(payload.payloadStr);
@@ -3946,7 +4054,14 @@
             setLobbyMusicPlaylist([]);
           }
         })
-        .subscribe();
+        .subscribe(status => {
+          socialChannelReady = status === 'SUBSCRIBED';
+          if (socialChannelReady) {
+            notifySocialChannelWaiters(socialChannel);
+            socialChannel.track({ id: localPlayer.id, role: localPlayer.role }).catch(() => {});
+          }
+          else if (['CHANNEL_ERROR', 'TIMED_OUT', 'CLOSED'].includes(status)) notifySocialChannelWaiters(null);
+        });
     }
 
     function initStaffGroupChannel() {
@@ -4007,7 +4122,7 @@
       if (realtimeChannel) realtimeChannel.unsubscribe();
 
       realtimeChannel = supabaseClient.channel(`room:${channelName}`, {
-        config: { presence: { key: localPlayer.id } }
+        config: { presence: { key: localPlayer.id }, broadcast: { ack: true } }
       });
 
       realtimeChannel
@@ -4034,6 +4149,7 @@
             syncFriendProfile(payload);
           }
         })
+        .on('broadcast', { event: 'direct_msg' }, ({ payload }) => receiveDirectMessage(payload))
         .on('broadcast', { event: 'global_chat' }, async ({ payload }) => {
           if (!payload || !isValidUserId(payload.senderId) || payload.senderId === localPlayer.id) return;
           const verifiedRole = await getTrustedUserRole(payload.senderId);
@@ -4618,6 +4734,9 @@
       const room = realtimeChannel; realtimeChannel = null;
       const social = socialChannel; socialChannel = null;
       const staff = staffGroupChannel; staffGroupChannel = null;
+      socialChannelReady = false;
+      socialOnlinePlayers = [];
+      notifySocialChannelWaiters(null);
       remotePlayers = {};
       if (room) { try { await room.untrack(); } catch (error) {} }
       await Promise.allSettled([room, social, staff].filter(Boolean).map(channel => channel.unsubscribe()));
