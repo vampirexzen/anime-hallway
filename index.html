@@ -1046,8 +1046,19 @@
     let authUser = null;
     let remotePlayers = {};
     const isValidUserId = value => typeof value === 'string' && value.trim() && value !== 'undefined' && value !== 'null';
-    let friendList = (Array.isArray(loadStoredJson('sakura_friends', [])) ? loadStoredJson('sakura_friends', []) : []).filter(f => f && isValidUserId(f.id) && typeof f.name === 'string' && f.name.trim() && f.name !== 'undefined');
-    friendList = Array.from(new Map(friendList.map(f => [f.id, { ...f, name: f.name.trim(), pfp: PROFILE_PFP_OPTIONS.includes(f.pfp) ? f.pfp : '🌸', accepted: true }])).values());
+    function normalizeFriendList(records) {
+      if (!Array.isArray(records)) return [];
+      const valid = records.filter(friend => friend && isValidUserId(friend.id)).map(friend => ({
+        ...friend,
+        name: typeof friend.name === 'string' && friend.name.trim() && friend.name !== 'undefined' ? friend.name.trim() : 'Slime',
+        pfp: PROFILE_PFP_OPTIONS.includes(friend.pfp) ? friend.pfp : '🌸',
+        avatarUrl: safeAvatarUrl(friend.avatarUrl || ''),
+        accepted: true
+      }));
+      return Array.from(new Map(valid.map(friend => [friend.id, friend])).values());
+    }
+    function friendStorageKey(userId) { return `sakura_friends_user_${userId}`; }
+    let friendList = normalizeFriendList(loadStoredJson('sakura_friends', []));
     let friendRequests = (Array.isArray(loadStoredJson('sakura_friend_reqs', [])) ? loadStoredJson('sakura_friend_reqs', []) : []).filter(r => r && isValidUserId(r.senderId) && typeof r.name === 'string' && r.name.trim());
     let outgoingFriendRequests = (Array.isArray(loadStoredJson('sakura_friend_outgoing', [])) ? loadStoredJson('sakura_friend_outgoing', []) : []).filter(r => r && isValidUserId(r.targetId));
     localStorage.setItem('sakura_friends', JSON.stringify(friendList));
@@ -3212,10 +3223,21 @@
       return wrap;
     }
     function saveFriendData() {
-      localStorage.setItem('sakura_friends', JSON.stringify(friendList));
+      const snapshot = JSON.stringify(normalizeFriendList(friendList));
+      localStorage.setItem('sakura_friends', snapshot);
+      if (isValidUserId(localPlayer.id) && !String(localPlayer.id).startsWith('guest_')) {
+        localStorage.setItem(friendStorageKey(localPlayer.id), snapshot);
+      }
       localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
       localStorage.setItem('sakura_friend_outgoing', JSON.stringify(outgoingFriendRequests));
       updateFriendRequestBadge();
+    }
+
+    function restoreFriendDataForAccount(userId) {
+      if (!isValidUserId(userId) || String(userId).startsWith('guest_')) return;
+      const scoped = loadStoredJson(friendStorageKey(userId), null);
+      friendList = normalizeFriendList(Array.isArray(scoped) ? scoped : friendList);
+      saveFriendData();
     }
 
     function syncFriendsUnreadDot() {
@@ -3623,6 +3645,7 @@
       authUser = user;
       guestMode = false;
       localPlayer.id = user.id;
+      restoreFriendDataForAccount(user.id);
       let { data: profile, error } = await supabaseClient.from('player_profiles').select('username,pfp,avatar_url,points,inventory,equipped_skin,equipped_accessory,equipped_title,equipped_emote,equipped_message_card,equipped_frame').eq('user_id', user.id).maybeSingle();
       if (!profile && !error) {
         const ensured = await supabaseClient.rpc('ensure_my_profile');
