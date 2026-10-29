@@ -29,6 +29,19 @@
     .market-card[data-tier="Celestial"],.market-card[data-tier="Ethereal"]{background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(237,233,254,.94),rgba(255,241,247,.9))}
     .market-tier-pill{box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 2px 7px rgba(76,29,149,.12)}
     .avatar-frame-shell{position:relative;isolation:isolate}
+    .energy-frame-wrapper{overflow:visible!important;isolation:isolate;--energy-a:#00d0ff;--energy-b:#0055ff}
+    .energy-frame-wrapper:before{content:"";position:absolute;z-index:0;inset:-45%;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,255,255,.2),transparent 54%);box-shadow:0 0 18px var(--energy-a),0 0 28px var(--energy-b);filter:blur(7px);animation:energy-glow-pulse 1.8s ease-in-out infinite alternate}
+    .energy-frame-wrapper:after{display:none!important}
+    .energy-frame-wrapper .avatar-face{z-index:2;border:1px solid rgba(255,255,255,.9);box-shadow:inset 0 0 8px var(--energy-a)}
+    .energy-frame-ring{position:absolute;z-index:3;inset:-2px;border:2.5px solid var(--energy-a);border-radius:50%;pointer-events:none;box-shadow:0 0 5px var(--energy-a),inset 0 0 5px var(--energy-b),0 0 11px var(--energy-b);animation:energy-pulse 1.7s ease-in-out infinite alternate,energy-spin 9s linear infinite}
+    .energy-frame-ring:after{content:"";position:absolute;inset:2px;border:1px dashed rgba(255,255,255,.8);border-radius:50%;opacity:.8}
+    .energy-frame-particles{position:absolute;z-index:4;inset:-18%;border-radius:50%;pointer-events:none;background-image:radial-gradient(circle at 18% 24%,var(--energy-a) 1px,transparent 2px),radial-gradient(circle at 82% 27%,var(--energy-b) 1.5px,transparent 2.5px),radial-gradient(circle at 34% 88%,var(--energy-a) 1px,transparent 2px),radial-gradient(circle at 78% 76%,var(--energy-b) 1px,transparent 2px);filter:drop-shadow(0 0 3px var(--energy-a));animation:energy-particles-float 3.1s linear infinite}
+    .frame-electric-blue{--energy-a:#00d0ff;--energy-b:#0055ff}.frame-super-cyan{--energy-a:#00ffcc;--energy-b:#0099aa}.frame-plasma-violet{--energy-a:#e024ff;--energy-b:#6b00ff}.frame-infernal-crimson{--energy-a:#ff5b24;--energy-b:#990000}.frame-celestial-gold{--energy-a:#ffcf37;--energy-b:#cc5500}
+    @keyframes energy-spin{to{transform:rotate(360deg)}}
+    @keyframes energy-pulse{from{transform:scale(.97);opacity:.82}to{transform:scale(1.035);opacity:1}}
+    @keyframes energy-glow-pulse{from{opacity:.48;transform:scale(.94)}to{opacity:.94;transform:scale(1.06)}}
+    @keyframes energy-particles-float{from{transform:rotate(0) scale(.97);opacity:.55}50%{transform:rotate(180deg) scale(1.04);opacity:1}to{transform:rotate(360deg) scale(.97);opacity:.55}}
+    @media(prefers-reduced-motion:reduce){.energy-frame-wrapper:before,.energy-frame-ring,.energy-frame-particles{animation-duration:.01ms!important;animation-iteration-count:1!important}}
     .avatar-face{position:relative;z-index:1;display:flex;width:100%;height:100%;align-items:center;justify-content:center;border-radius:9999px;overflow:hidden;background:linear-gradient(145deg,#fff7fb,#fbcfe8);border:1px solid rgba(255,255,255,.9)}
     .avatar-frame-shell:after{content:"";position:absolute;z-index:2;inset:-3px;border-radius:9999px;pointer-events:none;border:2px solid var(--frame-a,#f472b6);box-shadow:0 0 0 2px var(--frame-b,#fbcfe8),0 0 13px var(--frame-c,rgba(236,72,153,.65));}
     .avatar-frame-shell[data-frame="snowman"]:before{animation:ornament-float 2.8s ease-in-out infinite}
@@ -257,9 +270,13 @@
     #chat-sidebar[data-zone="spring"] .chat-tab[data-active="false"]:hover{color:#fff;background:rgba(34,197,94,.15)}
     #chat-sidebar[data-zone="spring"] #chat-messages{background:radial-gradient(ellipse at 80% 10%,rgba(74,222,128,.12),transparent 38%),linear-gradient(160deg,rgba(9,49,37,.42),rgba(9,36,32,.3))}
     #chat-sidebar[data-zone="spring"] .chat-composer{background:linear-gradient(110deg,rgba(6,46,34,.97),rgba(20,83,45,.92));border-color:rgba(134,239,172,.35)}
+    #chat-sidebar[data-zone="spring"] .chat-composer input{background:rgba(236,253,245,.96);border-color:rgba(134,239,172,.55);color:#064e3b}
+    #chat-sidebar[data-zone="spring"] .chat-composer input::placeholder{color:#4b8564}
     #chat-sidebar[data-zone="spring"] .chat-composer input:focus{border-color:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.24)}
+    #chat-sidebar[data-zone="spring"] #chat-form button[type="submit"]{background:linear-gradient(135deg,#16a34a,#22c55e 58%,#4ade80)!important;color:#f0fdf4;box-shadow:0 4px 12px rgba(22,163,74,.28)}
+    #chat-sidebar[data-zone="spring"] #chat-form button[type="submit"]:hover{filter:brightness(1.08);box-shadow:0 6px 16px rgba(22,163,74,.38)}
     #chat-sidebar[data-zone="spring"] .chat-panel-header>button{color:#bbf7d0}
-    #chat-sidebar[data-zone="spring"] .message-card-chat[data-role="player"]{border-color:rgba(134,239,172,.42)!important;background:linear-gradient(135deg,rgba(20,83,45,.38),rgba(6,78,59,.34))!important}
+    #chat-sidebar[data-zone="spring"] .message-card-chat[data-role="player"]:not([data-message-card]){border-color:rgba(134,239,172,.42)!important;background:linear-gradient(135deg,rgba(20,83,45,.38),rgba(6,78,59,.34))!important}
     #chat-sidebar[data-zone="spring"] .message-card-chat[data-role="player"] button{color:#bbf7d0!important}
     #chat-sidebar[data-zone="garden"] .chat-tab[data-active="true"]{background:linear-gradient(120deg,#db2777,#ec4899 55%,#fb7185)!important;color:#fff!important;box-shadow:0 3px 14px rgba(236,72,153,.34),inset 0 1px rgba(255,255,255,.35)}
     #chat-sidebar[data-zone="garden"] .chat-tab[data-active="false"]{color:#fbcfe8}
@@ -303,7 +320,10 @@
       #canvas-container>.pointer-events-none.absolute.top-12.right-3{top:4.35rem;max-width:45vw;text-align:right;line-height:1.25}
       #role-panel-modal .staff-search-row input{flex:1 1 100%;width:100%;font-size:16px}
       #role-panel-modal .staff-search-row button{min-height:42px;flex:1}
-      #role-panel-modal .staff-music-actions button{flex:1}
+      #role-panel-modal .staff-music-actions button{flex:1;min-height:40px}
+      #chat-sidebar{width:100vw;max-width:100vw}
+      #chat-sidebar .chat-composer{padding-bottom:max(.65rem,env(safe-area-inset-bottom))}
+      #chat-sidebar #chat-input{font-size:16px;min-width:0}
       #role-panel-modal .staff-management-card{padding:.7rem}
       #role-panel-modal .staff-management-card .staff-duration{width:100%;font-size:16px}
       #role-panel-modal .staff-management-card button{flex:1 1 42%;min-height:40px}
@@ -454,7 +474,6 @@
 
     <div class="flex-1 relative bg-pink-950/20 flex items-center justify-center overflow-hidden h-full w-full" id="canvas-container">
       <canvas id="gameCanvas" class="block w-full h-full cursor-pointer touch-none"></canvas>
-      <div class="pointer-events-none absolute top-12 right-3 z-10 rounded-xl border border-white/55 bg-slate-950/25 px-2.5 py-1.5 text-[9px] font-bold text-white/90 shadow-sm backdrop-blur-sm">Tap a lantern to toggle its light</div>
       <div id="world-action-toast" class="pointer-events-none absolute bottom-16 left-1/2 z-30 hidden -translate-x-1/2 rounded-xl border border-white/70 bg-slate-950/70 px-3 py-1.5 text-[10px] font-extrabold text-white shadow-lg backdrop-blur-sm"></div>
 
       <div id="world-switcher" data-zone="garden" role="group" aria-label="Choose a world" class="world-switcher absolute top-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 glass rounded-2xl border border-pink-200/80 shadow-md max-w-[95vw] overflow-x-auto">
@@ -713,7 +732,7 @@
           <span class="text-3xl">🔮</span><span class="mt-2 block text-sm font-extrabold text-violet-950">Slime Sequence</span><span class="mt-1 block text-[10px] text-violet-700">Watch the sticker pattern, then repeat it.</span>
         </button>
         <button onclick="openPetalCatchGame()" class="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-100 to-orange-50 p-4 text-left shadow-sm hover:shadow-md transition hover:-translate-y-0.5">
-          <span class="text-3xl">🏮</span><span class="mt-2 block text-sm font-extrabold text-amber-950">Lantern Petal Catch</span><span class="mt-1 block text-[10px] text-amber-800">Catch 10 floating blossoms in 15 seconds to earn 5 points.</span>
+          <span class="text-3xl">🏮</span><span class="mt-2 block text-sm font-extrabold text-amber-950">Lantern Petal Catch</span><span class="mt-1 block text-[10px] text-amber-800">Catch 10 floating blossoms in 17 seconds to earn 5 points.</span>
         </button>
       </div>
     </div>
@@ -754,14 +773,14 @@
   <div id="petal-catch-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 hidden">
     <div class="glass w-full max-w-md rounded-3xl p-4 sm:p-6 shadow-2xl border border-amber-100">
       <div class="flex items-center justify-between border-b border-amber-200 pb-3">
-        <div><h3 class="font-extrabold text-amber-950 text-base sm:text-lg">Lantern Petal Catch</h3><p class="text-[10px] text-amber-800">Catch 10 blossoms in 15 seconds to win 5 points.</p></div>
+        <div><h3 class="font-extrabold text-amber-950 text-base sm:text-lg">Lantern Petal Catch</h3><p class="text-[10px] text-amber-800">Catch 10 blossoms in 17 seconds to win 5 points.</p></div>
         <button onclick="closePetalCatchGame()" class="text-amber-900 p-1" aria-label="Close game">✕</button>
       </div>
-      <div class="flex items-center justify-between py-2 text-xs font-extrabold text-amber-950"><span id="petal-catch-score">Blossoms: 0 / 10</span><span id="petal-catch-time">Time: 14s</span></div>
+      <div class="flex items-center justify-between py-2 text-xs font-extrabold text-amber-950"><span id="petal-catch-score">Blossoms: 0 / 10</span><span id="petal-catch-time">Time: 17s</span></div>
       <p id="petal-catch-status" class="pb-2 text-center text-[10px] font-bold text-amber-900">Press Start, then tap the floating blossom.</p>
       <div id="petal-catch-stage" class="relative h-56 overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-indigo-950 via-violet-900 to-rose-950 shadow-inner">
         <span class="pointer-events-none absolute left-5 top-5 text-xl opacity-50">✨</span><span class="pointer-events-none absolute right-8 top-10 text-lg opacity-60">🌙</span><span class="pointer-events-none absolute bottom-5 left-12 text-lg opacity-50">🌸</span>
-        <button id="petal-catch-target" type="button" onclick="catchPetal()" disabled class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl opacity-40 transition-transform duration-150 drop-shadow-lg" aria-label="Catch blossom">🌸</button>
+        <button id="petal-catch-target" type="button" onclick="catchPetal()" disabled class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-1 text-4xl opacity-40 transition-transform duration-150 drop-shadow-lg" aria-label="Catch blossom">🌸</button>
       </div>
       <button onclick="startPetalCatchGame()" id="petal-catch-start" class="mt-3 w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 py-2.5 text-xs font-extrabold text-white shadow-md">Start game</button>
     </div>
@@ -809,10 +828,11 @@
           <div class="staff-music-actions flex gap-2 items-center">
             <input id="lobby-music-file" type="file" accept="audio/*" multiple class="block w-full text-[10px] text-slate-700 file:mr-2 file:rounded-lg file:border-0 file:bg-cyan-700 file:px-3 file:py-1.5 file:text-[10px] file:font-bold file:text-white" />
             <button onclick="uploadLobbyMusicFile()" class="rounded-xl bg-purple-700 px-3 py-2 text-[10px] font-bold text-white shrink-0">Add to Playlist</button>
+            <button onclick="staffNextPlaylistTrack()" class="rounded-xl bg-emerald-700 px-3 py-2 text-[10px] font-bold text-white shrink-0">Next Song</button>
             <button onclick="clearLobbyMusic()" class="rounded-xl bg-slate-500 px-3 py-2 text-[10px] font-bold text-white shrink-0">Clear All</button>
           </div>
         </div>
-        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Audio plays sequentially and syncs across the lobby. Tracks replay automatically!</p>
+        <p id="lobby-music-status" class="mt-1 text-[9px] text-slate-500">Click a playlist track to play it, or choose Next Song. Tracks replay automatically.</p>
         <div id="playlist-preview-list" class="mt-2 max-h-20 overflow-y-auto space-y-1 text-[10px] font-semibold text-slate-700"></div>
       </div>
     </div>
@@ -954,7 +974,13 @@
         { id: 'card_starlight', name: 'Cosmic Starlight', type: 'message_cards', theme: 'starlight', icon: '✨', price: 92000, colors: ['#312e81', '#6b21a8', '#1e293b'], desc: 'A shifting starfield twinkles behind your words.', preview: 'Deep space signal received. Constellations aligned.', tier: 'Epic' },
         { id: 'card_sakura', name: 'Sakura Blossom', type: 'message_cards', theme: 'sakura', icon: '🌸', price: 36000, colors: ['#831843', '#be185d', '#7c2d12'], desc: 'A soft spring shimmer carries drifting sakura petals.', preview: 'A spring breeze carries petals through the garden.', tier: 'Rare' }
       ],
-      frames: []
+      frames: [
+        { id: 'frame_energy_blue', name: 'Electric Blue Energy Frame', type: 'frames', style: 'energy-blue', energyClass: 'frame-electric-blue', icon: '⚡', price: 850000, colors: ['#00d0ff', '#0055ff', '#67e8f9'], desc: 'An animated plasma ring with electric sparks.', tier: 'Ethereal' },
+        { id: 'frame_energy_cyan', name: 'Super Cyan Energy Frame', type: 'frames', style: 'energy-cyan', energyClass: 'frame-super-cyan', icon: '✧', price: 1050000, colors: ['#00ffcc', '#0099aa', '#80ffea'], desc: 'A bright cyan halo with drifting energy particles.', tier: 'Ethereal' },
+        { id: 'frame_energy_violet', name: 'Plasma Violet Energy Frame', type: 'frames', style: 'energy-violet', energyClass: 'frame-plasma-violet', icon: '✦', price: 1300000, colors: ['#e024ff', '#6b00ff', '#f180ff'], desc: 'A violet plasma ring with a pulsing starlit edge.', tier: 'Ethereal' },
+        { id: 'frame_energy_crimson', name: 'Infernal Crimson Energy Frame', type: 'frames', style: 'energy-crimson', energyClass: 'frame-infernal-crimson', icon: '🔥', price: 1600000, colors: ['#ff5b24', '#990000', '#ff8800'], desc: 'A crimson flame ring trailing warm sparks.', tier: 'Ethereal' },
+        { id: 'frame_energy_gold', name: 'Celestial Gold Energy Frame', type: 'frames', style: 'energy-gold', energyClass: 'frame-celestial-gold', icon: '✧', price: 1950000, colors: ['#ffcf37', '#cc5500', '#ffea80'], desc: 'A golden celestial aura with orbiting embers.', tier: 'Ethereal' }
+      ]
     };
     const PROFILE_PFP_OPTIONS = PROFILE_STICKERS.map(item => item.icon);
     const ROLE_ITEMS = {
@@ -1000,7 +1026,7 @@
       role: 'player',
       equippedEmote: localStorage.getItem('sakura_eq_emote') || null,
       equippedMessageCard: localStorage.getItem('sakura_eq_message_card') || null,
-      equippedFrame: null,
+      equippedFrame: localStorage.getItem('sakura_eq_frame') || null,
       speechBubble: null,
       mutedUntil: null,
       activeSpecialEmote: null,
@@ -1083,6 +1109,7 @@
     let musicPlaylist = [];
     let musicPlaylistIndex = 0;
     let musicUploaderUserId = null;
+    let musicStartedAt = 0;
     let lobbyAudio = null;
     const musicNotes = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46];
 
@@ -1121,26 +1148,47 @@
       playTone(frequency, .34, .018, 'triangle');
     }
 
-    function playPlaylistCurrentTrack() {
+    function stopBasicMusic() {
+      window.clearInterval(musicTimer); musicTimer = null;
+    }
+
+    function playPlaylistCurrentTrack(startedAt = musicStartedAt) {
       if (!musicPlaying || !audioEnabled || !musicPlaylist.length) return;
+      stopBasicMusic();
       const trackUrl = musicPlaylist[musicPlaylistIndex % musicPlaylist.length];
       const resolvedUrl = typeof trackUrl === 'string' ? new URL(trackUrl, document.baseURI).href : '';
+      if (Number.isFinite(startedAt) && startedAt > 0) musicStartedAt = startedAt;
+      if (!musicStartedAt) musicStartedAt = Date.now();
+      const seekToLobbyPosition = audio => {
+        if (!audio || !Number.isFinite(audio.duration) || audio.duration <= 0) return;
+        const elapsed = Math.max(0, (Date.now() - musicStartedAt) / 1000);
+        try { audio.currentTime = elapsed % audio.duration; } catch (error) {}
+      };
+      const startAudio = audio => audio.play().catch(() => {
+        if (lobbyAudio !== audio || !audioEnabled) return;
+        audioEnabled = false; musicPlaying = false; updateAudioButton();
+        showWorldActionToast('Tap the music button to start the lobby track on this device.');
+      });
       if (lobbyAudio && lobbyAudio.src === resolvedUrl) {
-        lobbyAudio.play().catch(() => {});
+        if (lobbyAudio.readyState >= 1) seekToLobbyPosition(lobbyAudio);
+        else lobbyAudio.addEventListener('loadedmetadata', () => seekToLobbyPosition(lobbyAudio), { once: true });
+        startAudio(lobbyAudio);
         return;
       }
       if (lobbyAudio) { lobbyAudio.pause(); lobbyAudio = null; }
       lobbyAudio = new Audio(trackUrl);
       lobbyAudio.volume = .4;
-      lobbyAudio.onended = () => {
+      const activeAudio = lobbyAudio;
+      activeAudio.addEventListener('loadedmetadata', () => seekToLobbyPosition(activeAudio), { once: true });
+      activeAudio.onended = () => {
         if (musicPlaying && audioEnabled && musicPlaylist.length > 0) {
           musicPlaylistIndex = (musicPlaylistIndex + 1) % musicPlaylist.length;
-          playPlaylistCurrentTrack();
+          musicStartedAt = Date.now();
+          playPlaylistCurrentTrack(musicStartedAt);
         }
       };
-      lobbyAudio.play().catch(() => {});
+      startAudio(activeAudio);
     }
-
     function updateAudioButton() {
       const button = document.getElementById('music-toggle-btn');
       const icon = document.getElementById('music-icon');
@@ -1170,31 +1218,38 @@
       updateAudioButton();
     }
 
-    function setLobbyMusicPlaylist(playlistData, uploaderId = null) {
+    function setLobbyMusicPlaylist(playlistData, uploaderId = null, requestedIndex = null, playNow = false, startedAt = null) {
       const nextPlaylist = Array.isArray(playlistData) ? playlistData : typeof playlistData === 'string' && playlistData ? [playlistData] : [];
       const currentSrc = lobbyAudio && lobbyAudio.src;
       const currentIndex = currentSrc ? nextPlaylist.findIndex(track => new URL(track, document.baseURI).href === currentSrc) : -1;
+      const hasRequestedIndex = Number.isInteger(requestedIndex) && requestedIndex >= 0 && requestedIndex < nextPlaylist.length;
+      const nextIndex = hasRequestedIndex ? requestedIndex : currentIndex >= 0 ? currentIndex : 0;
+      const trackChanged = nextIndex !== musicPlaylistIndex || currentIndex < 0;
       musicPlaylist = nextPlaylist;
-      musicPlaylistIndex = currentIndex >= 0 ? currentIndex : 0;
+      musicPlaylistIndex = nextIndex;
       if (uploaderId) musicUploaderUserId = uploaderId;
+      if (Number.isFinite(startedAt) && startedAt > 0) musicStartedAt = startedAt;
+      else if (playNow || trackChanged || !musicStartedAt) musicStartedAt = Date.now();
+      if (playNow) { audioEnabled = true; musicPlaying = true; initAudio(); updateAudioButton(); }
       if (audioEnabled && musicPlaying) {
         if (musicPlaylist.length) {
-          if (currentIndex < 0) playPlaylistCurrentTrack();
+          stopBasicMusic();
+          if (playNow || trackChanged) playPlaylistCurrentTrack(musicStartedAt);
         } else {
           if (lobbyAudio) { lobbyAudio.pause(); lobbyAudio = null; }
+          musicStartedAt = 0;
           if (initAudio() && !musicTimer) { playNextMusicNote(); musicTimer = window.setInterval(playNextMusicNote, 420); }
         }
       }
       renderPlaylistPreview();
     }
-
     async function loadLobbyMusic() {
       const { data, error } = await supabaseClient.rpc('get_lobby_music');
       if (!error && data) {
         try {
           const parsed = JSON.parse(data);
           if (parsed && Array.isArray(parsed.playlist)) {
-            setLobbyMusicPlaylist(parsed.playlist, parsed.uploaderId);
+            setLobbyMusicPlaylist(parsed.playlist, parsed.uploaderId, Number.isInteger(parsed.activeIndex) ? parsed.activeIndex : null, parsed.playNow === true, Number.isFinite(parsed.activeStartedAt) ? parsed.activeStartedAt : null);
           } else {
             setLobbyMusicPlaylist(data);
           }
@@ -1213,11 +1268,45 @@
         return;
       }
       musicPlaylist.forEach((item, index) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'flex items-center justify-between bg-slate-100 p-1.5 rounded-lg';
-        itemDiv.innerHTML = `<span>🎵 Track ${index + 1}</span> <span class="text-[9px] text-cyan-800">${index === musicPlaylistIndex && musicPlaying ? '▶ Playing' : ''}</span>`;
-        list.appendChild(itemDiv);
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between gap-2 rounded-lg bg-slate-100 p-1.5';
+        const playButton = document.createElement('button'); playButton.type = 'button';
+        playButton.className = 'min-w-0 flex-1 truncate text-left font-bold text-slate-800 hover:text-emerald-800';
+        playButton.textContent = `▶ Play Track ${index + 1}`;
+        playButton.title = 'Play this playlist track now';
+        playButton.onclick = () => staffPlayPlaylistTrack(index);
+        const status = document.createElement('span');
+        status.className = 'shrink-0 text-[9px] text-emerald-800';
+        status.textContent = index === musicPlaylistIndex && musicPlaying ? 'Playing' : '';
+        row.append(playButton, status); list.appendChild(row);
       });
+    }
+
+    async function staffPlayPlaylistTrack(index) {
+      if (!['admin', 'developer'].includes(localPlayer.role) || !musicPlaylist.length) return;
+      const activeIndex = ((Number(index) || 0) % musicPlaylist.length + musicPlaylist.length) % musicPlaylist.length;
+      const uploaderId = musicUploaderUserId || localPlayer.id;
+      audioEnabled = true; musicPlaying = true;
+      initAudio();
+      const activeStartedAt = Date.now();
+      musicStartedAt = activeStartedAt;
+      setLobbyMusicPlaylist(musicPlaylist, uploaderId, activeIndex, true, activeStartedAt);
+      updateAudioButton();
+      const payloadStr = JSON.stringify({ playlist: musicPlaylist, uploaderId, activeIndex, playNow: true, activeStartedAt });
+      sendSocialBroadcast('lobby_music_update', { payloadStr });
+      const { error } = await supabaseClient.rpc('set_lobby_music', { p_music_url: payloadStr });
+      const status = document.getElementById('lobby-music-status');
+      if (status) status.textContent = error ? `Playing track ${activeIndex + 1}; lobby sync could not be saved.` : `Playing playlist track ${activeIndex + 1}.`;
+    }
+
+    function staffNextPlaylistTrack() {
+      if (!['admin', 'developer'].includes(localPlayer.role)) return;
+      if (!musicPlaylist.length) {
+        const status = document.getElementById('lobby-music-status');
+        if (status) status.textContent = 'Add a track to the playlist before choosing Next Song.';
+        return;
+      }
+      staffPlayPlaylistTrack((musicPlaylistIndex + 1) % musicPlaylist.length);
     }
 
     function uploadLobbyMusicFile() {
@@ -1249,7 +1338,7 @@
             musicUploaderUserId = localPlayer.id;
             setLobbyMusicPlaylist(updatedPlaylist, localPlayer.id);
 
-            const payloadStr = JSON.stringify({ playlist: updatedPlaylist, uploaderId: localPlayer.id });
+            const payloadStr = JSON.stringify({ playlist: updatedPlaylist, uploaderId: localPlayer.id, activeIndex: musicPlaylistIndex });
             await supabaseClient.rpc('set_lobby_music', { p_music_url: payloadStr });
             sendSocialBroadcast('lobby_music_update', { payloadStr });
 
@@ -1829,8 +1918,6 @@
         ctx.restore();
       }
     }
-    let worldCycleStart = Date.now();
-    let worldWeatherStart = worldCycleStart;
     const WORLD_WEATHER_INTERVAL_MS = 20 * 60 * 1000;
     const WORLD_RAIN_DURATION_MS = 3 * 60 * 1000;
     const WORLD_DAY_MS = 5 * 60 * 1000;
@@ -1838,7 +1925,7 @@
     let lastWorldClockText = '';
     function getNightAmount(time = Date.now()) {
       const cycle = WORLD_DAY_MS + WORLD_NIGHT_MS;
-      const phase = ((time - worldCycleStart) % cycle + cycle) % cycle;
+      const phase = ((time % cycle) + cycle) % cycle;
       const fade = 30000;
       if (phase < WORLD_DAY_MS) return 0;
       if (phase < WORLD_DAY_MS + fade) return (phase - WORLD_DAY_MS) / fade;
@@ -1846,9 +1933,8 @@
       return Math.max(0, (cycle - phase) / fade);
     }
     function getWorldWeather(time = Date.now()) {
-      const elapsed = Math.max(0, time - worldWeatherStart);
-      if (elapsed < WORLD_WEATHER_INTERVAL_MS) return 'clear';
-      return (elapsed - WORLD_WEATHER_INTERVAL_MS) % WORLD_WEATHER_INTERVAL_MS < WORLD_RAIN_DURATION_MS ? 'rain' : 'clear';
+      const phase = ((time % WORLD_WEATHER_INTERVAL_MS) + WORLD_WEATHER_INTERVAL_MS) % WORLD_WEATHER_INTERVAL_MS;
+      return phase < WORLD_RAIN_DURATION_MS ? 'rain' : 'clear';
     }
     function updateWorldClockLabel(time = Date.now()) {
       const label = document.getElementById('room-indicator');
@@ -1858,9 +1944,7 @@
       const text = `#${currentChannel} · ${night ? '🌙 NIGHT' : '☀ DAY'}${weather === 'rain' ? ' · 🌧 RAIN' : ''}`;
       if (text !== lastWorldClockText) { label.textContent = text; lastWorldClockText = text; }
     }
-
-    function startWorldDayNightCycle() { worldCycleStart = Date.now(); worldWeatherStart = worldCycleStart; lastWorldClockText = ''; updateWorldClockLabel(worldCycleStart); }
-
+    function startWorldDayNightCycle() { lastWorldClockText = ''; updateWorldClockLabel(Date.now()); }
     function drawOuterMeadow(garden, time) {
       const left = camera.x - 90, top = camera.y - 90;
       const width = canvas.width / zoomLevel + 180, height = canvas.height / zoomLevel + 180;
@@ -1911,9 +1995,10 @@
     }
 
     function drawBorderClouds(garden, time) {
-      const inset = 38;
-      const cloudFill = garden ? 'rgba(255,202,221,.48)' : 'rgba(244,255,232,.33)';
-      const cloudHighlight = garden ? 'rgba(255,239,246,.42)' : 'rgba(255,255,245,.36)';
+      const inset = -28;
+      const rainy = getWorldWeather(time) === 'rain';
+      const cloudFill = rainy ? 'rgba(82,101,127,.66)' : garden ? 'rgba(255,202,221,.48)' : 'rgba(244,255,232,.33)';
+      const cloudHighlight = rainy ? 'rgba(188,207,226,.28)' : garden ? 'rgba(255,239,246,.42)' : 'rgba(255,255,245,.36)';
       const visibleLeft = camera.x - 120, visibleTop = camera.y - 120;
       const visibleRight = camera.x + canvas.width / zoomLevel + 120;
       const visibleBottom = camera.y + canvas.height / zoomLevel + 120;
@@ -1950,7 +2035,8 @@
       const sunY = -142;
       ctx.save();
       if (night < .98) {
-        const day = 1 - night;
+        const rainy = getWorldWeather(time) === 'rain';
+        const day = (1 - night) * (rainy ? .26 : 1);
         const halo = ctx.createRadialGradient(sunX, sunY, 5, sunX, sunY, 148 * sizeScale);
         halo.addColorStop(0, garden ? 'rgba(255,221,156,.32)' : 'rgba(255,237,170,.34)');
         halo.addColorStop(.45, garden ? 'rgba(255,218,169,.15)' : 'rgba(255,235,173,.14)'); halo.addColorStop(1, 'rgba(255,239,191,0)');
@@ -2238,12 +2324,12 @@
       ctx.lineWidth = 3; ctx.strokeStyle = garden ? 'rgba(88,62,65,.6)' : 'rgba(51,77,59,.66)';
       for (const edge of ['left','right']) { ctx.beginPath(); ctx.moveTo(banks[0][edge], banks[0].y); for (let i = 1; i < banks.length; i++) ctx.lineTo(banks[i][edge], banks[i].y); ctx.stroke(); }
       const waterGradient = ctx.createLinearGradient(WORLD_SIZE - 250, 0, WORLD_SIZE - 70, 0);
-      if (garden) { waterGradient.addColorStop(0,'#bd6d98'); waterGradient.addColorStop(.24,'#df8fb2'); waterGradient.addColorStop(.58,'#f3bad0'); waterGradient.addColorStop(.82,'#e99fbd'); waterGradient.addColorStop(1,'#b96792'); }
-      else { waterGradient.addColorStop(0,'#408f88'); waterGradient.addColorStop(.3,'#65b9a2'); waterGradient.addColorStop(.68,'#a6d9b4'); waterGradient.addColorStop(1,'#438f86'); }
+      
+      waterGradient.addColorStop(0,'#408f88'); waterGradient.addColorStop(.3,'#65b9a2'); waterGradient.addColorStop(.68,'#a6d9b4'); waterGradient.addColorStop(1,'#438f86');
       fillRibbon(water, waterGradient);
       ctx.lineCap = 'round';
-      for (const edge of ['left','right']) { ctx.beginPath(); ctx.moveTo(water[0][edge], water[0].y); for (let i = 1; i < water.length; i++) ctx.lineTo(water[i][edge], water[i].y); ctx.strokeStyle = garden ? 'rgba(228,247,241,.7)' : 'rgba(226,251,210,.7)'; ctx.lineWidth = 2.5; ctx.stroke(); }
-      const glint = garden ? ['rgba(255,245,251,.8)','rgba(255,214,233,.72)','rgba(255,239,224,.58)'] : ['rgba(250,255,228,.62)','rgba(227,250,199,.54)','rgba(255,244,175,.5)'];
+      for (const edge of ['left','right']) { ctx.beginPath(); ctx.moveTo(water[0][edge], water[0].y); for (let i = 1; i < water.length; i++) ctx.lineTo(water[i][edge], water[i].y); ctx.strokeStyle = garden ? 'rgba(220,248,255,.78)' : 'rgba(226,251,210,.7)'; ctx.lineWidth = 2.5; ctx.stroke(); }
+      const glint = ['rgba(250,255,255,.8)','rgba(214,245,255,.72)','rgba(255,249,226,.58)'];
       for (let i = 0; i < 46; i++) {
         const riverLength = WORLD_SIZE - 76;
         const y = 38 + ((i * 83 + time * .052) % riverLength + riverLength) % riverLength;
@@ -2461,15 +2547,45 @@
     function drawWeatherOverlay(time = Date.now()) {
       if (getWorldWeather(time) !== 'rain') return;
       ctx.save();
-      ctx.fillStyle = 'rgba(42,67,96,.075)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-      const dropCount = Math.min(180, Math.max(55, Math.ceil(canvas.width * canvas.height / 5200)));
-      ctx.lineWidth = 1.25; ctx.lineCap = 'round';
+      ctx.fillStyle = 'rgba(32,51,76,.19)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const sunX = (WORLD_SIZE * .52 - camera.x) * zoomLevel;
+      const sunY = (-142 - camera.y) * zoomLevel;
+      const paintStormCloud = (centerX, centerY, scale, phase) => {
+        ctx.save(); ctx.translate(centerX, centerY); ctx.scale(scale, scale);
+        ctx.globalAlpha = .78; ctx.shadowColor = 'rgba(35,52,76,.52)'; ctx.shadowBlur = 16;
+        const cloud = ctx.createLinearGradient(0, -32, 0, 20);
+        cloud.addColorStop(0, '#9aacc0'); cloud.addColorStop(.55, '#647991'); cloud.addColorStop(1, '#40556e');
+        ctx.fillStyle = cloud; ctx.beginPath();
+        ctx.ellipse(-38, 2, 42, 21, 0, 0, Math.PI * 2);
+        ctx.ellipse(-12, -12, 32, 31, 0, 0, Math.PI * 2);
+        ctx.ellipse(21, -16, 36, 35, 0, 0, Math.PI * 2);
+        ctx.ellipse(50, 1, 39, 22, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0; ctx.globalAlpha = .23; ctx.fillStyle = '#e2eaf2';
+        ctx.beginPath(); ctx.ellipse(5, -28, 27, 6, -.08, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      };
+      const sunVisible = sunX > -150 && sunX < canvas.width + 150 && sunY > -130 && sunY < canvas.height * .68;
+      if (sunVisible) paintStormCloud(sunX, sunY, 1.75, time);
+      const cloudCount = Math.max(3, Math.ceil(canvas.width / 360));
+      for (let i = 0; i < cloudCount; i++) {
+        const travel = (time * (.018 + (i % 3) * .004) + i * 283) % (canvas.width + 260);
+        const x = travel - 130;
+        const y = 25 + (i % 3) * 38 + Math.sin(time * .0007 + i) * 7;
+        if (sunVisible && Math.abs(x - sunX) < 180 && Math.abs(y - sunY) < 85) continue;
+        paintStormCloud(x, y, .92 + (i % 2) * .18, time + i);
+      }
+
+      const dropCount = Math.min(360, Math.max(110, Math.ceil(canvas.width * canvas.height / 3000)));
+      ctx.lineCap = 'round';
       for (let i = 0; i < dropCount; i++) {
-        const x = (i * 137 + time * .19) % canvas.width;
-        const y = (i * 83 + time * .48) % canvas.height;
-        ctx.globalAlpha = .24 + .28 * (Math.sin(time * .002 + i) + 1) / 2;
-        ctx.strokeStyle = i % 3 === 0 ? 'rgba(224,244,255,.82)' : 'rgba(187,221,245,.72)';
-        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 6, y + 13); ctx.stroke();
+        const x = (i * 137 + time * .29) % canvas.width;
+        const y = (i * 83 + time * .72) % canvas.height;
+        const streak = 12 + (i % 4) * 3;
+        ctx.globalAlpha = .42 + .38 * (Math.sin(time * .002 + i) + 1) / 2;
+        ctx.strokeStyle = i % 3 === 0 ? 'rgba(235,248,255,.95)' : 'rgba(198,226,248,.88)';
+        ctx.lineWidth = i % 5 === 0 ? 2 : 1.35;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 8, y + streak); ctx.stroke();
       }
       ctx.restore();
     }
@@ -2848,37 +2964,30 @@
             marketPreviewCtx.fillText(marketTestingItem.name, 90, 125);
             marketPreviewCtx.restore();
           } else if (marketTestingItem.type === 'frames') {
-            // Profile frame preview
+            const colors = marketTestingItem.colors || ['#00d0ff', '#0055ff', '#67e8f9'];
+            const t = Date.now() * .001;
             marketPreviewCtx.save();
-            const frameColor = (marketTestingItem.colors && marketTestingItem.colors[0]) || (marketTestingItem.style === 'sakura' ? '#fb7185' : marketTestingItem.style === 'moon' ? '#38bdf8' : '#fbbf24');
-            marketPreviewCtx.shadowColor = frameColor;
-            marketPreviewCtx.shadowBlur = 25;
-            marketPreviewCtx.strokeStyle = frameColor;
-            marketPreviewCtx.lineWidth = 4;
-            marketPreviewCtx.beginPath();
-            marketPreviewCtx.arc(90, 75, 38, 0, Math.PI * 2);
-            marketPreviewCtx.stroke();
-            
-            marketPreviewCtx.shadowBlur = 0;
-            marketPreviewCtx.fillStyle = '#fce7f3';
-            marketPreviewCtx.beginPath();
-            marketPreviewCtx.arc(90, 75, 34, 0, Math.PI * 2);
-            marketPreviewCtx.fill();
-            
-            marketPreviewCtx.font = '36px sans-serif';
-            marketPreviewCtx.textAlign = 'center';
-            marketPreviewCtx.textBaseline = 'middle';
-            marketPreviewCtx.fillText('🌸', 90, 75);
-            marketPreviewCtx.font = '14px sans-serif';
-            const frameGlyph = marketTestingItem.icon || '✦';
-            for (let i = 0; i < 8; i++) {
-              const angle = i * Math.PI / 4 - Math.PI / 2;
-              marketPreviewCtx.fillText(frameGlyph, 90 + Math.cos(angle) * 39, 75 + Math.sin(angle) * 39);
+            const aura = marketPreviewCtx.createRadialGradient(90, 75, 24, 90, 75, 67);
+            aura.addColorStop(0, `${colors[0]}44`); aura.addColorStop(.65, `${colors[1] || colors[0]}28`); aura.addColorStop(1, 'rgba(255,255,255,0)');
+            marketPreviewCtx.fillStyle = aura; marketPreviewCtx.beginPath(); marketPreviewCtx.arc(90, 75, 68, 0, Math.PI * 2); marketPreviewCtx.fill();
+            const ring = marketPreviewCtx.createLinearGradient(48, 45, 132, 110);
+            colors.forEach((color, index) => ring.addColorStop(index / Math.max(1, colors.length - 1), color));
+            marketPreviewCtx.lineWidth = 8; marketPreviewCtx.strokeStyle = ring; marketPreviewCtx.shadowColor = colors[0]; marketPreviewCtx.shadowBlur = 20;
+            marketPreviewCtx.beginPath(); marketPreviewCtx.arc(90, 75, 39 + Math.sin(t * 2) * 1.5, 0, Math.PI * 2); marketPreviewCtx.stroke();
+            marketPreviewCtx.shadowBlur = 0; marketPreviewCtx.setLineDash([3, 5]); marketPreviewCtx.lineWidth = 1.5; marketPreviewCtx.strokeStyle = 'rgba(255,255,255,.9)';
+            marketPreviewCtx.beginPath(); marketPreviewCtx.arc(90, 75, 46, -t * .55, Math.PI * 1.65 - t * .55); marketPreviewCtx.stroke(); marketPreviewCtx.setLineDash([]);
+            marketPreviewCtx.fillStyle = '#fce7f3'; marketPreviewCtx.beginPath(); marketPreviewCtx.arc(90, 75, 33, 0, Math.PI * 2); marketPreviewCtx.fill();
+            marketPreviewCtx.font = '34px sans-serif'; marketPreviewCtx.textAlign = 'center'; marketPreviewCtx.textBaseline = 'middle'; marketPreviewCtx.fillText('🌸', 90, 75);
+            for (let i = 0; i < 14; i++) {
+              const angle = t * (i % 2 ? -.8 : .62) + i * Math.PI * 2 / 14;
+              const radius = 47 + Math.sin(t * 2 + i) * 4;
+              const px = 90 + Math.cos(angle) * radius, py = 75 + Math.sin(angle) * radius;
+              marketPreviewCtx.globalAlpha = .55 + .4 * (Math.sin(t * 3 + i) + 1) / 2;
+              marketPreviewCtx.fillStyle = colors[i % colors.length]; marketPreviewCtx.shadowColor = colors[0]; marketPreviewCtx.shadowBlur = 8;
+              marketPreviewCtx.beginPath(); marketPreviewCtx.arc(px, py, i % 4 === 0 ? 2.5 : 1.6, 0, Math.PI * 2); marketPreviewCtx.fill();
             }
-            
-            marketPreviewCtx.font = 'bold 11px Manrope';
-            marketPreviewCtx.fillStyle = '#831843';
-            marketPreviewCtx.fillText(marketTestingItem.name, 90, 125);
+            marketPreviewCtx.globalAlpha = 1; marketPreviewCtx.shadowBlur = 0;
+            marketPreviewCtx.font = 'bold 11px Manrope'; marketPreviewCtx.fillStyle = '#831843'; marketPreviewCtx.fillText(marketTestingItem.name, 90, 128);
             marketPreviewCtx.restore();
           } else {
             let sSkin = localPlayer.equippedSkin;
@@ -3034,6 +3143,7 @@
         wrap.style.setProperty('--frame-a', colors[0]);
         wrap.style.setProperty('--frame-b', colors[1] || colors[0]);
         wrap.style.setProperty('--frame-c', colors[2] || colors[0]);
+        if (frameItem.energyClass) wrap.classList.add('energy-frame-wrapper', frameItem.energyClass);
       }
       const face = document.createElement('span');
       face.className = 'avatar-face text-base';
@@ -3051,7 +3161,13 @@
         face.appendChild(stickerNode);
       }
       wrap.appendChild(face);
-      if (frameItem) {
+      if (frameItem && frameItem.energyClass) {
+        const particles = document.createElement('span');
+        particles.className = 'energy-frame-particles'; particles.setAttribute('aria-hidden', 'true');
+        const ring = document.createElement('span');
+        ring.className = 'energy-frame-ring'; ring.setAttribute('aria-hidden', 'true');
+        wrap.append(particles, ring);
+      } else if (frameItem) {
         const motifs = { sakura: ['🌸', '🌿'], snowman: ['❄️', '☃️'], prism: ['✦', '💎'], jade: ['🐉', '🍃'], aurora: ['🌲', '✨'], moon: ['🌙', '✧'], autumn: ['🍁', '🍂'], haunted: ['🦇', '👻'], storm: ['⚡', '🌲'], frost: ['❄️', '🌳'] };
         const [motifA, motifB] = motifs[frameItem.style] || [frameItem.icon || '✦', '✧'];
         const placements = [
@@ -3068,7 +3184,6 @@
       }
       return wrap;
     }
-
     function saveFriendData() {
       localStorage.setItem('sakura_friends', JSON.stringify(friendList));
       localStorage.setItem('sakura_friend_reqs', JSON.stringify(friendRequests));
@@ -3266,13 +3381,33 @@
     }
 
     function selectFriendForDM(friendId) {
-      activeDMUserId = friendId;
+      activeDMUserId = activeDMUserId === friendId ? null : friendId;
       document.querySelectorAll('.friend-row').forEach(row => {
-        const selected = row.dataset.friendId === friendId;
+        const selected = row.dataset.friendId === activeDMUserId;
         row.classList.toggle('bg-sky-100', selected); row.classList.toggle('border-sky-400', selected);
         row.classList.toggle('bg-white/80', !selected); row.classList.toggle('border-pink-200', !selected);
       });
       renderDMBox();
+    }
+
+    function appendDMMessage(message, target) {
+      const container = document.getElementById('dm-messages-container');
+      if (!container || !message) return;
+      const isMe = message.senderId === localPlayer.id;
+      const avatarProfile = isMe ? localPlayer : { pfp: message.pfp || (target && target.pfp), avatarUrl: message.avatarUrl || (target && target.avatarUrl), equippedFrame: message.equippedFrame || (target && target.equippedFrame) };
+      const row = document.createElement('div'); row.className = `flex items-end gap-1.5 ${isMe ? 'justify-end' : 'justify-start'}`;
+      const messageAvatar = makeAvatar(avatarProfile, 'w-6 h-6');
+      if (!isMe) row.appendChild(messageAvatar);
+      const bubble = document.createElement('div');
+      bubble.className = `message-card-chat friend-message-bubble max-w-[82%] rounded-2xl border px-3 py-1.5 font-medium ${isMe ? 'bg-sky-500 text-white border-sky-300' : 'bg-pink-100 text-pink-950 border-pink-200'}`;
+      const messageCard = getMessageCardById(message.equippedMessageCard);
+      if (messageCard) { bubble.classList.add(`chat-card-${messageCard.theme}`); bubble.dataset.messageCard = messageCard.id; }
+      const messageText = document.createElement('span'); messageText.className = 'relative z-[1]'; messageText.textContent = message.text || '';
+      bubble.appendChild(messageText); row.appendChild(bubble);
+      if (isMe) row.appendChild(messageAvatar);
+      container.appendChild(row);
+      container.scrollTop = container.scrollHeight;
+      requestAnimationFrame(() => { if (container.isConnected) container.scrollTop = container.scrollHeight; });
     }
 
     function renderDMBox() {
@@ -3313,29 +3448,8 @@
       input.placeholder = `Message ${target.name || 'player'}...`;
 
       const msgs = dmMessages[activeDMUserId] || [];
-      msgs.forEach(message => {
-        const row = document.createElement('div'); const isMe = message.senderId === localPlayer.id;
-        row.className = `flex items-end gap-1.5 ${isMe ? 'justify-end' : 'justify-start'}`;
-        const avatarProfile = isMe ? localPlayer : { pfp: message.pfp || target.pfp, avatarUrl: message.avatarUrl || target.avatarUrl, equippedFrame: message.equippedFrame || target.equippedFrame };
-        const messageAvatar = makeAvatar(avatarProfile, 'w-6 h-6');
-        if (!isMe) row.appendChild(messageAvatar);
-        
-        // Message card & stickers applied in DM chat: "message card and all the other profile frames and sticker should also apply on the friend chat"
-        const bubble = document.createElement('div');
-        bubble.className = `message-card-chat friend-message-bubble max-w-[82%] rounded-2xl border px-3 py-1.5 font-medium ${isMe ? 'bg-sky-500 text-white border-sky-300' : 'bg-pink-100 text-pink-950 border-pink-200'}`;
-        const messageCard = getMessageCardById(message.equippedMessageCard);
-        if (messageCard) { bubble.classList.add(`chat-card-${messageCard.theme}`); bubble.dataset.messageCard = messageCard.id; }
-        
-        const messageText = document.createElement('span'); messageText.className = 'relative z-[1]'; messageText.textContent = message.text;
-        bubble.appendChild(messageText);
-        row.appendChild(bubble); 
-        if (isMe) row.appendChild(messageAvatar); 
-        container.appendChild(row);
-      });
-
-      setTimeout(() => {
-        container.scrollTop = container.scrollHeight;
-      }, 50);
+      msgs.forEach(message => appendDMMessage(message, target));
+      container.scrollTop = container.scrollHeight;
     }
 
     function handleDMSubmit(e) {
@@ -3352,8 +3466,9 @@
       dmMessages[activeDMUserId].push(body);
       localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
       sendSocialBroadcast('direct_msg', { targetId: activeDMUserId, ...body });
-      input.value = ''; 
-      renderDMBox();
+      const currentTarget = developerDM ? (staffDMProfile || remotePlayers[activeDMUserId] || friendList.find(entry => entry.id === activeDMUserId)) : friendList.find(entry => entry.id === activeDMUserId);
+      appendDMMessage(body, currentTarget);
+      input.value = '';
     }
 
     // PROFILE SETTINGS & SIGN OUT
@@ -3431,7 +3546,7 @@
         localPlayer.equippedTitle = profile.equipped_title || null;
         localPlayer.equippedEmote = profile.equipped_emote || null;
         localPlayer.equippedMessageCard = localPlayer.inventory.includes(profile.equipped_message_card) ? profile.equipped_message_card : null;
-        localPlayer.equippedFrame = null;
+        localPlayer.equippedFrame = localPlayer.inventory.includes(profile.equipped_frame) ? profile.equipped_frame : null;
       }
       const { data: role, error: roleError } = await supabaseClient.rpc('get_my_role');
       localPlayer.role = roleError ? 'player' : (role || 'player');
@@ -3464,7 +3579,7 @@
       localPlayer.equippedTitle = profile.equipped_title || null;
       localPlayer.equippedEmote = profile.equipped_emote || null;
       localPlayer.equippedMessageCard = localPlayer.inventory.includes(profile.equipped_message_card) ? profile.equipped_message_card : null;
-      localPlayer.equippedFrame = null;
+      localPlayer.equippedFrame = localPlayer.inventory.includes(profile.equipped_frame) ? profile.equipped_frame : null;
       const { data: role } = await supabaseClient.rpc('get_my_role');
       if (role && ['player', 'admin', 'developer'].includes(role)) localPlayer.role = role;
       if (!['admin', 'developer'].includes(localPlayer.role)) {
@@ -3806,19 +3921,24 @@
         .on('broadcast', { event: 'direct_msg' }, async ({ payload }) => {
           if (!payload || payload.targetId !== localPlayer.id || !isValidUserId(payload.senderId)) return;
           const isFriend = friendList.some(f => f.id === payload.senderId && f.accepted);
-          const senderRole = await getTrustedUserRole(payload.senderId);
+          let senderRole = 'player';
+          if (!isFriend && localPlayer.role !== 'developer') senderRole = await getTrustedUserRole(payload.senderId);
           if (!isFriend && senderRole !== 'developer' && localPlayer.role !== 'developer') return;
           if (!dmMessages[payload.senderId]) dmMessages[payload.senderId] = [];
-          dmMessages[payload.senderId].push({ senderId: payload.senderId, text: payload.text, time: Date.now(), pfp: payload.pfp, avatarUrl: payload.avatarUrl, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard });
+          const incomingMessage = { senderId: payload.senderId, text: payload.text, time: Date.now(), pfp: payload.pfp, avatarUrl: payload.avatarUrl, equippedFrame: payload.equippedFrame, equippedMessageCard: payload.equippedMessageCard };
+          dmMessages[payload.senderId].push(incomingMessage);
           localStorage.setItem('sakura_dms', JSON.stringify(dmMessages));
           markFriendsUnread();
-          if (activeDMUserId === payload.senderId) renderDMBox();
+          if (activeDMUserId === payload.senderId) {
+            const target = friendList.find(friend => friend.id === payload.senderId) || remotePlayers[payload.senderId] || staffDMProfile;
+            appendDMMessage(incomingMessage, target);
+          }
         })
         .on('broadcast', { event: 'lobby_music_update' }, ({ payload }) => { 
           if (payload && payload.payloadStr) {
             try {
               const parsed = JSON.parse(payload.payloadStr);
-              setLobbyMusicPlaylist(parsed.playlist, parsed.uploaderId);
+              setLobbyMusicPlaylist(parsed.playlist, parsed.uploaderId, Number.isInteger(parsed.activeIndex) ? parsed.activeIndex : null, parsed.playNow === true, Number.isFinite(parsed.activeStartedAt) ? parsed.activeStartedAt : null);
             } catch(e) {
               setLobbyMusicPlaylist(payload.payloadStr);
             }
@@ -4153,7 +4273,7 @@
     let petalCatchMoveTimer = null;
     let petalCatchActive = false;
     let petalCatchScore = 0;
-    let petalCatchRemaining = 14;
+    let petalCatchRemaining = 17;
     function openPetalCatchGame() {
       closeGamesModal();
       document.getElementById('petal-catch-modal').classList.remove('hidden');
@@ -4168,9 +4288,9 @@
     function resetPetalCatchGame() {
       window.clearInterval(petalCatchTimer); petalCatchTimer = null;
       window.clearInterval(petalCatchMoveTimer); petalCatchMoveTimer = null; petalCatchActive = false;
-      petalCatchScore = 0; petalCatchRemaining = 14;
+      petalCatchScore = 0; petalCatchRemaining = 17;
       document.getElementById('petal-catch-score').textContent = 'Blossoms: 0 / 10';
-      document.getElementById('petal-catch-time').textContent = 'Time: 14s';
+      document.getElementById('petal-catch-time').textContent = 'Time: 17s';
       document.getElementById('petal-catch-status').textContent = 'Press Start, then tap the floating blossom.';
       document.getElementById('petal-catch-target').disabled = true;
       document.getElementById('petal-catch-target').classList.add('opacity-40');
@@ -4192,7 +4312,7 @@
       document.getElementById('petal-catch-status').textContent = 'Go! Catch the blossom before it drifts away.';
       document.getElementById('petal-catch-start').textContent = 'Restart';
       movePetalCatchTarget();
-      petalCatchMoveTimer = window.setInterval(movePetalCatchTarget, 1050);
+      petalCatchMoveTimer = window.setInterval(movePetalCatchTarget, 1300);
       petalCatchTimer = window.setInterval(() => {
         petalCatchRemaining--;
         document.getElementById('petal-catch-time').textContent = `Time: ${petalCatchRemaining}s`;
